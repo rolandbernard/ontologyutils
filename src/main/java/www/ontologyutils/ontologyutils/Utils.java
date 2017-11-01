@@ -15,6 +15,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -76,6 +77,18 @@ public class Utils {
 		}
 
 		return ontology;
+	}
+	
+	public static OWLOntology newOntologyExcludeNonLogicalAxioms(String ontologyFilePath) {
+		OWLOntology ontology = newOntology(ontologyFilePath);
+		
+		// exclude non-logical axioms: keeping ABox, TBox, RBox axioms
+		OWLOntology result = newEmptyOntology();
+		result.addAxioms(ontology.aboxAxioms(Imports.EXCLUDED));
+		result.addAxioms(ontology.tboxAxioms(Imports.EXCLUDED));
+		result.addAxioms(ontology.rboxAxioms(Imports.EXCLUDED));
+		
+		return result;
 	}
 
 	public static boolean isConsistent(OWLOntology ontology) {
