@@ -1,4 +1,4 @@
-package www.ontologyutils.ontologyutils;
+package www.ontologyutils.apps;
 
 /**
  * Hello world!

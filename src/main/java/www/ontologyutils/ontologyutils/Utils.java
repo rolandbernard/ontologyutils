@@ -1,17 +1,22 @@
 package www.ontologyutils.ontologyutils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.semanticweb.HermiT.Configuration;
+import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
+import org.semanticweb.owlapi.model.OWLObjectComplementOf;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -41,6 +46,24 @@ public class Utils {
 		log("Utils", message);
 	}
 	
+	/**
+	 * @param owlString
+	 * @return
+	 */
+	public static String pretty(String owlString) {
+		return owlString.replaceAll("<http.*?#", "").replaceAll(">", "").replaceAll("<", "");
+	}
+	
+	/**
+	 * @param ontology
+	 * 
+	 *            Prints the TBox of {@code ontology} on the standard output.
+	 */
+	public static void printTBox(OWLOntology ontology) {
+		Stream<OWLAxiom> tBoxAxioms = ontology.tboxAxioms(Imports.EXCLUDED);
+		tBoxAxioms.forEach((ax) -> System.out.println(pretty(ax.toString())));
+	}
+
 	public static OWLOntology newEmptyOntology() {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology newOntology = null;
@@ -91,11 +114,26 @@ public class Utils {
 		return result;
 	}
 
-	public static boolean isConsistent(OWLOntology ontology) {
+	/**
+	 * @param ontology
+	 * @return a JFact reasoner for {@code ontology}
+	 */
+	public static OWLReasoner getFactReasoner(OWLOntology ontology) {
 		OWLReasonerFactory reasonerFactory = new JFactFactory();
-		OWLReasonerConfiguration config = new SimpleConfiguration(5000);
-		OWLReasoner reasoner = reasonerFactory.createReasoner(ontology, config);
+		OWLReasonerConfiguration config = new SimpleConfiguration(50000);
+		return reasonerFactory.createReasoner(ontology, config);
+	}
 
+	/**
+	 * @param ontology
+	 * @return a Hermit reasoner for {@code ontology}
+	 */
+	public static OWLReasoner getHermitReasoner(OWLOntology ontology) {
+		return new Reasoner(new Configuration(), ontology);
+	}
+	
+	public static boolean isConsistent(OWLOntology ontology) {
+		OWLReasoner reasoner = getFactReasoner(ontology);
 		boolean result = reasoner.isConsistent();
 		reasoner.dispose();
 
@@ -112,6 +150,101 @@ public class Utils {
 		consistency = isConsistent(newOntology(axioms.stream()));
 		uglyAxiomSetConsistencyCache.put(axioms, consistency);
 		return consistency;
+	}
+
+	/**
+	 * @param ontology
+	 * @return the set of {@code OWLClassExpression} in {@code ontology}
+	 */
+	public static Set<OWLClassExpression> getSubOfTBox(OWLOntology ontology) {
+		return getSubConceptsOfAxioms(ontology.tboxAxioms(Imports.EXCLUDED));
+	}
+
+	public static Set<OWLClassExpression> getSubConceptsOfAxioms(Stream<OWLAxiom> axioms) {
+
+		Set<OWLClassExpression> subConcepts = new HashSet<>();
+
+		axioms.forEach((ax) -> {
+			ax.nestedClassExpressions().forEach((nce) -> {
+				if (!subConcepts.contains(nce)) {
+					subConcepts.add(nce);
+				}
+			});
+		});
+
+		return subConcepts;
+	}
+	
+
+	/**
+	 * @param c1
+	 * @param c2
+	 * @return true when {@code c1} and {@code c2} are the same concept at the
+	 *         syntactic level. E.g., C1 = exists p. (A or B) is the same as C2 =
+	 *         exists p. (A or B), even if the representing objects are different,
+	 *         that is they are the same even if C1 != C2 or !C1.equals(C2). On the
+	 *         other hand, we say that A and B is the same as B and A.
+	 */
+	public static boolean sameConcept(OWLClassExpression c1, OWLClassExpression c2) {
+		if (c1 == c2) {
+			return true;
+		}
+		if (c1.getClassExpressionType() != c2.getClassExpressionType()) {
+			return false;
+		}
+		switch (c1.getClassExpressionType()) {
+		case OWL_CLASS: {
+			return c1.equals(c2);
+		}
+		case OBJECT_COMPLEMENT_OF: {
+			OWLClassExpression op1 = ((OWLObjectComplementOf) c1).getOperand();
+			OWLClassExpression op2 = ((OWLObjectComplementOf) c2).getOperand();
+			return sameConcept(op1, op2);
+		}
+		case OBJECT_UNION_OF: {
+			Set<OWLClassExpression> disjuncts1 = c1.asDisjunctSet();
+			Set<OWLClassExpression> disjuncts2 = c2.asDisjunctSet();
+			if (disjuncts1.size() != disjuncts2.size()) {
+				return false;
+			}
+			for (OWLClassExpression e : disjuncts1) {
+				if (disjuncts2.stream().allMatch(c -> !sameConcept(c, e))) {
+					return false;
+				}
+			}
+			return true;
+		}
+		case OBJECT_INTERSECTION_OF: {
+			Set<OWLClassExpression> conjuncts1 = c1.asConjunctSet();
+			Set<OWLClassExpression> conjuncts2 = c2.asConjunctSet();
+			if (conjuncts1.size() != conjuncts2.size()) {
+				return false;
+			}
+			for (OWLClassExpression e : conjuncts1) {
+				if (conjuncts2.stream().allMatch(c -> !sameConcept(c, e))) {
+					return false;
+				}
+			}
+			return true;
+		}
+		case OBJECT_SOME_VALUES_FROM: {
+			OWLClassExpression op1 = ((OWLObjectSomeValuesFrom) c1).getFiller();
+			OWLObjectPropertyExpression prop1 = ((OWLObjectSomeValuesFrom) c1).getProperty();
+			OWLClassExpression op2 = ((OWLObjectSomeValuesFrom) c2).getFiller();
+			OWLObjectPropertyExpression prop2 = ((OWLObjectSomeValuesFrom) c2).getProperty();
+			return prop1.equals(prop2) && sameConcept(op1, op2);
+		}
+		case OBJECT_ALL_VALUES_FROM: {
+			OWLClassExpression op1 = ((OWLObjectAllValuesFrom) c1).getFiller();
+			OWLObjectPropertyExpression prop1 = ((OWLObjectAllValuesFrom) c1).getProperty();
+			OWLClassExpression op2 = ((OWLObjectAllValuesFrom) c2).getFiller();
+			OWLObjectPropertyExpression prop2 = ((OWLObjectAllValuesFrom) c2).getProperty();
+			return prop1.equals(prop2) && sameConcept(op1, op2);
+		}
+		default:
+			throw new RuntimeException();
+		}
+
 	}
 
 	public static <T> Set<Set<T>> powerSet(Set<T> set) {
@@ -135,103 +268,6 @@ public class Utils {
 		return stream.collect(Collectors.toSet());
 	}
 
-	public static boolean isMaximallyConsistentSubset(Set<OWLAxiom> subset, Set<OWLAxiom> set) {
-		return isConsistent(subset) && powerSet(set).stream()
-				.allMatch(s -> (s.equals(subset) || !s.containsAll(subset) || !isConsistent(s)));
-	}
 
-	private static HashMap<Set<OWLAxiom>, Set<Set<OWLAxiom>>> uglyMaximalConsistentSubsetsCache = new HashMap<>();
-
-	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms) {
-
-		Set<Set<OWLAxiom>> results = uglyMaximalConsistentSubsetsCache.get(axioms);
-		if (results != null) {
-			return results;
-		}
-		results = new HashSet<>();
-
-		for (Set<OWLAxiom> candidate : powerSet(axioms)) {
-			if (isMaximallyConsistentSubset(candidate, axioms)) {
-				results.add(candidate);
-			}
-		}
-		uglyMaximalConsistentSubsetsCache.put(axioms, results);
-		return results;
-	}
-
-	/**
-	 * @author nico
-	 *
-	 *         Ad hoc data structure to be used in the function
-	 *         {@link maximalConsistentSubsets} implementing Robert Malouf's
-	 *         "Maximal Consistent Subsets", Computational Linguistics, vol 33(2),
-	 *         p.153-160, 2007.
-	 * @see maximalConsistentSubsets(Set<OWLAxiom> axioms)
-	 */
-	private static class McsStruct {
-		Set<OWLAxiom> axioms;
-		int k;
-		boolean leftmost;
-
-		McsStruct(Set<OWLAxiom> axioms, int k, boolean leftmost) {
-			this.axioms = axioms;
-			this.k = k;
-			this.leftmost = leftmost;
-		}
-	}
-
-	/**
-	 * @param axioms
-	 *            a set of axioms
-	 * @return the set of maximal consistent subsets of axioms.
-	 */
-	public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Set<OWLAxiom> axioms) {
-		// This implementation follows the algorithm in Robert Malouf's "Maximal
-		// Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.
-
-		ArrayList<OWLAxiom> orderedAxioms = new ArrayList<OWLAxiom>(axioms);
-
-		Set<Set<OWLAxiom>> results = uglyMaximalConsistentSubsetsCache.get(axioms);
-		if (results != null) {
-			return results;
-		}
-		results = new HashSet<>();
-
-		LinkedList<McsStruct> Q = new LinkedList<>();
-		Q.add(new McsStruct(axioms, 0, false));
-
-		while (!Q.isEmpty()) {
-			McsStruct current = Q.poll(); // retrieve and dequeue
-			if (isConsistent(current.axioms)) {
-				if (results.stream().allMatch(mcs -> !mcs.containsAll(current.axioms))) {
-					// current.axioms is an mcs
-					results.add(current.axioms);
-				}
-			} else {
-				Set<OWLAxiom> L = new HashSet<>();
-				for (OWLAxiom ax : current.axioms) {
-					if (orderedAxioms.indexOf(ax) + 1 <= current.k) {
-						L.add(ax);
-					}
-				} // L is current.axioms's deepest leaf
-				if (current.leftmost || isConsistent(L)) {
-					boolean leftmost = true;
-					for (int i = current.k + 1; i <= orderedAxioms.size(); i++) {
-						Set<OWLAxiom> newSet = new HashSet<>();
-						for (OWLAxiom ax : current.axioms) {
-							if (orderedAxioms.indexOf(ax) + 1 != i) {
-								newSet.add(ax);
-							}
-						}
-						Q.add(new McsStruct(newSet, i, leftmost)); // enqueue
-						leftmost = false;
-					}
-				}
-			}
-		}
-
-		uglyMaximalConsistentSubsetsCache.put(axioms, results);
-		return results;
-	}
 
 }
