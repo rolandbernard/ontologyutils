@@ -154,7 +154,7 @@ public class Utils {
 
 	/**
 	 * @param ontology
-	 * @return the set of {@code OWLClassExpression} in {@code ontology}
+	 * @return the set of {@code OWLClassExpression} in the {@code ontology} TBox
 	 */
 	public static Set<OWLClassExpression> getSubOfTBox(OWLOntology ontology) {
 		return getSubConceptsOfAxioms(ontology.tboxAxioms(Imports.EXCLUDED));
