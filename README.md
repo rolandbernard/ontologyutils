@@ -334,37 +334,37 @@ To rules
 
 where
 a13		Integer
-a16			owl:Thing
-a28				Animal
-a2					Number
-a19						FRESH#[ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))]
-a25										       FRESH#[ObjectComplementOf(Black)]
-a21											FRESH#[ObjectAllValuesFrom(hasColour Black)]
-a27															     PhysicalObject
-r2															      hasQuality
-r1															       hasColour
-a3															        FRESH#[ObjectAllValuesFrom(hasColour White)]
-a20																				     WhiteCat
-a4																				      FRESH#[ObjectSomeValuesFrom(hasColour Black)]
-a17																				      					    FRESH#[ObjectComplementOf(White)]
-a14																									     Colour
-a6																									      FRESH#[ObjectSomeValuesFrom(hasColour White)]
-a22																									      					    FRESH#[ObjectComplementOf(Primeness)]
-a24																														     Primeness
-a9																														      FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))]
-a15																														      					    BlackCat
-a1																																			     GrayScale
-a18																																			      White
-a5																																			       AbstractObject
-a11																																			        Quality
-r3																																				 owl:topObjectProperty
-a8																																				  Pet
-a12																																				   owl:Nothing
-a7																																				    FRESH#[ObjectAllValuesFrom(hasQuality Primeness)]
-a23																																				    					  PrimeNumber
-a10																																									   Cat
-a26																																									    FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))]
-a29																																									    					  Black
+a16		owl:Thing
+a28		Animal
+a2		Number
+a19		FRESH#[ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))]
+a25		FRESH#[ObjectComplementOf(Black)]
+a21		FRESH#[ObjectAllValuesFrom(hasColour Black)]
+a27		PhysicalObject
+r2		hasQuality
+r1		hasColour
+a3		FRESH#[ObjectAllValuesFrom(hasColour White)]
+a20		WhiteCat
+a4		FRESH#[ObjectSomeValuesFrom(hasColour Black)]
+a17		FRESH#[ObjectComplementOf(White)]
+a14		Colour
+a6		FRESH#[ObjectSomeValuesFrom(hasColour White)]
+a22		FRESH#[ObjectComplementOf(Primeness)]
+a24		Primeness
+a9		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))]
+a15		BlackCat
+a1		GrayScale
+a18		White
+a5		AbstractObject
+a11		Quality
+r3		owl:topObjectProperty
+a8		Pet
+a12		owl:Nothing
+a7		FRESH#[ObjectAllValuesFrom(hasQuality Primeness)]
+a23		PrimeNumber
+a10		Cat
+a26		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))]
+a29		Black
 
 CONDOR NORMALIZATION
 
@@ -494,53 +494,53 @@ To rules
 
 where
 a22		Integer
-a12			owl:Thing
-a39				Animal
-a10					FRESH#[ObjectComplementOf(Quality)]
-a20						FRESH#[ObjectIntersectionOf(Cat ObjectSomeValuesFrom(hasColour Black) ObjectAllValuesFrom(hasColour Black))]
-a26										Number
-a13											FRESH#[ObjectIntersectionOf(Cat ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))) ObjectSomeValuesFrom(hasColour White))]
-a38															FRESH#[ObjectAllValuesFrom(hasQuality Quality)]
-a6																			      FRESH#[ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))]
-a21																			      					     FRESH#[ObjectComplementOf(Black)]
-a44																								      FRESH#[ObjectAllValuesFrom(hasColour Black)]
-a8																								      					   PhysicalObject
-r1																													    hasQuality
-a5																													     FRESH#[ObjectSomeValuesFrom(hasQuality owl:Thing)]
-r3																													     					    hasColour
-a42																																		     FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(White)))]
-a24																																		     							      FRESH#[ObjectAllValuesFrom(hasColour White)]
-a28																																									      					   WhiteCat
-a29																																														    FRESH#[ObjectComplementOf(PhysicalObject)]
-a23																																														     FRESH#[ObjectSomeValuesFrom(hasColour Black)]
-a27																																														     					   FRESH#[ObjectComplementOf(White)]
-a31																																																			    Colour
-a36																																																			     FRESH#[ObjectSomeValuesFrom(hasColour White)]
-a15																																																			     					   FRESH#[ObjectIntersectionOf(Integer ObjectComplementOf(ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))))]
-a7																																																								   				       FRESH#[ObjectComplementOf(Primeness)]
-a30																																																												        FRESH#[ObjectIntersectionOf(Integer ObjectAllValuesFrom(hasQuality Primeness))]
-a37																																																																	    Primeness
-a16																																																																	     BlackCat
-a43																																																																	      FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))]
-a40																																																																	      					    GrayScale
-a14																																																																						     White
-a41																																																																						      FRESH#[ObjectComplementOf(AbstractObject)]
-a1																																																																						       AbstractObject
-a34																																																																						        Quality
-a32																																																																							 FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black)))]
-a35																																																																							 							  FRESH#[ObjectIntersectionOf(Cat ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))) ObjectSomeValuesFrom(hasColour Black))]
-a17																																																																														  				  FRESH#[ObjectAllValuesFrom(hasColour Colour)]
-r2																																																																																		  				       owl:topObjectProperty
-a11																																																																																						        Pet
-a33																																																																																							 FRESH#[ObjectSomeValuesFrom(hasColour owl:Thing)]
-a45																																																																																							 				       FRESH#[ObjectIntersectionOf(Cat ObjectSomeValuesFrom(hasColour White) ObjectAllValuesFrom(hasColour White))]
-a3																																																																																											       				       owl:Nothing
-a9																																																																																															        FRESH#[ObjectAllValuesFrom(hasQuality Primeness)]
-a4																																																																																																				      PrimeNumber
-a19																																																																																																				       FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness)))]
-a25																																																																																																				       								 Cat
-a18																																																																																																												  FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))]
-a2																																																																																																												  					Black
+a12		owl:Thing
+a39		Animal
+a10		FRESH#[ObjectComplementOf(Quality)]
+a20		FRESH#[ObjectIntersectionOf(Cat ObjectSomeValuesFrom(hasColour Black) ObjectAllValuesFrom(hasColour Black))]
+a26		Number
+a13		FRESH#[ObjectIntersectionOf(Cat ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))) ObjectSomeValuesFrom(hasColour White))]
+a38		FRESH#[ObjectAllValuesFrom(hasQuality Quality)]
+a6		FRESH#[ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))]
+a21		FRESH#[ObjectComplementOf(Black)]
+a44		FRESH#[ObjectAllValuesFrom(hasColour Black)]
+a8		PhysicalObject
+r1		hasQuality
+a5		FRESH#[ObjectSomeValuesFrom(hasQuality owl:Thing)]
+r3		hasColour
+a42		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(White)))]
+a24		FRESH#[ObjectAllValuesFrom(hasColour White)]
+a28		WhiteCat
+a29		FRESH#[ObjectComplementOf(PhysicalObject)]
+a23		FRESH#[ObjectSomeValuesFrom(hasColour Black)]
+a27		FRESH#[ObjectComplementOf(White)]
+a31		Colour
+a36		FRESH#[ObjectSomeValuesFrom(hasColour White)]
+a15		FRESH#[ObjectIntersectionOf(Integer ObjectComplementOf(ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))))]
+a7		FRESH#[ObjectComplementOf(Primeness)]
+a30		FRESH#[ObjectIntersectionOf(Integer ObjectAllValuesFrom(hasQuality Primeness))]
+a37		Primeness
+a16		BlackCat
+a43		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))]
+a40		GrayScale
+a14		White
+a41		FRESH#[ObjectComplementOf(AbstractObject)]
+a1		AbstractObject
+a34		Quality
+a32		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black)))]
+a35		FRESH#[ObjectIntersectionOf(Cat ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))) ObjectSomeValuesFrom(hasColour Black))]
+a17		FRESH#[ObjectAllValuesFrom(hasColour Colour)]
+r2		owl:topObjectProperty
+a11		Pet
+a33		FRESH#[ObjectSomeValuesFrom(hasColour owl:Thing)]
+a45		FRESH#[ObjectIntersectionOf(Cat ObjectSomeValuesFrom(hasColour White) ObjectAllValuesFrom(hasColour White))]
+a3		owl:Nothing
+a9		FRESH#[ObjectAllValuesFrom(hasQuality Primeness)]
+a4		PrimeNumber
+a19		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness)))]
+a25		Cat
+a18		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))]
+a2		Black
 
 Finished.
 ```
