@@ -9,12 +9,11 @@ A suite of utility functions and applications for engineering OWL ontologies.
 
 The function `MaximalConsistentSets#maximalConsistentSubsets` takes a set of axioms in parameter and returns the set of maximally consistent subsets.
 
-It is an implementation of the algorithm presented in Robert Malouf's "Maximal Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.
-
+It is an implementation of the algorithm presented in Robert Malouf's "Maximal Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.`
 
 ## TBox Normalization and rule generation
 
-The function `Normalization#normalizeCondor` returns normalized version of the input ontology, following the procedure of Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies" (IJCAI 2011). The function `Normalization#normalizeNaive" is a more naive normalization, which normalizes every subclass axiom individually, using exclusively the function `NormalizationTools#normalizeSubClassAxiom`. If the TBox of the original ontology does not have only subclass types of axioms, some preprocessing is necessary using `NormalizationsTools#asSubClassOfAxioms`. Not every TBox can be converted.
+The function `Normalization#normalizeCondor` returns normalized version of the input ontology, following the procedure of Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies" (IJCAI 2011). The function `Normalization#normalizeNaive` is a more naive normalization, which normalizes every subclass axiom individually, using exclusively the function `NormalizationTools#normalizeSubClassAxiom`. If the TBox of the original ontology does not have only subclass types of axioms, some preprocessing is necessary using `NormalizationsTools#asSubClassOfAxioms`. Not every TBox can be converted.
 
 Both normalization functions return an ontology who TBox contains only subclass axioms in normal form: A TBox axiom in normal form can be of one of four types:
 
@@ -181,7 +180,7 @@ If the TBox of the original ontology does not have only subclass types of axioms
 
 ## Example
 
-Running `AppNormalization` with `resources/catsandnumbers.col` as argument gives these results:
+Running `AppNormalization` with `resources/catsandnumbers.owl` as argument gives these results:
 
 ```
 Ontology http://www.semanticweb.org/ontologies/dl2017_example loaded.
