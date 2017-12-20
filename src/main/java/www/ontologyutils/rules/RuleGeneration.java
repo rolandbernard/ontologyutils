@@ -35,10 +35,11 @@ public class RuleGeneration {
 		OWLClassExpression right = ((OWLSubClassOfAxiom) ax).getSuperClass();
 
 		if (NormalForm.typeOneSubClassAxiom(left, right)) {
-			// (isAtom(left) || isConjunctionOfAtoms(left)) && (isAtom(right) || isDisjunctionOfAtoms(right))
-			String res = "a(1, (";
+			// (isAtom(left) || isConjunctionOfAtoms(left)) && (isAtom(right) ||
+			// isDisjunctionOfAtoms(right))
+			String res = "a(1, ";
 			if (NormalForm.isAtom(left)) {
-				res += map.get(left);
+				res += map.get(left) + ", " + map.get(left);
 			} else {
 				boolean first = true;
 				for (OWLClassExpression e : left.asConjunctSet()) {
@@ -50,9 +51,9 @@ public class RuleGeneration {
 					}
 				}
 			}
-			res += "), (";
+			res += ", (";
 			if (NormalForm.isAtom(right)) {
-				res += map.get(right);
+				res += map.get(right) + ",";
 			} else {
 				boolean first = true;
 				for (OWLClassExpression e : right.asDisjunctSet()) {

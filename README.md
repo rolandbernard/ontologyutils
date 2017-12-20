@@ -29,11 +29,13 @@ Both normalization functions return an ontology who TBox contains only subclass 
 The function `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. 
 It takes an axiom of Type1-4 and returns a string representation. E.g.,
 
-* Type1 axiom SubClass(Conjunction(A B), C) becomes (1,a7,a12,|,a13)
+* Type1 axiom SubClass(Conjunction(A B), C) becomes a(1, a7, a12, (a13,))
 
-* Type1 axiom SubClass(Conjunction(A B), Disjunction(C,D)) becomes (1,a7,a12,|,a13,a4)
+* Type1 axiom SubClass(Conjunction(A B), Disjunction(C,D)) becomes a(1, a7, a12, (a13, a4))
 
-* Type3 axiom Subclass(A, forall hasProperty B) becomes (3,a7,r3,a12)
+* Type1 axiom SubClass(A, Disjunction(C,D)) becomes a(1, a7, a7, (a13, a4))
+
+* Type3 axiom Subclass(A, forall hasProperty B) becomes a(3, a7, r3, a12)
 
 
 
@@ -45,7 +47,7 @@ The directory `resources/` contains test OWL ontology.
 
 # App example: show ontology #
 
-The app AppShowOntology allows one to display a "human readable" form of an OWL ontology.
+The app `AppShowOntology` allows one to display a "human readable" form of an OWL ontology.
 
 `AppShowOntology resources/bodysystem.owl` prints:
 
@@ -138,11 +140,13 @@ AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#UrinarySystem> "Ur
 AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#AutonomicNervousSystem> "Autonomic Nervous System"^^xsd:string)
 AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#NervousSystem> "Nervous System"^^xsd:string)
 AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#MentalSystem> "Mental System"^^xsd:string)
+
 ```
 
 
 # App example: TBox normalizations #
 
+We present `AppNormalize`.
 
 We provide the tools to convert the TBox an ontology into a normalized form. An axiom is in normalized form when it has one of the following forms. This might change in the future.
 
@@ -164,23 +168,26 @@ If the TBox of the original ontology does not have only subclass types of axioms
 
 * `normalizeNaive` which normalizes every subclass axiom individually, using exclusively the function `NormalizationTools.normalizeSubClassAxiom`.
  
+(See also `AppSuperNormalize` which only allows Type1 axioms with at most two conjuncts at the left.)
 
 
 ## Rule generation
 
+The function `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. 
+It takes an axiom of Type1-4 and returns a string representation. E.g.,
 
-`RuleGeneration.java` contains `normalizedSubClassAxiomToRule` which takes an axiom of Type1-4 and returns a string representation. E.g.,
+* Type1 axiom SubClass(Conjunction(A B), C) becomes a(1, a7, a12, (a13,))
 
-* Type1 axiom SubClass(Conjunction(A B), C) becomes (1,a7,a12,|,a13)
+* Type1 axiom SubClass(Conjunction(A B), Disjunction(C,D)) becomes a(1, a7, a12, (a13, a4))
 
-* Type1 axiom SubClass(Conjunction(A B), Disjunction(C,D)) becomes (1,a7,a12,|,a13,a4)
+* Type1 axiom SubClass(A, Disjunction(C,D)) becomes a(1, a7, a7, (a13, a4))
 
-* Type3 axiom Subclass(A, forall hasProperty B) becomes (3,a7,r3,a12)
+* Type3 axiom Subclass(A, forall hasProperty B) becomes a(3, a7, r3, a12)
 
 
 ## Example
 
-Running `AppNormalization` with `resources/catsandnumbers.owl` as argument gives these results:
+Running `AppNormalize` with `resources/catsandnumbers.owl` as argument gives these results:
 
 ```
 Ontology http://www.semanticweb.org/ontologies/dl2017_example loaded.
@@ -303,64 +310,64 @@ nc(a23).
 nc(a16).
 nc(a10).
 nc(a14).
-a(1, (a18), (a17)).
+a(1, a18, a18, (a17,)).
 a(3, a3, r2, a24).
-a(1, (a3, a19), (a23)).
-a(1, (a29), (a3, a11)).
+a(1, a3, a19, (a23,)).
+a(1, a29, a29, (a3, a11)).
 a(2, a11, r2, a5).
 a(4, a5, r2, a11).
-a(1, (a5, a24), (a28)).
-a(1, (a29), (a5, a24)).
-a(1, (a5, a24), (a28)).
-a(1, (a29), (a5, a24)).
-a(1, (a12, a22), (a28)).
-a(1, (a14, a26), (a28)).
-a(1, (a23), (a19)).
+a(1, a5, a24, (a28,)).
+a(1, a29, a29, (a5, a24)).
+a(1, a5, a24, (a28,)).
+a(1, a29, a29, (a5, a24)).
+a(1, a12, a22, (a28,)).
+a(1, a14, a26, (a28,)).
+a(1, a23, a23, (a19,)).
 a(3, a23, r2, a24).
-a(1, (a16), (a21)).
-a(1, (a15), (a16)).
+a(1, a16, a16, (a21,)).
+a(1, a15, a15, (a16,)).
 a(2, a15, r1, a14).
 a(3, a15, r1, a14).
 a(2, a7, r1, a14).
 a(4, a14, r1, a7).
 a(3, a1, r1, a14).
-a(1, (a1, a7, a16), (a15)).
-a(1, (a29), (a1, a9)).
+a(1, a1, a7, a16, (a15,)).
+a(1, a29, a29, (a1, a9)).
 a(2, a9, r1, a4).
 a(4, a4, r1, a9).
-a(1, (a4, a14), (a28)).
-a(1, (a29), (a4, a14)).
-a(1, (a4, a14), (a28)).
-a(1, (a29), (a4, a14)).
-a(1, (a14), (a18)).
-a(1, (a20), (a12)).
-a(1, (a12, a22), (a28)).
+a(1, a4, a14, (a28,)).
+a(1, a29, a29, (a4, a14)).
+a(1, a4, a14, (a28,)).
+a(1, a29, a29, (a4, a14)).
+a(1, a14, a14, (a18,)).
+a(1, a20, a20, (a12,)).
+a(1, a12, a22, (a28,)).
 a(2, a8, r1, a26).
 a(4, a26, r1, a8).
 a(3, a2, r1, a26).
-a(1, (a2, a8, a16), (a27)).
-a(1, (a29), (a2, a10)).
+a(1, a2, a8, a16, (a27,)).
+a(1, a29, a29, (a2, a10)).
 a(2, a10, r1, a6).
 a(4, a6, r1, a10).
-a(1, (a6, a26), (a28)).
-a(1, (a29), (a6, a26)).
-a(1, (a6, a26), (a28)).
-a(1, (a29), (a6, a26)).
-a(1, (a14, a26), (a28)).
-a(1, (a21), (a13)).
-a(1, (a17), (a25)).
-a(1, (a27), (a16)).
+a(1, a6, a26, (a28,)).
+a(1, a29, a29, (a6, a26)).
+a(1, a6, a26, (a28,)).
+a(1, a29, a29, (a6, a26)).
+a(1, a14, a26, (a28,)).
+a(1, a21, a21, (a13,)).
+a(1, a17, a17, (a25,)).
+a(1, a27, a27, (a16,)).
 a(2, a27, r1, a26).
 a(3, a27, r1, a26).
-a(1, (a13), (a22)).
+a(1, a13, a13, (a22,)).
 a(4, a29, r2, a29).
-a(1, (a19), (a20)).
-a(1, (a22, a25), (a28)).
+a(1, a19, a19, (a20,)).
+a(1, a22, a25, (a28,)).
 a(4, a29, r1, a22).
 a(3, a29, r2, a25).
-a(1, (a26), (a18)).
-a(1, (a22, a25), (a28)).
-a(1, (a24), (a25)).
+a(1, a26, a26, (a18,)).
+a(1, a22, a25, (a28,)).
+a(1, a24, a24, (a25,)).
 a(3, a29, r1, a17).
 
 where
@@ -510,66 +517,66 @@ nc(a14).
 nc(a32).
 nc(a24).
 nc(a30).
-a(1, (a16), (a43)).
-a(1, (a17), (a1)).
-a(1, (a17), (a32)).
-a(1, (a13, a22, a32), (a16)).
-a(1, (a45), (a14, a26)).
+a(1, a16, a16, (a43,)).
+a(1, a17, a17, (a1,)).
+a(1, a17, a17, (a32,)).
+a(1, a13, a22, a32, (a16,)).
+a(1, a45, a45, (a14, a26)).
 a(3, a2, r1, a33).
 a(3, a3, r1, a42).
-a(1, (a32), (a37)).
-a(1, (a37), (a29)).
-a(1, (a45), (a2)).
-a(1, (a15), (a31)).
-a(1, (a38), (a10)).
-a(1, (a40), (a41)).
-a(1, (a17), (a21)).
-a(1, (a31), (a17)).
-a(1, (a43), (a18)).
-a(1, (a12, a21, a32), (a15)).
-a(1, (a45), (a13, a24)).
-a(1, (a6, a28), (a44)).
+a(1, a32, a32, (a37,)).
+a(1, a37, a37, (a29,)).
+a(1, a45, a45, (a2,)).
+a(1, a15, a15, (a31,)).
+a(1, a38, a38, (a10,)).
+a(1, a40, a40, (a41,)).
+a(1, a17, a17, (a21,)).
+a(1, a31, a31, (a17,)).
+a(1, a43, a43, (a18,)).
+a(1, a12, a21, a32, (a15,)).
+a(1, a45, a45, (a13, a24)).
+a(1, a6, a28, (a44,)).
 a(4, a45, r1, a25).
 a(4, a30, r1, a21).
-a(1, (a20), (a39)).
-a(1, (a28), (a8)).
-a(1, (a8, a38), (a44)).
-a(1, (a11, a42), (a44)).
-a(1, (a30), (a11)).
-a(1, (a7, a30), (a44)).
-a(1, (a9, a40), (a44)).
-a(1, (a35), (a36)).
+a(1, a20, a20, (a39,)).
+a(1, a28, a28, (a8,)).
+a(1, a8, a38, (a44,)).
+a(1, a11, a42, (a44,)).
+a(1, a30, a30, (a11,)).
+a(1, a7, a30, (a44,)).
+a(1, a9, a40, (a44,)).
+a(1, a35, a35, (a36,)).
 a(4, a42, r1, a22).
 a(2, a22, r1, a42).
 a(2, a21, r1, a30).
-a(1, (a45), (a5)).
+a(1, a45, a45, (a5,)).
 a(3, a5, r2, a41).
-a(1, (a36), (a28)).
-a(1, (a29), (a38)).
-a(1, (a10, a41), (a44)).
-a(1, (a42), (a34)).
-a(1, (a18), (a32)).
-a(1, (a39), (a19)).
+a(1, a36, a36, (a28,)).
+a(1, a29, a29, (a38,)).
+a(1, a10, a41, (a44,)).
+a(1, a42, a42, (a34,)).
+a(1, a18, a18, (a32,)).
+a(1, a39, a39, (a19,)).
 a(3, a4, r2, a40).
-a(1, (a19), (a35)).
-a(1, (a33), (a41)).
-a(1, (a14, a35), (a20)).
-a(1, (a42), (a7)).
-a(1, (a25), (a38)).
-a(1, (a45), (a12, a23)).
+a(1, a19, a19, (a35,)).
+a(1, a33, a33, (a41,)).
+a(1, a14, a35, (a20,)).
+a(1, a42, a42, (a7,)).
+a(1, a25, a25, (a38,)).
+a(1, a45, a45, (a12, a23)).
 a(3, a1, r1, a30).
 a(2, a26, r2, a9).
-a(1, (a30), (a34)).
-a(1, (a41), (a8)).
+a(1, a30, a30, (a34,)).
+a(1, a41, a41, (a8,)).
 a(2, a23, r1, a7).
-a(1, (a19), (a4)).
-a(1, (a18), (a3)).
+a(1, a19, a19, (a4,)).
+a(1, a18, a18, (a3,)).
 a(2, a24, r1, a11).
-a(1, (a34), (a33)).
-a(1, (a18), (a22)).
+a(1, a34, a34, (a33,)).
+a(1, a18, a18, (a22,)).
 a(4, a45, r2, a27).
-a(1, (a27), (a45)).
-a(1, (a38), (a6)).
+a(1, a27, a27, (a45,)).
+a(1, a38, a38, (a6,)).
 
 where
 a35		Integer
