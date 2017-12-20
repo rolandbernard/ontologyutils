@@ -27,7 +27,7 @@ public class AppNormalize {
 		File ontologyFile = new File(ontologyFilePath);
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		IRI ontologyIRI = IRI.create(ontologyFile);
+		IRI ontologyIRI = IRI.create(ontologyFile); 
 
 		try {
 			ontology = manager.loadOntologyFromOntologyDocument(ontologyIRI);
@@ -117,6 +117,8 @@ public class AppNormalize {
 
 		System.out.println("\nTo rules");
 		RuleGeneration rgn = new RuleGeneration(naive);
+		rgn.getMap().entrySet().stream()
+			.forEach(e -> System.out.println(rgn.atomToRule(e.getKey())));
 		naive.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgn.normalizedSubClassAxiomToRule(ax)));
 
 		System.out.println("\nwhere");
@@ -130,6 +132,8 @@ public class AppNormalize {
 
 		System.out.println("\nTo rules");
 		RuleGeneration rgc = new RuleGeneration(condor);
+		rgc.getMap().entrySet().stream()
+			.forEach(e -> System.out.println(rgc.atomToRule(e.getKey())));
 		condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgc.normalizedSubClassAxiomToRule(ax)));
 
 		System.out.println("\nwhere");

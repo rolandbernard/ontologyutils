@@ -36,44 +36,60 @@ public class RuleGeneration {
 
 		if (NormalForm.typeOneSubClassAxiom(left, right)) {
 			// (isAtom(left) || isConjunctionOfAtoms(left)) && (isAtom(right) || isDisjunctionOfAtoms(right))
-			String res = "(1";
+			String res = "a(1, (";
 			if (NormalForm.isAtom(left)) {
-				res += ", " + map.get(left);
+				res += map.get(left);
 			} else {
+				boolean first = true;
 				for (OWLClassExpression e : left.asConjunctSet()) {
-					res += ", " + map.get(e);
+					if (first) {
+						res += map.get(e);
+						first = false;
+					} else {
+						res += ", " + map.get(e);
+					}
 				}
 			}
-			res += ",|";
+			res += "), (";
 			if (NormalForm.isAtom(right)) {
-				res += ", " + map.get(right);
+				res += map.get(right);
 			} else {
+				boolean first = true;
 				for (OWLClassExpression e : right.asDisjunctSet()) {
-					res += ", " + map.get(e);
+					if (first) {
+						res += map.get(e);
+						first = false;
+					} else {
+						res += ", " + map.get(e);
+					}
 				}
 			}
-			res += ").";
+			res += ")).";
 			return res;
 		} else if (NormalForm.typeTwoSubClassAxiom(left, right)) {
 			// isAtom(left) && isExistentialOfAtom(right)
 			OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) right).getFiller();
 			OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFromImpl) right).getProperty();
-			return "(2, " + map.get(left) + ", " + map.get(property) + ", " + map.get(filler) + ").";
+			return "a(2, " + map.get(left) + ", " + map.get(property) + ", " + map.get(filler) + ").";
 		} else if (NormalForm.typeThreeSubClassAxiom(left, right)) {
 			// isAtom(left) && isUniversalOfAtom(right)
 			OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) right).getFiller();
 			OWLObjectPropertyExpression property = ((OWLObjectAllValuesFromImpl) right).getProperty();
-			return "(3, " + map.get(left) + ", " + map.get(property) + ", " + map.get(filler) + ").";
+			return "a(3, " + map.get(left) + ", " + map.get(property) + ", " + map.get(filler) + ").";
 		} else if (NormalForm.typeFourSubClassAxiom(left, right)) {
 			// isExistentialOfAtom(left) && isAtom(right)
 			OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) left).getFiller();
 			OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFromImpl) left).getProperty();
-			return "(4, " + map.get(filler) + ", " + map.get(property) + ", " + map.get(right) + ").";
+			return "a(4, " + map.get(filler) + ", " + map.get(property) + ", " + map.get(right) + ").";
 		} else {
 			throw new RuntimeException("I don't know what to do with " + ax);
 		}
 	}
 
+	public String atomToRule(OWLEntity e) {
+		return "nc(" + map.get(e) + ").";
+	}
+	
 	public  Map<OWLEntity, String> getMap() {
 		return map;
 	}

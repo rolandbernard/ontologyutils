@@ -271,99 +271,131 @@ Naive Normalized TBox
 -- SubClassOf(owl:Thing ObjectAllValuesFrom(hasColour Colour))
 
 To rules
-(1, a1,|, a14).
-(3, a7, r2, a24).
-(1, a7, a13,|, a23).
-(1, a16,|, a7, a19).
-(2, a19, r2, a22).
-(4, a22, r2, a19).
-(1, a22, a24,|, a12).
-(1, a16,|, a22, a24).
-(1, a22, a24,|, a12).
-(1, a16,|, a22, a24).
-(1, a5, a27,|, a12).
-(1, a29, a18,|, a12).
-(1, a23,|, a13).
-(3, a23, r2, a24).
-(1, a10,|, a8).
-(1, a15,|, a10).
-(2, a15, r1, a29).
-(3, a15, r1, a29).
-(2, a4, r1, a29).
-(4, a29, r1, a4).
-(3, a21, r1, a29).
-(1, a21, a4, a10,|, a15).
-(1, a16,|, a21, a9).
-(2, a9, r1, a25).
-(4, a25, r1, a9).
-(1, a25, a29,|, a12).
-(1, a16,|, a25, a29).
-(1, a25, a29,|, a12).
-(1, a16,|, a25, a29).
-(1, a29,|, a1).
-(1, a2,|, a5).
-(1, a5, a27,|, a12).
-(2, a6, r1, a18).
-(4, a18, r1, a6).
-(3, a3, r1, a18).
-(1, a3, a6, a10,|, a20).
-(1, a16,|, a3, a26).
-(2, a26, r1, a17).
-(4, a17, r1, a26).
-(1, a17, a18,|, a12).
-(1, a16,|, a17, a18).
-(1, a17, a18,|, a12).
-(1, a16,|, a17, a18).
-(1, a29, a18,|, a12).
-(1, a8,|, a28).
-(1, a14,|, a11).
-(1, a20,|, a10).
-(2, a20, r1, a18).
-(3, a20, r1, a18).
-(1, a28,|, a27).
-(4, a16, r2, a16).
-(1, a13,|, a2).
-(1, a27, a11,|, a12).
-(4, a16, r1, a27).
-(3, a16, r2, a11).
-(1, a18,|, a1).
-(1, a27, a11,|, a12).
-(1, a24,|, a11).
-(3, a16, r1, a14).
+nc(a19).
+nc(a13).
+nc(a29).
+nc(a20).
+nc(a4).
+nc(a11).
+nc(a1).
+nc(a22).
+nc(r2).
+nc(r1).
+nc(a2).
+nc(a27).
+nc(a6).
+nc(a7).
+nc(a17).
+nc(a8).
+nc(a5).
+nc(a24).
+nc(a9).
+nc(a15).
+nc(a18).
+nc(a26).
+nc(a12).
+nc(a25).
+nc(r3).
+nc(a21).
+nc(a28).
+nc(a3).
+nc(a23).
+nc(a16).
+nc(a10).
+nc(a14).
+a(1, (a18), (a17)).
+a(3, a3, r2, a24).
+a(1, (a3, a19), (a23)).
+a(1, (a29), (a3, a11)).
+a(2, a11, r2, a5).
+a(4, a5, r2, a11).
+a(1, (a5, a24), (a28)).
+a(1, (a29), (a5, a24)).
+a(1, (a5, a24), (a28)).
+a(1, (a29), (a5, a24)).
+a(1, (a12, a22), (a28)).
+a(1, (a14, a26), (a28)).
+a(1, (a23), (a19)).
+a(3, a23, r2, a24).
+a(1, (a16), (a21)).
+a(1, (a15), (a16)).
+a(2, a15, r1, a14).
+a(3, a15, r1, a14).
+a(2, a7, r1, a14).
+a(4, a14, r1, a7).
+a(3, a1, r1, a14).
+a(1, (a1, a7, a16), (a15)).
+a(1, (a29), (a1, a9)).
+a(2, a9, r1, a4).
+a(4, a4, r1, a9).
+a(1, (a4, a14), (a28)).
+a(1, (a29), (a4, a14)).
+a(1, (a4, a14), (a28)).
+a(1, (a29), (a4, a14)).
+a(1, (a14), (a18)).
+a(1, (a20), (a12)).
+a(1, (a12, a22), (a28)).
+a(2, a8, r1, a26).
+a(4, a26, r1, a8).
+a(3, a2, r1, a26).
+a(1, (a2, a8, a16), (a27)).
+a(1, (a29), (a2, a10)).
+a(2, a10, r1, a6).
+a(4, a6, r1, a10).
+a(1, (a6, a26), (a28)).
+a(1, (a29), (a6, a26)).
+a(1, (a6, a26), (a28)).
+a(1, (a29), (a6, a26)).
+a(1, (a14, a26), (a28)).
+a(1, (a21), (a13)).
+a(1, (a17), (a25)).
+a(1, (a27), (a16)).
+a(2, a27, r1, a26).
+a(3, a27, r1, a26).
+a(1, (a13), (a22)).
+a(4, a29, r2, a29).
+a(1, (a19), (a20)).
+a(1, (a22, a25), (a28)).
+a(4, a29, r1, a22).
+a(3, a29, r2, a25).
+a(1, (a26), (a18)).
+a(1, (a22, a25), (a28)).
+a(1, (a24), (a25)).
+a(3, a29, r1, a17).
 
 where
-a13		Integer
-a16		owl:Thing
-a28		Animal
-a2		Number
-a19		FRESH#[ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))]
-a25		FRESH#[ObjectComplementOf(Black)]
-a21		FRESH#[ObjectAllValuesFrom(hasColour Black)]
-a27		PhysicalObject
+a19		Integer
+a13		Animal
+a29		owl:Thing
+a20		Number
+a4		FRESH#[ObjectComplementOf(Black)]
+a11		FRESH#[ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))]
+a1		FRESH#[ObjectAllValuesFrom(hasColour Black)]
+a22		PhysicalObject
 r2		hasQuality
 r1		hasColour
-a3		FRESH#[ObjectAllValuesFrom(hasColour White)]
-a20		WhiteCat
-a4		FRESH#[ObjectSomeValuesFrom(hasColour Black)]
-a17		FRESH#[ObjectComplementOf(White)]
-a14		Colour
-a6		FRESH#[ObjectSomeValuesFrom(hasColour White)]
-a22		FRESH#[ObjectComplementOf(Primeness)]
+a2		FRESH#[ObjectAllValuesFrom(hasColour White)]
+a27		WhiteCat
+a6		FRESH#[ObjectComplementOf(White)]
+a7		FRESH#[ObjectSomeValuesFrom(hasColour Black)]
+a17		Colour
+a8		FRESH#[ObjectSomeValuesFrom(hasColour White)]
+a5		FRESH#[ObjectComplementOf(Primeness)]
 a24		Primeness
 a9		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))]
 a15		BlackCat
-a1		GrayScale
-a18		White
-a5		AbstractObject
-a11		Quality
+a18		GrayScale
+a26		White
+a12		AbstractObject
+a25		Quality
 r3		owl:topObjectProperty
-a8		Pet
-a12		owl:Nothing
-a7		FRESH#[ObjectAllValuesFrom(hasQuality Primeness)]
+a21		Pet
+a28		owl:Nothing
+a3		FRESH#[ObjectAllValuesFrom(hasQuality Primeness)]
 a23		PrimeNumber
-a10		Cat
-a26		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))]
-a29		Black
+a16		Cat
+a10		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))]
+a14		Black
 
 CONDOR NORMALIZATION
 
@@ -430,116 +462,164 @@ Condor Normalized TBox
 -- SubClassOf(PhysicalObject FRESH#[ObjectComplementOf(AbstractObject)])
 
 To rules
-(1, a13,|, a28).
-(1, a20,|, a44).
-(1, a20,|, a25).
-(1, a42, a36, a25,|, a13).
-(1, a12,|, a19, a6).
-(3, a17, r3, a31).
-(3, a24, r3, a14).
-(1, a25,|, a11).
-(1, a11,|, a39).
-(1, a12,|, a17).
-(1, a35,|, a16).
-(1, a8,|, a10).
-(1, a37,|, a34).
-(1, a20,|, a23).
-(1, a16,|, a20).
-(1, a28,|, a45).
-(1, a32, a23, a25,|, a35).
-(1, a12,|, a42, a18).
-(1, a41, a1,|, a3).
-(4, a12, r3, a33).
-(4, a2, r3, a23).
-(1, a15,|, a4).
-(1, a1,|, a29).
-(1, a29, a8,|, a3).
-(1, a27, a14,|, a3).
-(1, a2,|, a27).
-(1, a21, a2,|, a3).
-(1, a7, a37,|, a3).
-(1, a22,|, a26).
-(4, a14, r3, a36).
-(2, a36, r3, a14).
-(2, a23, r3, a2).
-(1, a12,|, a38).
-(3, a38, r1, a34).
-(1, a26,|, a1).
-(1, a39,|, a8).
-(1, a10, a34,|, a3).
-(1, a14,|, a40).
-(1, a45,|, a25).
-(1, a4,|, a30).
-(3, a9, r1, a37).
-(1, a30,|, a22).
-(1, a31,|, a34).
-(1, a19, a22,|, a15).
-(1, a14,|, a21).
-(1, a33,|, a8).
-(1, a12,|, a32, a43).
-(3, a44, r3, a2).
-(2, a6, r1, a7).
-(1, a2,|, a40).
-(1, a34,|, a29).
-(2, a43, r3, a21).
-(1, a30,|, a9).
-(1, a45,|, a24).
-(2, a18, r3, a27).
-(1, a40,|, a31).
-(1, a45,|, a36).
-(4, a12, r1, a5).
-(1, a5,|, a12).
-(1, a8,|, a41).
+nc(a35).
+nc(a29).
+nc(a45).
+nc(a10).
+nc(a17).
+nc(a36).
+nc(a5).
+nc(a16).
+nc(a7).
+nc(a26).
+nc(a1).
+nc(a38).
+nc(r2).
+nc(a27).
+nc(r1).
+nc(a13).
+nc(a3).
+nc(a8).
+nc(a43).
+nc(a11).
+nc(a21).
+nc(a33).
+nc(a22).
+nc(a20).
+nc(a9).
+nc(a19).
+nc(a40).
+nc(a23).
+nc(a31).
+nc(a34).
+nc(a42).
+nc(a6).
+nc(a28).
+nc(a41).
+nc(a12).
+nc(a15).
+nc(a2).
+nc(r3).
+nc(a37).
+nc(a25).
+nc(a18).
+nc(a44).
+nc(a4).
+nc(a39).
+nc(a14).
+nc(a32).
+nc(a24).
+nc(a30).
+a(1, (a16), (a43)).
+a(1, (a17), (a1)).
+a(1, (a17), (a32)).
+a(1, (a13, a22, a32), (a16)).
+a(1, (a45), (a14, a26)).
+a(3, a2, r1, a33).
+a(3, a3, r1, a42).
+a(1, (a32), (a37)).
+a(1, (a37), (a29)).
+a(1, (a45), (a2)).
+a(1, (a15), (a31)).
+a(1, (a38), (a10)).
+a(1, (a40), (a41)).
+a(1, (a17), (a21)).
+a(1, (a31), (a17)).
+a(1, (a43), (a18)).
+a(1, (a12, a21, a32), (a15)).
+a(1, (a45), (a13, a24)).
+a(1, (a6, a28), (a44)).
+a(4, a45, r1, a25).
+a(4, a30, r1, a21).
+a(1, (a20), (a39)).
+a(1, (a28), (a8)).
+a(1, (a8, a38), (a44)).
+a(1, (a11, a42), (a44)).
+a(1, (a30), (a11)).
+a(1, (a7, a30), (a44)).
+a(1, (a9, a40), (a44)).
+a(1, (a35), (a36)).
+a(4, a42, r1, a22).
+a(2, a22, r1, a42).
+a(2, a21, r1, a30).
+a(1, (a45), (a5)).
+a(3, a5, r2, a41).
+a(1, (a36), (a28)).
+a(1, (a29), (a38)).
+a(1, (a10, a41), (a44)).
+a(1, (a42), (a34)).
+a(1, (a18), (a32)).
+a(1, (a39), (a19)).
+a(3, a4, r2, a40).
+a(1, (a19), (a35)).
+a(1, (a33), (a41)).
+a(1, (a14, a35), (a20)).
+a(1, (a42), (a7)).
+a(1, (a25), (a38)).
+a(1, (a45), (a12, a23)).
+a(3, a1, r1, a30).
+a(2, a26, r2, a9).
+a(1, (a30), (a34)).
+a(1, (a41), (a8)).
+a(2, a23, r1, a7).
+a(1, (a19), (a4)).
+a(1, (a18), (a3)).
+a(2, a24, r1, a11).
+a(1, (a34), (a33)).
+a(1, (a18), (a22)).
+a(4, a45, r2, a27).
+a(1, (a27), (a45)).
+a(1, (a38), (a6)).
 
 where
-a22		Integer
-a12		owl:Thing
-a39		Animal
+a35		Integer
+a29		Animal
+a45		owl:Thing
 a10		FRESH#[ObjectComplementOf(Quality)]
-a20		FRESH#[ObjectIntersectionOf(Cat ObjectSomeValuesFrom(hasColour Black) ObjectAllValuesFrom(hasColour Black))]
-a26		Number
-a13		FRESH#[ObjectIntersectionOf(Cat ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))) ObjectSomeValuesFrom(hasColour White))]
-a38		FRESH#[ObjectAllValuesFrom(hasQuality Quality)]
-a6		FRESH#[ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))]
-a21		FRESH#[ObjectComplementOf(Black)]
-a44		FRESH#[ObjectAllValuesFrom(hasColour Black)]
-a8		PhysicalObject
-r1		hasQuality
-a5		FRESH#[ObjectSomeValuesFrom(hasQuality owl:Thing)]
-r3		hasColour
-a42		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(White)))]
-a24		FRESH#[ObjectAllValuesFrom(hasColour White)]
-a28		WhiteCat
-a29		FRESH#[ObjectComplementOf(PhysicalObject)]
-a23		FRESH#[ObjectSomeValuesFrom(hasColour Black)]
-a27		FRESH#[ObjectComplementOf(White)]
-a31		Colour
-a36		FRESH#[ObjectSomeValuesFrom(hasColour White)]
-a15		FRESH#[ObjectIntersectionOf(Integer ObjectComplementOf(ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))))]
-a7		FRESH#[ObjectComplementOf(Primeness)]
-a30		FRESH#[ObjectIntersectionOf(Integer ObjectAllValuesFrom(hasQuality Primeness))]
-a37		Primeness
-a16		BlackCat
-a43		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))]
-a40		GrayScale
-a14		White
-a41		FRESH#[ObjectComplementOf(AbstractObject)]
-a1		AbstractObject
-a34		Quality
-a32		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black)))]
-a35		FRESH#[ObjectIntersectionOf(Cat ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))) ObjectSomeValuesFrom(hasColour Black))]
-a17		FRESH#[ObjectAllValuesFrom(hasColour Colour)]
-r2		owl:topObjectProperty
-a11		Pet
-a33		FRESH#[ObjectSomeValuesFrom(hasColour owl:Thing)]
-a45		FRESH#[ObjectIntersectionOf(Cat ObjectSomeValuesFrom(hasColour White) ObjectAllValuesFrom(hasColour White))]
-a3		owl:Nothing
-a9		FRESH#[ObjectAllValuesFrom(hasQuality Primeness)]
-a4		PrimeNumber
-a19		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness)))]
-a25		Cat
-a18		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))]
-a2		Black
+a17		FRESH#[ObjectIntersectionOf(Cat ObjectSomeValuesFrom(hasColour Black) ObjectAllValuesFrom(hasColour Black))]
+a36		Number
+a5		FRESH#[ObjectAllValuesFrom(hasQuality Quality)]
+a16		FRESH#[ObjectIntersectionOf(Cat ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))) ObjectSomeValuesFrom(hasColour White))]
+a7		FRESH#[ObjectComplementOf(Black)]
+a26		FRESH#[ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))]
+a1		FRESH#[ObjectAllValuesFrom(hasColour Black)]
+a38		PhysicalObject
+r2		hasQuality
+a27		FRESH#[ObjectSomeValuesFrom(hasQuality owl:Thing)]
+r1		hasColour
+a13		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(White)))]
+a3		FRESH#[ObjectAllValuesFrom(hasColour White)]
+a8		FRESH#[ObjectComplementOf(PhysicalObject)]
+a43		WhiteCat
+a11		FRESH#[ObjectComplementOf(White)]
+a21		FRESH#[ObjectSomeValuesFrom(hasColour Black)]
+a33		Colour
+a22		FRESH#[ObjectSomeValuesFrom(hasColour White)]
+a20		FRESH#[ObjectIntersectionOf(Integer ObjectComplementOf(ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness))))]
+a9		FRESH#[ObjectComplementOf(Primeness)]
+a19		FRESH#[ObjectIntersectionOf(Integer ObjectAllValuesFrom(hasQuality Primeness))]
+a40		Primeness
+a23		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))]
+a31		BlackCat
+a34		GrayScale
+a42		White
+a6		FRESH#[ObjectComplementOf(AbstractObject)]
+a28		AbstractObject
+a41		Quality
+a12		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black)))]
+a15		FRESH#[ObjectIntersectionOf(Cat ObjectComplementOf(ObjectSomeValuesFrom(hasColour ObjectComplementOf(Black))) ObjectSomeValuesFrom(hasColour Black))]
+a2		FRESH#[ObjectAllValuesFrom(hasColour Colour)]
+r3		owl:topObjectProperty
+a37		Pet
+a25		FRESH#[ObjectSomeValuesFrom(hasColour owl:Thing)]
+a18		FRESH#[ObjectIntersectionOf(Cat ObjectSomeValuesFrom(hasColour White) ObjectAllValuesFrom(hasColour White))]
+a44		owl:Nothing
+a4		FRESH#[ObjectAllValuesFrom(hasQuality Primeness)]
+a39		PrimeNumber
+a14		FRESH#[ObjectComplementOf(ObjectSomeValuesFrom(hasQuality ObjectComplementOf(Primeness)))]
+a32		Cat
+a24		FRESH#[ObjectSomeValuesFrom(hasColour ObjectComplementOf(White))]
+a30		Black
 
 Finished.
 ```
