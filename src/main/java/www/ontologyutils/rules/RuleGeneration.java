@@ -87,8 +87,13 @@ public class RuleGeneration {
 		}
 	}
 
-	public String atomToRule(OWLEntity e) {
-		return "nc(" + map.get(e) + ").";
+	public String entityToRule(OWLEntity e) {
+		if (e.isOWLClass()) {
+			return "nc(" + map.get(e) + ").";
+		} else if (e.isOWLObjectProperty()) {
+			return "nr(" + map.get(e) + ").";
+		}
+		throw new IllegalArgumentException();
 	}
 	
 	public  Map<OWLEntity, String> getMap() {

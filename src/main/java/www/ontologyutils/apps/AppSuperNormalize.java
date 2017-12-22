@@ -186,7 +186,7 @@ public class AppSuperNormalize {
 		System.out.println("\nTo rules");
 		RuleGeneration rgn = new RuleGeneration(naive);
 		rgn.getMap().entrySet().stream()
-			.forEach(e -> System.out.println(rgn.atomToRule(e.getKey())));
+			.forEach(e -> System.out.println(rgn.entityToRule(e.getKey())));
 		naive.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgn.normalizedSubClassAxiomToRule(ax)));
 
 		System.out.println("\nwhere");
@@ -201,7 +201,7 @@ public class AppSuperNormalize {
 		System.out.println("\nTo rules");
 		RuleGeneration rgc = new RuleGeneration(condor);
 		rgc.getMap().entrySet().stream()
-			.forEach(e -> System.out.println(rgc.atomToRule(e.getKey())));
+			.forEach(e -> System.out.println(rgc.entityToRule(e.getKey())));
 		condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgc.normalizedSubClassAxiomToRule(ax)));
 
 		System.out.println("\nwhere");

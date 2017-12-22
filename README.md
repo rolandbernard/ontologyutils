@@ -286,8 +286,8 @@ nc(a4).
 nc(a11).
 nc(a1).
 nc(a22).
-nc(r2).
-nc(r1).
+nr(r2).
+nr(r1).
 nc(a2).
 nc(a27).
 nc(a6).
@@ -302,7 +302,7 @@ nc(a18).
 nc(a26).
 nc(a12).
 nc(a25).
-nc(r3).
+nr(r3).
 nc(a21).
 nc(a28).
 nc(a3).
@@ -481,9 +481,9 @@ nc(a7).
 nc(a26).
 nc(a1).
 nc(a38).
-nc(r2).
+nr(r2).
 nc(a27).
-nc(r1).
+nr(r1).
 nc(a13).
 nc(a3).
 nc(a8).
@@ -506,7 +506,7 @@ nc(a41).
 nc(a12).
 nc(a15).
 nc(a2).
-nc(r3).
+nr(r3).
 nc(a37).
 nc(a25).
 nc(a18).
