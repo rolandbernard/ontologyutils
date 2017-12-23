@@ -196,9 +196,6 @@ where G is an integer representing a group of axioms: two axioms belong to the s
 Running `AppNormalize` with `resources/catsandnumbers.owl` as argument gives these results:
 
 ```
-log4j:WARN No appenders could be found for logger (org.eclipse.rdf4j.rio.RDFParserRegistry).
-log4j:WARN Please initialize the log4j system properly.
-log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
 Ontology http://www.semanticweb.org/ontologies/dl2017_example loaded.
 
 Original TBox
@@ -650,7 +647,7 @@ Finished.
 
 # App example:  AppCondorRules#
 
-Running `AppCondorRules` with `resources/catsandnumbers.owl` as argument gives these result:
+Running `AppCondorRules` with `resources/catsandnumbers.owl` as argument gives this result:
 
 ```
 a(2, 3, a25, r1, a7).
