@@ -29,6 +29,7 @@ import uk.ac.manchester.cs.owl.owlapi.OWLObjectSomeValuesFromImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectUnionOfImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLQuantifiedRestrictionImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
+import www.ontologyutils.ontologyutils.Annotate;
 import www.ontologyutils.ontologyutils.FreshAtoms;
 import www.ontologyutils.ontologyutils.Utils;
 
@@ -114,7 +115,7 @@ public class Normalization {
 		OWLClassExpression newLeft = replaceIfPolarity(e, substitute, a.getSubClass(), true);
 		OWLClassExpression newRight = replaceIfPolarity(e, substitute, a.getSuperClass(), false);
 
-		return new OWLSubClassOfAxiomImpl(newLeft, newRight, EMPTY_ANNOTATION);
+		return new OWLSubClassOfAxiomImpl(newLeft, newRight, Annotate.getAxiomAnnotations(a));
 	}
 
 	/**
@@ -205,14 +206,22 @@ public class Normalization {
 				continue;
 			}
 			if (ontology.tboxAxioms(Imports.EXCLUDED).anyMatch(ax -> isNegativeIn(e, ax))) {
-				OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(structuralTransformation(e, map), map.get(e),
-						EMPTY_ANNOTATION);
-				transformed.add(sba);
+				ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> { 
+					if (isNegativeIn(e, ax)) {
+						OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(structuralTransformation(e, map), map.get(e),
+								Annotate.getAxiomAnnotations(ax));
+						transformed.add(sba);
+					}
+				});
 			}
 			if (ontology.tboxAxioms(Imports.EXCLUDED).anyMatch(ax -> isPositiveIn(e, ax))) {
-				OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(e), structuralTransformation(e, map),
-						EMPTY_ANNOTATION);
-				transformed.add(sba);
+				ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> { 
+					if (isPositiveIn(e, ax)) {
+						OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(e), structuralTransformation(e, map),
+								Annotate.getAxiomAnnotations(ax));
+						transformed.add(sba);
+					}
+				});
 			}
 		}
 
@@ -224,7 +233,7 @@ public class Normalization {
 				OWLClassExpression right = ((OWLSubClassOfAxiom) a).getSuperClass();
 
 				OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(left), map.get(right),
-						EMPTY_ANNOTATION);
+						Annotate.getAxiomAnnotations(a));
 				transformed.add(sba);
 			}
 		});

@@ -117,12 +117,12 @@ public class AppNormalize {
 
 		System.out.println("\nTo rules");
 		RuleGeneration rgn = new RuleGeneration(naive);
-		rgn.getMap().entrySet().stream()
+		rgn.getMapEntities().entrySet().stream()
 			.forEach(e -> System.out.println(rgn.entityToRule(e.getKey())));
 		naive.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgn.normalizedSubClassAxiomToRule(ax)));
 
 		System.out.println("\nwhere");
-		rgn.getMap().entrySet().stream()
+		rgn.getMapEntities().entrySet().stream()
 				.forEach(e -> System.out.println(e.getValue() + "\t\t" + Utils.pretty(e.getKey().toString())));
 
 		///////////////////////////////////////////////////////////////////////////////////
@@ -132,12 +132,12 @@ public class AppNormalize {
 
 		System.out.println("\nTo rules");
 		RuleGeneration rgc = new RuleGeneration(condor);
-		rgc.getMap().entrySet().stream()
+		rgc.getMapEntities().entrySet().stream()
 			.forEach(e -> System.out.println(rgc.entityToRule(e.getKey())));
 		condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgc.normalizedSubClassAxiomToRule(ax)));
 
 		System.out.println("\nwhere");
-		rgc.getMap().entrySet().stream()
+		rgc.getMapEntities().entrySet().stream()
 				.forEach(e -> System.out.println(e.getValue() + "\t\t" + Utils.pretty(e.getKey().toString())));
 
 		///////////////////////////////////////////////////////////////////////////////////

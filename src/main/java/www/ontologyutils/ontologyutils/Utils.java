@@ -93,7 +93,6 @@ public class Utils {
 
 		try {
 			ontology = manager.loadOntologyFromOntologyDocument(ontologyIRI);
-			System.out.println("Ontology loaded.");
 		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
 			System.exit(1);
