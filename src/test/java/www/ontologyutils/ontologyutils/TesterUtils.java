@@ -65,7 +65,7 @@ public class TesterUtils extends TestCase {
 
     public static Test suite()
     {
-        return new TestSuite( AppTest.class );
+        return new TestSuite( TesterUtils.class );
     }
     
 	public void testMaximalConsistentSetsNaive() {
