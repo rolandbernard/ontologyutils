@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -131,24 +132,28 @@ public class Utils {
 		return new Reasoner(new Configuration(), ontology);
 	}
 	
-	public static boolean isConsistent(OWLOntology ontology) {
-		OWLReasoner reasoner = getFactReasoner(ontology);
-		boolean result = reasoner.isConsistent();
-		reasoner.dispose();
-
-		return result;
-	}
-
 	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
-
-	public static boolean isConsistent(Set<OWLAxiom> axioms) {
+	
+	public static void flushConsistencyCache() {
+		uglyAxiomSetConsistencyCache = new HashMap<Set<OWLAxiom>, Boolean>();
+	}
+	
+	public static boolean isConsistent(OWLOntology ontology) {
+		Set<OWLAxiom> axioms = ontology.axioms().collect(Collectors.toSet());
 		Boolean consistency = uglyAxiomSetConsistencyCache.get(axioms);
 		if (consistency != null) {
 			return consistency;
 		}
-		consistency = isConsistent(newOntology(axioms.stream()));
+		OWLReasoner reasoner = getFactReasoner(ontology);
+		consistency = reasoner.isConsistent();
+		reasoner.dispose();
+
 		uglyAxiomSetConsistencyCache.put(axioms, consistency);
 		return consistency;
+	}
+
+	public static boolean isConsistent(Set<OWLAxiom> axioms) {
+		return isConsistent(newOntology(axioms.stream()));
 	}
 
 	/**

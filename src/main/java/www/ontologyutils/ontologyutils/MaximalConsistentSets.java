@@ -16,6 +16,10 @@ public class MaximalConsistentSets {
 	}
 
 	private static HashMap<Set<OWLAxiom>, Set<Set<OWLAxiom>>> uglyMaximalConsistentSubsetsCache = new HashMap<>();
+	
+	public static void flushConsistentSubsetsCache() {
+		uglyMaximalConsistentSubsetsCache = new HashMap<Set<OWLAxiom>, Set<Set<OWLAxiom>>>();
+	}
 
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms) {
 
