@@ -16,7 +16,7 @@ public class TesterCovers
 	
 	private static final String OWL_FILE_PATH = "resources/catsandnumbers.owl";
 	static OWLOntology ontology;
-	static RefinementOperator ro;
+	static Covers ro;
 	
 
     public TesterCovers( String testName )
@@ -24,7 +24,7 @@ public class TesterCovers
         super( testName );
         
         ontology = Utils.newOntology(OWL_FILE_PATH);
-        ro = new RefinementOperator(ontology);
+        ro = new Covers(ontology);
     }
 
     public static Test suite()
