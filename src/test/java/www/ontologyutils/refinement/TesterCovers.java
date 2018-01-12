@@ -2,8 +2,6 @@ package www.ontologyutils.refinement;
 
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -18,7 +16,6 @@ public class TesterCovers
 	
 	private static final String OWL_FILE_PATH = "resources/catsandnumbers.owl";
 	static OWLOntology ontology;
-	static OWLReasoner reasoner;
 	static RefinementOperator ro;
 	
 
@@ -27,8 +24,7 @@ public class TesterCovers
         super( testName );
         
         ontology = Utils.newOntology(OWL_FILE_PATH);
-        reasoner = Utils.getFactReasoner(ontology);
-        ro = new RefinementOperator(reasoner);
+        ro = new RefinementOperator(ontology);
     }
 
     public static Test suite()

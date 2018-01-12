@@ -15,7 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class RefinementOperator {
-
+	
 	private OWLReasoner reasoner;
 	private OWLOntology ontology;
 	private ArrayList<OWLClassExpression> subConcepts;
@@ -27,7 +27,7 @@ public class RefinementOperator {
 	/**
 	 * @param reasoner
 	 */
-	public RefinementOperator(OWLReasoner reasoner) {
+	private RefinementOperator(OWLReasoner reasoner) {
 		this.ontology = reasoner.getRootOntology();
 		this.reasoner = reasoner;
 
@@ -42,6 +42,14 @@ public class RefinementOperator {
 		}
 	}
 
+	/**
+	 * @param ontology
+	 */
+	public RefinementOperator(OWLOntology ontology) {
+		this(Utils.getFactReasoner(ontology));
+		//this(Utils.getHermitReasoner(ontology));
+	}
+	
 	/**
 	 * @param concept
 	 */
