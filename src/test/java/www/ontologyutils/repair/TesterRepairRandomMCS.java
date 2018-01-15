@@ -1,4 +1,4 @@
-package www.ontologyutils.ontologyutils;
+package www.ontologyutils.repair;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,15 +13,15 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLOntology;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import uk.ac.manchester.cs.owl.owlapi.OWLClassAssertionAxiomImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
+import www.ontologyutils.ontologyutils.Utils;
 
-public class TesterUtils extends TestCase {
+public class TesterRepairRandomMCS extends TestCase {
 
 	private static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
 	private static final OWLClassExpression TOP = new OWLDataFactoryImpl().getOWLThing();
@@ -46,7 +46,7 @@ public class TesterUtils extends TestCase {
 
 	static Set<OWLAxiom> agenda;
 
-	public TesterUtils(String testName) {
+	public TesterRepairRandomMCS(String testName) {
 		super(testName);
 
 		agenda = new HashSet<OWLAxiom>();
@@ -58,58 +58,25 @@ public class TesterUtils extends TestCase {
 		agenda.add(ax6);
 		agenda.add(ax7);
 
-		System.out.println("AGENDA " + agenda);
+		System.out.println("AGENDA");
+		agenda.stream().forEach(System.out::println);
 	}
 
-	public static Test suite() {
-		return new TestSuite(TesterUtils.class);
+	public void testIsInconsistent() {
+		System.out.println("%%% TEST (IN)CONSISTENCY OF AGENDA");
+
+		assertFalse(Utils.isConsistent(agenda));
 	}
 
-	public void testMaximalConsistentSetsNaive() {
-		System.out.println("%%% TEST MCSs");
+	public void testRepair() {
+		System.out.println("%%% TEST REPAIR");
 
-		Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsetsNaive(agenda);
+		OntologyRepairRandomMCS orrmcs = new OntologyRepairRandomMCS(Utils.newOntology(agenda.stream()));
+		OWLOntology repair = orrmcs.repair();
 
-		System.out.println("Found " + results.size() + " MCSs in " + agenda);
-		results.stream().forEach(System.out::println);
-
-		assertTrue(
-				results.stream().allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)));
-		assertTrue(SetUtils.powerSet(agenda).stream()
-				.allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
-						|| results.contains(subset))));
+		System.out.println("REPAIRED AGENDA");
+		repair.axioms().forEach(System.out::println);
+		assertTrue(Utils.isConsistent(repair));
 	}
 
-	public void testMaximalConsistentSets() {
-		System.out.println("%%% TEST MCSs");
-
-		Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda);
-
-		System.out.println("Found " + results.size() + " MCSs in " + agenda);
-		results.stream().forEach(System.out::println);
-
-		assertTrue(
-				results.stream().allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)));
-		assertTrue(SetUtils.powerSet(agenda).stream()
-				.allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
-						|| results.contains(subset))));
-	}
-
-	public void testMaximalConsistentSetsFlushedCaches() {
-		Utils.flushConsistencyCache();
-		MaximalConsistentSets.flushConsistentSubsetsCache();
-
-		System.out.println("%%% TEST MCSs");
-
-		Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda);
-
-		System.out.println("Found " + results.size() + " MCSs in " + agenda);
-		results.stream().forEach(System.out::println);
-
-		assertTrue(
-				results.stream().allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)));
-		assertTrue(SetUtils.powerSet(agenda).stream()
-				.allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
-						|| results.contains(subset))));
-	}
 }

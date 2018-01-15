@@ -44,6 +44,14 @@ It takes an axiom of Type1-4 and returns a string representation. E.g.,
 
 where G is an integer representing a group of axioms: two axioms belong to the same group if they result from the normalization of the same axiom in the OWL ontology.
 
+## Refinement
+
+The class `RefinementOperator` contains an implementation of the generic refinement operator presented in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz. Repairing Ontologies via Axiom Weakening. In Thirty-Second AAAI Conference on Artificial Intelligence (AAAI 2018). It can be instantiated as generalisation operator (with a reference ontology, `way` as UpCover, `back` as DownCover) or as a specialisation operator (with a reference ontology, `way` as DownCover, `back` as UpCover). The function `RefinementOperator#refine` return the set of concepts that immediately refine a concept via the refinement operator.
+
+## Axiom weakening
+
+The class `AxiomWeakener` implements the axiom weakening operations presented in Troquard et al. "Repairing Ontologies via Axiom Weakening" (AAAI 2018). `AxiomWeakener:getWeakerSubClassAxiom' is used for subclass axioms, and `AxiomWeakener:getWeakerClassAssertionAxioms' is used for assertion axioms.
+
 
 # Test ontologies #
 

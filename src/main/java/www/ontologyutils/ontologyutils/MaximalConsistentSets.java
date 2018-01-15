@@ -10,8 +10,12 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 
 public class MaximalConsistentSets {
 
+	// Prevent instantiation
+	private MaximalConsistentSets() {
+	}
+	
 	public static boolean isMaximallyConsistentSubset(Set<OWLAxiom> subset, Set<OWLAxiom> set) {
-		return Utils.isConsistent(subset) && Utils.powerSet(set).stream().parallel()
+		return Utils.isConsistent(subset) && SetUtils.powerSet(set).stream().parallel()
 				.allMatch(s -> (s.equals(subset) || !s.containsAll(subset) || !Utils.isConsistent(s)));
 	}
 
@@ -29,7 +33,7 @@ public class MaximalConsistentSets {
 		}
 		results = new HashSet<>();
 
-		for (Set<OWLAxiom> candidate : Utils.powerSet(axioms)) {
+		for (Set<OWLAxiom> candidate : SetUtils.powerSet(axioms)) {
 			if (isMaximallyConsistentSubset(candidate, axioms)) {
 				results.add(candidate);
 			}
