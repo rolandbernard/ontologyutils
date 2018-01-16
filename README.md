@@ -31,7 +31,7 @@ Both normalization functions return an ontology who TBox contains only subclass 
 * Type4: Subclass(exists property atom, atom)
 
 
-Furthemore, the function `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. See section [App example: TBox normalizations](App-example:-TBox-normalizations) for more details.
+Furthemore, the function `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. See section [#markdown-header-app-example-tbox-normalizations](App-example:-TBox-normalizations) for more details.
 
 
 ## Refinement
