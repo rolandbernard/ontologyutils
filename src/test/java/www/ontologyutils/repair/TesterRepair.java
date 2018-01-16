@@ -21,7 +21,7 @@ import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
 import www.ontologyutils.ontologyutils.Utils;
 
-public class TesterRepairRandomMCS extends TestCase {
+public class TesterRepair extends TestCase {
 
 	private static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
 	private static final OWLClassExpression TOP = new OWLDataFactoryImpl().getOWLThing();
@@ -46,7 +46,7 @@ public class TesterRepairRandomMCS extends TestCase {
 
 	static Set<OWLAxiom> agenda;
 
-	public TesterRepairRandomMCS(String testName) {
+	public TesterRepair(String testName) {
 		super(testName);
 
 		agenda = new HashSet<OWLAxiom>();
@@ -68,15 +68,38 @@ public class TesterRepairRandomMCS extends TestCase {
 		assertFalse(Utils.isConsistent(agenda));
 	}
 
-	public void testRepair() {
-		System.out.println("%%% TEST REPAIR");
+	public void testRepairRandomMCS() {
+		System.out.println("%%% TEST REPAIR RANDOM MCSs");
 
-		OntologyRepairRandomMCS orrmcs = new OntologyRepairRandomMCS(Utils.newOntology(agenda.stream()));
-		OWLOntology repair = orrmcs.repair();
+		OntologyRepair orrmcs = new OntologyRepairRandomMCS(Utils.newOntology(agenda.stream()));
+		OWLOntology repair;
 
-		System.out.println("REPAIRED AGENDA");
-		repair.axioms().forEach(System.out::println);
-		assertTrue(Utils.isConsistent(repair));
+		for (int i = 1; i <= 3; i++) {
+			repair = orrmcs.repair();
+
+			System.out.println("REPAIRED AGENDA " + i);
+			repair.axioms().forEach(System.out::println);
+			assertTrue(Utils.isConsistent(repair));
+		}
+	}
+
+	public void testRepairWeaken() {
+		System.out.println("%%% TEST REPAIR WEAKEN");
+
+		Boolean verbose = true;
+		OntologyRepair orrmcs = new OntologyRepairWeakening(Utils.newOntology(agenda.stream()), verbose);
+		OWLOntology repair;
+
+		for (int i = 1; i <= 3; i++) {
+			if (verbose) {
+				System.out.println("--- Repair " + i);
+			}
+			repair = orrmcs.repair();
+
+			System.out.println("REPAIRED AGENDA " + i);
+			repair.axioms().forEach(System.out::println);
+			assertTrue(Utils.isConsistent(repair));
+		}
 	}
 
 }
