@@ -16,7 +16,7 @@ The function `MaximalConsistentSets#maximalConsistentSubsets` takes a set of axi
 
 It is an implementation of the algorithm presented in Robert Malouf's "Maximal Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.`
 
-## TBox Normalization and rule generation
+## TBox Normalization
 
 The function `Normalization#normalizeCondor` returns normalized version of the input ontology, following the procedure of Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies" (IJCAI 2011). The function `Normalization#normalizeNaive` is a more naive normalization, which normalizes every subclass axiom individually, using exclusively the function `NormalizationTools#normalizeSubClassAxiom`. If the TBox of the original ontology does not have only subclass types of axioms, some preprocessing is necessary using `NormalizationsTools#asSubClassOfAxioms`. Not every TBox can be converted.
 
@@ -31,26 +31,16 @@ Both normalization functions return an ontology who TBox contains only subclass 
 * Type4: Subclass(exists property atom, atom)
 
 
-The function `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. 
-It takes an axiom of Type1-4 and returns a string representation. E.g.,
+Furthemore, the function `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. See section [App example: TBox normalizations](App-example:-TBox-normalizations) for more details.
 
-* Type1 axiom SubClass(Conjunction(A B), C) becomes a(1, G, a7, a12, (a13,))
-
-* Type1 axiom SubClass(Conjunction(A B), Disjunction(C,D)) becomes a(1, G, a7, a12, (a13, a4))
-
-* Type1 axiom SubClass(A, Disjunction(C,D)) becomes a(1, G, a7, a7, (a13, a4))
-
-* Type3 axiom Subclass(A, forall hasProperty B) becomes a(3, G, a7, r3, a12)
-
-where G is an integer representing a group of axioms: two axioms belong to the same group if they result from the normalization of the same axiom in the OWL ontology.
 
 ## Refinement
 
-The class `RefinementOperator` contains an implementation of the generic refinement operator presented in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz. Repairing Ontologies via Axiom Weakening. In Thirty-Second AAAI Conference on Artificial Intelligence (AAAI 2018). It can be instantiated as generalisation operator (with a reference ontology, `way` as UpCover, `back` as DownCover) or as a specialisation operator (with a reference ontology, `way` as DownCover, `back` as UpCover). The function `RefinementOperator#refine` return the set of concepts that immediately refine a concept via the refinement operator.
+The class `RefinementOperator` contains an implementation of the generic refinement operator presented in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz: "Repairing Ontologies via Axiom Weakening", in Thirty-Second AAAI Conference on Artificial Intelligence (AAAI 2018). It can be instantiated as generalisation operator (with a reference ontology, `way` as UpCover, `back` as DownCover) or as a specialisation operator (with a reference ontology, `way` as DownCover, `back` as UpCover). The function `RefinementOperator#refine` return the set of concepts that immediately refine a concept via the refinement operator.
 
 ## Axiom weakening
 
-The class `AxiomWeakener` implements the axiom weakening operations presented in Troquard et al. "Repairing Ontologies via Axiom Weakening" (AAAI 2018). `AxiomWeakener:getWeakerSubClassAxiom' is used for subclass axioms, and `AxiomWeakener:getWeakerClassAssertionAxioms' is used for assertion axioms.
+The class `AxiomWeakener` implements the axiom weakening operations presented in Troquard et al. "Repairing Ontologies via Axiom Weakening" (AAAI 2018). `AxiomWeakener:getWeakerSubClassAxiom` is used for subclass axioms, and `AxiomWeakener:getWeakerClassAssertionAxioms` is used for assertion axioms.
 
 
 # Test ontologies #
