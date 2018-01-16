@@ -48,7 +48,7 @@ public class AxiomWeakener {
 	 *         where A' is in {@code specOp.specialise(A)} and all the axioms A ->
 	 *         B' where B' is in {@code genOp.generalise(A)}.
 	 */
-	protected Set<OWLAxiom> getWeakerSubClassAxioms(OWLSubClassOfAxiom axiom) {
+	public Set<OWLAxiom> getWeakerSubClassAxioms(OWLSubClassOfAxiom axiom) {
 		HashSet<OWLAxiom> result = new HashSet<OWLAxiom>();
 
 		OWLClassExpression left = axiom.getSubClass();
@@ -77,7 +77,7 @@ public class AxiomWeakener {
 	 *         {@code genOp.generalise(A)}. TODO possibly keep track of original
 	 *         axioms through annotations
 	 */
-	protected Set<OWLAxiom> getWeakerClassAssertionAxioms(OWLClassAssertionAxiom axiom) {
+	public Set<OWLAxiom> getWeakerClassAssertionAxioms(OWLClassAssertionAxiom axiom) {
 		HashSet<OWLAxiom> result = new HashSet<OWLAxiom>();
 
 		OWLClassExpression expression = axiom.getClassExpression();
