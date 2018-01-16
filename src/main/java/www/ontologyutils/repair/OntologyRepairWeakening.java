@@ -49,7 +49,6 @@ public class OntologyRepairWeakening implements OntologyRepair {
 		// 3- Repairing
 		while (!Utils.isConsistent(axioms)) {
 			OWLAxiom badAxiom = findBadAxiom(axioms);
-			axioms.remove(badAxiom);
 			Set<OWLAxiom> weakerAxioms = null;
 			if (badAxiom.isOfType(AxiomType.SUBCLASS_OF)) {
 				weakerAxioms = aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) badAxiom);
@@ -60,6 +59,7 @@ public class OntologyRepairWeakening implements OntologyRepair {
 						+ "Could not repair the ontology.");
 			}
 			// we remove the bad axiom and add one of its weakenings
+			axioms.remove(badAxiom);
 			weakerAxioms.remove(badAxiom);
 			OWLAxiom weakerAxiom = SetUtils.getRandom(weakerAxioms);
 			axioms.add(weakerAxiom);
@@ -87,7 +87,15 @@ public class OntologyRepairWeakening implements OntologyRepair {
 		int minOcc = Integer.MAX_VALUE;
 		for (OWLAxiom a : axioms) {
 			if (a.isOfType(AxiomType.SUBCLASS_OF) || a.isOfType(AxiomType.CLASS_ASSERTION)) {
-				minOcc = Integer.min(minOcc, occurences.get(a));
+				if (!occurences.containsKey(a)) { // FIXME
+					throw new RuntimeException("ERROR: not in any MCS! " + a + " is inconsistent on its own!");
+					// happens e.g., after
+					// Weaken: SubClassOf(owl:Thing <www.first.org>)
+					// Into: SubClassOf(owl:Thing owl:Nothing)
+					// Because <www.first.org> is equivalent to owl:Nothing
+					// and SubClassOf(owl:Thing <www.first.org>) does not occur in an MCS
+				}
+				minOcc = Integer.min(minOcc, occurences.get(a)); // FIXME: throws NullPointerException
 			}
 		}
 		Set<OWLAxiom> badAxioms = new HashSet<>();
