@@ -1,13 +1,15 @@
 package www.ontologyutils.ontologyutils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 
+/**
+ * TODO: useful and safe cache
+ */
 public class MaximalConsistentSets {
 
 	// Prevent instantiation
@@ -19,26 +21,15 @@ public class MaximalConsistentSets {
 				.allMatch(s -> (s.equals(subset) || !s.containsAll(subset) || !Utils.isConsistent(s)));
 	}
 
-	private static HashMap<Set<OWLAxiom>, Set<Set<OWLAxiom>>> uglyMaximalConsistentSubsetsCache = new HashMap<>();
-	
-	public static void flushConsistentSubsetsCache() {
-		uglyMaximalConsistentSubsetsCache = new HashMap<Set<OWLAxiom>, Set<Set<OWLAxiom>>>();
-	}
-
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms) {
-
-		Set<Set<OWLAxiom>> results = uglyMaximalConsistentSubsetsCache.get(axioms);
-		if (results != null) {
-			return results;
-		}
-		results = new HashSet<>();
+		Set<Set<OWLAxiom>> results = new HashSet<>();
 
 		for (Set<OWLAxiom> candidate : SetUtils.powerSet(axioms)) {
 			if (isMaximallyConsistentSubset(candidate, axioms)) {
 				results.add(candidate);
 			}
 		}
-		uglyMaximalConsistentSubsetsCache.put(axioms, results);
+
 		return results;
 	}
 
@@ -73,12 +64,7 @@ public class MaximalConsistentSets {
 		// Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.
 
 		ArrayList<OWLAxiom> orderedAxioms = new ArrayList<OWLAxiom>(axioms);
-
-		Set<Set<OWLAxiom>> results = uglyMaximalConsistentSubsetsCache.get(axioms);
-		if (results != null) {
-			return results;
-		}
-		results = new HashSet<>();
+		Set<Set<OWLAxiom>> results = new HashSet<>();
 
 		LinkedList<McsStruct> Q = new LinkedList<>();
 		Q.add(new McsStruct(axioms, 0, false));
@@ -113,7 +99,6 @@ public class MaximalConsistentSets {
 			}
 		}
 
-		uglyMaximalConsistentSubsetsCache.put(axioms, results);
 		return results;
 	}
 	

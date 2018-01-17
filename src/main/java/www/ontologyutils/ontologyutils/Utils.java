@@ -1,10 +1,10 @@
 package www.ontologyutils.ontologyutils;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -148,7 +148,7 @@ public class Utils {
 		consistency = reasoner.isConsistent();
 		reasoner.dispose();
 
-		uglyAxiomSetConsistencyCache.put(axioms, consistency);
+		uglyAxiomSetConsistencyCache.put(Collections.unmodifiableSet(axioms), consistency);
 		return consistency;
 	}
 

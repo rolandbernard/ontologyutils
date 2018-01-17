@@ -78,9 +78,7 @@ public class TesterUtils extends TestCase {
 		assertTrue(SetUtils.powerSet(agenda).stream()
 				.allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
 						|| results.contains(subset))));
-		for (Set<OWLAxiom> mcs : results) {
-			assertTrue(mcs.stream().allMatch(ax -> agenda.contains(ax)));
-		}
+		assertTrue(results.stream().allMatch(mcs -> mcs.stream().allMatch(ax -> agenda.contains(ax))));
 	}
 
 	public void testMaximalConsistentSets() {
@@ -96,29 +94,6 @@ public class TesterUtils extends TestCase {
 		assertTrue(SetUtils.powerSet(agenda).stream()
 				.allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
 						|| results.contains(subset))));
-		for (Set<OWLAxiom> mcs : results) {
-			assertTrue(mcs.stream().allMatch(ax -> agenda.contains(ax)));
-		}
-	}
-
-	public void testMaximalConsistentSetsFlushedCaches() {
-		Utils.flushConsistencyCache();
-		MaximalConsistentSets.flushConsistentSubsetsCache();
-
-		System.out.println("%%% TEST MCSs");
-
-		Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda);
-
-		System.out.println("Found " + results.size() + " MCSs in " + agenda);
-		results.stream().forEach(System.out::println);
-
-		assertTrue(
-				results.stream().allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)));
-		assertTrue(SetUtils.powerSet(agenda).stream()
-				.allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
-						|| results.contains(subset))));
-		for (Set<OWLAxiom> mcs : results) {
-			assertTrue(mcs.stream().allMatch(ax -> agenda.contains(ax)));
-		}
+		assertTrue(results.stream().allMatch(mcs -> mcs.stream().allMatch(ax -> agenda.contains(ax))));
 	}
 }
