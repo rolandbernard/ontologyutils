@@ -33,6 +33,9 @@ import www.ontologyutils.ontologyutils.Annotate;
 import www.ontologyutils.ontologyutils.FreshAtoms;
 import www.ontologyutils.ontologyutils.Utils;
 
+/**
+ * TODO: reorganize code into interface + implementations
+ */
 public class Normalization {
 
 	private static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
@@ -206,19 +209,19 @@ public class Normalization {
 				continue;
 			}
 			if (ontology.tboxAxioms(Imports.EXCLUDED).anyMatch(ax -> isNegativeIn(e, ax))) {
-				ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> { 
+				ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
 					if (isNegativeIn(e, ax)) {
-						OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(structuralTransformation(e, map), map.get(e),
-								Annotate.getAxiomAnnotations(ax));
+						OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(structuralTransformation(e, map),
+								map.get(e), Annotate.getAxiomAnnotations(ax));
 						transformed.add(sba);
 					}
 				});
 			}
 			if (ontology.tboxAxioms(Imports.EXCLUDED).anyMatch(ax -> isPositiveIn(e, ax))) {
-				ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> { 
+				ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
 					if (isPositiveIn(e, ax)) {
-						OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(e), structuralTransformation(e, map),
-								Annotate.getAxiomAnnotations(ax));
+						OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(e),
+								structuralTransformation(e, map), Annotate.getAxiomAnnotations(ax));
 						transformed.add(sba);
 					}
 				});
