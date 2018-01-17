@@ -16,6 +16,18 @@ import www.ontologyutils.ontologyutils.SetUtils;
 import www.ontologyutils.ontologyutils.Utils;
 import www.ontologyutils.refinement.AxiomWeakener;
 
+/**
+ * An implementation of {@code OntologyRepair} following closely (but not
+ * stictly) the axiom weakening approach described in Nicolas Troquard, Roberto
+ * Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz:
+ * "Repairing Ontologies via Axiom Weakening", AAAI 2018.
+ * 
+ * The ontology passed in parameter of the constructor should only contain
+ * assertion or subclass axioms.
+ * 
+ * TODO: ... or axioms that can be converted into subclass axioms via
+ * {@code NormalizationTools:asSubClassOfAxioms}.
+ */
 public class OntologyRepairWeakening implements OntologyRepair {
 
 	private OWLOntology originalOntology;
@@ -77,32 +89,31 @@ public class OntologyRepairWeakening implements OntologyRepair {
 	private OWLAxiom findBadAxiom(Set<OWLAxiom> axioms) {
 		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms);
 		HashMap<OWLAxiom, Integer> occurences = new HashMap<>();
+		for (OWLAxiom ax : axioms) {
+			occurences.put(ax, 0);
+		}
 		for (Set<OWLAxiom> mcs : mcss) {
-			mcs.stream().filter(a -> a.isOfType(AxiomType.SUBCLASS_OF) || a.isOfType(AxiomType.CLASS_ASSERTION))
-					.forEach(ax -> {
-						int occ = occurences.containsKey(ax) ? occurences.get(ax) : 0;
-						occurences.put(ax, occ + 1);
-					});
+			mcs.stream().forEach(ax -> {
+				if (!occurences.containsKey(ax)) { // FIXME
+					throw new RuntimeException("Did not expect " + ax);
+				}
+				occurences.put(ax, occurences.get(ax) + 1);
+			});
 		}
 		int minOcc = Integer.MAX_VALUE;
-		for (OWLAxiom a : axioms) {
-			if (a.isOfType(AxiomType.SUBCLASS_OF) || a.isOfType(AxiomType.CLASS_ASSERTION)) {
-				if (!occurences.containsKey(a)) { // FIXME
-					throw new RuntimeException("ERROR: not in any MCS! " + a + " is inconsistent on its own!");
-					// happens e.g., after
-					// Weaken: SubClassOf(owl:Thing <www.first.org>)
-					// Into: SubClassOf(owl:Thing owl:Nothing)
-					// Because <www.first.org> is equivalent to owl:Nothing
-					// and SubClassOf(owl:Thing <www.first.org>) does not occur in an MCS
+		for (OWLAxiom ax : axioms) {
+			if (ax.isOfType(AxiomType.SUBCLASS_OF) || ax.isOfType(AxiomType.CLASS_ASSERTION)) {
+				if (!occurences.containsKey(ax)) { // FIXME
+					throw new RuntimeException("Did not expect " + ax);
 				}
-				minOcc = Integer.min(minOcc, occurences.get(a)); // FIXME: throws NullPointerException
+				minOcc = Integer.min(minOcc, occurences.get(ax));
 			}
 		}
 		Set<OWLAxiom> badAxioms = new HashSet<>();
-		for (OWLAxiom a : axioms) {
-			if (a.isOfType(AxiomType.SUBCLASS_OF) || a.isOfType(AxiomType.CLASS_ASSERTION)) {
-				if (occurences.get(a) == minOcc) {
-					badAxioms.add(a);
+		for (OWLAxiom ax : axioms) {
+			if (ax.isOfType(AxiomType.SUBCLASS_OF) || ax.isOfType(AxiomType.CLASS_ASSERTION)) {
+				if (occurences.get(ax) == minOcc) {
+					badAxioms.add(ax);
 				}
 			}
 		}
