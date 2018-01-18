@@ -44,7 +44,7 @@ public class AppRepair {
 		
 		// 1- Choosing a reference ontology (randomly)
 		System.out.println("Searching all MCSs and electing one as reference ontology...");
-		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms);
+		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(logicalAxioms);
 		OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss).stream());
 				
 		// 2- AxiomWeakener
@@ -52,7 +52,7 @@ public class AppRepair {
 		
 		// 3- Repairing
 		while (!Utils.isConsistent(logicalAxioms)) {
-			ArrayList<OWLAxiom> badAxioms = new ArrayList(findBadAxioms(logicalAxioms));
+			ArrayList<OWLAxiom> badAxioms = new ArrayList<OWLAxiom>(findBadAxioms(logicalAxioms));
 			
 			// SELECT BAD AXIOM
 			System.out.println("Select an axiom to weaken.");
@@ -74,9 +74,9 @@ public class AppRepair {
 			// SELECT WEAKENING
 			ArrayList<OWLAxiom> weakerAxioms = null;
 			if (badAxiom.isOfType(AxiomType.SUBCLASS_OF)) {
-				weakerAxioms = new ArrayList(aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) badAxiom));
+				weakerAxioms = new ArrayList<OWLAxiom>(aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) badAxiom));
 			} else if (badAxiom.isOfType(AxiomType.CLASS_ASSERTION)) {
-				weakerAxioms = new ArrayList(aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) badAxiom));
+				weakerAxioms = new ArrayList<OWLAxiom>(aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) badAxiom));
 			} else {
 				throw new RuntimeException("Cannot weaken axiom that is neither a subclass nor an assertion axiom. "
 						+ "Could not repair the ontology.");
