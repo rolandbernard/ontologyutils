@@ -60,7 +60,7 @@ public class OntologyRepairWeakening implements OntologyRepair {
 		AxiomWeakener aw = new AxiomWeakener(referenceOntology);
 		// 3- Repairing
 		while (!Utils.isConsistent(axioms)) {
-			OWLAxiom badAxiom = findBadAxiom(axioms);
+			OWLAxiom badAxiom = SetUtils.getRandom(findBadAxioms(axioms));
 			Set<OWLAxiom> weakerAxioms = null;
 			if (badAxiom.isOfType(AxiomType.SUBCLASS_OF)) {
 				weakerAxioms = aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) badAxiom);
@@ -83,10 +83,10 @@ public class OntologyRepairWeakening implements OntologyRepair {
 
 	/**
 	 * @param axioms
-	 * @return one of the subclass or assertion axioms occurring in the least number
-	 *         of maximal consistent sets of {@code axioms}.
+	 * @return the set of subclass and assertion axioms occurring in the least
+	 *         number of maximal consistent sets of {@code axioms}.
 	 */
-	private OWLAxiom findBadAxiom(Set<OWLAxiom> axioms) {
+	private static Set<OWLAxiom> findBadAxioms(Set<OWLAxiom> axioms) {
 		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms);
 		HashMap<OWLAxiom, Integer> occurences = new HashMap<>();
 		for (OWLAxiom ax : axioms) {
@@ -120,7 +120,7 @@ public class OntologyRepairWeakening implements OntologyRepair {
 		if (badAxioms.size() < 1) {
 			throw new RuntimeException("Did not find a bad subclass or assertion axiom in " + axioms);
 		}
-		return SetUtils.getRandom(badAxioms);
+		return badAxioms;
 	}
 
 }
