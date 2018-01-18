@@ -139,7 +139,6 @@ public class AppCondorRules {
 					try {
 						write.append(e.getValue() + "\t\t" + Utils.pretty(e.getKey().toString()) + "\n");
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				});
@@ -152,20 +151,17 @@ public class AppCondorRules {
 						try {
 							write.append(ann.getValue().toString());
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					});
 					write.append("\n");
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			});
 			write.flush();
 			write.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
