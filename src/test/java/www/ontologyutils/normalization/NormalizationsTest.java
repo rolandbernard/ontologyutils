@@ -45,14 +45,6 @@ public class NormalizationsTest extends TestCase {
 
 	private static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
 
-	OWLEntity entity1;
-	OWLEntity entity2;
-	OWLEntity entity3;
-	OWLEntity entity4;
-	OWLEntity entity1bis;
-	OWLEntity role;
-	OWLEntity rolebis;
-
 	File[] FILES = { new File("./resources/catsandnumbers.owl"), new File("./resources/bodysystem.owl"),
 			new File("./resources/bfo.owl"), new File("./resources/apo.owl"), new File("./resources/aeo.owl"),
 			new File("./resources/duo.owl") };
@@ -65,8 +57,6 @@ public class NormalizationsTest extends TestCase {
 	 */
 	public NormalizationsTest(String testName) {
 		super(testName);
-		init();
-
 	}
 
 	/**
@@ -74,125 +64,6 @@ public class NormalizationsTest extends TestCase {
 	 */
 	public static Test suite() {
 		return new TestSuite(NormalizationsTest.class);
-	}
-
-	public void init() {
-		OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
-		entity1 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.first.org"));
-		entity2 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.second.org"));
-		entity3 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.third.org"));
-		entity4 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.fourth.org"));
-		entity1bis = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.first.org"));
-		role = dataFactory.getOWLObjectProperty(IRI.create("www.role.org"));
-		rolebis = dataFactory.getOWLObjectProperty(IRI.create("www.role.org"));
-	}
-
-	/**
-	 * 
-	 */
-	public void testConceptEquality() {
-		assertTrue(entity1 == entity1bis);
-		assertTrue(Utils.sameConcept((OWLClassExpression) entity1, (OWLClassExpression) entity1bis));
-
-		Set<OWLClassExpression> operands12 = new HashSet<OWLClassExpression>();
-		operands12.add((OWLClassExpression) entity1);
-		operands12.add((OWLClassExpression) entity2);
-		OWLObjectUnionOf union12 = new OWLObjectUnionOfImpl(operands12.stream());
-
-		Set<OWLClassExpression> operands12bis = new HashSet<OWLClassExpression>();
-		operands12bis.add((OWLClassExpression) entity1bis);
-		operands12bis.add((OWLClassExpression) entity2);
-		OWLObjectUnionOf union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
-
-		assertFalse(union12 == union12bis);
-		assertTrue(Utils.sameConcept(union12, union12bis));
-
-		operands12.add((OWLClassExpression) entity3);
-		operands12bis.add((OWLClassExpression) entity3);
-		union12 = new OWLObjectUnionOfImpl(operands12.stream());
-		union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
-
-		assertFalse(union12 == union12bis);
-		assertTrue(Utils.sameConcept(union12, union12bis));
-
-		OWLObjectSomeValuesFromImpl exist12 = new OWLObjectSomeValuesFromImpl((OWLObjectPropertyExpression) role,
-				union12);
-		OWLObjectSomeValuesFromImpl exist12bis = new OWLObjectSomeValuesFromImpl((OWLObjectPropertyExpression) rolebis,
-				union12bis);
-
-		assertTrue(Utils.sameConcept(exist12, exist12bis));
-
-		operands12.add((OWLClassExpression) exist12);
-		operands12bis.add((OWLClassExpression) exist12bis);
-		union12 = new OWLObjectUnionOfImpl(operands12.stream());
-		union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
-
-		assertFalse(union12 == union12bis);
-		assertTrue(Utils.sameConcept(union12, union12bis));
-
-		OWLObjectAllValuesFromImpl all12 = new OWLObjectAllValuesFromImpl((OWLObjectPropertyExpression) role,
-				(OWLClassExpression) union12);
-		OWLObjectAllValuesFromImpl all12bis = new OWLObjectAllValuesFromImpl((OWLObjectPropertyExpression) rolebis,
-				(OWLClassExpression) union12bis);
-
-		operands12.add((OWLClassExpression) all12);
-		operands12bis.add((OWLClassExpression) all12bis);
-		OWLObjectIntersectionOfImpl inter12 = new OWLObjectIntersectionOfImpl(operands12.stream());
-		OWLObjectIntersectionOfImpl inter12bis = new OWLObjectIntersectionOfImpl(operands12bis.stream());
-
-		assertFalse(inter12 == inter12bis);
-		assertTrue(Utils.sameConcept(inter12, inter12bis));
-	}
-
-	/**
-	 * 
-	 */
-	public void testFreshAtomsEquality() {
-		OWLClassExpression ef1 = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity1);
-		OWLClassExpression ef2 = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity2);
-		OWLClassExpression ef1bis = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity1);
-
-		assertFalse(ef1 == ef1bis);
-		assertTrue(ef1.equals(ef1bis));
-		assertFalse(ef1 == ef2);
-		assertTrue(Utils.sameConcept(ef1, ef1bis));
-	}
-
-	/**
-	 * Test whether we can normalize an ontology in such a way that all TBox axioms
-	 * are replaced with subclass axioms; The new ontology entails all axioms of the
-	 * original ontology, and vice versa.
-	 * 
-	 * @throws OWLOntologyCreationException
-	 */
-	public void testAsSubClass() throws OWLOntologyCreationException {
-		for (File ontologyFile : FILES) {
-
-			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-			OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(ontologyFile));
-
-			System.out.println("Testing subclass normalization on " + ontology);
-
-			Stream<OWLAxiom> tBox = ontology.tboxAxioms(Imports.EXCLUDED);
-			Object[] tBoxArray = tBox.toArray();
-
-			for (int i = 0; i < tBoxArray.length; i++) {
-				OWLAxiom ax = (OWLAxiom) tBoxArray[i];
-				ontology.remove(ax);
-				ontology.add(NormalizationTools.asSubClassOfAxioms(ax));
-			}
-			// all subclass axioms
-			ontology.tboxAxioms(Imports.EXCLUDED).forEach((ax) -> assertTrue(ax.isOfType(AxiomType.SUBCLASS_OF)));
-
-			OWLOntologyManager managerOrigin = OWLManager.createOWLOntologyManager();
-			OWLOntology ontologyOrigin = managerOrigin.loadOntologyFromOntologyDocument(IRI.create(ontologyFile));
-			OWLReasoner originReasoner = Utils.getFactReasoner(ontologyOrigin);
-			// the original ontology entails all the axioms of the new ontology.
-			ontology.axioms().forEach((ax) -> assertTrue(originReasoner.isEntailed(ax)));
-			OWLReasoner reasoner = Utils.getFactReasoner(ontology);
-			// the new ontology entails all the axioms of the original ontology.
-			ontologyOrigin.axioms().forEach((ax) -> assertTrue(reasoner.isEntailed(ax)));
-		}
 	}
 
 	public void testNormalizeCondor() throws OWLOntologyCreationException {
