@@ -12,10 +12,12 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  */
 public class MaximalConsistentSets {
 
+	private static final int ALL_MCSS = -1;
+
 	// Prevent instantiation
 	private MaximalConsistentSets() {
 	}
-	
+
 	public static boolean isMaximallyConsistentSubset(Set<OWLAxiom> subset, Set<OWLAxiom> set) {
 		return Utils.isConsistent(subset) && SetUtils.powerSet(set).stream().parallel()
 				.allMatch(s -> (s.equals(subset) || !s.containsAll(subset) || !Utils.isConsistent(s)));
@@ -34,12 +36,10 @@ public class MaximalConsistentSets {
 	}
 
 	/**
-	 * @author nico
-	 *
-	 *         Ad hoc data structure to be used in the function
-	 *         {@link maximalConsistentSubsets} implementing Robert Malouf's
-	 *         "Maximal Consistent Subsets", Computational Linguistics, vol 33(2),
-	 *         p.153-160, 2007.
+	 * Ad hoc data structure to be used in the function
+	 * {@link maximalConsistentSubsets} implementing Robert Malouf's "Maximal
+	 * Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.
+	 * 
 	 * @see maximalConsistentSubsets(Set<OWLAxiom> axioms)
 	 */
 	private static class McsStruct {
@@ -60,6 +60,18 @@ public class MaximalConsistentSets {
 	 * @return the set of maximal consistent subsets of axioms.
 	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Set<OWLAxiom> axioms) {
+		return maximalConsistentSubsets(axioms, ALL_MCSS);
+	}
+
+	/**
+	 * @param axioms
+	 *            a set of axioms
+	 * @param howMany
+	 *            the maximal number of maximal consistent subsets to be returned
+	 * @return a set of at most {@code howMany} maximal consistent subsets of
+	 *         axioms.
+	 */
+	public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Set<OWLAxiom> axioms, int howMany) {
 		// This implementation follows the algorithm in Robert Malouf's "Maximal
 		// Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.
 
@@ -75,6 +87,9 @@ public class MaximalConsistentSets {
 				if (results.stream().parallel().allMatch(mcs -> !mcs.containsAll(current.axioms))) {
 					// current.axioms is an mcs
 					results.add(current.axioms);
+					if (howMany != ALL_MCSS && results.size() == howMany) {
+						return results;
+					}
 				}
 			} else {
 				Set<OWLAxiom> L = new HashSet<>();
@@ -101,5 +116,5 @@ public class MaximalConsistentSets {
 
 		return results;
 	}
-	
+
 }
