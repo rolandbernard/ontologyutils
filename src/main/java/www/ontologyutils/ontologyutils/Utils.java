@@ -46,7 +46,7 @@ public class Utils {
 	private static void log(String message) {
 		log("Utils", message);
 	}
-	
+
 	/**
 	 * @param owlString
 	 * @return
@@ -54,7 +54,7 @@ public class Utils {
 	public static String pretty(String owlString) {
 		return owlString.replaceAll("<http.*?#", "").replaceAll(">", "").replaceAll("<", "");
 	}
-	
+
 	/**
 	 * @param ontology
 	 * 
@@ -65,8 +65,9 @@ public class Utils {
 		tBoxAxioms.forEach((ax) -> System.out.println(pretty(ax.toString())));
 	}
 
+	private static final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+
 	public static OWLOntology newEmptyOntology() {
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		OWLOntology newOntology = null;
 		try {
 			newOntology = manager.createOntology();
@@ -82,12 +83,11 @@ public class Utils {
 		ontology.addAxioms(axioms);
 		return ontology;
 	}
-	
+
 	public static OWLOntology newOntology(String ontologyFilePath) {
 
 		File ontologyFile = new File(ontologyFilePath);
 
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		IRI ontologyIRI = IRI.create(ontologyFile);
 
 		OWLOntology ontology = null;
@@ -101,43 +101,48 @@ public class Utils {
 
 		return ontology;
 	}
-	
+
 	public static OWLOntology newOntologyExcludeNonLogicalAxioms(String ontologyFilePath) {
 		OWLOntology ontology = newOntology(ontologyFilePath);
-		
+
 		// exclude non-logical axioms: keeping ABox, TBox, RBox axioms
+		// TODO OWLOntology result = newOntology(ontology.axioms().filter(ax ->
+		// ax.isLogicalAxiom()));
 		OWLOntology result = newEmptyOntology();
 		result.addAxioms(ontology.aboxAxioms(Imports.EXCLUDED));
 		result.addAxioms(ontology.tboxAxioms(Imports.EXCLUDED));
 		result.addAxioms(ontology.rboxAxioms(Imports.EXCLUDED));
-		
+
 		return result;
 	}
+
+	private static final OWLReasonerFactory reasonerFactoryFact = new JFactFactory();
+	private static final OWLReasonerConfiguration configFact = new SimpleConfiguration();
 
 	/**
 	 * @param ontology
 	 * @return a JFact reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getFactReasoner(OWLOntology ontology) {
-		OWLReasonerFactory reasonerFactory = new JFactFactory();
-		OWLReasonerConfiguration config = new SimpleConfiguration(50000);
-		return reasonerFactory.createReasoner(ontology, config);
+		return reasonerFactoryFact.createReasoner(ontology, configFact);
 	}
+
+	private static final Configuration configHermit = new Configuration();
 
 	/**
 	 * @param ontology
 	 * @return a Hermit reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getHermitReasoner(OWLOntology ontology) {
-		return new Reasoner(new Configuration(), ontology);
+		return new Reasoner(configHermit, ontology);
 	}
-	
+
 	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
-	
+
 	public static void flushConsistencyCache() {
 		uglyAxiomSetConsistencyCache = new HashMap<Set<OWLAxiom>, Boolean>();
 	}
-	
+
 	public static boolean isConsistent(OWLOntology ontology) {
 		Set<OWLAxiom> axioms = ontology.axioms().collect(Collectors.toSet());
 		Boolean consistency = uglyAxiomSetConsistencyCache.get(axioms);
@@ -178,7 +183,6 @@ public class Utils {
 
 		return subConcepts;
 	}
-	
 
 	/**
 	 * @param c1

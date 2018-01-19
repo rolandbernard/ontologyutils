@@ -14,7 +14,9 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.parameters.Imports;
 
+import www.ontologyutils.normalization.NormalizationTools;
 import www.ontologyutils.ontologyutils.MaximalConsistentSets;
 import www.ontologyutils.ontologyutils.SetUtils;
 import www.ontologyutils.ontologyutils.Utils;
@@ -35,16 +37,25 @@ public class AppRepair {
 	 *            One argument must be given, corresponding to an OWL ontology file
 	 *            path. E.g., run with the parameter resources/inconsistent-leftpolicies.owl
 	 */
-	public static void main(String[] args) {		
+	public static void main(String[] args) {	
+		final int MCS_SAMPLE_SIZE = 3;
 		AppRepair mApp = new AppRepair(args[0]);
 		System.out.println("Loaded... " + mApp.ontology);
 		Set<OWLAxiom> axioms = mApp.ontology.axioms().collect(Collectors.toSet());
-		Set<OWLAxiom> logicalAxioms = axioms.stream().filter(ax -> ax.isLogicalAxiom()).collect(Collectors.toSet());
 		Set<OWLAxiom> nonLogicalAxioms = axioms.stream().filter(ax -> !ax.isLogicalAxiom()).collect(Collectors.toSet());
-		
+		// 0- We isolate the logical axioms, and make sure the TBox axioms are all subclass axioms, converting them when necessary.
+		Set<OWLAxiom> logicalAxioms = new HashSet<>();//axioms.stream().filter(ax -> ax.isLogicalAxiom()).collect(Collectors.toSet());
+		logicalAxioms.addAll(mApp.ontology.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
+		logicalAxioms.addAll(mApp.ontology.rboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
+		mApp.ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
+			logicalAxioms.addAll(NormalizationTools.asSubClassOfAxioms(ax));
+		});
+		System.out.println("Converted ontology: " + logicalAxioms.size() + " logical axioms:");
+		logicalAxioms.forEach(System.out::println);
+
 		// 1- Choosing a reference ontology (randomly)
-		System.out.println("Searching all MCSs and electing one as reference ontology...");
-		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(logicalAxioms);
+		System.out.println("Searching some MCSs and electing one as reference ontology...");
+		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(logicalAxioms, MCS_SAMPLE_SIZE);
 		OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss).stream());
 				
 		// 2- AxiomWeakener
