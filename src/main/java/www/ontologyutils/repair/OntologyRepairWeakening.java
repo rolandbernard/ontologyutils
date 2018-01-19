@@ -10,6 +10,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.parameters.Imports;
 
 import www.ontologyutils.ontologyutils.MaximalConsistentSets;
 import www.ontologyutils.ontologyutils.SetUtils;
@@ -40,6 +41,12 @@ public class OntologyRepairWeakening implements OntologyRepair {
 	}
 
 	public OntologyRepairWeakening(OWLOntology ontology, Boolean verbose) {
+		// TODO: normalize TBox?
+		if (ontology.tboxAxioms(Imports.EXCLUDED)
+				.anyMatch(ax -> (!ax.isOfType(AxiomType.SUBCLASS_OF) && !ax.isOfType(AxiomType.CLASS_ASSERTION)))) {
+			throw new RuntimeException(
+					"Every logical axiom of the ontology to repair must be either a subclass axiom or an assertion axioms.");
+		}
 		this.originalOntology = ontology;
 		this.verbose = verbose;
 	}
@@ -50,8 +57,6 @@ public class OntologyRepairWeakening implements OntologyRepair {
 
 	@Override
 	public OWLOntology repair() {
-		// TODO: normalize TBox
-
 		Set<OWLAxiom> axioms = originalOntology.axioms().collect(Collectors.toSet());
 		// 1- Choosing a reference ontology as a random MCS of the original axioms
 		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms);
