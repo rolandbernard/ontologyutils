@@ -27,7 +27,7 @@ public class OntologyRepairRandomMCS implements OntologyRepair {
 
 	@Override
 	public OWLOntology repair() {
-		return Utils.newOntology(SetUtils.getRandom(mcss).stream());
+		return Utils.newOntology(SetUtils.getRandom(mcss));
 	}
 
 }

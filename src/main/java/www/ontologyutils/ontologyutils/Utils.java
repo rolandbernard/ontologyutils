@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.semanticweb.HermiT.Configuration;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
@@ -23,9 +22,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
@@ -84,14 +81,16 @@ public class Utils {
 		return ontology;
 	}
 
+	public static OWLOntology newOntology(Set<OWLAxiom> axioms) {
+		OWLOntology ontology = newEmptyOntology();
+		ontology.addAxioms(axioms);
+		return ontology;
+	}
+
 	public static OWLOntology newOntology(String ontologyFilePath) {
-
 		File ontologyFile = new File(ontologyFilePath);
-
 		IRI ontologyIRI = IRI.create(ontologyFile);
-
 		OWLOntology ontology = null;
-
 		try {
 			ontology = manager.loadOntologyFromOntologyDocument(ontologyIRI);
 		} catch (OWLOntologyCreationException e) {
@@ -104,37 +103,29 @@ public class Utils {
 
 	public static OWLOntology newOntologyExcludeNonLogicalAxioms(String ontologyFilePath) {
 		OWLOntology ontology = newOntology(ontologyFilePath);
-
 		// exclude non-logical axioms: keeping ABox, TBox, RBox axioms
-		// TODO OWLOntology result = newOntology(ontology.axioms().filter(ax ->
-		// ax.isLogicalAxiom()));
-		OWLOntology result = newEmptyOntology();
-		result.addAxioms(ontology.aboxAxioms(Imports.EXCLUDED));
-		result.addAxioms(ontology.tboxAxioms(Imports.EXCLUDED));
-		result.addAxioms(ontology.rboxAxioms(Imports.EXCLUDED));
-
-		return result;
+		return newOntology(ontology.axioms().filter(ax -> ax.isLogicalAxiom()));
 	}
 
 	private static final OWLReasonerFactory reasonerFactoryFact = new JFactFactory();
-	private static final OWLReasonerConfiguration configFact = new SimpleConfiguration();
 
 	/**
 	 * @param ontology
 	 * @return a JFact reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getFactReasoner(OWLOntology ontology) {
-		return reasonerFactoryFact.createReasoner(ontology, configFact);
+		return reasonerFactoryFact.createReasoner(ontology);
 	}
 
-	private static final Configuration configHermit = new Configuration();
+	@SuppressWarnings("deprecation")
+	private static final OWLReasonerFactory reasonerFactoryHermit = new Reasoner.ReasonerFactory();
 
 	/**
 	 * @param ontology
 	 * @return a Hermit reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getHermitReasoner(OWLOntology ontology) {
-		return new Reasoner(configHermit, ontology);
+		return reasonerFactoryHermit.createReasoner(ontology);
 	}
 
 	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
@@ -143,13 +134,31 @@ public class Utils {
 		uglyAxiomSetConsistencyCache = new HashMap<Set<OWLAxiom>, Boolean>();
 	}
 
+	enum ReasonerName {
+		FACT, HERMIT
+	}
+
 	public static boolean isConsistent(OWLOntology ontology) {
+		return isConsistent(ontology, ReasonerName.FACT);
+	}
+
+	public static boolean isConsistent(OWLOntology ontology, ReasonerName reasonerName) {
 		Set<OWLAxiom> axioms = ontology.axioms().collect(Collectors.toSet());
 		Boolean consistency = uglyAxiomSetConsistencyCache.get(axioms);
 		if (consistency != null) {
 			return consistency;
 		}
-		OWLReasoner reasoner = getFactReasoner(ontology);
+		OWLReasoner reasoner;
+		switch (reasonerName) {
+		case HERMIT:
+			reasoner = getHermitReasoner(ontology);
+			break;
+		case FACT:
+			reasoner = getFactReasoner(ontology);
+			break;
+		default:
+			reasoner = getFactReasoner(ontology);
+		}
 		consistency = reasoner.isConsistent();
 		reasoner.dispose();
 
@@ -158,7 +167,11 @@ public class Utils {
 	}
 
 	public static boolean isConsistent(Set<OWLAxiom> axioms) {
-		return isConsistent(newOntology(axioms.stream()));
+		Boolean consistency = uglyAxiomSetConsistencyCache.get(axioms);
+		if (consistency != null) {
+			return consistency;
+		}
+		return isConsistent(newOntology(axioms));
 	}
 
 	/**

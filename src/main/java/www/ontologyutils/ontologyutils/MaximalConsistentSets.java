@@ -1,8 +1,9 @@
 package www.ontologyutils.ontologyutils;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -19,16 +20,36 @@ public class MaximalConsistentSets {
 	}
 
 	public static boolean isMaximallyConsistentSubset(Set<OWLAxiom> subset, Set<OWLAxiom> set) {
-		return Utils.isConsistent(subset) && SetUtils.powerSet(set).stream().parallel()
+		return Utils.isConsistent(subset) && SetUtils.powerSet(set).stream()
 				.allMatch(s -> (s.equals(subset) || !s.containsAll(subset) || !Utils.isConsistent(s)));
 	}
 
+	/**
+	 * @param axioms
+	 *            a set of axioms
+	 * @return the set of maximal consistent subsets of axioms.
+	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms) {
+		return maximalConsistentSubsetsNaive(axioms, ALL_MCSS);
+	}
+
+	/**
+	 * @param axioms
+	 *            a set of axioms
+	 * @param howMany
+	 *            the maximal number of maximal consistent subsets to be returned
+	 * @return a set of at most {@code howMany} maximal consistent subsets of
+	 *         axioms.
+	 */
+	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms, int howMany) {
 		Set<Set<OWLAxiom>> results = new HashSet<>();
 
 		for (Set<OWLAxiom> candidate : SetUtils.powerSet(axioms)) {
 			if (isMaximallyConsistentSubset(candidate, axioms)) {
 				results.add(candidate);
+				if (howMany != ALL_MCSS && results.size() == howMany) {
+					return results;
+				}
 			}
 		}
 
@@ -75,16 +96,16 @@ public class MaximalConsistentSets {
 		// This implementation follows the algorithm in Robert Malouf's "Maximal
 		// Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.
 
-		ArrayList<OWLAxiom> orderedAxioms = new ArrayList<OWLAxiom>(axioms);
+		final ArrayList<OWLAxiom> orderedAxioms = new ArrayList<OWLAxiom>(axioms);
 		Set<Set<OWLAxiom>> results = new HashSet<>();
 
-		LinkedList<McsStruct> Q = new LinkedList<>();
+		Deque<McsStruct> Q = new ArrayDeque<>();
 		Q.add(new McsStruct(axioms, 0, false));
 
 		while (!Q.isEmpty()) {
 			McsStruct current = Q.poll(); // retrieve and dequeue
 			if (Utils.isConsistent(current.axioms)) {
-				if (results.stream().parallel().allMatch(mcs -> !mcs.containsAll(current.axioms))) {
+				if (results.stream().allMatch(mcs -> !mcs.containsAll(current.axioms))) {
 					// current.axioms is an mcs
 					results.add(current.axioms);
 					if (howMany != ALL_MCSS && results.size() == howMany) {

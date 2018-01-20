@@ -71,7 +71,7 @@ public class TesterRepair extends TestCase {
 	public void testRepairRandomMCS() {
 		System.out.println("%%% TEST REPAIR RANDOM MCSs");
 
-		OntologyRepair orrmcs = new OntologyRepairRandomMCS(Utils.newOntology(agenda.stream()));
+		OntologyRepair orrmcs = new OntologyRepairRandomMCS(Utils.newOntology(agenda));
 		OWLOntology repair;
 
 		for (int i = 1; i <= 3; i++) {
@@ -87,7 +87,7 @@ public class TesterRepair extends TestCase {
 		System.out.println("%%% TEST REPAIR WEAKEN");
 
 		Boolean verbose = true;
-		OntologyRepair orrmcs = new OntologyRepairWeakening(Utils.newOntology(agenda.stream()), verbose);
+		OntologyRepair orrmcs = new OntologyRepairWeakening(Utils.newOntology(agenda), verbose);
 		OWLOntology repair;
 
 		for (int i = 1; i <= 3; i++) {

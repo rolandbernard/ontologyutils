@@ -38,7 +38,7 @@ public class AppRepair {
 	 *            path. E.g., run with the parameter resources/inconsistent-leftpolicies.owl
 	 */
 	public static void main(String[] args) {	
-		final int MCS_SAMPLE_SIZE = 3;
+		final int MCS_SAMPLE_SIZE = 1;
 		AppRepair mApp = new AppRepair(args[0]);
 		System.out.println("Loaded... " + mApp.ontology);
 		Set<OWLAxiom> axioms = mApp.ontology.axioms().collect(Collectors.toSet());
@@ -56,7 +56,7 @@ public class AppRepair {
 		// 1- Choosing a reference ontology (randomly)
 		System.out.println("Searching some MCSs and electing one as reference ontology...");
 		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(logicalAxioms, MCS_SAMPLE_SIZE);
-		OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss).stream());
+		OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss));
 				
 		// 2- AxiomWeakener
 		AxiomWeakener aw = new AxiomWeakener(referenceOntology);
@@ -95,11 +95,11 @@ public class AppRepair {
 			weakerAxioms.remove(badAxiom);
 			weakerAxioms.add(0, badAxiom);
 
-			System.out.println("Select a weakening.");
+			System.out.print("Select a weakening.");
 			for (int i = 0 ; i < weakerAxioms.size() ; i++) {
 				System.out.println((i + 1) + "\t" + weakerAxioms.get(i));
 			}
-			System.out.println("Enter axiom number > ");
+			System.out.print("Enter axiom number > ");
 			BufferedReader brW = new BufferedReader(new InputStreamReader(System.in));
 			int axNumW = -777;
 			try{
@@ -121,6 +121,8 @@ public class AppRepair {
 		System.out.println("Repaired ontology.");
 		logicalAxioms.forEach(System.out::println);
 		nonLogicalAxioms.forEach(System.out::println);
+		
+		System.out.println("Done.");
 	}
 	
 	// TODO remove code duplication with {@code OntologyRepairWeakening}

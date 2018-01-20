@@ -60,7 +60,7 @@ public class OntologyRepairWeakening implements OntologyRepair {
 		Set<OWLAxiom> axioms = originalOntology.axioms().collect(Collectors.toSet());
 		// 1- Choosing a reference ontology as a random MCS of the original axioms
 		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms);
-		OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss).stream());
+		OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss));
 		// 2- AxiomWeakener
 		AxiomWeakener aw = new AxiomWeakener(referenceOntology);
 		// 3- Repairing
@@ -83,7 +83,7 @@ public class OntologyRepairWeakening implements OntologyRepair {
 			// we log the operation
 			log("- Weaken: \t " + badAxiom + "\n  Into:   \t " + weakerAxiom + "\n");
 		}
-		return Utils.newOntology(axioms.stream());
+		return Utils.newOntology(axioms);
 	}
 
 	/**
