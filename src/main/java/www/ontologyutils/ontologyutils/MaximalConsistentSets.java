@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -113,21 +114,15 @@ public class MaximalConsistentSets {
 					}
 				}
 			} else {
-				Set<OWLAxiom> L = new HashSet<>();
-				for (OWLAxiom ax : current.axioms) {
-					if (orderedAxioms.indexOf(ax) + 1 <= current.k) {
-						L.add(ax);
-					}
-				} // L is current.axioms's deepest leaf
+				Set<OWLAxiom> L = current.axioms.stream().filter(ax -> orderedAxioms.indexOf(ax) + 1 <= current.k)
+						.collect(Collectors.toSet());
+				// L is current.axioms's deepest leaf
 				if (current.leftmost || Utils.isConsistent(L)) {
 					boolean leftmost = true;
 					for (int i = current.k + 1; i <= orderedAxioms.size(); i++) {
-						Set<OWLAxiom> newSet = new HashSet<>();
-						for (OWLAxiom ax : current.axioms) {
-							if (orderedAxioms.indexOf(ax) + 1 != i) {
-								newSet.add(ax);
-							}
-						}
+						final int index = i;
+						Set<OWLAxiom> newSet = current.axioms.stream()
+								.filter(ax -> orderedAxioms.indexOf(ax) + 1 != index).collect(Collectors.toSet());
 						Q.add(new McsStruct(newSet, i, leftmost)); // enqueue
 						leftmost = false;
 					}
