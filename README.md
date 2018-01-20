@@ -791,3 +791,9 @@ AXIOMS GROUPS
 6		SubClassOf(Integer Number)
 8		SubClassOf(Colour Quality)
 ```
+
+
+
+# Acknowledgments #
+
+Have contributed to this project: Roberto Confalonieri (UNIBZ), Pietro Galliani (UNIBZ).
