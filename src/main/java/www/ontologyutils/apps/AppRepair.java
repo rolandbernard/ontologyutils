@@ -57,20 +57,21 @@ public class AppRepair {
 		System.out.println("Searching some MCSs and electing one as reference ontology...");
 		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(logicalAxioms, MCS_SAMPLE_SIZE);
 		OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss));
-				
+		
 		// 2- AxiomWeakener
 		AxiomWeakener aw = new AxiomWeakener(referenceOntology);
 		
 		// 3- Repairing
 		while (!Utils.isConsistent(logicalAxioms)) {
-			ArrayList<OWLAxiom> badAxioms = new ArrayList<OWLAxiom>(findBadAxioms(logicalAxioms));
+			System.out.println("Looking for a bad axiom...");
+			ArrayList<OWLAxiom> badAxioms = new ArrayList<OWLAxiom>(findSomehowBadAxioms(logicalAxioms));
 			
 			// SELECT BAD AXIOM
 			System.out.println("Select an axiom to weaken.");
 			for (int i = 0 ; i < badAxioms.size() ; i++) {
 				System.out.println((i + 1) + "\t" + badAxioms.get(i));
 			}
-			System.out.println("Enter axiom number >");
+			System.out.print("Enter axiom number > ");
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			int axNum = -777;
 			try{
@@ -95,7 +96,7 @@ public class AppRepair {
 			weakerAxioms.remove(badAxiom);
 			weakerAxioms.add(0, badAxiom);
 
-			System.out.print("Select a weakening.");
+			System.out.println("Select a weakening.");
 			for (int i = 0 ; i < weakerAxioms.size() ; i++) {
 				System.out.println((i + 1) + "\t" + weakerAxioms.get(i));
 			}
@@ -126,8 +127,8 @@ public class AppRepair {
 	}
 	
 	// TODO remove code duplication with {@code OntologyRepairWeakening}
-	private static Set<OWLAxiom> findBadAxioms(Set<OWLAxiom> axioms) {
-		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms);
+	private static Set<OWLAxiom> findSomehowBadAxioms(Set<OWLAxiom> axioms) {
+		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms, (int) (axioms.size() / 4) + 1);
 		HashMap<OWLAxiom, Integer> occurences = new HashMap<>();
 		for (OWLAxiom ax : axioms) {
 			occurences.put(ax, 0);
