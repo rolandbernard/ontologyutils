@@ -62,7 +62,9 @@ public class TesterUtils extends TestCase {
 	static OWLAxiom ax5 = new OWLSubClassOfAxiomImpl(TOP, entity1, EMPTY_ANNOTATION);
 	static OWLAxiom ax6 = new OWLSubClassOfAxiomImpl(entity4, BOT, EMPTY_ANNOTATION);
 	static OWLAxiom ax7 = new OWLClassAssertionAxiomImpl(indy1, entity1, EMPTY_ANNOTATION);
+	static OWLAxiom ax8 = new OWLSubClassOfAxiomImpl(TOP, BOT, EMPTY_ANNOTATION);
 
+	
 	static Set<OWLAxiom> agenda;
 
 	File[] FILES = { new File("./resources/catsandnumbers.owl"), new File("./resources/bodysystem.owl"),
@@ -80,6 +82,7 @@ public class TesterUtils extends TestCase {
 		agenda.add(ax5);
 		agenda.add(ax6);
 		agenda.add(ax7);
+		agenda.add(ax8);
 
 		System.out.println("AGENDA " + agenda);
 	}
@@ -230,6 +233,21 @@ public class TesterUtils extends TestCase {
 			OWLReasoner reasoner = Utils.getFactReasoner(ontology);
 			// the new ontology entails all the axioms of the original ontology.
 			ontologyOrigin.axioms().forEach((ax) -> assertTrue(reasoner.isEntailed(ax)));
+		}
+	}
+	
+	public void testMaximalConsistentSetsSupersetsOf() {
+		System.out.println("%%% TEST MCSs SUPERSETS OF");
+
+		Set<Set<OWLAxiom>> powerSetAgenda = SetUtils.powerSet(agenda);
+		
+		for (Set<OWLAxiom> subset : powerSetAgenda ) {			
+			Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda, MaximalConsistentSets.ALL_MCSS, subset);
+			Set<Set<OWLAxiom>> resultsNaive = MaximalConsistentSets.maximalConsistentSubsetsNaive(agenda, MaximalConsistentSets.ALL_MCSS, subset);
+			System.out.println("Testing mcss supersets of " + subset);
+			assertTrue(results.containsAll(resultsNaive));
+			assertTrue(resultsNaive.containsAll(results));
+
 		}
 	}
 }

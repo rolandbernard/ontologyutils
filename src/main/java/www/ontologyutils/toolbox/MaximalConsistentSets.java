@@ -14,7 +14,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  */
 public class MaximalConsistentSets {
 
-	private static final int ALL_MCSS = -1;
+	public static final int ALL_MCSS = -1;
 
 	// Prevent instantiation
 	private MaximalConsistentSets() {
@@ -28,7 +28,7 @@ public class MaximalConsistentSets {
 	/**
 	 * @param axioms
 	 *            a set of axioms
-	 * @return the set of maximal consistent subsets of axioms.
+	 * @return the set of maximal consistent subsets of axioms from {@code axioms}.
 	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms) {
 		return maximalConsistentSubsetsNaive(axioms, ALL_MCSS);
@@ -39,21 +39,38 @@ public class MaximalConsistentSets {
 	 *            a set of axioms
 	 * @param howMany
 	 *            the maximal number of maximal consistent subsets to be returned
-	 * @return a set of at most {@code howMany} maximal consistent subsets of
-	 *         axioms.
+	 * @return a set of at most {@code howMany} maximal consistent subsets of axioms
+	 *         from {@code axioms}.
 	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms, int howMany) {
-		Set<Set<OWLAxiom>> results = new HashSet<>();
+		return maximalConsistentSubsetsNaive(axioms, howMany, new HashSet<>());
+	}
 
+	/**
+	 * @param axioms
+	 *            a set of axioms
+	 * @param howMany
+	 *            the maximal number of maximal consistent subsets to be returned
+	 * @param contained
+	 *            a set of axioms that must be contained by the returned maximal
+	 *            consistent sets.
+	 * @return a set of at most {@code howMany} maximal consistent subsets of axioms
+	 *         from {@code axioms} containing {@code contained}.
+	 */
+	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms, int howMany,
+			Set<OWLAxiom> contained) {
+		Set<Set<OWLAxiom>> results = new HashSet<>();
+		if (!axioms.containsAll(contained)) {
+			return results;
+		}
 		for (Set<OWLAxiom> candidate : SetUtils.powerSet(axioms)) {
-			if (isMaximallyConsistentSubset(candidate, axioms)) {
+			if (candidate.containsAll(contained) && isMaximallyConsistentSubset(candidate, axioms)) {
 				results.add(candidate);
 				if (howMany != ALL_MCSS && results.size() == howMany) {
 					return results;
 				}
 			}
 		}
-
 		return results;
 	}
 
@@ -79,7 +96,7 @@ public class MaximalConsistentSets {
 	/**
 	 * @param axioms
 	 *            a set of axioms
-	 * @return the set of maximal consistent subsets of axioms.
+	 * @return the set of maximal consistent subsets of axioms from {@code axioms}.
 	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Set<OWLAxiom> axioms) {
 		return maximalConsistentSubsets(axioms, ALL_MCSS);
@@ -90,8 +107,8 @@ public class MaximalConsistentSets {
 	 *            a set of axioms
 	 * @param howMany
 	 *            the maximal number of maximal consistent subsets to be returned
-	 * @return a set of at most {@code howMany} maximal consistent subsets of
-	 *         axioms.
+	 * @return a set of at most {@code howMany} maximal consistent subsets of axioms
+	 *         from {@code axioms}.
 	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Set<OWLAxiom> axioms, int howMany) {
 		// This implementation follows the algorithm in Robert Malouf's "Maximal
@@ -131,6 +148,22 @@ public class MaximalConsistentSets {
 		}
 
 		return results;
+	}
+
+	/**
+	 * @param axioms
+	 *            a set of axioms
+	 * @param howMany
+	 *            the maximal number of maximal consistent subsets to be returned
+	 * @param contained
+	 *            a set of axioms that must be contained by the returned maximal
+	 *            consistent sets.
+	 * @return a set of at most {@code howMany} maximal consistent subsets of axioms
+	 *         from {@code axioms} containing {@code contained}. TODO
+	 */
+	public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Set<OWLAxiom> axioms, int howMany,
+			Set<OWLAxiom> contained) {
+		return null; //maximalConsistentSubsetsNaive(axioms, howMany, contained); TODO
 	}
 
 }
