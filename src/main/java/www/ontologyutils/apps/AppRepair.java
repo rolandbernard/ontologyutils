@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 
 import www.ontologyutils.normalization.NormalizationTools;
+import www.ontologyutils.ontologyutils.Annotate;
 import www.ontologyutils.ontologyutils.MaximalConsistentSets;
 import www.ontologyutils.ontologyutils.SetUtils;
 import www.ontologyutils.ontologyutils.Utils;
@@ -69,7 +70,7 @@ public class AppRepair {
 			// SELECT BAD AXIOM
 			System.out.println("Select an axiom to weaken.");
 			for (int i = 0 ; i < badAxioms.size() ; i++) {
-				System.out.println((i + 1) + "\t" + badAxioms.get(i));
+				System.out.println((i + 1) + "\t" + Utils.prettyPrintAxiom(badAxioms.get(i)));
 			}
 			System.out.print("Enter axiom number > ");
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -93,12 +94,15 @@ public class AppRepair {
 				throw new RuntimeException("Cannot weaken axiom that is neither a subclass nor an assertion axiom. "
 						+ "Could not repair the ontology.");
 			}
-			weakerAxioms.remove(badAxiom);
-			weakerAxioms.add(0, badAxiom);
+			weakerAxioms = weakerAxioms.stream().map(ax -> ax.getAxiomWithoutAnnotations()).collect(Collectors.toCollection(ArrayList<OWLAxiom>::new));
+			weakerAxioms.remove(badAxiom.getAxiomWithoutAnnotations());
+			weakerAxioms.add(0, badAxiom.getAxiomWithoutAnnotations());
 
 			System.out.println("Select a weakening.");
+			System.out.println("0 \t[KEEP AND DO NOT ASK AGAIN]");
 			for (int i = 0 ; i < weakerAxioms.size() ; i++) {
-				System.out.println((i + 1) + "\t" + weakerAxioms.get(i));
+				//System.out.println((i + 1) + "\t" + Utils.prettyPrintAxiom(weakerAxioms.get(i)) + ((i==0)?"\t[KEEP]":""));
+				System.out.println((i + 1) + "\t" + ((i==0)?"[KEEP FOR NOW]":"" + Utils.prettyPrintAxiom(weakerAxioms.get(i))));
 			}
 			System.out.print("Enter axiom number > ");
 			BufferedReader brW = new BufferedReader(new InputStreamReader(System.in));
@@ -110,13 +114,20 @@ public class AppRepair {
 	        } catch (IOException e) {
 				e.printStackTrace();
 			}
-			OWLAxiom weakerAxiom = weakerAxioms.get(axNumW);
+			OWLAxiom weakerAxiom = null;
+			if (axNumW == -1) {
+				weakerAxiom = weakerAxioms.get(1);
+				System.out.println("Functionality not available."); // TODO
+			}
+			else {
+				weakerAxiom = weakerAxioms.get(axNumW);
+			}
 			
 			// we remove the bad axiom and add its weakenings
 			logicalAxioms.remove(badAxiom);
-			logicalAxioms.add(weakerAxiom);
+			logicalAxioms.add(Annotate.getAnnotatedAxiom(weakerAxiom, badAxiom));
 			// we log the operation
-			System.out.println("- Weaken: \t " + badAxiom + "\n  Into:   \t " + weakerAxiom + "\n");
+			System.out.println("- Weaken: \t " + badAxiom + "\n  Into:   \t " + Annotate.getAnnotatedAxiom(weakerAxiom, badAxiom) + "\n");
 		}
 		
 		System.out.println("Repaired ontology.");
