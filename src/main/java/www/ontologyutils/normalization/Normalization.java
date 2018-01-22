@@ -29,7 +29,7 @@ import uk.ac.manchester.cs.owl.owlapi.OWLObjectSomeValuesFromImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectUnionOfImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLQuantifiedRestrictionImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
-import www.ontologyutils.ontologyutils.Annotate;
+import www.ontologyutils.ontologyutils.AnnotateOrigin;
 import www.ontologyutils.ontologyutils.FreshAtoms;
 import www.ontologyutils.ontologyutils.Utils;
 
@@ -118,7 +118,7 @@ public class Normalization {
 		OWLClassExpression newLeft = replaceIfPolarity(e, substitute, a.getSubClass(), true);
 		OWLClassExpression newRight = replaceIfPolarity(e, substitute, a.getSuperClass(), false);
 
-		return new OWLSubClassOfAxiomImpl(newLeft, newRight, Annotate.getAxiomAnnotations(a));
+		return new OWLSubClassOfAxiomImpl(newLeft, newRight, AnnotateOrigin.getAxiomAnnotations(a));
 	}
 
 	/**
@@ -212,7 +212,7 @@ public class Normalization {
 				ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
 					if (isNegativeIn(e, ax)) {
 						OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(structuralTransformation(e, map),
-								map.get(e), Annotate.getAxiomAnnotations(ax));
+								map.get(e), AnnotateOrigin.getAxiomAnnotations(ax));
 						transformed.add(sba);
 					}
 				});
@@ -221,7 +221,7 @@ public class Normalization {
 				ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
 					if (isPositiveIn(e, ax)) {
 						OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(e),
-								structuralTransformation(e, map), Annotate.getAxiomAnnotations(ax));
+								structuralTransformation(e, map), AnnotateOrigin.getAxiomAnnotations(ax));
 						transformed.add(sba);
 					}
 				});
@@ -236,7 +236,7 @@ public class Normalization {
 				OWLClassExpression right = ((OWLSubClassOfAxiom) a).getSuperClass();
 
 				OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(left), map.get(right),
-						Annotate.getAxiomAnnotations(a));
+						AnnotateOrigin.getAxiomAnnotations(a));
 				transformed.add(sba);
 			}
 		});

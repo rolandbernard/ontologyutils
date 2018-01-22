@@ -19,7 +19,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectIntersectionOfImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
-import www.ontologyutils.ontologyutils.Annotate;
+import www.ontologyutils.ontologyutils.AnnotateOrigin;
 import www.ontologyutils.ontologyutils.FreshAtoms;
 import www.ontologyutils.normalization.NormalForm;
 import www.ontologyutils.normalization.Normalization;
@@ -30,13 +30,13 @@ import www.ontologyutils.rules.RuleGeneration;
 public class AppSuperNormalize {
 	private OWLOntology ontology;
 	private String ontologyName;
-	
+
 	public AppSuperNormalize(String ontologyFilePath) {
 
 		File ontologyFile = new File(ontologyFilePath);
 
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		IRI ontologyIRI = IRI.create(ontologyFile); 
+		IRI ontologyIRI = IRI.create(ontologyFile);
 
 		try {
 			ontology = manager.loadOntologyFromOntologyDocument(ontologyIRI);
@@ -62,9 +62,9 @@ public class AppSuperNormalize {
 
 		System.out.println("\nCondor Normalized TBox");
 		OWLOntology condor = null;
-		//condor = Normalization.normalizeCondor(copy);
+		// condor = Normalization.normalizeCondor(copy);
 		condor = superNormalize(Normalization.normalizeCondor(copy));
-		
+
 		condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(Utils.pretty("-- " + ax.toString())));
 
 		// check every axiom of the original ontology is entailed in condor
@@ -93,7 +93,7 @@ public class AppSuperNormalize {
 
 		System.out.println("\nNaive Normalized TBox");
 		OWLOntology naive = null;
-		//naive = Normalization.normalizeNaive(copy);
+		// naive = Normalization.normalizeNaive(copy);
 		naive = superNormalize(Normalization.normalizeNaive(copy));
 
 		naive.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(Utils.pretty("-- " + ax.toString())));
@@ -109,24 +109,25 @@ public class AppSuperNormalize {
 
 		return naive;
 	}
-	
 
 	/**
-	 * @param on 	an ontology in normal form
-	 * @return		an equivalent ontology where type-1 rules have at most 2 conjuncts on the left. 
+	 * @param on
+	 *            an ontology in normal form
+	 * @return an equivalent ontology where type-1 rules have at most 2 conjuncts on
+	 *         the left.
 	 */
-	
-	private static OWLOntology superNormalize(OWLOntology on) {		
+
+	private static OWLOntology superNormalize(OWLOntology on) {
 		OWLOntology res = Utils.newEmptyOntology();
 		on.tboxAxioms(Imports.EXCLUDED).forEach(a -> {
 			res.addAxioms(superNormalize(a));
 		});
 		res.addAxioms(on.rboxAxioms(Imports.EXCLUDED));
 		res.addAxioms(on.aboxAxioms(Imports.EXCLUDED));
-		
+
 		return res;
 	}
-	
+
 	private static Set<OWLAxiom> superNormalize(OWLAxiom a) {
 		Set<OWLAxiom> res = new HashSet<>();
 		OWLClassExpression left = ((OWLSubClassOfAxiom) a).getSubClass();
@@ -141,26 +142,25 @@ public class AppSuperNormalize {
 			Iterator<OWLClassExpression> iter = leftConj.iterator();
 			OWLClassExpression one = iter.next();
 			OWLClassExpression two = iter.next();
-			
+
 			OWLClassExpression newConj = new OWLObjectIntersectionOfImpl(one, two);
-			assert(newConj.asConjunctSet().size() == 2);
+			assert (newConj.asConjunctSet().size() == 2);
 			if (leftConj.size() == 2) {
-				assert(!iter.hasNext());
-				OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, right, Annotate.getAxiomAnnotations(a));
+				assert (!iter.hasNext());
+				OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, right, AnnotateOrigin.getAxiomAnnotations(a));
 				res.add(axiom);
 				return res;
 			}
-			
+
 			OWLClassExpression newAtom = FreshAtoms.createFreshAtomCopy(newConj);
 			leftConj.remove(one);
 			leftConj.remove(two);
 			leftConj.add(newAtom);
 
-			OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, newAtom, Annotate.getAxiomAnnotations(a));
+			OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, newAtom, AnnotateOrigin.getAxiomAnnotations(a));
 			res.add(axiom);
 		}
 	}
-
 
 	/**
 	 * @param args
@@ -180,8 +180,7 @@ public class AppSuperNormalize {
 
 		System.out.println("\nTo rules");
 		RuleGeneration rgn = new RuleGeneration(naive);
-		rgn.getMapEntities().entrySet().stream()
-			.forEach(e -> System.out.println(rgn.entityToRule(e.getKey())));
+		rgn.getMapEntities().entrySet().stream().forEach(e -> System.out.println(rgn.entityToRule(e.getKey())));
 		naive.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgn.normalizedSubClassAxiomToRule(ax)));
 
 		System.out.println("\nwhere");
@@ -195,8 +194,7 @@ public class AppSuperNormalize {
 
 		System.out.println("\nTo rules");
 		RuleGeneration rgc = new RuleGeneration(condor);
-		rgc.getMapEntities().entrySet().stream()
-			.forEach(e -> System.out.println(rgc.entityToRule(e.getKey())));
+		rgc.getMapEntities().entrySet().stream().forEach(e -> System.out.println(rgc.entityToRule(e.getKey())));
 		condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgc.normalizedSubClassAxiomToRule(ax)));
 
 		System.out.println("\nwhere");

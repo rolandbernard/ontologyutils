@@ -17,7 +17,7 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 
 import www.ontologyutils.normalization.NormalizationTools;
-import www.ontologyutils.ontologyutils.Annotate;
+import www.ontologyutils.ontologyutils.AnnotateOrigin;
 import www.ontologyutils.ontologyutils.MaximalConsistentSets;
 import www.ontologyutils.ontologyutils.SetUtils;
 import www.ontologyutils.ontologyutils.Utils;
@@ -26,7 +26,7 @@ import www.ontologyutils.refinement.AxiomWeakener;
 public class AppRepair {
 
 	OWLOntology ontology;
-	
+
 	public AppRepair(String ontologyFilePath) {
 
 		ontology = Utils.newOntology(ontologyFilePath);
@@ -36,16 +36,19 @@ public class AppRepair {
 	/**
 	 * @param args
 	 *            One argument must be given, corresponding to an OWL ontology file
-	 *            path. E.g., run with the parameter resources/inconsistent-leftpolicies.owl
+	 *            path. E.g., run with the parameter
+	 *            resources/inconsistent-leftpolicies.owl
 	 */
-	public static void main(String[] args) {	
+	public static void main(String[] args) {
 		final int MCS_SAMPLE_SIZE = 1;
 		AppRepair mApp = new AppRepair(args[0]);
 		System.out.println("Loaded... " + mApp.ontology);
 		Set<OWLAxiom> axioms = mApp.ontology.axioms().collect(Collectors.toSet());
 		Set<OWLAxiom> nonLogicalAxioms = axioms.stream().filter(ax -> !ax.isLogicalAxiom()).collect(Collectors.toSet());
-		// 0- We isolate the logical axioms, and make sure the TBox axioms are all subclass axioms, converting them when necessary.
-		Set<OWLAxiom> logicalAxioms = new HashSet<>();//axioms.stream().filter(ax -> ax.isLogicalAxiom()).collect(Collectors.toSet());
+		// 0- We isolate the logical axioms, and make sure the TBox axioms are all
+		// subclass axioms, converting them when necessary.
+		Set<OWLAxiom> logicalAxioms = new HashSet<>();// axioms.stream().filter(ax ->
+														// ax.isLogicalAxiom()).collect(Collectors.toSet());
 		logicalAxioms.addAll(mApp.ontology.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
 		logicalAxioms.addAll(mApp.ontology.rboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
 		mApp.ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
@@ -58,85 +61,89 @@ public class AppRepair {
 		System.out.println("Searching some MCSs and electing one as reference ontology...");
 		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(logicalAxioms, MCS_SAMPLE_SIZE);
 		OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss));
-		
+
 		// 2- AxiomWeakener
 		AxiomWeakener aw = new AxiomWeakener(referenceOntology);
-		
+
 		// 3- Repairing
 		while (!Utils.isConsistent(logicalAxioms)) {
 			System.out.println("Looking for a bad axiom...");
 			ArrayList<OWLAxiom> badAxioms = new ArrayList<OWLAxiom>(findSomehowBadAxioms(logicalAxioms));
-			
+
 			// SELECT BAD AXIOM
 			System.out.println("Select an axiom to weaken.");
-			for (int i = 0 ; i < badAxioms.size() ; i++) {
+			for (int i = 0; i < badAxioms.size(); i++) {
 				System.out.println((i + 1) + "\t" + Utils.prettyPrintAxiom(badAxioms.get(i)));
 			}
 			System.out.print("Enter axiom number > ");
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			int axNum = -777;
-			try{
-	            axNum = Integer.parseInt(br.readLine()) - 1;
-	        } catch (NumberFormatException e) {
-	        		e.printStackTrace();
-	        } catch (IOException e) {
+			try {
+				axNum = Integer.parseInt(br.readLine()) - 1;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			OWLAxiom badAxiom = badAxioms.get(axNum);
-			
+
 			// SELECT WEAKENING
 			ArrayList<OWLAxiom> weakerAxioms = null;
 			if (badAxiom.isOfType(AxiomType.SUBCLASS_OF)) {
 				weakerAxioms = new ArrayList<OWLAxiom>(aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) badAxiom));
 			} else if (badAxiom.isOfType(AxiomType.CLASS_ASSERTION)) {
-				weakerAxioms = new ArrayList<OWLAxiom>(aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) badAxiom));
+				weakerAxioms = new ArrayList<OWLAxiom>(
+						aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) badAxiom));
 			} else {
 				throw new RuntimeException("Cannot weaken axiom that is neither a subclass nor an assertion axiom. "
 						+ "Could not repair the ontology.");
 			}
-			weakerAxioms = weakerAxioms.stream().map(ax -> ax.getAxiomWithoutAnnotations()).collect(Collectors.toCollection(ArrayList<OWLAxiom>::new));
+			weakerAxioms = weakerAxioms.stream().map(ax -> ax.getAxiomWithoutAnnotations())
+					.collect(Collectors.toCollection(ArrayList<OWLAxiom>::new));
 			weakerAxioms.remove(badAxiom.getAxiomWithoutAnnotations());
 			weakerAxioms.add(0, badAxiom.getAxiomWithoutAnnotations());
 
 			System.out.println("Select a weakening.");
 			System.out.println("0 \t[KEEP AND DO NOT ASK AGAIN]");
-			for (int i = 0 ; i < weakerAxioms.size() ; i++) {
-				//System.out.println((i + 1) + "\t" + Utils.prettyPrintAxiom(weakerAxioms.get(i)) + ((i==0)?"\t[KEEP]":""));
-				System.out.println((i + 1) + "\t" + ((i==0)?"[KEEP FOR NOW]":"" + Utils.prettyPrintAxiom(weakerAxioms.get(i))));
+			for (int i = 0; i < weakerAxioms.size(); i++) {
+				// System.out.println((i + 1) + "\t" +
+				// Utils.prettyPrintAxiom(weakerAxioms.get(i)) + ((i==0)?"\t[KEEP]":""));
+				System.out.println((i + 1) + "\t"
+						+ ((i == 0) ? "[KEEP FOR NOW]" : "" + Utils.prettyPrintAxiom(weakerAxioms.get(i))));
 			}
 			System.out.print("Enter axiom number > ");
 			BufferedReader brW = new BufferedReader(new InputStreamReader(System.in));
 			int axNumW = -777;
-			try{
-	            axNumW = Integer.parseInt(brW.readLine()) - 1;
-	        } catch (NumberFormatException e) {
-	        		e.printStackTrace();
-	        } catch (IOException e) {
+			try {
+				axNumW = Integer.parseInt(brW.readLine()) - 1;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			OWLAxiom weakerAxiom = null;
 			if (axNumW == -1) {
 				weakerAxiom = weakerAxioms.get(1);
 				System.out.println("Functionality not available."); // TODO
-			}
-			else {
+			} else {
 				weakerAxiom = weakerAxioms.get(axNumW);
 			}
-			
+
 			// we remove the bad axiom and add its weakenings
 			logicalAxioms.remove(badAxiom);
-			logicalAxioms.add(Annotate.getAnnotatedAxiom(weakerAxiom, badAxiom));
+			logicalAxioms.add(AnnotateOrigin.getAnnotatedAxiom(weakerAxiom, badAxiom));
 			// we log the operation
-			System.out.println("- Weaken: \t " + badAxiom + "\n  Into:   \t " + Annotate.getAnnotatedAxiom(weakerAxiom, badAxiom) + "\n");
+			System.out.println("- Weaken: \t " + badAxiom + "\n  Into:   \t "
+					+ AnnotateOrigin.getAnnotatedAxiom(weakerAxiom, badAxiom) + "\n");
 		}
-		
+
 		System.out.println("Repaired ontology.");
 		logicalAxioms.forEach(System.out::println);
 		nonLogicalAxioms.forEach(System.out::println);
-		
+
 		System.out.println("Done.");
 	}
-	
+
 	// TODO remove code duplication with {@code OntologyRepairWeakening}
 	private static Set<OWLAxiom> findSomehowBadAxioms(Set<OWLAxiom> axioms) {
 		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms, (int) (axioms.size() / 4) + 1);

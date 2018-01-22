@@ -17,7 +17,7 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 
-public class Annotate {
+public class AnnotateOrigin {
 
 	public static final String ANN_ORIGIN = "origin";
 	

@@ -74,8 +74,7 @@ public class AxiomWeakener {
 	 *         (using the {@code SpecialisationOperator} {@code specOp} of this
 	 *         {@code JavaWeakener} object). Given an axiom A(i), the function
 	 *         returns the set containing all the axioms A'(i) where A' is in
-	 *         {@code genOp.generalise(A)}. TODO possibly keep track of original
-	 *         axioms through annotations
+	 *         {@code genOp.generalise(A)}.
 	 */
 	public Set<OWLAxiom> getWeakerClassAssertionAxioms(OWLClassAssertionAxiom axiom) {
 		HashSet<OWLAxiom> result = new HashSet<OWLAxiom>();
