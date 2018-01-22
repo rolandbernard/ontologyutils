@@ -163,7 +163,52 @@ public class MaximalConsistentSets {
 	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Set<OWLAxiom> axioms, int howMany,
 			Set<OWLAxiom> contained) {
-		return null; //maximalConsistentSubsetsNaive(axioms, howMany, contained); TODO
+		// This an adaptation of the algorithm in Robert Malouf's "Maximal
+		// Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.
+		// TODO reorganise code and remove code duplications
+		
+		ArrayList<OWLAxiom> orderedAxioms = new ArrayList<OWLAxiom>(axioms);
+		orderedAxioms.removeAll(contained);
+		
+		Set<Set<OWLAxiom>> results = new HashSet<>();
+		if (!axioms.containsAll(contained)) {
+			return results;
+		}
+
+		Deque<McsStruct> Q = new ArrayDeque<>();
+		Q.add(new McsStruct(axioms, 0, false));
+
+		while (!Q.isEmpty()) {
+			McsStruct current = Q.poll(); // retrieve and dequeue
+			if (Utils.isConsistent(current.axioms)) {
+				if (results.stream().allMatch(mcs -> !mcs.containsAll(current.axioms))) {
+					// current.axioms is an mcs
+					results.add(current.axioms);
+					if (howMany != ALL_MCSS && results.size() == howMany) {
+						return results;
+					}
+				}
+			} else {
+				Set<OWLAxiom> L = current.axioms.stream().filter(ax -> orderedAxioms.indexOf(ax) + 1 <= current.k)
+						.collect(Collectors.toSet());
+				// L is current.axioms's deepest leaf
+				L.addAll(contained);
+				if (current.leftmost || Utils.isConsistent(L)) {
+					boolean leftmost = true;
+					for (int i = current.k + 1; i <= orderedAxioms.size(); i++) {
+						final int index = i;
+						Set<OWLAxiom> newSet = current.axioms.stream()
+								.filter(ax -> orderedAxioms.indexOf(ax) + 1 != index).collect(Collectors.toSet());
+						Q.add(new McsStruct(newSet, i, leftmost)); // enqueue
+						leftmost = false;
+					}
+				}
+			}
+		}
+
+		return results;
+		
+		//return null; //maximalConsistentSubsetsNaive(axioms, howMany, contained); TODO
 	}
 
 }
