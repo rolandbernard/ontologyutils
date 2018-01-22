@@ -53,6 +53,16 @@ public class Utils {
 	}
 
 	/**
+	 * @param ax
+	 * @return a pretty string representing {@code ax}, without its annotations and
+	 *         without namespaces.
+	 */
+	public static String prettyPrintAxiom(OWLAxiom ax) {
+		return ax.getAxiomWithoutAnnotations().toString().replaceAll("<http.*?#", "").replaceAll(">", "")
+				.replaceAll("<", "").replaceFirst("Annotation(.*?) ", "");
+	}
+
+	/**
 	 * @param ontology
 	 * 
 	 *            Prints the TBox of {@code ontology} on the standard output.
