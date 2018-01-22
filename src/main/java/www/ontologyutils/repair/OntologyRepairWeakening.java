@@ -12,10 +12,10 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 
-import www.ontologyutils.ontologyutils.MaximalConsistentSets;
-import www.ontologyutils.ontologyutils.SetUtils;
-import www.ontologyutils.ontologyutils.Utils;
 import www.ontologyutils.refinement.AxiomWeakener;
+import www.ontologyutils.toolbox.MaximalConsistentSets;
+import www.ontologyutils.toolbox.SetUtils;
+import www.ontologyutils.toolbox.Utils;
 
 /**
  * An implementation of {@code OntologyRepair} following closely (but not

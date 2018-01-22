@@ -6,7 +6,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import www.ontologyutils.ontologyutils.Utils;
+import www.ontologyutils.toolbox.Utils;
 
 public class TesterRefinement  extends TestCase {
 

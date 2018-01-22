@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import www.ontologyutils.ontologyutils.MaximalConsistentSets;
-import www.ontologyutils.ontologyutils.SetUtils;
-import www.ontologyutils.ontologyutils.Utils;
+import www.ontologyutils.toolbox.MaximalConsistentSets;
+import www.ontologyutils.toolbox.SetUtils;
+import www.ontologyutils.toolbox.Utils;
 
 /**
  * A simple implementation of {@code OntologyRepair}. It repairs an inconsistent

@@ -31,8 +31,8 @@ import uk.ac.manchester.cs.owl.owlapi.OWLObjectSomeValuesFromImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectUnionOfImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLQuantifiedRestrictionImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
-import www.ontologyutils.ontologyutils.AnnotateOrigin;
-import www.ontologyutils.ontologyutils.FreshAtoms;
+import www.ontologyutils.toolbox.AnnotateOrigin;
+import www.ontologyutils.toolbox.FreshAtoms;
 
 public class NormalizationTools {
 

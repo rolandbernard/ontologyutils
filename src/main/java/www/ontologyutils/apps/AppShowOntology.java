@@ -2,7 +2,7 @@ package www.ontologyutils.apps;
 
 import org.semanticweb.owlapi.model.OWLOntology;
 
-import www.ontologyutils.ontologyutils.Utils;
+import www.ontologyutils.toolbox.Utils;
 
 public class AppShowOntology {
 	

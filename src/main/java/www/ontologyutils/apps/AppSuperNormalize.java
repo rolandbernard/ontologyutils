@@ -19,13 +19,13 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectIntersectionOfImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
-import www.ontologyutils.ontologyutils.AnnotateOrigin;
-import www.ontologyutils.ontologyutils.FreshAtoms;
 import www.ontologyutils.normalization.NormalForm;
 import www.ontologyutils.normalization.Normalization;
 import www.ontologyutils.normalization.NormalizationTools;
-import www.ontologyutils.ontologyutils.Utils;
 import www.ontologyutils.rules.RuleGeneration;
+import www.ontologyutils.toolbox.AnnotateOrigin;
+import www.ontologyutils.toolbox.FreshAtoms;
+import www.ontologyutils.toolbox.Utils;
 
 public class AppSuperNormalize {
 	private OWLOntology ontology;

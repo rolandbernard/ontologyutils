@@ -2,10 +2,11 @@ package www.ontologyutils.refinement;
 
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import www.ontologyutils.ontologyutils.Utils;
+import www.ontologyutils.toolbox.Utils;
 
 /**
  * Unit test for simple App.

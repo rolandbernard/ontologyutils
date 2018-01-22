@@ -18,8 +18,8 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import www.ontologyutils.ontologyutils.FreshAtoms;
-import www.ontologyutils.ontologyutils.Utils;
+import www.ontologyutils.toolbox.FreshAtoms;
+import www.ontologyutils.toolbox.Utils;
 
 /**
  * Unit tests for Tools.

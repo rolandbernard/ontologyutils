@@ -17,11 +17,11 @@ import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 
 import www.ontologyutils.normalization.NormalizationTools;
-import www.ontologyutils.ontologyutils.AnnotateOrigin;
-import www.ontologyutils.ontologyutils.MaximalConsistentSets;
-import www.ontologyutils.ontologyutils.SetUtils;
-import www.ontologyutils.ontologyutils.Utils;
 import www.ontologyutils.refinement.AxiomWeakener;
+import www.ontologyutils.toolbox.AnnotateOrigin;
+import www.ontologyutils.toolbox.MaximalConsistentSets;
+import www.ontologyutils.toolbox.SetUtils;
+import www.ontologyutils.toolbox.Utils;
 
 public class AppRepair {
 

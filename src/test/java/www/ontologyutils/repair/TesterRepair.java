@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import uk.ac.manchester.cs.owl.owlapi.OWLClassAssertionAxiomImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
-import www.ontologyutils.ontologyutils.Utils;
+import www.ontologyutils.toolbox.Utils;
 
 public class TesterRepair extends TestCase {
 

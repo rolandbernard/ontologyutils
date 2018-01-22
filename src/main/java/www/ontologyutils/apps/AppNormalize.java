@@ -12,11 +12,11 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import www.ontologyutils.ontologyutils.FreshAtoms;
 import www.ontologyutils.normalization.Normalization;
 import www.ontologyutils.normalization.NormalizationTools;
-import www.ontologyutils.ontologyutils.Utils;
 import www.ontologyutils.rules.RuleGeneration;
+import www.ontologyutils.toolbox.FreshAtoms;
+import www.ontologyutils.toolbox.Utils;
 
 public class AppNormalize {
 	private OWLOntology ontology;

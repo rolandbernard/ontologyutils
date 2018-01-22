@@ -1,4 +1,4 @@
-package www.ontologyutils.ontologyutils;
+package www.ontologyutils.toolbox;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

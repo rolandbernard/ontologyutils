@@ -19,7 +19,7 @@ import uk.ac.manchester.cs.owl.owlapi.OWLObjectAllValuesFromImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLObjectSomeValuesFromImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLQuantifiedRestrictionImpl;
 import www.ontologyutils.normalization.NormalForm;
-import www.ontologyutils.ontologyutils.AnnotateOrigin;
+import www.ontologyutils.toolbox.AnnotateOrigin;
 
 public class RuleGeneration {
 
