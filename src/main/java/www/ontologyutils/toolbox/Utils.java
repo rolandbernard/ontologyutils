@@ -40,10 +40,6 @@ public class Utils {
 		System.out.println(tag + " : " + message);
 	}
 
-	private static void log(String message) {
-		log("Utils", message);
-	}
-
 	/**
 	 * @param owlString
 	 * @return

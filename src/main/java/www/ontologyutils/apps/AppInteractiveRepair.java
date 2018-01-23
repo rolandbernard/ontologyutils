@@ -16,7 +16,6 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 
-import uk.ac.manchester.cs.jfact.kernel.Axiom;
 import www.ontologyutils.normalization.NormalizationTools;
 import www.ontologyutils.refinement.AxiomWeakener;
 import www.ontologyutils.toolbox.AnnotateOrigin;
@@ -125,6 +124,10 @@ public class AppInteractiveRepair {
 			OWLAxiom weakerAxiom = null;
 			if (axNumW == -1) {
 				axiomsToKeep.add(badAxiom);
+				if (!Utils.isConsistent(axiomsToKeep)) {
+					System.out.println("The set of axioms to keep is inconsistent; we empty it.");
+					axiomsToKeep = new HashSet<>();
+				}
 				System.out.println("Keeping " + axiomsToKeep.size() + " axiom" + (axiomsToKeep.size() >= 2?"s.":"."));
 				continue;
 			} else {

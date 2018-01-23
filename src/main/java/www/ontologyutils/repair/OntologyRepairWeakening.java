@@ -19,7 +19,7 @@ import www.ontologyutils.toolbox.Utils;
 
 /**
  * An implementation of {@code OntologyRepair} following closely (but not
- * stictly) the axiom weakening approach described in Nicolas Troquard, Roberto
+ * strictly) the axiom weakening approach described in Nicolas Troquard, Roberto
  * Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz:
  * "Repairing Ontologies via Axiom Weakening", AAAI 2018.
  * 

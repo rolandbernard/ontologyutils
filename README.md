@@ -58,26 +58,7 @@ The app `AppShowOntology` allows one to display a "human readable" form of an OW
 Ontology loaded.
 Declaration(Class(<http://who.int/bodysystem.owl#AutonomicNervousSystem>))
 Declaration(Class(<http://who.int/bodysystem.owl#HaematopoieticSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#SympatheticNervousSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#SkinSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#MetabolicSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#CentralNervousSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#MentalSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#VestibularSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#MusculoskeletalSystem>))
-Declaration(Class(owl:Thing))
-Declaration(Class(<http://who.int/bodysystem.owl#MotoricSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#EndocrineSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#ImmuneSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#ParasympatheticNervousSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#PeripheralNervousSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#CirculatorySystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#HaemolymphoidSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#RespiratorySystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#NutritionalSystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#UrinarySystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#BodySystem>))
-Declaration(Class(<http://who.int/bodysystem.owl#DigestiveSystem>))
+[Truncated for README: 20 more Declaration lines]
 Declaration(Class(<http://who.int/bodysystem.owl#AuditorySystem>))
 Declaration(Class(<http://who.int/bodysystem.owl#VisualSystem>))
 Declaration(Class(<http://who.int/bodysystem.owl#GenitourinarySystem>))
@@ -87,25 +68,7 @@ Declaration(Class(<http://who.int/bodysystem.owl#SceletalSystem>))
 Declaration(Class(<http://who.int/bodysystem.owl#MuscularSystem>))
 Declaration(Class(<http://who.int/bodysystem.owl#NervousSystem>))
 SubClassOf(<http://who.int/bodysystem.owl#AuditorySystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#SkinSystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#FemaleGenitalSystem> <http://who.int/bodysystem.owl#GenitourinarySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#GenitourinarySystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#CentralNervousSystem> <http://who.int/bodysystem.owl#NervousSystem>)
-SubClassOf(<http://who.int/bodysystem.owl#HaematopoieticSystem> <http://who.int/bodysystem.owl#HaemolymphoidSystem>)
-SubClassOf(<http://who.int/bodysystem.owl#SceletalSystem> <http://who.int/bodysystem.owl#MusculoskeletalSystem>)
-SubClassOf(<http://who.int/bodysystem.owl#ParasympatheticNervousSystem> <http://who.int/bodysystem.owl#AutonomicNervousSystem>)
-SubClassOf(<http://who.int/bodysystem.owl#VestibularSystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#MusculoskeletalSystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#MaleGenitalSystem> <http://who.int/bodysystem.owl#GenitourinarySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#NervousSystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#PeripheralNervousSystem> <http://who.int/bodysystem.owl#NervousSystem>)
-SubClassOf(<http://who.int/bodysystem.owl#MotoricSystem> <http://who.int/bodysystem.owl#NervousSystem>)
-SubClassOf(<http://who.int/bodysystem.owl#EndocrineSystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#VisualSystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#MetabolicSystem> <http://who.int/bodysystem.owl#BodySystem>)
-SubClassOf(<http://who.int/bodysystem.owl#SympatheticNervousSystem> <http://who.int/bodysystem.owl#AutonomicNervousSystem>)
-SubClassOf(<http://who.int/bodysystem.owl#ImmuneSystem> <http://who.int/bodysystem.owl#HaemolymphoidSystem>)
-SubClassOf(<http://who.int/bodysystem.owl#UrinarySystem> <http://who.int/bodysystem.owl#GenitourinarySystem>)
+[Truncated for README: 20 more SubClassOf lines]
 SubClassOf(<http://who.int/bodysystem.owl#MentalSystem> <http://who.int/bodysystem.owl#BodySystem>)
 SubClassOf(<http://who.int/bodysystem.owl#NutritionalSystem> <http://who.int/bodysystem.owl#BodySystem>)
 SubClassOf(<http://who.int/bodysystem.owl#HaemolymphoidSystem> <http://who.int/bodysystem.owl#BodySystem>)
@@ -123,27 +86,7 @@ AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#PeripheralNervousS
 AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#MuscularSystem> "Muscular System"^^xsd:string)
 AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#AuditorySystem> "Auditory System"^^xsd:string)
 AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#HaematopoieticSystem> "Haematopoietic System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#EndocrineSystem> "Endocrine System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#MusculoskeletalSystem> "Musculoskeletal System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#CirculatorySystem> "Circulatory System (Cardiovascular System)"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#DigestiveSystem> "Digestive System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#FemaleGenitalSystem> "Female Genital System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#VisualSystem> "Visual System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#NutritionalSystem> "Nutritional System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#VestibularSystem> "Vestibular System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#CentralNervousSystem> "Central Nervous System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#MetabolicSystem> "Metabolic System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#SkinSystem> "Skin System (Integumentary System)"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#RespiratorySystem> "Respiratory System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#ImmuneSystem> "Immune System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#HaemolymphoidSystem> "Haemolymphoid System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#GenitourinarySystem> "Genitourinary System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#SympatheticNervousSystem> "Sympathetic Nervous System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#UrinarySystem> "Urinary System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#AutonomicNervousSystem> "Autonomic Nervous System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#NervousSystem> "Nervous System"^^xsd:string)
-AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#MentalSystem> "Mental System"^^xsd:string)
-
+[Truncated for README: 20 more AnnotationAssertion lines]
 ```
 
 
@@ -643,7 +586,7 @@ Finished.
 
 
 
-# App example:  AppCondorRules#
+# App example:  AppCondorRules #
 
 Running `AppCondorRules` with `resources/catsandnumbers.owl` as argument gives this result:
 
@@ -790,6 +733,43 @@ AXIOMS GROUPS
 12		SubClassOf(Primeness Quality)
 6		SubClassOf(Integer Number)
 8		SubClassOf(Colour Quality)
+```
+
+
+
+# App example: AppAutomatedRepairWeakening #
+
+This is an app showcasing `OntologyRepairWeakening` which is an implementation of `OntologyRepair` following closely (although not strictly) the axiom weakening approach described in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz: "Repairing Ontologies via Axiom Weakening", AAAI 2018. See also `AppAutomatedRepairRandomMCS` and `AppInteractiveRepair`.
+
+Ran with the parameter `resources/inconsistent-leftpolicies-small.owl`, it gives:
+```
+Loaded... Ontology(OntologyID(OntologyIRI(<agenda:eu>) VersionIRI(<null>))) [Axioms: 10 Logical Axioms: 6] First 20 axioms: {SubClassOf(<agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>) SubClassOf(<agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>) Declaration(Class(<agenda:eu#RaiseWages>)) Declaration(NamedIndividual(<agenda:eu#Sweden>)) Declaration(Class(<agenda:eu#RaiseWelfare>)) Declaration(Class(<agenda:eu#LeftPolicy>)) ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>) ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>) ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>) DisjointUnion(<agenda:eu#LeftPolicy> <agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare> ) }
+Converted ontology: 9 logical axioms:
+ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
+ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#LeftPolicy> ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>))
+Repairing... 
+Repaired ontology.
+SubClassOf(<agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#LeftPolicy> ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>))
+SubClassOf(<agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
+ClassAssertion(ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#Sweden>)
+ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+Declaration(Class(<agenda:eu#LeftPolicy>))
+Declaration(Class(<agenda:eu#RaiseWelfare>))
+Declaration(Class(<agenda:eu#RaiseWages>))
+Declaration(NamedIndividual(<agenda:eu#Sweden>))
+Done.
 ```
 
 

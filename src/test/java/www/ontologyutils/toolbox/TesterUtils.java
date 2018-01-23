@@ -91,6 +91,14 @@ public class TesterUtils extends TestCase {
 		return new TestSuite(TesterUtils.class);
 	}
 
+	public void testPowerset() {
+
+		Set<Set<OWLAxiom>> powerSetAgenda = SetUtils.powerSet(agenda);
+		assertTrue(powerSetAgenda.size() == (int) Math.pow(2,agenda.size()));
+		assertTrue(powerSetAgenda.stream().allMatch(subset -> agenda.containsAll(subset)));
+		
+	}
+	
 	public void testMaximalConsistentSetsNaive() {
 		System.out.println("%%% TEST MCSs");
 
@@ -241,10 +249,12 @@ public class TesterUtils extends TestCase {
 
 		Set<Set<OWLAxiom>> powerSetAgenda = SetUtils.powerSet(agenda);
 		
-		for (Set<OWLAxiom> subset : powerSetAgenda ) {			
+		int i = 0;
+		for (Set<OWLAxiom> subset : powerSetAgenda ) {	
+			i++;
 			Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda, MaximalConsistentSets.ALL_MCSS, subset);
 			Set<Set<OWLAxiom>> resultsNaive = MaximalConsistentSets.maximalConsistentSubsetsNaive(agenda, MaximalConsistentSets.ALL_MCSS, subset);
-			System.out.println("Testing mcss supersets of " + subset);
+			System.out.println("Testing (" + i + ") mcss supersets of " + subset);
 			assertTrue(results.containsAll(resultsNaive));
 			assertTrue(resultsNaive.containsAll(results));
 
