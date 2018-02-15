@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +20,6 @@ import org.semanticweb.owlapi.model.parameters.Imports;
 import www.ontologyutils.normalization.NormalizationTools;
 import www.ontologyutils.refinement.AxiomWeakener;
 import www.ontologyutils.toolbox.AnnotateOrigin;
-import www.ontologyutils.toolbox.MaximalConsistentSets;
 import www.ontologyutils.toolbox.Utils;
 
 public class AppInteractiveReferenceOntologyAndRepair {
@@ -51,42 +51,77 @@ public class AppInteractiveReferenceOntologyAndRepair {
 		}
 	}
 
-	private static Set<OWLAxiom> findSomehowBadAxioms(Set<OWLAxiom> axioms, Set<OWLAxiom> axiomsToKeep) {
-		Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms,
-				(int) ((axioms.size() - axiomsToKeep.size()) / 4) + 1, axiomsToKeep);
-		HashMap<OWLAxiom, Integer> occurences = new HashMap<>();
-		for (OWLAxiom ax : axioms) {
-			occurences.put(ax, 0);
+	private static Set<OWLAxiom> findMIS(Set<OWLAxiom> axiomSet, Set<OWLAxiom> axiomsToKeep) {
+		HashSet<OWLAxiom> copyAxiomSet = new HashSet<OWLAxiom>(axiomSet);
+		if (copyAxiomSet.size() == 1) {
+			return copyAxiomSet;
 		}
-		for (Set<OWLAxiom> mcs : mcss) {
-			mcs.stream().forEach(ax -> {
-				if (!occurences.containsKey(ax)) {
-					throw new RuntimeException("Did not expect " + ax);
+		copyAxiomSet.removeAll(axiomsToKeep);
+
+		OWLAxiom axiom = null;		
+		HashSet<OWLAxiom> smallerAxiomSet = null;
+		boolean foundSmaller = true;
+		while(foundSmaller){
+			foundSmaller = false;
+			
+			// Every time, consider the axioms in a different order
+			ArrayList<Integer> axiomsNum = new ArrayList<Integer>();
+			for (int i = 0; i < copyAxiomSet.size(); i++) {
+				axiomsNum.add(i);
+			}
+			Collections.shuffle(axiomsNum);
+			
+			for (int i = 0; i < copyAxiomSet.size(); i++){
+				smallerAxiomSet = new HashSet<OWLAxiom>(copyAxiomSet);
+				axiom = (OWLAxiom) (copyAxiomSet.toArray())[axiomsNum.get(i)];
+				smallerAxiomSet.remove(axiom);
+				HashSet<OWLAxiom> smaller = new HashSet<OWLAxiom>(smallerAxiomSet);
+				smaller.addAll(axiomsToKeep);
+				if (!Utils.isConsistent(smaller)) {
+					foundSmaller = true;
+					copyAxiomSet.clear();
+					copyAxiomSet = smallerAxiomSet;
+					break;
 				}
-				occurences.put(ax, occurences.get(ax) + 1);
-			});
-		}
-		int minOcc = Integer.MAX_VALUE;
-		for (OWLAxiom ax : axioms) {
-			if (ax.isOfType(AxiomType.SUBCLASS_OF) || ax.isOfType(AxiomType.CLASS_ASSERTION)) {
-				if (!occurences.containsKey(ax)) {
-					throw new RuntimeException("Did not expect " + ax);
-				}
-				minOcc = Integer.min(minOcc, occurences.get(ax));
 			}
 		}
-		Set<OWLAxiom> badAxioms = new HashSet<>();
-		for (OWLAxiom ax : axioms) {
-			if (ax.isOfType(AxiomType.SUBCLASS_OF) || ax.isOfType(AxiomType.CLASS_ASSERTION)) {
-				if (occurences.get(ax) == minOcc) {
-					badAxioms.add(ax);
+
+		return copyAxiomSet;
+	}
+
+	private static Set<OWLAxiom> findSomehowBadAxioms(Set<OWLAxiom> axiomSet, Set<OWLAxiom> axiomsToKeep) {
+		
+		int precision = (axiomSet.size() - axiomsToKeep.size()) / 2 + 1;
+		
+		HashMap<OWLAxiom, Integer> hm = new HashMap<OWLAxiom, Integer>();
+		ArrayList<OWLAxiom> worstAxioms = new ArrayList<OWLAxiom>();
+		
+		for(OWLAxiom ax : axiomSet) {
+			hm.put(ax, 0);
+		}
+
+		int max = 0;
+		for(int i = 0 ; i < precision ; i++) {
+			ArrayList<OWLAxiom> MIS = new ArrayList<OWLAxiom>(findMIS(axiomSet, axiomsToKeep));
+			Collections.shuffle(MIS);
+			for (OWLAxiom ax : MIS) {
+				int axOccurences = hm.get(ax);
+				
+				if (axOccurences == max) {
+					worstAxioms = new ArrayList<OWLAxiom>();
+					worstAxioms.add(ax);
+					max = hm.get(ax) + 1;
+				} 
+				else if (axOccurences == max-1) {
+					worstAxioms.add(ax);
 				}
+				
+				hm.put(ax, hm.get(ax) + 1);
 			}
 		}
-		if (badAxioms.size() < 1) {
-			throw new RuntimeException("Did not find a bad subclass or assertion axiom in " + axioms);
-		}
-		return badAxioms;
+		//hm.entrySet().stream().forEach(e -> System.out.println(e.getValue() + "\t" + e.getKey()));;
+
+		return new HashSet<>(worstAxioms);
 	}
 
 	private static OWLAxiom selectBadAxiom(Set<OWLAxiom> allAxioms, Set<OWLAxiom> axiomsToKeep) {
