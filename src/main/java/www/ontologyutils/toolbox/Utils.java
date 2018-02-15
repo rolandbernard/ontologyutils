@@ -24,6 +24,7 @@ import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
+import openllet.owlapi.OpenlletReasonerFactory;
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
 /**
@@ -133,6 +134,16 @@ public class Utils {
 	public static OWLReasoner getHermitReasoner(OWLOntology ontology) {
 		return reasonerFactoryHermit.createReasoner(ontology);
 	}
+	
+	private static final OWLReasonerFactory reasonerFactoryOpenllet = new OpenlletReasonerFactory();
+	
+	/**
+	 * @param ontology
+	 * @return a Openllet reasoner for {@code ontology}
+	 */
+	public static OWLReasoner getOpenlletReasoner(OWLOntology ontology) {
+		return reasonerFactoryOpenllet.createReasoner(ontology);
+	}
 
 	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
 
@@ -141,7 +152,7 @@ public class Utils {
 	}
 
 	enum ReasonerName {
-		FACT, HERMIT
+		FACT, HERMIT, OPENLLET
 	}
 
 	public static boolean isConsistent(OWLOntology ontology) {
@@ -162,8 +173,11 @@ public class Utils {
 		case FACT:
 			reasoner = getFactReasoner(ontology);
 			break;
+		case OPENLLET:
+			reasoner = getOpenlletReasoner(ontology);
+			break;
 		default:
-			reasoner = getFactReasoner(ontology);
+			reasoner = getOpenlletReasoner(ontology);
 		}
 		consistency = reasoner.isConsistent();
 		reasoner.dispose();
