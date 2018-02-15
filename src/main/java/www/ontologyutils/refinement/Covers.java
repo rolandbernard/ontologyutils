@@ -48,6 +48,7 @@ public class Covers {
 	public Covers(OWLOntology ontology) {
 		this(Utils.getFactReasoner(ontology));
 		//this(Utils.getHermitReasoner(ontology));
+		//this(Utils.getOpenlletReasoner(ontology));
 	}
 	
 	/**
