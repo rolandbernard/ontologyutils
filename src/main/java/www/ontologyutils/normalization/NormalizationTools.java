@@ -3,6 +3,7 @@ package www.ontologyutils.normalization;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -12,12 +13,17 @@ import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLDisjointClassesAxiom;
 import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
+import org.semanticweb.owlapi.model.OWLFunctionalDataPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLFunctionalObjectPropertyAxiom;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
+import org.semanticweb.owlapi.model.OWLPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiomShortCut;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLDisjointClassesAxiomImpl;
@@ -95,7 +101,16 @@ public class NormalizationTools {
 			OWLSubClassOfAxiom scoa = new OWLSubClassOfAxiomImpl(new OWLObjectSomeValuesFromImpl(property, TOP), domain,
 					EMPTY_ANNOTATION);
 			subClassOfAxioms.add(scoa);
-		} else {
+		} else if (ax.isOfType(AxiomType.FUNCTIONAL_OBJECT_PROPERTY)) {
+			subClassOfAxioms = Collections.singleton(((OWLFunctionalObjectPropertyAxiom) ax).asOWLSubClassOfAxiom());
+		} else if (ax.isOfType(AxiomType.DATA_PROPERTY_RANGE)) {
+			subClassOfAxioms = Collections.singleton(((OWLDataPropertyRangeAxiom) ax).asOWLSubClassOfAxiom());
+		} else if (ax.isOfType(AxiomType.DATA_PROPERTY_DOMAIN)) {
+			subClassOfAxioms = Collections.singleton(((OWLSubClassOfAxiomShortCut) ax).asOWLSubClassOfAxiom());
+		} else if (ax.isOfType(AxiomType.FUNCTIONAL_DATA_PROPERTY)) {
+			subClassOfAxioms = Collections.singleton(((OWLFunctionalDataPropertyAxiom) ax).asOWLSubClassOfAxiom());
+		} 	
+		else {
 			throw new RuntimeException("The axiom " + ax + " of type " + ax.getAxiomType()
 					+ " could not be converted into subclass axioms.");
 		}
