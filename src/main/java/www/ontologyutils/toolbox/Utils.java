@@ -151,7 +151,7 @@ public class Utils {
 		uglyAxiomSetConsistencyCache = new HashMap<Set<OWLAxiom>, Boolean>();
 	}
 
-	enum ReasonerName {
+	public enum ReasonerName {
 		FACT, HERMIT, OPENLLET
 	}
 
