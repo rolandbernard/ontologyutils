@@ -18,9 +18,11 @@ import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyAlreadyExistsException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.model.parameters.OntologyCopy;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
@@ -33,6 +35,8 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
  */
 public class Utils {
 
+	private static long IRI_ID = 0;
+	
 	// Prevent instantiation
 	private Utils() {
 	}
@@ -74,8 +78,12 @@ public class Utils {
 	public static OWLOntology newEmptyOntology() {
 		OWLOntology newOntology = null;
 		try {
-			newOntology = manager.createOntology();
-		} catch (OWLOntologyCreationException e) {
+			newOntology = manager.createOntology(IRI.create("http://ontologyutils/" + (IRI_ID++)));
+		} catch (OWLOntologyAlreadyExistsException e) {
+			IRI_ID++;
+			return newEmptyOntology();
+		}
+		catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -113,6 +121,16 @@ public class Utils {
 		// exclude non-logical axioms: keeping ABox, TBox, RBox axioms
 		return newOntology(ontology.axioms().filter(ax -> ax.isLogicalAxiom()));
 	}
+	
+	public static OWLOntology copyOntology(OWLOntology ontology) {
+		try {
+			return OWLManager.createOWLOntologyManager().copyOntology(ontology, OntologyCopy.SHALLOW);
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return null;
+	}
 
 	private static final OWLReasonerFactory reasonerFactoryFact = new JFactFactory();
 
@@ -121,7 +139,7 @@ public class Utils {
 	 * @return a JFact reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getFactReasoner(OWLOntology ontology) {
-		return reasonerFactoryFact.createReasoner(ontology);
+		return reasonerFactoryFact.createNonBufferingReasoner(ontology);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -132,7 +150,7 @@ public class Utils {
 	 * @return a Hermit reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getHermitReasoner(OWLOntology ontology) {
-		return reasonerFactoryHermit.createReasoner(ontology);
+		return reasonerFactoryHermit.createNonBufferingReasoner(ontology);
 	}
 	
 	private static final OWLReasonerFactory reasonerFactoryOpenllet = new OpenlletReasonerFactory();
@@ -142,7 +160,7 @@ public class Utils {
 	 * @return a Openllet reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getOpenlletReasoner(OWLOntology ontology) {
-		return reasonerFactoryOpenllet.createReasoner(ontology);
+		return reasonerFactoryOpenllet.createNonBufferingReasoner(ontology);
 	}
 
 	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
