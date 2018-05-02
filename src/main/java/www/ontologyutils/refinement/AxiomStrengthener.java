@@ -29,10 +29,10 @@ public class AxiomStrengthener {
 	public AxiomStrengthener(OWLOntology ontology) {
 		this.ontology = ontology;
 		Covers covers = new Covers(ontology);
-		this.genOp = new RefinementOperator(ontology, 
+		this.genOp = new RefinementOperator( 
 				covers.getUpCoverOperator(), 
 				covers.getDownCoverOperator());
-		this.specOp = new RefinementOperator(ontology,
+		this.specOp = new RefinementOperator(
 				covers.getDownCoverOperator(),
 				covers.getUpCoverOperator());
 	}

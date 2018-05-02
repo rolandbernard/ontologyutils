@@ -11,7 +11,6 @@ import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectComplementOf;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
 import uk.ac.manchester.cs.owl.owlapi.OWLNaryBooleanClassExpressionImpl;
@@ -37,7 +36,6 @@ public class RefinementOperator {
 	public static final int FLAG_NNF_STRICT = 2; // bit flag 10
 
 	/**
-	 * @param ontology
 	 * @param way
 	 * @param back
 	 * @param flags
@@ -47,14 +45,14 @@ public class RefinementOperator {
 	 *            Combine them with {@code FLAG_NNF_STRICT | FLAG_ALC_STRICT}. Use
 	 *            {@code FLAG_NON_STRICT} otherwise.
 	 */
-	public RefinementOperator(OWLOntology ontology, Cover way, Cover back, int flags) {
+	public RefinementOperator(Cover way, Cover back, int flags) {
 		this.way = way;
 		this.back = back;
 		this.flags_strict = flags;
 	}
-
-	public RefinementOperator(OWLOntology ontology, Cover way, Cover back) {
-		this(ontology, way, back, FLAG_NON_STRICT);
+		
+	public RefinementOperator(Cover way, Cover back) {
+		this(way, back, FLAG_NON_STRICT);
 	}
 
 	/**

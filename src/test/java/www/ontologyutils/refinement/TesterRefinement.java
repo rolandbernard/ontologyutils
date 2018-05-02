@@ -22,10 +22,10 @@ public class TesterRefinement  extends TestCase {
         
         ontology = Utils.newOntology(OWL_FILE_PATH);
         covers = new Covers(ontology);
-        generalisation = new RefinementOperator(ontology, 
+        generalisation = new RefinementOperator( 
         		covers.getUpCoverOperator(), 
         		covers.getDownCoverOperator());
-        specialisation = new RefinementOperator(ontology, 
+        specialisation = new RefinementOperator( 
         		covers.getDownCoverOperator(), 
         		covers.getUpCoverOperator());
     }
