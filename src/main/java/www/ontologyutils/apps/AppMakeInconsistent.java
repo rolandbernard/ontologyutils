@@ -131,9 +131,11 @@ public class AppMakeInconsistent {
 			
 			if (!stronger.isEmpty()) {
 				OWLAxiom strongerAx = SetUtils.getRandom(stronger);
-				System.out.println("remove: " + Utils.prettyPrintAxiom(ax));
-				//mApp.ontology.remove(ax); // could be made optional
-				System.out.println("add: " + Utils.prettyPrintAxiom(strongerAx));
+				System.out.println("strengthening: " + Utils.prettyPrintAxiom(ax));
+				// alternatively, remove the old axioms...
+				// System.out.println("remove: " + Utils.prettyPrintAxiom(ax));
+				// mApp.ontology.remove(ax);
+				System.out.println("adding: " + Utils.prettyPrintAxiom(strongerAx));
 				mApp.ontology.addAxiom(strongerAx);
 			}
 			
