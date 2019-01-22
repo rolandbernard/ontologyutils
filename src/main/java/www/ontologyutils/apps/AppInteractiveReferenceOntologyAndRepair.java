@@ -189,17 +189,19 @@ public class AppInteractiveReferenceOntologyAndRepair {
 	}
 
 	private static ArrayList<OWLAxiom> getWeakerAxioms(OWLAxiom axiom, AxiomWeakener aw) {
-		ArrayList<OWLAxiom> weakerAxioms = null;
+		ArrayList<OWLAxiom> weakerAxiomsAux = null;
 		if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
-			weakerAxioms = new ArrayList<OWLAxiom>(aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) axiom));
+			weakerAxiomsAux = new ArrayList<OWLAxiom>(aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) axiom));
 		} else if (axiom.isOfType(AxiomType.CLASS_ASSERTION)) {
-			weakerAxioms = new ArrayList<OWLAxiom>(aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) axiom));
+			weakerAxiomsAux = new ArrayList<OWLAxiom>(aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) axiom));
 		} else {
 			throw new RuntimeException("Cannot weaken axiom that is neither a subclass nor an assertion axiom. "
 					+ "Could not repair the ontology.");
 		}
-		weakerAxioms = weakerAxioms.stream().map(ax -> ax.getAxiomWithoutAnnotations())
-				.collect(Collectors.toCollection(ArrayList<OWLAxiom>::new));
+		ArrayList<OWLAxiom> weakerAxioms = new ArrayList<OWLAxiom>();
+		for (OWLAxiom ax : weakerAxiomsAux) {
+			weakerAxioms.add(ax.getAxiomWithoutAnnotations());
+		}
 		weakerAxioms.remove(axiom.getAxiomWithoutAnnotations());
 		weakerAxioms.add(0, axiom.getAxiomWithoutAnnotations());
 
