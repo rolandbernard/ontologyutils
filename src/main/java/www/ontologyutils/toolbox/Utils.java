@@ -165,10 +165,6 @@ public class Utils {
 
 	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
 
-	public static void flushConsistencyCache() {
-		uglyAxiomSetConsistencyCache = new HashMap<Set<OWLAxiom>, Boolean>();
-	}
-
 	public enum ReasonerName {
 		FACT, HERMIT, OPENLLET
 	}
