@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
@@ -18,7 +19,6 @@ public class AxiomWeakener {
 
 	private final static ArrayList<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
 
-	private OWLOntology ontology;
 	private RefinementOperator genOp;
 	private RefinementOperator specOp;
 
@@ -27,7 +27,6 @@ public class AxiomWeakener {
 	 *            a reference ontology to make inferences.
 	 */
 	public AxiomWeakener(OWLOntology ontology) {
-		this.ontology = ontology;
 		Covers covers = new Covers(ontology);
 		this.genOp = new RefinementOperator( 
 				covers.getUpCoverOperator(), 
@@ -90,5 +89,20 @@ public class AxiomWeakener {
 
 		return result;
 	}
+	
+	/**
+	 * @param axiom which must be a subclass axiom or an assertion axiom.
+	 * @return the set containing all the weaker axioms, obtained with {@code getWeakerSubClassAxioms(axiom)} or {@code getWeakerClassAssertionAxioms(axiom)}.
+	 */
+	public Set<OWLAxiom> getWeakerAxioms(OWLAxiom axiom) {
+		if (axiom.getAxiomType().equals(AxiomType.CLASS_ASSERTION)) {
+			return getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) axiom);
+		} else if (axiom.getAxiomType().equals(AxiomType.SUBCLASS_OF)) {
+			return getWeakerSubClassAxioms((OWLSubClassOfAxiom) axiom);
+		} else {
+			throw new IllegalArgumentException(axiom + " must be a class assertion axiom or a subclass axiom.");
+		}
+	}
+
 
 }
