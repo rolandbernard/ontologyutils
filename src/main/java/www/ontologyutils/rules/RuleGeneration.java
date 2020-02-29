@@ -1,6 +1,5 @@
 package www.ontologyutils.rules;
 
-import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class RuleGeneration {
 	public String normalizedSubClassAxiomToRule(OWLAxiom ax) {
 
 		if (!NormalForm.isNormalFormTBoxAxiom(ax)) {
-			throw new InvalidParameterException("Axiom " + ax + " must be in normal form.");
+			throw new IllegalArgumentException("Axiom " + ax + " must be in normal form.");
 		}
 
 		// a "group of axioms" is identified with the annotation of the original axiom
