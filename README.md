@@ -292,6 +292,7 @@ AXIOMS GROUPS
 This is an app showcasing `OntologyRepairWeakening` which is an implementation of `OntologyRepair` following closely (although not strictly) the axiom weakening approach described in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz: "Repairing Ontologies via Axiom Weakening", AAAI 2018. See also `AppAutomatedRepairRandomMCS` and `AppInteractiveRepair`.
 
 Ran with the parameter `resources/inconsistent-leftpolicies-small.owl`, it gives:
+
 ```
 Loaded... Ontology(OntologyID(OntologyIRI(<agenda:eu>) VersionIRI(<null>))) [Axioms: 10 Logical Axioms: 6] First 20 axioms: {SubClassOf(<agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>) SubClassOf(<agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>) Declaration(Class(<agenda:eu#RaiseWages>)) Declaration(NamedIndividual(<agenda:eu#Sweden>)) Declaration(Class(<agenda:eu#RaiseWelfare>)) Declaration(Class(<agenda:eu#LeftPolicy>)) ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>) ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>) ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>) DisjointUnion(<agenda:eu#LeftPolicy> <agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare> ) }
 Converted ontology: 9 logical axioms:
@@ -321,6 +322,160 @@ Declaration(Class(<agenda:eu#RaiseWages>))
 Declaration(NamedIndividual(<agenda:eu#Sweden>))
 Done.
 ```
+
+# App example: AppTurnBasedMechanism #
+
+
+This app showcases the multiagent turn-based approach for ontology aggregation presented in Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to Ontology Aggregation Based on Axiom Weakening. In 27th International Joint Conference on Artificial Intelligence and 23rd European Conference on Artificial Intelligence (IJCAI-ECAI 2018). International Joint Conferences on Artificial Intelligence Organization, 2018, pages 1942-1948.
+
+Ran with the parameter `resources/inconsistent-leftpolicies-small.owl`, it gives:
+```
+--- The ontology is not consistent.
+
+--- Voters.
+How many voters? > 2
+
+--- Preferences.
+- This is the agenda:
+1 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+2 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+3 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#LeftPolicy> ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>))
+4 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+5 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
+6 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+7 : ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
+8 : ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+9 : ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+- Preferences voter 1
+- Current ranking: []
+Next favorite axiom? > 1
+- Current ranking: [1]
+Next favorite axiom? > 2
+- Current ranking: [1, 2]
+Next favorite axiom? > 3
+- Current ranking: [1, 2, 3]
+Next favorite axiom? > 4
+- Current ranking: [1, 2, 3, 4]
+Next favorite axiom? > 5
+- Current ranking: [1, 2, 3, 4, 5]
+Next favorite axiom? > 6
+- Current ranking: [1, 2, 3, 4, 5, 6]
+Next favorite axiom? > 7
+- Current ranking: [1, 2, 3, 4, 5, 6, 7]
+Next favorite axiom? > 8
+- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8]
+Next favorite axiom? > 9
+- Preferences voter 1 : [1, 2, 3, 4, 5, 6, 7, 8, 9]
+- Preferences voter 2
+- Current ranking: []
+Next favorite axiom? > 9
+- Current ranking: [9]
+Next favorite axiom? > 8
+- Current ranking: [9, 8]
+Next favorite axiom? > 7
+- Current ranking: [9, 8, 7]
+Next favorite axiom? > 6
+- Current ranking: [9, 8, 7, 6]
+Next favorite axiom? > 5
+- Current ranking: [9, 8, 7, 6, 5]
+Next favorite axiom? > 4
+- Current ranking: [9, 8, 7, 6, 5, 4]
+Next favorite axiom? > 3
+- Current ranking: [9, 8, 7, 6, 5, 4, 3]
+Next favorite axiom? > 2
+- Current ranking: [9, 8, 7, 6, 5, 4, 3, 2]
+Next favorite axiom? > 1
+- Preferences voter 2 : [9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+--- Approvals.
+- This is the agenda:
+1 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+2 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+3 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#LeftPolicy> ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>))
+4 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+5 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
+6 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+7 : ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
+8 : ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+9 : ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+- Approvals voter 1
+Approve axiom 1? (0/1) > 1
+Approve axiom 2? (0/1) > 1
+Approve axiom 3? (0/1) > 0
+Approve axiom 4? (0/1) > 0
+Approve axiom 5? (0/1) > 0
+Approve axiom 6? (0/1) > 0
+Approve axiom 7? (0/1) > 0
+Approve axiom 8? (0/1) > 0
+Approve axiom 9? (0/1) > 0
+- Approvals voter 1 : [1, 1, 0, 0, 0, 0, 0, 0, 0]
+- Approvals voter 2
+Approve axiom 1? (0/1) > 0
+Approve axiom 2? (0/1) > 0
+Approve axiom 3? (0/1) > 0
+Approve axiom 4? (0/1) > 1
+Approve axiom 5? (0/1) > 1
+Approve axiom 6? (0/1) > 1
+Approve axiom 7? (0/1) > 1
+Approve axiom 8? (0/1) > 1
+Approve axiom 9? (0/1) > 1
+- Approvals voter 2 : [0, 0, 0, 1, 1, 1, 1, 1, 1]
+
+--- Starting turn-based mechanism...
+
+Current voter: 1
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+Current voter: 2
+Next accepted favorite axiom: ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+Adding axiom: ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+Current voter: 1
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+Current voter: 2
+Next accepted favorite axiom: ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+Adding axiom: ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+Current voter: 1
+Voter 1 gives up!
+Current voter: 2
+Next accepted favorite axiom: ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
+** Weakening. **
+Adding axiom: ClassAssertion(ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#Sweden>)
+Current voter: 1
+Voter 1 gives up!
+Current voter: 2
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+Current voter: 1
+Voter 1 gives up!
+Current voter: 2
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
+Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
+Current voter: 1
+Voter 1 gives up!
+Current voter: 2
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+Current voter: 1
+Voter 1 gives up!
+Current voter: 2
+Voter 2 gives up!
+-- End of procedure: all voters have given up.
+
+--- Turn-based mechanism finished in 0 seconds
+
+--- RESULT ONTOLOGY
+
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+ClassAssertion(ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#Sweden>)
+```
+
 
 # App example: AppMakeInconsistent #
 
