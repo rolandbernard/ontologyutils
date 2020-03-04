@@ -199,11 +199,13 @@ public class TesterUtils extends TestCase {
 		OWLClassExpression ef1 = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity1);
 		OWLClassExpression ef2 = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity2);
 		OWLClassExpression ef1bis = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity1);
+		OWLClassExpression ef1bisbis = FreshAtoms.createFreshAtomCopy(ef1bis);
 
-		assertFalse(ef1 == ef1bis);
 		assertTrue(ef1.equals(ef1bis));
 		assertFalse(ef1 == ef2);
 		assertTrue(Utils.sameConcept(ef1, ef1bis));
+		assertTrue(!Utils.sameConcept(ef1, ef1bisbis));
+		assertTrue(!Utils.sameConcept(ef1bis, ef1bisbis));
 	}
 
 	/**
