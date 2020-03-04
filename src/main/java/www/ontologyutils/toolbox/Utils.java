@@ -36,7 +36,7 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
 public class Utils {
 
 	private static long IRI_ID = 0;
-	
+
 	// Prevent instantiation
 	private Utils() {
 	}
@@ -66,7 +66,7 @@ public class Utils {
 	/**
 	 * @param ontology
 	 * 
-	 *            Prints the TBox of {@code ontology} on the standard output.
+	 *                 Prints the TBox of {@code ontology} on the standard output.
 	 */
 	public static void printTBox(OWLOntology ontology) {
 		Stream<OWLAxiom> tBoxAxioms = ontology.tboxAxioms(Imports.EXCLUDED);
@@ -82,8 +82,7 @@ public class Utils {
 		} catch (OWLOntologyAlreadyExistsException e) {
 			IRI_ID++;
 			return newEmptyOntology();
-		}
-		catch (OWLOntologyCreationException e) {
+		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -121,7 +120,7 @@ public class Utils {
 		// exclude non-logical axioms: keeping ABox, TBox, RBox axioms
 		return newOntology(ontology.axioms().filter(ax -> ax.isLogicalAxiom()));
 	}
-	
+
 	public static OWLOntology copyOntology(OWLOntology ontology) {
 		try {
 			return OWLManager.createOWLOntologyManager().copyOntology(ontology, OntologyCopy.SHALLOW);
@@ -152,9 +151,9 @@ public class Utils {
 	public static OWLReasoner getHermitReasoner(OWLOntology ontology) {
 		return reasonerFactoryHermit.createNonBufferingReasoner(ontology);
 	}
-	
+
 	private static final OWLReasonerFactory reasonerFactoryOpenllet = new OpenlletReasonerFactory();
-	
+
 	/**
 	 * @param ontology
 	 * @return a Openllet reasoner for {@code ontology}
@@ -206,6 +205,28 @@ public class Utils {
 			return consistency;
 		}
 		return isConsistent(newOntology(axioms));
+	}
+
+	public static boolean isEntailed(OWLOntology ontology, OWLAxiom axiom, ReasonerName reasonerName) {
+		OWLReasoner reasoner;
+		switch (reasonerName) {
+		case HERMIT:
+			reasoner = getHermitReasoner(ontology);
+			break;
+		case FACT:
+			reasoner = getFactReasoner(ontology);
+			break;
+		case OPENLLET:
+			reasoner = getOpenlletReasoner(ontology);
+			break;
+		default:
+			reasoner = getOpenlletReasoner(ontology);
+		}
+		return reasoner.isEntailed(axiom);
+	}
+
+	public static boolean isEntailed(OWLOntology ontology, OWLAxiom axiom) {
+		return isEntailed(ontology, axiom, ReasonerName.FACT);
 	}
 
 	/**
