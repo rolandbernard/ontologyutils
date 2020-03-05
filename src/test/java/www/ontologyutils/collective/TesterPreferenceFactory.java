@@ -125,8 +125,39 @@ public class TesterPreferenceFactory {
 
 	}
 
+	
 	@Test
-	public void testGetAxiomAtRank() {
+	public void testGetRank() {
+
+		ArrayList<Integer> ranking = new ArrayList<>(Arrays.asList(2, 3, 1, 4));
+
+		preference = prefFactory.makePreference(ranking);
+
+		assertTrue(preference.getRank(ax1) == 2);
+		assertTrue(preference.getRank(ax2) == 3);
+		assertTrue(preference.getRank(ax3) == 1);
+		assertTrue(preference.getRank(ax4) == 4);
+		assertTrue(preference.getRank(prefFactory.getAgenda().get(0)) == 2);
+		assertTrue(preference.getRank(prefFactory.getAgenda().get(1)) == 3);
+		assertTrue(preference.getRank(prefFactory.getAgenda().get(2)) == 1);
+		assertTrue(preference.getRank(prefFactory.getAgenda().get(3)) == 4);
+	}
+	
+	@Test
+	public void testGet1() {
+
+		ArrayList<Integer> ranking = new ArrayList<>(Arrays.asList(3, 2, 4, 1));
+
+		preference = prefFactory.makePreference(ranking);
+
+		assertTrue(preference.get(1).equals(prefFactory.getAgenda().get(3)));
+		assertTrue(preference.get(2).equals(prefFactory.getAgenda().get(1)));
+		assertTrue(preference.get(3).equals(prefFactory.getAgenda().get(0)));
+		assertTrue(preference.get(4).equals(prefFactory.getAgenda().get(2)));
+	}
+	
+	@Test
+	public void testGet2() {
 
 		ArrayList<Integer> ranking = new ArrayList<>(Arrays.asList(2, 3, 1, 4));
 		preference = prefFactory.makePreference(ranking);
