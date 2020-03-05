@@ -330,6 +330,10 @@ This app showcases the multiagent turn-based approach for ontology aggregation p
 
 Ran with the parameter `resources/inconsistent-leftpolicies-small.owl`, it gives:
 ```
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+
 --- The ontology is not consistent.
 
 --- Voters.
@@ -337,125 +341,137 @@ How many voters? > 2
 
 --- Preferences.
 - This is the agenda:
-1 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
-2 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
-3 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#LeftPolicy> ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>))
-4 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
-5 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
-6 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
-7 : ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
-8 : ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
-9 : ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+1 : ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
+2 : ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+3 : ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+4 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <
+agenda:eu#LeftPolicy> ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>))
+5 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <
+agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+6 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <
+agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+7 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agen
+da:eu#LeftPolicy>)
+8 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <
+agenda:eu#LeftPolicy>)
+9 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) O
+bjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
 - Preferences voter 1
-- Current ranking: []
+- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0]
 Next favorite axiom? > 1
-- Current ranking: [1]
+- Current ranking: [1, 0, 0, 0, 0, 0, 0, 0, 0]
 Next favorite axiom? > 2
-- Current ranking: [1, 2]
-Next favorite axiom? > 3
-- Current ranking: [1, 2, 3]
-Next favorite axiom? > 4
-- Current ranking: [1, 2, 3, 4]
+- Current ranking: [1, 2, 0, 0, 0, 0, 0, 0, 0]
 Next favorite axiom? > 5
-- Current ranking: [1, 2, 3, 4, 5]
+- Current ranking: [1, 2, 0, 0, 3, 0, 0, 0, 0]
 Next favorite axiom? > 6
-- Current ranking: [1, 2, 3, 4, 5, 6]
+- Current ranking: [1, 2, 0, 0, 3, 4, 0, 0, 0]
 Next favorite axiom? > 7
-- Current ranking: [1, 2, 3, 4, 5, 6, 7]
+- Current ranking: [1, 2, 0, 0, 3, 4, 5, 0, 0]
 Next favorite axiom? > 8
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8]
+- Current ranking: [1, 2, 0, 0, 3, 4, 5, 6, 0]
 Next favorite axiom? > 9
-- Preferences voter 1 : [1, 2, 3, 4, 5, 6, 7, 8, 9]
+- Current ranking: [1, 2, 0, 0, 3, 4, 5, 6, 7]
+Next favorite axiom? > 3
+- Current ranking: [1, 2, 8, 0, 3, 4, 5, 6, 7]
+Next favorite axiom? > 4
+- Preferences voter 1 : [1, 2, 8, 9, 3, 4, 5, 6, 7]
 - Preferences voter 2
-- Current ranking: []
+- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0]
 Next favorite axiom? > 9
-- Current ranking: [9]
+- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 1]
 Next favorite axiom? > 8
-- Current ranking: [9, 8]
+- Current ranking: [0, 0, 0, 0, 0, 0, 0, 2, 1]
 Next favorite axiom? > 7
-- Current ranking: [9, 8, 7]
+- Current ranking: [0, 0, 0, 0, 0, 0, 3, 2, 1]
 Next favorite axiom? > 6
-- Current ranking: [9, 8, 7, 6]
+- Current ranking: [0, 0, 0, 0, 0, 4, 3, 2, 1]
 Next favorite axiom? > 5
-- Current ranking: [9, 8, 7, 6, 5]
-Next favorite axiom? > 4
-- Current ranking: [9, 8, 7, 6, 5, 4]
-Next favorite axiom? > 3
-- Current ranking: [9, 8, 7, 6, 5, 4, 3]
-Next favorite axiom? > 2
-- Current ranking: [9, 8, 7, 6, 5, 4, 3, 2]
+- Current ranking: [0, 0, 0, 0, 5, 4, 3, 2, 1]
 Next favorite axiom? > 1
-- Preferences voter 2 : [9, 8, 7, 6, 5, 4, 3, 2, 1]
+- Current ranking: [6, 0, 0, 0, 5, 4, 3, 2, 1]
+Next favorite axiom? > 2
+- Current ranking: [6, 7, 0, 0, 5, 4, 3, 2, 1]
+Next favorite axiom? > 3
+- Current ranking: [6, 7, 8, 0, 5, 4, 3, 2, 1]
+Next favorite axiom? > 4
+- Preferences voter 2 : [6, 7, 8, 9, 5, 4, 3, 2, 1]
 
 --- Approvals.
 - This is the agenda:
-1 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
-2 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
-3 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#LeftPolicy> ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>))
-4 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
-5 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
-6 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
-7 : ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
-8 : ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
-9 : ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+1 : ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
+2 : ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
+3 : ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+4 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <
+agenda:eu#LeftPolicy> ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>))
+5 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <
+agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+6 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <
+agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+7 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agen
+da:eu#LeftPolicy>)
+8 : SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <
+agenda:eu#LeftPolicy>)
+9 : SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) O
+bjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
 - Approvals voter 1
 Approve axiom 1? (0/1) > 1
 Approve axiom 2? (0/1) > 1
 Approve axiom 3? (0/1) > 0
 Approve axiom 4? (0/1) > 0
-Approve axiom 5? (0/1) > 0
+Approve axiom 5? (0/1) > 1
 Approve axiom 6? (0/1) > 0
 Approve axiom 7? (0/1) > 0
-Approve axiom 8? (0/1) > 0
-Approve axiom 9? (0/1) > 0
-- Approvals voter 1 : [1, 1, 0, 0, 0, 0, 0, 0, 0]
+Approve axiom 8? (0/1) > 1
+Approve axiom 9? (0/1) > 1
+- Approvals voter 1 : [1, 1, 0, 0, 1, 0, 0, 1, 1]
 - Approvals voter 2
 Approve axiom 1? (0/1) > 0
 Approve axiom 2? (0/1) > 0
 Approve axiom 3? (0/1) > 0
-Approve axiom 4? (0/1) > 1
+Approve axiom 4? (0/1) > 0
 Approve axiom 5? (0/1) > 1
 Approve axiom 6? (0/1) > 1
 Approve axiom 7? (0/1) > 1
 Approve axiom 8? (0/1) > 1
 Approve axiom 9? (0/1) > 1
-- Approvals voter 2 : [0, 0, 0, 1, 1, 1, 1, 1, 1]
+- Approvals voter 2 : [0, 0, 0, 0, 1, 1, 1, 1, 1]
 
 --- Starting turn-based mechanism...
 
 Current voter: 1
-Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
-Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+Next accepted favorite axiom: ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
+Adding axiom: ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
 Current voter: 2
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages ag
+enda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWel
+fare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+Current voter: 1
 Next accepted favorite axiom: ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
 Adding axiom: ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
-Current voter: 1
-Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
-Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
 Current voter: 2
-Next accepted favorite axiom: ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
-Adding axiom: ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) 
+<agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
+Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#Raise
+Welfare> <agenda:eu#LeftPolicy>)
 Current voter: 1
-Voter 1 gives up!
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages ag
+enda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWel
+fare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
 Current voter: 2
-Next accepted favorite axiom: ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
-** Weakening. **
-Adding axiom: ClassAssertion(ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#Sweden>)
-Current voter: 1
-Voter 1 gives up!
-Current voter: 2
-Next accepted favorite axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <a
+genda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
+Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWa
+ges> <agenda:eu#LeftPolicy>)
 Current voter: 1
 Voter 1 gives up!
 Current voter: 2
-Next accepted favorite axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
-Current voter: 1
-Voter 1 gives up!
-Current voter: 2
-Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
-Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+Next accepted favorite axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages ag
+enda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+Adding axiom: SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWel
+fare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
 Current voter: 1
 Voter 1 gives up!
 Current voter: 2
@@ -466,14 +482,19 @@ Voter 2 gives up!
 
 --- RESULT ONTOLOGY
 
-SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
-SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agenda:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
-SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>)
-SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>)
-SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>)
 ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
-ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
-ClassAssertion(ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#Sweden>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agen
+da:eu#RaiseWelfare> ObjectComplementOf(<agenda:eu#RaiseWages>))
+SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWelfare agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWelfare> <agen
+da:eu#LeftPolicy>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) Objec
+tUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#LeftPolicy>)
+SubClassOf(Annotation(<origin> <DisjointUnion(agenda:eu#LeftPolicy agenda:eu#RaiseWages agenda:eu#RaiseWelfare )>) <agen
+da:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
+SubClassOf(Annotation(<origin> <SubClassOf(agenda:eu#RaiseWages agenda:eu#LeftPolicy)>) <agenda:eu#RaiseWages> <agenda:e
+u#LeftPolicy>)
+
 ```
 
 

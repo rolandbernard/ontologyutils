@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -94,15 +96,16 @@ public class AppTurnBasedMechanism {
 		}
 		for (int i = 0; i < numVoters; i++) {
 			System.out.println("- Preferences voter " + (i + 1));
-			ArrayList<Integer> ranking = new ArrayList<>();
-			for (int j = 0; j < prefFactory.getAgenda().size(); j++) {
+			List<Integer> ranking = Stream.generate(String::new).limit(prefFactory.getAgenda().size()).map(s -> 0)
+					.collect(Collectors.toList());
+			for (int j = 1; j <= prefFactory.getAgenda().size(); j++) {
 				System.out.println("- Current ranking: " + ranking);
 				int axiomIndex = readNumber("Next favorite axiom?", 1, prefFactory.getAgenda().size());
-				if (ranking.contains(axiomIndex)) {
+				if (ranking.get(axiomIndex - 1) != 0) {
 					j--;
 					continue;
 				}
-				ranking.add(axiomIndex);
+				ranking.set(axiomIndex - 1, j);
 			}
 			Preference preference = prefFactory.makePreference(ranking);
 			System.out.println("- Preferences voter " + (i + 1) + " : " + preference);
