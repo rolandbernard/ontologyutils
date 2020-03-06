@@ -11,8 +11,10 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 /**
  * @author nico
  * 
- *         An agenda is a list of OWLAxioms, e.g., [ax1,ax2,ax3]. It must not
- *         contain duplicates.
+ *         An agenda is a list of OWLAxioms, e.g., [ax1,ax2,ax3]. A preference
+ *         over an agenda is a list of Integers, e.g., [2,3,1]. [2,3,1] says
+ *         that ax3 (rank 1) is preferred to ax1 (rank 2), which is preferred to
+ *         ax2 (rank 3). It must not contain duplicates.
  * 
  *         Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
  *         Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
@@ -70,7 +72,8 @@ public class PreferenceFactory {
 	 * 
 	 *         An agenda is a list of OWLAxioms, e.g., [ax1,ax2,ax3]. A preference
 	 *         over an agenda is a list of Integers, e.g., [2,3,1]. [2,3,1] says
-	 *         that ax3 is preferred to ax1, which is preferred to ax2.
+	 *         that ax3 (rank 1) is preferred to ax1 (rank 2), which is preferred to
+	 *         ax2 (rank 3). It must not contain duplicates.
 	 */
 	public class Preference {
 
@@ -82,12 +85,12 @@ public class PreferenceFactory {
 
 		private Preference(List<Integer> ranking) {
 			if (ranking.size() != agenda.size()) {
-				throw new IllegalArgumentException("A ranking must specify a rank for every axiom of the agenda");
+				throw new IllegalArgumentException("A ranking must specify a rank for every axiom of the agenda.");
 			}
 			for (int i = 1; i <= ranking.size(); i++) {
 				if (!ranking.contains(i)) {
 					throw new IllegalArgumentException("A ranking must specificy a rank unique "
-							+ "from 1 to agenda.size() to every axiom of the agenda");
+							+ "from 1 to agenda.size() to every axiom of the agenda.");
 				}
 			}
 			this.ranking = ranking;
@@ -107,7 +110,7 @@ public class PreferenceFactory {
 
 		public int getRank(OWLAxiom ax) {
 			if (!agenda.contains(ax)) {
-				throw new IllegalArgumentException("Argument must be an axiom from the agenda");
+				throw new IllegalArgumentException("Argument must be an axiom from the agenda.");
 			}
 			return ranking.get(agenda.indexOf(ax));
 		}
@@ -119,7 +122,7 @@ public class PreferenceFactory {
 		 */
 		public OWLAxiom get(int rank) {
 			if (rank < 1 || rank > agenda.size()) {
-				throw new IllegalArgumentException("Rank out of bounds");
+				throw new IllegalArgumentException("Rank out of bounds.");
 			}
 			return agenda.get(ranking.indexOf(rank));
 		}
@@ -131,7 +134,7 @@ public class PreferenceFactory {
 		 */
 		public boolean prefers(OWLAxiom a1, OWLAxiom a2) {
 			if (!(agenda.contains(a1) && agenda.contains(a2))) {
-				throw new IllegalStateException("The axioms in parameter must be in the agenda");
+				throw new IllegalStateException("The axioms in parameter must be in the agenda.");
 			}
 			return ranking.get(agenda.indexOf(a1)) < ranking.get(agenda.indexOf(a2));
 		}
@@ -144,12 +147,12 @@ public class PreferenceFactory {
 		public boolean prefers(Set<OWLAxiom> set1, Set<OWLAxiom> set2) {
 			for (OWLAxiom ax : set1) {
 				if (!agenda.contains(ax)) {
-					throw new IllegalStateException("The axioms in the first set must all be in the agenda");
+					throw new IllegalStateException("The axioms in the first set must all be in the agenda.");
 				}
 			}
 			for (OWLAxiom ax : set2) {
 				if (!agenda.contains(ax)) {
-					throw new IllegalStateException("The axioms in the second set must all be in the agenda");
+					throw new IllegalStateException("The axioms in the second set must all be in the agenda.");
 				}
 			}
 
