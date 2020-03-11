@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#"
+     xml:base="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#is_controlled_by -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#is_controlled_by"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#moves_on -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#moves_on"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#needs -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#needs"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Airplane -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Airplane">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Boat -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Boat">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Car -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Car">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#is_controlled_by"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#moves_on"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air"/>
+                            <rdf:Description rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground"/>
+                            <rdf:Description rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#needs"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
