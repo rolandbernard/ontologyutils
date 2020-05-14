@@ -40,12 +40,12 @@ public class AppBlendingDialogue {
 
 	OWLOntology ontologyOne;
 	OWLOntology ontologyTwo;
-	OWLOntology referenceOntology;
+	OWLOntology initialOntology;
 	OWLOntology alignmentOntology;
 
 	private static final String MSG_USAGE = "Usage: the program expects four (paths to) ontologies in parameter and optionally, "
 			+ "a file pathname to save the result of the blending dialog, preceded by the flag -o: "
-			+ "<ontologyFilePath1> <ontologyFilePath2> <referenceOntologyFilePath> <alignmentsOntologyFilePath> "
+			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> "
 			+ "-o <outputOntologyFilePath>";
 
 	private static void usage(String[] args) {
@@ -148,11 +148,9 @@ public class AppBlendingDialogue {
 	 *                                   through a blending dialogue. The moves of
 	 *                                   agent two will contain the (normalized)
 	 *                                   axioms of this ontology.
-	 * @param referenceOntologyFilePath  the path to a consistent ontology to serve
-	 *                                   as reference ontology if weakening is
-	 *                                   required during the blending dialogue. The
-	 *                                   axioms of this ontology will be in the
-	 *                                   blend.
+	 * @param initialOntologyFilePath    the path to a consistent ontology to serve
+	 *                                   as initial ontology. The axioms of this
+	 *                                   ontology will be in the blend.
 	 * @param alignmentsOntologyFilePath the path to an ontology intended to contain
 	 *                                   alignments between the entities occurring
 	 *                                   in the first and second ontologies. The
@@ -160,16 +158,16 @@ public class AppBlendingDialogue {
 	 *                                   be part of the moves of both agent one and
 	 *                                   agent two.
 	 */
-	public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2,
-			String referenceOntologyFilePath, String alignmentsOntologyFilePath) {
+	public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2, String initialOntologyFilePath,
+			String alignmentsOntologyFilePath) {
 
 		OWLOntology base1 = ontologyOne = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
 		OWLOntology base2 = ontologyTwo = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
 		OWLOntology baseAlignments = ontologyTwo = Utils.newOntologyExcludeNonLogicalAxioms(alignmentsOntologyFilePath);
 
-		this.referenceOntology = Utils.newOntologyExcludeNonLogicalAxioms(referenceOntologyFilePath);
+		this.initialOntology = Utils.newOntologyExcludeNonLogicalAxioms(initialOntologyFilePath);
 
-		if (!Utils.isConsistent(base1) || !Utils.isConsistent(base2) || !Utils.isConsistent(referenceOntology)) {
+		if (!Utils.isConsistent(base1) || !Utils.isConsistent(base2) || !Utils.isConsistent(initialOntology)) {
 			System.out.println("The ontologies must be consistent.");
 			System.exit(1);
 		}
@@ -246,7 +244,7 @@ public class AppBlendingDialogue {
 		System.out.println("- Preferences agent two: " + preferenceTwo);
 
 		BlendingDialogue bdg = new BlendingDialogue(prefFactoryOne.getAgenda(), preferenceOne,
-				prefFactoryTwo.getAgenda(), preferenceTwo, mApp.referenceOntology);
+				prefFactoryTwo.getAgenda(), preferenceTwo, mApp.initialOntology);
 
 		int importanceOne = readNumber("Importance of agent one?", 1, 100);
 		int importanceTwo = readNumber("Importance of agent two?", 1, 100);

@@ -23,7 +23,7 @@ public class BlendingDialogue {
 	private List<OWLAxiom> atwo;
 	private Preference pone;
 	private Preference ptwo;
-	private OWLOntology referenceOntology;
+	private OWLOntology initialOntology;
 
 	private boolean verbose = false;
 
@@ -39,21 +39,21 @@ public class BlendingDialogue {
 	}
 
 	/**
-	 * @param aone              a list of axioms
-	 * @param pone              a preference over {@code aone} axioms
-	 * @param otwo              a list of axioms
-	 * @param ptwo              a preference over {@code atwo} axioms
-	 * @param referenceOntology a consistent ontology
+	 * @param aone            a list of axioms
+	 * @param pone            a preference over {@code aone} axioms
+	 * @param otwo            a list of axioms
+	 * @param ptwo            a preference over {@code atwo} axioms
+	 * @param initialOntology a consistent ontology
 	 */
 	public BlendingDialogue(List<OWLAxiom> aone, Preference pone, List<OWLAxiom> atwo, Preference ptwo,
-			OWLOntology referenceOntology) {
-		if (!Utils.isConsistent(referenceOntology)) {
-			throw new IllegalArgumentException("The reference ontology must be consistent.");
+			OWLOntology initialOntology) {
+		if (!Utils.isConsistent(initialOntology)) {
+			throw new IllegalArgumentException("The initial ontology must be consistent.");
 		}
 		if (!aone.equals(pone.getAgenda()) || !atwo.equals(ptwo.getAgenda())) {
 			throw new IllegalArgumentException("The preferences must be over their respective list of axioms.");
 		}
-		this.referenceOntology = referenceOntology;
+		this.initialOntology = initialOntology;
 		this.aone = aone;
 		this.atwo = atwo;
 		this.pone = pone;
@@ -88,7 +88,7 @@ public class BlendingDialogue {
 	 */
 	public OWLOntology get(double probabilityTurnOne) {
 
-		OWLOntology result = Utils.newOntology(this.referenceOntology.axioms());
+		OWLOntology result = Utils.newOntology(this.initialOntology.axioms());
 
 		List<OWLAxiom> remainone = new ArrayList<>(this.aone);
 		List<OWLAxiom> remaintwo = new ArrayList<>(this.atwo);
