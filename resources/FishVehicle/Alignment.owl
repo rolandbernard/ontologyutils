@@ -39,6 +39,7 @@
 
     <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food">
         <owl:equivalentClass rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
     </owl:Class>
     
 
