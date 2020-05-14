@@ -268,7 +268,7 @@ public class AppBlendingDialogue {
 		System.out.println("Happiness of two: " + happiness(mApp.ontologyTwo, result));
 
 		System.out.println("(\"Happiness\" of an agent with the result is estimated as "
-				+ "the ratio of the number of axioms and inferred and taxonomy axioms "
+				+ "the ratio of the number of axioms and inferred taxonomy axioms "
 				+ "in the ontology of the agent that are inferred by the result ontology.)");
 
 		if (args.length == 6 && args[4].equals("-o")) {
