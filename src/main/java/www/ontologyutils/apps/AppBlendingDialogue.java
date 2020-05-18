@@ -208,7 +208,7 @@ public class AppBlendingDialogue {
 		// preferences agent one
 		System.out.println("- These are the base moves of agent one:");
 		for (int i = 0; i < prefFactoryOne.getAgenda().size(); i++) {
-			System.out.println((i + 1) + " : " + prefFactoryOne.getAgenda().get(i));
+			System.out.println((i + 1) + " : " + Utils.prettyPrintAxiom(prefFactoryOne.getAgenda().get(i)));
 		}
 		List<Integer> rankingOne = Stream.generate(String::new).limit(prefFactoryOne.getAgenda().size()).map(s -> 0)
 				.collect(Collectors.toList());
@@ -227,7 +227,7 @@ public class AppBlendingDialogue {
 		// preferences agent two
 		System.out.println("- These are the base moves of agent two:");
 		for (int i = 0; i < prefFactoryTwo.getAgenda().size(); i++) {
-			System.out.println((i + 1) + " : " + prefFactoryTwo.getAgenda().get(i));
+			System.out.println((i + 1) + " : " + Utils.prettyPrintAxiom(prefFactoryTwo.getAgenda().get(i)));
 		}
 		List<Integer> rankingTwo = Stream.generate(String::new).limit(prefFactoryTwo.getAgenda().size()).map(s -> 0)
 				.collect(Collectors.toList());
@@ -259,7 +259,7 @@ public class AppBlendingDialogue {
 		OWLOntology result = bdg.setVerbose(true).get(probabilityTurnOne);
 
 		System.out.println("\n--- RESULT ONTOLOGY\n");
-		result.axioms().forEach(a -> System.out.println("- " + a));
+		result.axioms().forEach(a -> System.out.println("- " + Utils.prettyPrintAxiom(a)));
 
 		System.out.println("\n-- EVALUATION\n");
 		System.out.println("Happiness of one: " + happiness(mApp.ontologyOne, result));

@@ -128,7 +128,7 @@ public class BlendingDialogue {
 				}
 				remaintwo.remove(consideredAxiom);
 			}
-			log("\nConsidering axiom " + consideredAxiom);
+			log("\nConsidering axiom " + Utils.prettyPrintAxiom(consideredAxiom));
 			result.add(consideredAxiom);
 			while (!Utils.isConsistent(result)) {
 				log("\n** Weakening. **");
@@ -141,7 +141,7 @@ public class BlendingDialogue {
 				consideredAxiom = (OWLAxiom) (weakerAxioms.toArray())[randomPick];
 				result.add(consideredAxiom);
 			}
-			log("\nAdding axiom: " + consideredAxiom);
+			log("\nAdding axiom: " + Utils.prettyPrintAxiom(consideredAxiom));
 		}
 
 		return result;
