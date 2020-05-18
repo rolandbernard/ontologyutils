@@ -75,6 +75,12 @@
     
 
 
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Energy -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Energy"/>
+    
+
+
     <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish">
@@ -119,7 +125,9 @@
 
     <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food"/>
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Energy"/>
+    </owl:Class>
     
 
 

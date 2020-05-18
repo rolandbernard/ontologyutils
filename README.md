@@ -505,427 +505,258 @@ This app showcases the technique of dialogical concept combination.
 Ran with the parameters `./resources/FishVehicle/Vehicle.owl ./resources/FishVehicle/Fish.owl ./resources/FishVehicle/InitialOntology.owl ./resources/FishVehicle/Alignment.owl`, it gives:
 
 ```
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+
 --- Preferences.
 - These are the base moves of agent one:
-1 : SubClassOf(Annotation(<origin> <SubClassOf(Car Vehicle)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ca
-r> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-2 : SubClassOf(Annotation(<origin> <SubClassOf(Vehicle Machine)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/f
-v#Vehicle> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine>)
-3 : SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(moves_on ObjectUnionOf(Air Ground Water)))>)
- <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guend
-a/ontologies/2020/2/vehicle#moves_on> ObjectUnionOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http:/
-/www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)
-))
-4 : SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(is_controlled_by Human))>) <http://www.seman
-ticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/
-2/vehicle#is_controlled_by> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>))
-5 : SubClassOf(Annotation(<origin> <SubClassOf(Human Animal)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#H
-uman> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>)
-6 : SubClassOf(Annotation(<origin> <SubClassOf(Airplane Vehicle)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/
-fv#Airplane> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-7 : SubClassOf(Annotation(<origin> <SubClassOf(Boat Vehicle)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#B
-oat> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-8 : SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(needs Fuel))>) <http://www.semanticweb.org/g
-uenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#ne
-eds> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
-9 : SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ontologies/2020/2
-/fv#Fuel> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>)
-10 : SubClassOf(Annotation(<origin> <EquivalentClasses(Water ObjectUnionOf(Air Ground Water) )>) ObjectUnionOf(<http://w
-ww.semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <htt
-p://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Wate
-r>)
-11 : SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ontologies/2020/
-2/fv#Food> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>)
-12 : SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/ontologies/2020
-/2/fv#Self> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>)
-13 : SubClassOf(Annotation(<origin> <EquivalentClasses(Water ObjectUnionOf(Air Ground Water) )>) <http://www.semanticweb
-.org/guenda/ontologies/2020/2/fv#Water> ObjectUnionOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http
-://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water
->))
-14 : SubClassOf(Annotation(<origin> <DisjointClasses(Animal Machine)>) <http://www.semanticweb.org/guenda/ontologies/202
-0/2/fv#Machine> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>))
-15 : SubClassOf(Annotation(<origin> <DisjointClasses(Animal Machine)>) <http://www.semanticweb.org/guenda/ontologies/202
-0/2/fv#Animal> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine>))
-16 : SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/ontologies/2020
-/2/fv#Human> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>)
-17 : SubClassOf(Annotation(<origin> <DisjointClasses(Food Fuel)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/f
-v#Fuel> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-18 : SubClassOf(Annotation(<origin> <DisjointClasses(Food Fuel)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/f
-v#Food> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
-- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 1
-- Current ranking: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 2
-- Current ranking: [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 3
-- Current ranking: [1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 4
-- Current ranking: [1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 5
-- Current ranking: [1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 6
-- Current ranking: [1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 7
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 7
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 8
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 9
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 10
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 11
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 12
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 13
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 0, 0, 0, 0]
-Next favorite axiom? > 14
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 0, 0, 0]
+1 : SubClassOf(Vehicle ObjectSomeValuesFrom(is_controlled_by Human))
+2 : SubClassOf(Boat Vehicle)
+3 : SubClassOf(Vehicle ObjectSomeValuesFrom(moves_on ObjectUnionOf(Air Ground Water)))
+4 : SubClassOf(Fuel Energy)
+5 : SubClassOf(Car Vehicle)
+6 : SubClassOf(Vehicle Machine)
+7 : SubClassOf(Airplane Vehicle)
+8 : SubClassOf(Vehicle ObjectSomeValuesFrom(needs Fuel))
+9 : SubClassOf(Human Animal)
+10 : SubClassOf(ObjectUnionOf(Air Ground Water) Water)
+11 : SubClassOf(Water ObjectUnionOf(Air Ground Water))
+12 : SubClassOf(ObjectSomeValuesFrom(is_controlled_by Human) ObjectSomeValuesFrom(is_motivated_by Self))
+13 : SubClassOf(Food Fuel)
+14 : SubClassOf(Machine ObjectComplementOf(Animal))
+15 : SubClassOf(Animal ObjectComplementOf(Machine))
+16 : SubClassOf(Fuel ObjectComplementOf(Food))
+17 : SubClassOf(Food ObjectComplementOf(Fuel))
+18 : SubClassOf(Fuel Food)
+19 : SubClassOf(ObjectSomeValuesFrom(is_motivated_by Self) ObjectSomeValuesFrom(is_controlled_by Human))
+- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Next favorite axiom? > 15
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 0, 0]
-Next favorite axiom? > 16
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0, 0]
+- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 6
+- Current ranking: [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 8
+- Current ranking: [0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 1
+- Current ranking: [4, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 3
+- Current ranking: [4, 0, 5, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
 Next favorite axiom? > 17
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 0]
+- Current ranking: [4, 0, 5, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 6, 0, 0]
+Next favorite axiom? > 16
+- Current ranking: [4, 0, 5, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 10
+- Current ranking: [4, 0, 5, 0, 0, 2, 0, 3, 0, 8, 0, 0, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 5
+- Current ranking: [4, 0, 5, 0, 9, 2, 0, 3, 0, 8, 0, 0, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 7
+- Current ranking: [4, 0, 5, 0, 9, 2, 10, 3, 0, 8, 0, 0, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 2
+- Current ranking: [4, 11, 5, 0, 9, 2, 10, 3, 0, 8, 0, 0, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 4
+- Current ranking: [4, 11, 5, 12, 9, 2, 10, 3, 0, 8, 0, 0, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 9
+- Current ranking: [4, 11, 5, 12, 9, 2, 10, 3, 13, 8, 0, 0, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 11
+- Current ranking: [4, 11, 5, 12, 9, 2, 10, 3, 13, 8, 14, 0, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 12
+- Current ranking: [4, 11, 5, 12, 9, 2, 10, 3, 13, 8, 14, 15, 0, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 13
+- Current ranking: [4, 11, 5, 12, 9, 2, 10, 3, 13, 8, 14, 15, 16, 0, 1, 7, 6, 0, 0]
+Next favorite axiom? > 14
+- Current ranking: [4, 11, 5, 12, 9, 2, 10, 3, 13, 8, 14, 15, 16, 17, 1, 7, 6, 0, 0]
 Next favorite axiom? > 18
-- Preferences agent one: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+- Current ranking: [4, 11, 5, 12, 9, 2, 10, 3, 13, 8, 14, 15, 16, 17, 1, 7, 6, 18, 0]
+Next favorite axiom? > 19
+- Preferences agent one: [4, 11, 5, 12, 9, 2, 10, 3, 13, 8, 14, 15, 16, 17, 1, 7, 6, 18, 19]
 - These are the base moves of agent two:
-1 : SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectSomeValuesFrom(needs Food))>) <http://www.semanticweb.org/guen
-da/ontologies/2020/2/fv#Fish> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs> <http:
-//www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-2 : SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(lives_in Water) ObjectAllV
-aluesFrom(lives_in Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectIntersectionOf(ObjectS
-omeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lives_in> <http://www.semanticweb.org/guenda/ontol
-ogies/2020/2/fv#Water>) ObjectAllValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lives_in> <http://ww
-w.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
-3 : SubClassOf(Annotation(<origin> <SubClassOf(Animal ObjectSomeValuesFrom(needs Food))>) <http://www.semanticweb.org/gu
-enda/ontologies/2020/2/fv#Animal> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs> <h
-ttp://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-4 : SubClassOf(Annotation(<origin> <SubClassOf(Animal ObjectSomeValuesFrom(is_motivated_by Self))>) <http://www.semantic
-web.org/guenda/ontologies/2020/2/fv#Animal> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv
-#is_motivated_by> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>))
-5 : SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(moves_in Water) ObjectAllV
-aluesFrom(moves_in Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectIntersectionOf(ObjectS
-omeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_in> <http://www.semanticweb.org/guenda/ontol
-ogies/2020/2/fv#Water>) ObjectAllValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_in> <http://ww
-w.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
-6 : SubClassOf(Annotation(<origin> <SubClassOf(Shark Fish)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Sha
-rk> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish>)
-7 : SubClassOf(Annotation(<origin> <SubClassOf(Fish Animal)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fi
-sh> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>)
-8 : SubClassOf(Annotation(<origin> <SubClassOf(Human Animal)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#H
-uman> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>)
-9 : SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ontologies/2020/2
-/fv#Fuel> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>)
-10 : SubClassOf(Annotation(<origin> <EquivalentClasses(Water ObjectUnionOf(Air Ground Water) )>) ObjectUnionOf(<http://w
-ww.semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <htt
-p://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Wate
-r>)
-11 : SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ontologies/2020/
-2/fv#Food> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>)
-12 : SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/ontologies/2020
-/2/fv#Self> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>)
-13 : SubClassOf(Annotation(<origin> <EquivalentClasses(Water ObjectUnionOf(Air Ground Water) )>) <http://www.semanticweb
-.org/guenda/ontologies/2020/2/fv#Water> ObjectUnionOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http
-://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water
->))
-14 : SubClassOf(Annotation(<origin> <DisjointClasses(Animal Machine)>) <http://www.semanticweb.org/guenda/ontologies/202
-0/2/fv#Machine> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>))
-15 : SubClassOf(Annotation(<origin> <DisjointClasses(Animal Machine)>) <http://www.semanticweb.org/guenda/ontologies/202
-0/2/fv#Animal> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine>))
-16 : SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/ontologies/2020
-/2/fv#Human> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>)
-17 : SubClassOf(Annotation(<origin> <DisjointClasses(Food Fuel)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/f
-v#Fuel> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-18 : SubClassOf(Annotation(<origin> <DisjointClasses(Food Fuel)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/f
-v#Food> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
-- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 1
-- Current ranking: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 2
-- Current ranking: [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 3
-- Current ranking: [1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 4
-- Current ranking: [1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 5
-- Current ranking: [1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 6
-- Current ranking: [1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 7
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 8
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 9
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 10
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 11
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 12
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0, 0, 0, 0, 0, 0]
-Next favorite axiom? > 13
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 0, 0, 0, 0]
-Next favorite axiom? > 14
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 0, 0, 0]
+1 : SubClassOf(Animal ObjectSomeValuesFrom(is_motivated_by Self))
+2 : SubClassOf(Food Energy)
+3 : SubClassOf(Fish Animal)
+4 : SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(moves_in Water) ObjectAllValuesFrom(moves_in Water)))
+5 : SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(lives_in Water) ObjectAllValuesFrom(lives_in Water)))
+6 : SubClassOf(Shark Fish)
+7 : SubClassOf(Animal ObjectSomeValuesFrom(needs Food))
+8 : SubClassOf(Fish ObjectSomeValuesFrom(needs Food))
+9 : SubClassOf(Human Animal)
+10 : SubClassOf(ObjectUnionOf(Air Ground Water) Water)
+11 : SubClassOf(Water ObjectUnionOf(Air Ground Water))
+12 : SubClassOf(ObjectSomeValuesFrom(is_controlled_by Human) ObjectSomeValuesFrom(is_motivated_by Self))
+13 : SubClassOf(Food Fuel)
+14 : SubClassOf(Machine ObjectComplementOf(Animal))
+15 : SubClassOf(Animal ObjectComplementOf(Machine))
+16 : SubClassOf(Fuel ObjectComplementOf(Food))
+17 : SubClassOf(Food ObjectComplementOf(Fuel))
+18 : SubClassOf(Fuel Food)
+19 : SubClassOf(ObjectSomeValuesFrom(is_motivated_by Self) ObjectSomeValuesFrom(is_controlled_by Human))
+- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Next favorite axiom? > 15
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 0, 0]
-Next favorite axiom? > 16
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0, 0]
-Next favorite axiom? > 17
-- Current ranking: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 0]
+- Current ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 3
+- Current ranking: [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 3
+- Current ranking: [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 8
+- Current ranking: [0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 4
+- Current ranking: [0, 0, 2, 4, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 5
+- Current ranking: [0, 0, 2, 4, 5, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 6
+- Current ranking: [0, 0, 2, 4, 5, 6, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 7
+- Current ranking: [0, 0, 2, 4, 5, 6, 7, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 1
+- Current ranking: [8, 0, 2, 4, 5, 6, 7, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 2
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+Next favorite axiom? > 19
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 10]
 Next favorite axiom? > 18
-- Preferences agent two: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 11, 10]
+Next favorite axiom? > 17
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 0, 0, 0, 0, 0, 0, 1, 0, 12, 11, 10]
+Next favorite axiom? > 16
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 0, 0, 0, 0, 0, 0, 1, 13, 12, 11, 10]
+Next favorite axiom? > 9
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 14, 0, 0, 0, 0, 0, 1, 13, 12, 11, 10]
+Next favorite axiom? > 10
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 14, 15, 0, 0, 0, 0, 1, 13, 12, 11, 10]
+Next favorite axiom? > 11
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 14, 15, 16, 0, 0, 0, 1, 13, 12, 11, 10]
+Next favorite axiom? > 12
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 14, 15, 16, 17, 0, 0, 1, 13, 12, 11, 10]
+Next favorite axiom? > 13
+- Current ranking: [8, 9, 2, 4, 5, 6, 7, 3, 14, 15, 16, 17, 18, 0, 1, 13, 12, 11, 10]
+Next favorite axiom? > 14
+- Preferences agent two: [8, 9, 2, 4, 5, 6, 7, 3, 14, 15, 16, 17, 18, 19, 1, 13, 12, 11, 10]
 Importance of agent one? > 4
 Importance of agent two? > 1
 
---- At each turn, probability for agent one to act: 0.8104575163398693
+--- At each turn, probability for agent one to act: 0.8098159509202454
 
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Car Vehicle)>) <http://www.semanticweb.org/guenda/ontologie
-s/2020/2/fv#Car> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Car Vehicle)>) <http://www.semanticweb.org/guenda/ontologies/20
-20/2/fv#Car> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Vehicle Machine)>) <http://www.semanticweb.org/guenda/ontol
-ogies/2020/2/fv#Vehicle> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine>)
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Vehicle Machine)>) <http://www.semanticweb.org/guenda/ontologie
-s/2020/2/fv#Vehicle> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine>)
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectSomeValuesFrom(needs Food))>) <http://www.semant
-icweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv
-#needs> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectSomeValuesFrom(needs Food))>) <http://www.semanticwe
-b.org/guenda/ontologies/2020/2/fv#Fish> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#nee
-ds> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
+Considering axiom SubClassOf(Animal ObjectComplementOf(Machine))
+Adding axiom: SubClassOf(Animal ObjectComplementOf(Machine))
 Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(moves_on ObjectUnionOf(Air Gro
-und Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanti
-cweb.org/guenda/ontologies/2020/2/vehicle#moves_on> ObjectUnionOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/f
-v#Air> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <http://www.semanticweb.org/guenda/ontologies/202
-0/2/fv#Water>)))
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(moves_on ObjectUnionOf(Air Ground 
-Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb
-.org/guenda/ontologies/2020/2/vehicle#moves_on> ObjectUnionOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ai
-r> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <http://www.semanticweb.org/guenda/ontologies/2020/2/
-fv#Water>)))
+Considering axiom SubClassOf(Vehicle Machine)
+Adding axiom: SubClassOf(Vehicle Machine)
+Turn: 1
+Considering axiom SubClassOf(Vehicle ObjectSomeValuesFrom(needs Fuel))
+Adding axiom: SubClassOf(Vehicle ObjectSomeValuesFrom(needs Fuel))
+Turn: 1
+Considering axiom SubClassOf(Vehicle ObjectSomeValuesFrom(is_controlled_by Human))
+Adding axiom: SubClassOf(Vehicle ObjectSomeValuesFrom(is_controlled_by Human))
+Turn: 1
+Considering axiom SubClassOf(Vehicle ObjectSomeValuesFrom(moves_on ObjectUnionOf(Air Ground Water)))
+Adding axiom: SubClassOf(Vehicle ObjectSomeValuesFrom(moves_on ObjectUnionOf(Air Ground Water)))
+Turn: 1
+Considering axiom SubClassOf(Food ObjectComplementOf(Fuel))
+Adding axiom: SubClassOf(Food ObjectComplementOf(Fuel))
+Turn: 1
+Considering axiom SubClassOf(ObjectUnionOf(Air Ground Water) Water)
+Adding axiom: SubClassOf(ObjectUnionOf(Air Ground Water) Water)
+Turn: 1
+Considering axiom SubClassOf(Car Vehicle)
+Adding axiom: SubClassOf(Car Vehicle)
+Turn: 1
+Considering axiom SubClassOf(Airplane Vehicle)
+Adding axiom: SubClassOf(Airplane Vehicle)
+Turn: 1
+Considering axiom SubClassOf(Boat Vehicle)
+Adding axiom: SubClassOf(Boat Vehicle)
+Turn: 1
+Considering axiom SubClassOf(Fuel Energy)
+Adding axiom: SubClassOf(Fuel Energy)
+Turn: 1
+Considering axiom SubClassOf(Human Animal)
+Adding axiom: SubClassOf(Human Animal)
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(lives_in Wat
-er) ObjectAllValuesFrom(lives_in Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectIntersec
-tionOf(ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lives_in> <http://www.semanticweb.or
-g/guenda/ontologies/2020/2/fv#Water>) ObjectAllValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lives_
-in> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(lives_in Water) 
-ObjectAllValuesFrom(lives_in Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectIntersection
-Of(ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lives_in> <http://www.semanticweb.org/gu
-enda/ontologies/2020/2/fv#Water>) ObjectAllValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lives_in> 
-<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(is_controlled_by Human))>) <ht
-tp://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/on
-tologies/2020/2/vehicle#is_controlled_by> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>))
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(is_controlled_by Human))>) <http:/
-/www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontolo
-gies/2020/2/vehicle#is_controlled_by> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>))
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Human Animal)>) <http://www.semanticweb.org/guenda/ontologi
-es/2020/2/fv#Human> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>)
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Human Animal)>) <http://www.semanticweb.org/guenda/ontologies/2
-020/2/fv#Human> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Airplane Vehicle)>) <http://www.semanticweb.org/guenda/onto
-logies/2020/2/fv#Airplane> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Airplane Vehicle)>) <http://www.semanticweb.org/guenda/ontologi
-es/2020/2/fv#Airplane> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Boat Vehicle)>) <http://www.semanticweb.org/guenda/ontologi
-es/2020/2/fv#Boat> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Boat Vehicle)>) <http://www.semanticweb.org/guenda/ontologies/2
-020/2/fv#Boat> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(needs Fuel))>) <http://www.sem
-anticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/202
-0/2/vehicle#needs> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(needs Fuel))>) <http://www.semanti
-cweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/
-vehicle#needs> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ont
-ologies/2020/2/fv#Fuel> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>)
-Adding axiom: SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ontolog
-ies/2020/2/fv#Fuel> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <EquivalentClasses(Water ObjectUnionOf(Air Ground Water) )>) ObjectUnio
-nOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv
-#Ground> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>) <http://www.semanticweb.org/guenda/ontologies/2
-020/2/fv#Water>)
-Adding axiom: SubClassOf(Annotation(<origin> <EquivalentClasses(Water ObjectUnionOf(Air Ground Water) )>) ObjectUnionOf(
-<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Gro
-und> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>) <http://www.semanticweb.org/guenda/ontologies/2020/
-2/fv#Water>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ont
-ologies/2020/2/fv#Food> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>)
-Adding axiom: SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ontolog
-ies/2020/2/fv#Food> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/on
-tologies/2020/2/fv#Self> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>)
-Adding axiom: SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/ontolo
-gies/2020/2/fv#Self> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <DisjointClasses(Animal Machine)>) <http://www.semanticweb.org/guenda/o
-ntologies/2020/2/fv#Machine> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>))
-Adding axiom: SubClassOf(Annotation(<origin> <DisjointClasses(Animal Machine)>) <http://www.semanticweb.org/guenda/ontol
-ogies/2020/2/fv#Machine> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>))
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/on
-tologies/2020/2/fv#Human> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>)
-Adding axiom: SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/ontolo
-gies/2020/2/fv#Human> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <DisjointClasses(Food Fuel)>) <http://www.semanticweb.org/guenda/ontolo
-gies/2020/2/fv#Fuel> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
+Considering axiom SubClassOf(Fish Animal)
 ** Weakening. **
 ** Weakening. **
 ** Weakening. **
 ** Weakening. **
-Adding axiom: SubClassOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food> owl:Thing)
-Turn: 1
-Considering axiom SubClassOf(Annotation(<origin> <DisjointClasses(Food Fuel)>) <http://www.semanticweb.org/guenda/ontolo
-gies/2020/2/fv#Food> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
 ** Weakening. **
-Adding axiom: SubClassOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food> ObjectComplementOf(owl:Nothing))
+** Weakening. **
+** Weakening. **
+Adding axiom: SubClassOf(Airplane ObjectComplementOf(Fish))
+Turn: 1
+Considering axiom SubClassOf(ObjectSomeValuesFrom(is_controlled_by Human) ObjectSomeValuesFrom(is_motivated_by Self))
+Adding axiom: SubClassOf(ObjectSomeValuesFrom(is_controlled_by Human) ObjectSomeValuesFrom(is_motivated_by Self))
+Turn: 1
+Considering axiom SubClassOf(Food Fuel)
+Adding axiom: SubClassOf(Food Fuel)
+Turn: 1
+Considering axiom SubClassOf(Fuel Food)
+** Weakening. **
+Adding axiom: SubClassOf(Food Food)
+Turn: 1
+Considering axiom SubClassOf(ObjectSomeValuesFrom(is_motivated_by Self) ObjectSomeValuesFrom(is_controlled_by Human))
+Adding axiom: SubClassOf(ObjectSomeValuesFrom(is_motivated_by Self) ObjectSomeValuesFrom(is_controlled_by Human))
 Turn: 1
 All axioms considered or already entailed.
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Animal ObjectSomeValuesFrom(needs Food))>) <http://www.sema
-nticweb.org/guenda/ontologies/2020/2/fv#Animal> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/
-2/fv#needs> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Animal ObjectSomeValuesFrom(needs Food))>) <http://www.semantic
-web.org/guenda/ontologies/2020/2/fv#Animal> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv
-#needs> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
+Considering axiom SubClassOf(Fish ObjectSomeValuesFrom(needs Food))
+** Weakening. **
+Adding axiom: SubClassOf(Fish ObjectSomeValuesFrom(needs Air))
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Animal ObjectSomeValuesFrom(is_motivated_by Self))>) <http:
-//www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontolo
-gies/2020/2/fv#is_motivated_by> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>))
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Animal ObjectSomeValuesFrom(is_motivated_by Self))>) <http://ww
-w.semanticweb.org/guenda/ontologies/2020/2/fv#Animal> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies
-/2020/2/fv#is_motivated_by> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>))
+Considering axiom SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(moves_in Water) ObjectAllValuesFrom(moves_in Water)))
+Adding axiom: SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(moves_in Water) ObjectAllValuesFrom(moves_in Water)))
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(moves_in Wat
-er) ObjectAllValuesFrom(moves_in Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectIntersec
-tionOf(ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_in> <http://www.semanticweb.or
-g/guenda/ontologies/2020/2/fv#Water>) ObjectAllValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_
-in> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(moves_in Water) 
-ObjectAllValuesFrom(moves_in Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectIntersection
-Of(ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_in> <http://www.semanticweb.org/gu
-enda/ontologies/2020/2/fv#Water>) ObjectAllValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_in> 
-<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
+Considering axiom SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(lives_in Water) ObjectAllValuesFrom(lives_in Water)))
+Adding axiom: SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(lives_in Water) ObjectAllValuesFrom(lives_in Water)))
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Shark Fish)>) <http://www.semanticweb.org/guenda/ontologies
-/2020/2/fv#Shark> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish>)
-Adding axiom: SubClassOf(Annotation(<origin> <SubClassOf(Shark Fish)>) <http://www.semanticweb.org/guenda/ontologies/202
-0/2/fv#Shark> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish>)
+Considering axiom SubClassOf(Shark Fish)
+Adding axiom: SubClassOf(Shark Fish)
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <SubClassOf(Fish Animal)>) <http://www.semanticweb.org/guenda/ontologie
-s/2020/2/fv#Fish> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>)
+Considering axiom SubClassOf(Animal ObjectSomeValuesFrom(needs Food))
 ** Weakening. **
 ** Weakening. **
 ** Weakening. **
-Adding axiom: SubClassOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://w
-ww.semanticweb.org/guenda/ontologies/2020/2/fv#needs> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
+Adding axiom: SubClassOf(owl:Nothing Boat)
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <DisjointClasses(Food Fuel)>) <http://www.semanticweb.org/guenda/ontolo
-gies/2020/2/fv#Fuel> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-** Weakening. **
-** Weakening. **
-** Weakening. **
-** Weakening. **
-Adding axiom: SubClassOf(owl:Nothing ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
+Considering axiom SubClassOf(Animal ObjectSomeValuesFrom(is_motivated_by Self))
+Adding axiom: SubClassOf(Animal ObjectSomeValuesFrom(is_motivated_by Self))
 Turn: 2
-Considering axiom SubClassOf(Annotation(<origin> <DisjointClasses(Food Fuel)>) <http://www.semanticweb.org/guenda/ontolo
-gies/2020/2/fv#Food> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
+Considering axiom SubClassOf(Fuel Food)
 ** Weakening. **
-** Weakening. **
-Adding axiom: SubClassOf(owl:Nothing ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
+Adding axiom: SubClassOf(Food Food)
 Turn: 2
 All axioms considered or already entailed.
 --- RESULT ONTOLOGY
 
-- EquivalentClasses(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> <http://www.semanticweb.org/guenda/ont
-ologies/2020/2/fv#FishVehicle> )
-- EquivalentClasses(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#FishVehicle> <http://www.semanticweb.org/gue
-nda/ontologies/2020/2/fv#Vehicle> )
-- SubClassOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticw
-eb.org/guenda/ontologies/2020/2/fv#needs> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-- SubClassOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food> ObjectComplementOf(owl:Nothing))
-- SubClassOf(owl:Nothing ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
-- SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(moves_in Water) ObjectAllVal
-uesFrom(moves_in Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectIntersectionOf(ObjectSom
-eValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_in> <http://www.semanticweb.org/guenda/ontolog
-ies/2020/2/fv#Water>) ObjectAllValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_in> <http://www.
-semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
-- SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/ontologies/2020/2/
-fv#Self> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>)
-- SubClassOf(Annotation(<origin> <SubClassOf(Animal ObjectSomeValuesFrom(needs Food))>) <http://www.semanticweb.org/guen
-da/ontologies/2020/2/fv#Animal> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs> <htt
-p://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-- SubClassOf(Annotation(<origin> <SubClassOf(Airplane Vehicle)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv
-#Airplane> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-- SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(lives_in Water) ObjectAllVal
-uesFrom(lives_in Water)))>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish> ObjectIntersectionOf(ObjectSom
-eValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lives_in> <http://www.semanticweb.org/guenda/ontolog
-ies/2020/2/fv#Water>) ObjectAllValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lives_in> <http://www.
-semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
-- SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(is_controlled_by Human))>) <http://www.semanti
-cweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/
-vehicle#is_controlled_by> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human>))
-- SubClassOf(Annotation(<origin> <SubClassOf(Fish ObjectSomeValuesFrom(needs Food))>) <http://www.semanticweb.org/guenda
-/ontologies/2020/2/fv#Fish> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs> <http://
-www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>))
-- SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(moves_on ObjectUnionOf(Air Ground Water)))>) <
-http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/
-ontologies/2020/2/vehicle#moves_on> ObjectUnionOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http://w
-ww.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)))
-- SubClassOf(Annotation(<origin> <SubClassOf(Vehicle Machine)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#
-Vehicle> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine>)
-- SubClassOf(Annotation(<origin> <SubClassOf(Animal ObjectSomeValuesFrom(is_motivated_by Self))>) <http://www.semanticwe
-b.org/guenda/ontologies/2020/2/fv#Animal> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#i
-s_motivated_by> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>))
-- SubClassOf(Annotation(<origin> <EquivalentClasses(Human Self )>) <http://www.semanticweb.org/guenda/ontologies/2020/2/
-fv#Human> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self>)
-- SubClassOf(Annotation(<origin> <SubClassOf(Human Animal)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Hum
-an> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>)
-- SubClassOf(Annotation(<origin> <SubClassOf(Shark Fish)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Shark
-> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish>)
-- SubClassOf(Annotation(<origin> <SubClassOf(Boat Vehicle)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Boa
-t> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-- SubClassOf(Annotation(<origin> <EquivalentClasses(Water ObjectUnionOf(Air Ground Water) )>) ObjectUnionOf(<http://www.
-semanticweb.org/guenda/ontologies/2020/2/fv#Air> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground> <http:/
-/www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water>)
-- SubClassOf(Annotation(<origin> <SubClassOf(Vehicle ObjectSomeValuesFrom(needs Fuel))>) <http://www.semanticweb.org/gue
-nda/ontologies/2020/2/fv#Vehicle> ObjectSomeValuesFrom(<http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#need
-s> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>))
-- SubClassOf(Annotation(<origin> <DisjointClasses(Animal Machine)>) <http://www.semanticweb.org/guenda/ontologies/2020/2
-/fv#Machine> ObjectComplementOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal>))
-- SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ontologies/2020/2/f
-v#Fuel> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food>)
-- SubClassOf(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food> owl:Thing)
-- SubClassOf(Annotation(<origin> <EquivalentClasses(Food Fuel )>) <http://www.semanticweb.org/guenda/ontologies/2020/2/f
-v#Food> <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel>)
-- SubClassOf(Annotation(<origin> <SubClassOf(Car Vehicle)>) <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Car>
- <http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle>)
-- ClassAssertion(<http://www.semanticweb.org/guenda/ontologies/2020/2/fv#FishVehicle> <http://www.semanticweb.org/guenda
-/ontologies/2020/2/reference-ontology#fishymover>)
+- ClassAssertion(FishVehicle fishymover)
+- EquivalentClasses(Fish FishVehicle )
+- EquivalentClasses(FishVehicle Vehicle )
+- SubClassOf(Vehicle ObjectSomeValuesFrom(needs Fuel))
+- SubClassOf(Airplane Vehicle)
+- SubClassOf(Animal ObjectComplementOf(Machine))
+- SubClassOf(Airplane ObjectComplementOf(Fish))
+- SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(moves_in Water) ObjectAllValuesFrom(moves_in Water)))
+- SubClassOf(Fish ObjectIntersectionOf(ObjectSomeValuesFrom(lives_in Water) ObjectAllValuesFrom(lives_in Water)))
+- SubClassOf(Vehicle ObjectSomeValuesFrom(moves_on ObjectUnionOf(Air Ground Water)))
+- SubClassOf(Food ObjectComplementOf(Fuel))
+- SubClassOf(Fuel Energy)
+- SubClassOf(owl:Nothing Boat)
+- SubClassOf(ObjectSomeValuesFrom(is_motivated_by Self) ObjectSomeValuesFrom(is_controlled_by Human))
+- SubClassOf(Shark Fish)
+- SubClassOf(ObjectUnionOf(Air Ground Water) Water)
+- SubClassOf(Food Food)
+- SubClassOf(Human Animal)
+- SubClassOf(Food Fuel)
+- SubClassOf(Vehicle ObjectSomeValuesFrom(is_controlled_by Human))
+- SubClassOf(Fish ObjectSomeValuesFrom(needs Air))
+- SubClassOf(Animal ObjectSomeValuesFrom(is_motivated_by Self))
+- SubClassOf(Car Vehicle)
+- SubClassOf(Boat Vehicle)
+- SubClassOf(Vehicle Machine)
+- SubClassOf(ObjectSomeValuesFrom(is_controlled_by Human) ObjectSomeValuesFrom(is_motivated_by Self))
 
 -- EVALUATION
 
 Happiness of one: 1.0
-Happiness of two: 0.8461538461538461
+Happiness of two: 0.7333333333333333
 ("Happiness" of an agent with the result is estimated as the ratio of the number of axioms and inferred taxonomy axioms 
 in the ontology of the agent that are inferred by the result ontology.)
 

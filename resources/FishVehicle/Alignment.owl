@@ -13,6 +13,29 @@
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_controlled_by -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_controlled_by"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_motivated_by -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_motivated_by"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
     // Classes
     //
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +82,6 @@
     <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human">
-        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self"/>
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal"/>
     </owl:Class>
     
@@ -90,6 +112,27 @@
             </owl:Class>
         </owl:equivalentClass>
     </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_controlled_by"/>
+        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human"/>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_motivated_by"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Self"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Restriction>
 </rdf:RDF>
 
 

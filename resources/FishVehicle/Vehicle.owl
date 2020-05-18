@@ -21,21 +21,21 @@
     
 
 
-    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#is_controlled_by -->
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_controlled_by -->
 
-    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#is_controlled_by"/>
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_controlled_by"/>
     
 
 
-    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#moves_on -->
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_on -->
 
-    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#moves_on"/>
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_on"/>
     
 
 
-    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#needs -->
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs -->
 
-    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#needs"/>
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs"/>
     
 
 
@@ -64,12 +64,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal"/>
-    
-
-
     <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Boat -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Boat">
@@ -86,9 +80,17 @@
     
 
 
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Energy -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Energy"/>
+    
+
+
     <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Energy"/>
+    </owl:Class>
     
 
 
@@ -100,9 +102,7 @@
 
     <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Animal"/>
-    </owl:Class>
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human"/>
     
 
 
@@ -118,13 +118,13 @@
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Machine"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#is_controlled_by"/>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#is_controlled_by"/>
                 <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#moves_on"/>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#moves_on"/>
                 <owl:someValuesFrom>
                     <owl:Class>
                         <owl:unionOf rdf:parseType="Collection">
@@ -138,7 +138,7 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/vehicle#needs"/>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs"/>
                 <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
             </owl:Restriction>
         </rdfs:subClassOf>
