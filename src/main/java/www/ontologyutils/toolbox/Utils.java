@@ -234,20 +234,9 @@ public class Utils {
 	 * @return the set of {@code OWLClassExpression} in the {@code ontology} TBox
 	 */
 	public static Set<OWLClassExpression> getSubOfTBox(OWLOntology ontology) {
-		return getSubConceptsOfAxioms(ontology.tboxAxioms(Imports.EXCLUDED));
-	}
-
-	public static Set<OWLClassExpression> getSubConceptsOfAxioms(Stream<OWLAxiom> axioms) {
-
 		Set<OWLClassExpression> subConcepts = new HashSet<>();
-
-		axioms.forEach((ax) -> {
-			ax.nestedClassExpressions().forEach((nce) -> {
-				if (!subConcepts.contains(nce)) {
-					subConcepts.add(nce);
-				}
-			});
-		});
+		ontology.tboxAxioms(Imports.EXCLUDED)
+				.forEach((ax) -> subConcepts.addAll(ax.nestedClassExpressions().collect(Collectors.toSet())));
 
 		return subConcepts;
 	}
