@@ -1,6 +1,8 @@
 package www.ontologyutils.refinement;
 
 import java.util.IntSummaryStatistics;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -26,6 +28,9 @@ public class TesterTermination extends TestCase {
 
 	private final static OWLClassExpression TOP = OWLManager.getOWLDataFactory().getOWLThing();
 	private final int NUMBER_TESTS = 100;
+	private final boolean PROPER = false; // true to force each generalization step to find non-equivalent
+											// generalization
+											// concept (unless it is TOP).
 	static OWLOntology ontology;
 	static Covers covers;
 	static RefinementOperator generalisation;
@@ -56,7 +61,15 @@ public class TesterTermination extends TestCase {
 			System.out.format("**** Test %d. Trying to reach TOP from %s.%n", i, Utils.pretty(e.toString()));
 			while (!e.equals(TOP)) {
 				steps++;
-				e = SetUtils.getRandom(generalisation.refine(e));
+				Set<OWLClassExpression> gen;
+				if (PROPER) {
+					final OWLClassExpression ee = e;
+					gen = generalisation.refine(e).stream()
+							.filter(c -> !Utils.areEquivalent(ee, c, ontology) || c == TOP).collect(Collectors.toSet());
+				} else {
+					gen = generalisation.refine(e);
+				}
+				e = SetUtils.getRandom(gen);
 				System.out.println(Utils.pretty(e.toString()));
 			}
 			System.out.format("Required %d steps.%n", steps);
