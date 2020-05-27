@@ -1,6 +1,7 @@
 package www.ontologyutils.toolbox;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import openllet.owlapi.OpenlletReasonerFactory;
 import uk.ac.manchester.cs.jfact.JFactFactory;
+import uk.ac.manchester.cs.owl.owlapi.OWLEquivalentClassesAxiomImpl;
 
 /**
  * @author nico
@@ -234,22 +236,23 @@ public class Utils {
 	 * @return the set of {@code OWLClassExpression} in the {@code ontology} TBox
 	 */
 	public static Set<OWLClassExpression> getSubOfTBox(OWLOntology ontology) {
-		return getSubConceptsOfAxioms(ontology.tboxAxioms(Imports.EXCLUDED));
-	}
-
-	public static Set<OWLClassExpression> getSubConceptsOfAxioms(Stream<OWLAxiom> axioms) {
-
 		Set<OWLClassExpression> subConcepts = new HashSet<>();
-
-		axioms.forEach((ax) -> {
-			ax.nestedClassExpressions().forEach((nce) -> {
-				if (!subConcepts.contains(nce)) {
-					subConcepts.add(nce);
-				}
-			});
-		});
+		ontology.tboxAxioms(Imports.EXCLUDED)
+				.forEach((ax) -> subConcepts.addAll(ax.nestedClassExpressions().collect(Collectors.toSet())));
 
 		return subConcepts;
+	}
+
+	/**
+	 * @param c1
+	 * @param c2
+	 * @param ontology
+	 * @return true exactly when {@code c1} and {@code c2} are provably equivalent
+	 *         in {@code ontology}.
+	 */
+	public static boolean areEquivalent(OWLClassExpression c1, OWLClassExpression c2, OWLOntology ontology) {
+		OWLAxiom equiv = new OWLEquivalentClassesAxiomImpl(new HashSet<>(Arrays.asList(c1, c2)), new HashSet<>());
+		return isEntailed(ontology, equiv);
 	}
 
 	/**
