@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -195,6 +196,9 @@ public class AppBlendingDialogue {
 		List<OWLAxiom> listAxiomsOne = mApp.ontologyOne.axioms().collect(Collectors.toList());
 		List<OWLAxiom> listAxiomsTwo = mApp.ontologyTwo.axioms().collect(Collectors.toList());
 		List<OWLAxiom> listAxiomsAlignments = mApp.alignmentOntology.axioms().collect(Collectors.toList());
+		Collections.sort(listAxiomsOne);
+		Collections.sort(listAxiomsTwo);
+		Collections.sort(listAxiomsAlignments);
 		listAxiomsOne.addAll(listAxiomsAlignments);
 		listAxiomsTwo.addAll(listAxiomsAlignments);
 		removeDuplicates(listAxiomsOne);
