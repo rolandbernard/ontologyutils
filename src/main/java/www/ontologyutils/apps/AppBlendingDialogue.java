@@ -44,13 +44,14 @@ public class AppBlendingDialogue {
 	OWLOntology initialOntology;
 	OWLOntology alignmentOntology;
 
-	private static final String MSG_USAGE = "Usage: the program expects four (paths to) ontologies in parameter and optionally, "
+	private static final String MSG_USAGE = "Usage: the program expects four (paths to) ontologies in parameter, "
+			+ "a number of desired runs, and optionally, "
 			+ "a file pathname to save the result of the blending dialog, preceded by the flag -o: "
-			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> "
+			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <numberOfRuns>"
 			+ "-o <outputOntologyFilePath>";
 
 	private static void usage(String[] args) {
-		if ((args.length != 4 && args.length != 6) || (args.length == 6 && !args[4].equals("-o"))) {
+		if ((args.length != 5 && args.length != 7) || (args.length == 7 && !args[5].equals("-o"))) {
 			System.out.println(MSG_USAGE);
 			System.exit(1);
 		}
@@ -191,6 +192,7 @@ public class AppBlendingDialogue {
 		usage(args);
 
 		AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3]);
+		int numberOfTestRuns = Integer.parseInt(args[4]);
 
 		// Preferences
 		List<OWLAxiom> listAxiomsOne = mApp.ontologyOne.axioms().collect(Collectors.toList());
@@ -260,22 +262,25 @@ public class AppBlendingDialogue {
 				/ (importanceOne * infoInOne + importanceTwo * infoInTwo);
 		System.out.println("\n--- At each turn, probability for agent one to act: " + probabilityTurnOne);
 
-		OWLOntology result = bdg.setVerbose(true).get(probabilityTurnOne);
+		for (int i = 0; i < numberOfTestRuns; i++) {
+			System.out.println("\n\n*********************** RUN " + (i + 1));
+			OWLOntology result = bdg.setVerbose(true).get(probabilityTurnOne);
 
-		System.out.println("\n--- RESULT ONTOLOGY\n");
-		result.axioms().forEach(a -> System.out.println("- " + Utils.prettyPrintAxiom(a)));
+			System.out.println("\n--- RESULT ONTOLOGY\n");
+			result.axioms().forEach(a -> System.out.println("- " + Utils.prettyPrintAxiom(a)));
 
-		System.out.println("\n-- EVALUATION\n");
-		System.out.println("Happiness of one: " + happiness(mApp.ontologyOne, result));
-		System.out.println("Happiness of two: " + happiness(mApp.ontologyTwo, result));
+			System.out.println("\n-- EVALUATION RUN " + (i + 1) + "\n");
+			System.out.println("Happiness of one: " + happiness(mApp.ontologyOne, result));
+			System.out.println("Happiness of two: " + happiness(mApp.ontologyTwo, result));
 
-		System.out.println("(\"Happiness\" of an agent with the result is estimated as "
-				+ "the ratio of the number of axioms and inferred taxonomy axioms "
-				+ "in the ontology of the agent that are inferred by the result ontology.)");
+			System.out.println("(\"Happiness\" of an agent with the result is estimated as "
+					+ "the ratio of the number of axioms and inferred taxonomy axioms "
+					+ "in the ontology of the agent that are inferred by the result ontology.)");
 
-		if (args.length == 6 && args[4].equals("-o")) {
-			System.out.println("\n--- Saving result ontology.");
-			saveOntology(result, args[5]);
+			if (args.length == 6 && args[5].equals("-o")) {
+				System.out.println("\n--- Saving result ontology.");
+				saveOntology(result, i + " " + args[6]);
+			}
 		}
 
 	}
