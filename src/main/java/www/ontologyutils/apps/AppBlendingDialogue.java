@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,15 +45,16 @@ public class AppBlendingDialogue {
 	OWLOntology ontologyTwo;
 	OWLOntology initialOntology;
 	OWLOntology alignmentOntology;
+	OWLOntology testOntology;
 
 	private static final String MSG_USAGE = "Usage: the program expects four (paths to) ontologies in parameter, "
 			+ "a number of desired runs, and optionally, "
 			+ "a file pathname to save the result of the blending dialog, preceded by the flag -o: "
-			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <numberOfRuns>"
-			+ "-o <outputOntologyFilePath>";
+			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
+			+ "<numberOfRuns> -o <outputOntologyFilePath>";
 
 	private static void usage(String[] args) {
-		if ((args.length != 5 && args.length != 7) || (args.length == 7 && !args[5].equals("-o"))) {
+		if ((args.length != 6 && args.length != 8) || (args.length == 8 && !args[6].equals("-o"))) {
 			System.out.println(MSG_USAGE);
 			System.exit(1);
 		}
@@ -161,7 +164,7 @@ public class AppBlendingDialogue {
 	 *                                   agent two.
 	 */
 	public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2, String initialOntologyFilePath,
-			String alignmentsOntologyFilePath) {
+			String alignmentsOntologyFilePath, String testOntologyFilePath) {
 
 		OWLOntology base1 = ontologyOne = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
 		OWLOntology base2 = ontologyTwo = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
@@ -185,14 +188,15 @@ public class AppBlendingDialogue {
 		baseAlignments.tboxAxioms(Imports.EXCLUDED)
 				.forEach(a -> this.alignmentOntology.add(NormalizationTools.asSubClassOfAxioms(a)));
 
+		this.testOntology = Utils.newOntologyExcludeNonLogicalAxioms(testOntologyFilePath);
 	}
 
 	public static void main(String[] args) {
 
 		usage(args);
 
-		AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3]);
-		int numberOfTestRuns = Integer.parseInt(args[4]);
+		AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3], args[4]);
+		int numberOfTestRuns = Integer.parseInt(args[5]);
 
 		// Preferences
 		List<OWLAxiom> listAxiomsOne = mApp.ontologyOne.axioms().collect(Collectors.toList());
@@ -262,6 +266,12 @@ public class AppBlendingDialogue {
 				/ (importanceOne * infoInOne + importanceTwo * infoInTwo);
 		System.out.println("\n--- At each turn, probability for agent one to act: " + probabilityTurnOne);
 
+		// happiness and testing
+		double sumHappinessOne = 0.0;
+		double sumHappinessTwo = 0.0;
+		List<OWLAxiom> listAxiomsTest = mApp.testOntology.axioms().collect(Collectors.toList());
+		Map<OWLAxiom, Integer> counts = new HashMap<OWLAxiom, Integer>();
+
 		for (int i = 0; i < numberOfTestRuns; i++) {
 			System.out.println("\n\n*********************** RUN " + (i + 1));
 			OWLOntology result = bdg.setVerbose(true).get(probabilityTurnOne);
@@ -270,17 +280,45 @@ public class AppBlendingDialogue {
 			result.axioms().forEach(a -> System.out.println("- " + Utils.prettyPrintAxiom(a)));
 
 			System.out.println("\n-- EVALUATION RUN " + (i + 1) + "\n");
-			System.out.println("Happiness of one: " + happiness(mApp.ontologyOne, result));
-			System.out.println("Happiness of two: " + happiness(mApp.ontologyTwo, result));
+			double happinessOne = happiness(mApp.ontologyOne, result);
+			double happinessTwo = happiness(mApp.ontologyTwo, result);
+			sumHappinessOne += happinessOne;
+			sumHappinessTwo += happinessTwo;
+			System.out.println("Happiness of one: " + happinessOne);
+			System.out.println("Happiness of two: " + happinessTwo);
 
-			System.out.println("(\"Happiness\" of an agent with the result is estimated as "
-					+ "the ratio of the number of axioms and inferred taxonomy axioms "
-					+ "in the ontology of the agent that are inferred by the result ontology.)");
-
-			if (args.length == 6 && args[5].equals("-o")) {
-				System.out.println("\n--- Saving result ontology.");
-				saveOntology(result, i + " " + args[6]);
+			System.out.println("\n-- TESTS RUN " + (i + 1) + "\n");
+			OWLReasoner reasoner = Utils.getFactReasoner(result);
+			for (OWLAxiom a : listAxiomsTest) {
+				System.out.print(Utils.prettyPrintAxiom(a) + " ?\t");
+				if (reasoner.isEntailed(a)) {
+					System.out.println("yes");
+					Integer num = counts.get(a);
+					counts.put(a, (num == null ? 1 : num + 1));
+				} else {
+					System.out.println("no");
+				}
 			}
+
+			if (args.length == 8 && args[6].equals("-o")) {
+				System.out.println("\n--- Saving result ontology.");
+				saveOntology(result, i + " " + args[7]);
+			}
+		}
+
+		// SUMMARY
+		System.out.println("\n-- SUMMARY");
+
+		System.out.println("Average Happiness of one: " + sumHappinessOne / numberOfTestRuns);
+		System.out.println("Average Happiness of two: " + sumHappinessTwo / numberOfTestRuns);
+		System.out.println("(\"Happiness\" of an agent with the result is estimated as "
+				+ "the ratio of the number of axioms and inferred taxonomy axioms "
+				+ "in the ontology of the agent that are inferred by the result ontology.)");
+
+		for (OWLAxiom a : listAxiomsTest) {
+			Integer num = counts.get(a);
+			System.out.println(
+					Utils.prettyPrintAxiom(a) + " : " + (num == null ? 0 : num) + " out of " + numberOfTestRuns);
 		}
 
 	}
