@@ -47,7 +47,7 @@ public class AppBlendingDialogue {
 	OWLOntology alignmentOntology;
 	OWLOntology testOntology;
 
-	private static final String MSG_USAGE = "Usage: the program expects four (paths to) ontologies in parameter, "
+	private static final String MSG_USAGE = "Usage: the program expects five (paths to) ontologies in parameter, "
 			+ "a number of desired runs, and optionally, "
 			+ "a file pathname to save the result of the blending dialog, preceded by the flag -o: "
 			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
@@ -270,6 +270,7 @@ public class AppBlendingDialogue {
 		double sumHappinessOne = 0.0;
 		double sumHappinessTwo = 0.0;
 		List<OWLAxiom> listAxiomsTest = mApp.testOntology.axioms().collect(Collectors.toList());
+		Collections.sort(listAxiomsTest);
 		Map<OWLAxiom, Integer> counts = new HashMap<OWLAxiom, Integer>();
 
 		for (int i = 0; i < numberOfTestRuns; i++) {
