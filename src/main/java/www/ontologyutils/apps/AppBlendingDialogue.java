@@ -289,7 +289,7 @@ public class AppBlendingDialogue {
 			System.out.println("Happiness of two: " + happinessTwo);
 
 			System.out.println("\n-- TESTS RUN " + (i + 1) + "\n");
-			OWLReasoner reasoner = Utils.getFactReasoner(result);
+			OWLReasoner reasoner = Utils.getOpenlletReasoner(result);
 			for (OWLAxiom a : listAxiomsTest) {
 				System.out.print(Utils.prettyPrintAxiom(a) + " ?\t");
 				if (reasoner.isEntailed(a)) {
