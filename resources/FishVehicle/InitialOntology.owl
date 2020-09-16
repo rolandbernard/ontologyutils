@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<rdf:RDF xmlns="http://www.semanticweb.org/guenda/ontologies/2020/2/reference-ontology#"
-     xml:base="http://www.semanticweb.org/guenda/ontologies/2020/2/reference-ontology"
+<rdf:RDF xmlns="http://www.semanticweb.org/anonym/ontologies/2020/2/reference-ontology#"
+     xml:base="http://www.semanticweb.org/anonym/ontologies/2020/2/reference-ontology"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
-    <owl:Ontology rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/reference-ontology"/>
+    <owl:Ontology rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/reference-ontology"/>
     
 
 
@@ -21,25 +21,24 @@
     
 
 
-    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish -->
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fish">
-        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#FishVehicle"/>
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle"/>
     </owl:Class>
     
 
 
-    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#FishVehicle -->
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#FishVehicle">
-        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle"/>
-    </owl:Class>
-    
-
-
-    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle"/>
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle"/>
     
 
 
@@ -54,10 +53,10 @@
     
 
 
-    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/reference-ontology#fishymover -->
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/reference-ontology#fishymover -->
 
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/reference-ontology#fishymover">
-        <rdf:type rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#FishVehicle"/>
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/reference-ontology#fishymover">
+        <rdf:type rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 

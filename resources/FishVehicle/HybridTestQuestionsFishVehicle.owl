@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#"
+     xml:base="http://www.semanticweb.org/anonym/ontologies/2020/2/fv"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#is_controlled_by -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#is_controlled_by"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#lives_in -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#lives_in"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#moves_in -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#moves_in"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#moves_on -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#moves_on"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Air -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Air"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Airplane -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Airplane">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Animal"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Animal -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Animal">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Machine"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#is_controlled_by"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Human"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fuel"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Boat -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Boat">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Animal"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Car -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Car">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Animal"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Machine"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#is_controlled_by"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Human"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fuel"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Food -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Food"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fuel -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fuel">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Food"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Ground -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Ground"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Human -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Human"/>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Machine -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Machine">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Animal"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Shark -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Shark">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Animal"/>
+        <rdfs:subClassOf>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Air"/>
+                    <rdf:Description rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Ground"/>
+                    <owl:Class>
+                        <owl:intersectionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Air"/>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#lives_in"/>
+                                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Water"/>
+                            </owl:Restriction>
+                        </owl:intersectionOf>
+                    </owl:Class>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#lives_in"/>
+                        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Water"/>
+                    </owl:Restriction>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Food"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Water -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Water"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
