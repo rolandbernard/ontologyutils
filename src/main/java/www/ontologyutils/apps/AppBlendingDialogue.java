@@ -300,6 +300,7 @@ public class AppBlendingDialogue {
 					System.out.println("no");
 				}
 			}
+			reasoner.dispose();
 
 			if (args.length == 8 && args[6].equals("-o")) {
 				System.out.println("\n--- Saving result ontology.");
