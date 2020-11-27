@@ -44,6 +44,21 @@ public class Utils {
 
 	private static long IRI_ID = 0;
 
+	private static int UGLY_AXIOM_SET_CONSISTENCY_CACHE_SIZE = 1024;
+	
+	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
+
+	private static Boolean uglyAxiomSetConsistencyCheck(Set<OWLAxiom> axioms) {
+		return uglyAxiomSetConsistencyCache.get(axioms);
+	}
+	
+	private static void uglyAxiomsSetConsistencyAdd(Set<OWLAxiom> axioms, Boolean consistency) {
+		if (uglyAxiomSetConsistencyCache.size() >= UGLY_AXIOM_SET_CONSISTENCY_CACHE_SIZE) {
+			uglyAxiomSetConsistencyCache.clear();
+		}
+		uglyAxiomSetConsistencyCache.put(Collections.unmodifiableSet(axioms), consistency);
+	}
+	
 	// Prevent instantiation
 	private Utils() {
 	}
@@ -168,9 +183,7 @@ public class Utils {
 	public static OWLReasoner getOpenlletReasoner(OWLOntology ontology) {
 		return reasonerFactoryOpenllet.createNonBufferingReasoner(ontology);
 	}
-
-	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
-
+	
 	public enum ReasonerName {
 		FACT, HERMIT, OPENLLET
 	}
@@ -181,7 +194,7 @@ public class Utils {
 
 	public static boolean isConsistent(OWLOntology ontology, ReasonerName reasonerName) {
 		Set<OWLAxiom> axioms = ontology.axioms().collect(Collectors.toSet());
-		Boolean consistency = uglyAxiomSetConsistencyCache.get(axioms);
+		Boolean consistency = uglyAxiomSetConsistencyCheck(axioms);
 		if (consistency != null) {
 			return consistency;
 		}
@@ -202,7 +215,7 @@ public class Utils {
 		consistency = reasoner.isConsistent();
 		reasoner.dispose();
 
-		uglyAxiomSetConsistencyCache.put(Collections.unmodifiableSet(axioms), consistency);
+		uglyAxiomsSetConsistencyAdd(Collections.unmodifiableSet(axioms), consistency);
 		return consistency;
 	}
 
@@ -229,7 +242,10 @@ public class Utils {
 		default:
 			reasoner = getOpenlletReasoner(ontology);
 		}
-		return reasoner.isEntailed(axiom);
+		boolean entailment = reasoner.isEntailed(axiom);
+		reasoner.dispose();
+
+		return entailment;
 	}
 
 	public static boolean isEntailed(OWLOntology ontology, OWLAxiom axiom) {
@@ -269,16 +285,21 @@ public class Utils {
 		final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
 		OWLReasonerFactory reasonerFactory = new JFactFactory();
 		OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
+		boolean isConsistent = reasoner.isConsistent();
 		Set<OWLAxiom> result = new HashSet<>();
 		ontology.classesInSignature(Imports.EXCLUDED).forEach((left) -> {
 			ontology.classesInSignature(Imports.EXCLUDED).forEach((right) -> {
 				OWLSubClassOfAxiom scoa = new OWLSubClassOfAxiomImpl(left, right, EMPTY_ANNOTATION);
-				if (reasoner.isEntailed(scoa)) {
+				if (!isConsistent) {
+					result.add(scoa);
+				}
+				else if (reasoner.isEntailed(scoa)) {
 					result.add(scoa);
 				}
 			});
 		});
 
+		reasoner.dispose();
 		return result;
 	}
 
