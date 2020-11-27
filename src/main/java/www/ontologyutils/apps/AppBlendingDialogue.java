@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -17,18 +16,12 @@ import java.util.stream.Stream;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.util.InferredAxiomGenerator;
-import org.semanticweb.owlapi.util.InferredOntologyGenerator;
-import org.semanticweb.owlapi.util.InferredSubClassAxiomGenerator;
 
-import uk.ac.manchester.cs.jfact.JFactFactory;
 import www.ontologyutils.collective.PreferenceFactory;
 import www.ontologyutils.collective.PreferenceFactory.Preference;
 import www.ontologyutils.collective.blending.BlendingDialogue;
@@ -99,32 +92,13 @@ public class AppBlendingDialogue {
 
 	/**
 	 * @param ontology
-	 * @return the set of subclass axioms describing the taxonomy of the classes in
-	 *         {@code ontology}.
-	 */
-	private static Set<OWLAxiom> inferredTaxonomyAxioms(OWLOntology ontology) {
-		OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
-		OWLReasonerFactory reasonerFactory = new JFactFactory();
-		OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
-
-		ArrayList<InferredAxiomGenerator<? extends OWLAxiom>> gens = new ArrayList<InferredAxiomGenerator<? extends OWLAxiom>>();
-		gens.add(new InferredSubClassAxiomGenerator());
-		InferredOntologyGenerator iog = new InferredOntologyGenerator(reasoner, gens);
-		List<InferredAxiomGenerator<?>> inferredSubClasses = iog.getAxiomGenerators();
-		InferredAxiomGenerator<?> iag = inferredSubClasses.get(0);
-
-		return (Set<OWLAxiom>) iag.createAxioms(dataFactory, reasoner);
-	}
-
-	/**
-	 * @param ontology
 	 * @return an estimation of the "amount of information" in {@code ontology}. We
 	 *         define it as the number of axiom plus the number of sub-class axioms
 	 *         in the inferred class taxonomy.
 	 * 
 	 */
 	private static int quantifyInformation(OWLOntology ontology) {
-		return inferredTaxonomyAxioms(ontology).size() + ontology.getAxiomCount();
+		return Utils.inferredClassSubClassClassAxioms(ontology).size() + ontology.getAxiomCount();
 	}
 
 	/**
@@ -135,7 +109,7 @@ public class AppBlendingDialogue {
 	 *         taxonomy axioms in {@code one} that are inferred by {code two}.
 	 */
 	private static double happiness(OWLOntology agent, OWLOntology ontology) {
-		Set<OWLAxiom> axioms = inferredTaxonomyAxioms(agent);
+		Set<OWLAxiom> axioms = Utils.inferredClassSubClassClassAxioms(agent);
 		axioms.addAll(agent.axioms().collect(Collectors.toSet()));
 
 		OWLReasoner reasoner = Utils.getFactReasoner(ontology);

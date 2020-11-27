@@ -1,7 +1,9 @@
 package www.ontologyutils.toolbox;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +14,7 @@ import java.util.stream.Stream;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
@@ -22,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyAlreadyExistsException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.model.parameters.OntologyCopy;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -30,6 +34,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import openllet.owlapi.OpenlletReasonerFactory;
 import uk.ac.manchester.cs.jfact.JFactFactory;
 import uk.ac.manchester.cs.owl.owlapi.OWLEquivalentClassesAxiomImpl;
+import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
 
 /**
  * @author nico
@@ -253,6 +258,28 @@ public class Utils {
 	public static boolean areEquivalent(OWLClassExpression c1, OWLClassExpression c2, OWLOntology ontology) {
 		OWLAxiom equiv = new OWLEquivalentClassesAxiomImpl(new HashSet<>(Arrays.asList(c1, c2)), new HashSet<>());
 		return isEntailed(ontology, equiv);
+	}
+
+	/**
+	 * @param ontology
+	 * @return the set of C1 subclass C2 axioms, C1 and C2 classes in the signature
+	 *         of {@code ontology}, entailed by {@code ontology}.
+	 */
+	public static Set<OWLAxiom> inferredClassSubClassClassAxioms(OWLOntology ontology) {
+		final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
+		OWLReasonerFactory reasonerFactory = new JFactFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
+		Set<OWLAxiom> result = new HashSet<>();
+		ontology.classesInSignature(Imports.EXCLUDED).forEach((left) -> {
+			ontology.classesInSignature(Imports.EXCLUDED).forEach((right) -> {
+				OWLSubClassOfAxiom scoa = new OWLSubClassOfAxiomImpl(left, right, EMPTY_ANNOTATION);
+				if (reasoner.isEntailed(scoa)) {
+					result.add(scoa);
+				}
+			});
+		});
+
+		return result;
 	}
 
 	/**
