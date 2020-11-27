@@ -106,7 +106,8 @@ public class AppBlendingDialogue {
 	 * @param ontology
 	 * @return an estimation of the "happiness" of ontology {@code agent} with
 	 *         ontology {@code two}. The ratio of the number of axioms and inferred
-	 *         taxonomy axioms in {@code agent} that are inferred by {code ontology}.
+	 *         taxonomy axioms in {@code agent} that are inferred by {code
+	 *         ontology}.
 	 */
 	private static double happiness(OWLOntology agent, OWLOntology ontology) {
 		Set<OWLAxiom> axioms = Utils.inferredClassSubClassClassAxioms(agent);
@@ -255,6 +256,12 @@ public class AppBlendingDialogue {
 			System.out.println("\n--- RESULT ONTOLOGY\n");
 			result.axioms().forEach(a -> System.out.println("- " + Utils.prettyPrintAxiom(a)));
 
+			OWLReasoner reasoner = Utils.getOpenlletReasoner(result);
+			if (!reasoner.isConsistent()) {
+				System.out.println("THERE WAS A PROBLEM. THE RESULT ONTOLOGY IS NOT CONSISTENT.");
+				System.exit(1);
+			}
+
 			System.out.println("\n-- EVALUATION RUN " + (i + 1) + "\n");
 			double happinessOne = happiness(mApp.ontologyOne, result);
 			double happinessTwo = happiness(mApp.ontologyTwo, result);
@@ -264,7 +271,6 @@ public class AppBlendingDialogue {
 			System.out.println("Happiness of two: " + happinessTwo);
 
 			System.out.println("\n-- TESTS RUN " + (i + 1) + "\n");
-			OWLReasoner reasoner = Utils.getOpenlletReasoner(result);
 			for (OWLAxiom a : listAxiomsTest) {
 				System.out.print(Utils.prettyPrintAxiom(a) + " ?\t");
 				if (reasoner.isEntailed(a)) {
