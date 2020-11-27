@@ -106,7 +106,7 @@ public class AppBlendingDialogue {
 	 * @param ontology
 	 * @return an estimation of the "happiness" of ontology {@code agent} with
 	 *         ontology {@code two}. The ratio of the number of axioms and inferred
-	 *         taxonomy axioms in {@code one} that are inferred by {code two}.
+	 *         taxonomy axioms in {@code agent} that are inferred by {code ontology}.
 	 */
 	private static double happiness(OWLOntology agent, OWLOntology ontology) {
 		Set<OWLAxiom> axioms = Utils.inferredClassSubClassClassAxioms(agent);
@@ -115,6 +115,7 @@ public class AppBlendingDialogue {
 		OWLReasoner reasoner = Utils.getFactReasoner(ontology);
 		long countSatisfiedAxioms = axioms.stream().filter(a -> reasoner.isEntailed(a)).count();
 
+		reasoner.dispose();
 		return (double) countSatisfiedAxioms / axioms.size();
 	}
 
