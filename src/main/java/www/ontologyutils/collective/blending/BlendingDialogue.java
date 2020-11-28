@@ -72,8 +72,7 @@ public class BlendingDialogue {
 		assert (axioms.stream().allMatch(a -> pref.getAgenda().contains(a)));
 
 		OWLAxiom result = null;
-		for (OWLAxiom a : axioms.stream().filter(b -> !Utils.isEntailed(context, b, Utils.ReasonerName.HERMIT))
-				.collect(Collectors.toList())) {
+		for (OWLAxiom a : axioms.stream().filter(b -> !Utils.isEntailed(context, b)).collect(Collectors.toList())) {
 			if (result == null || pref.prefers(a, result)) {
 				result = a;
 			}

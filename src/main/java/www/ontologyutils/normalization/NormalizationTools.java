@@ -108,17 +108,17 @@ public class NormalizationTools {
 			subClassOfAxioms = Collections.singleton(((OWLSubClassOfAxiomShortCut) ax).asOWLSubClassOfAxiom());
 		} else if (ax.isOfType(AxiomType.FUNCTIONAL_DATA_PROPERTY)) {
 			subClassOfAxioms = Collections.singleton(((OWLFunctionalDataPropertyAxiom) ax).asOWLSubClassOfAxiom());
-		} 	
-		else {
+		} else {
 			throw new RuntimeException("The axiom " + ax + " of type " + ax.getAxiomType()
 					+ " could not be converted into subclass axioms.");
 		}
-		
-		// we add an annotation to each axiom referring to the original axiom in parameter
+
+		// we add an annotation to each axiom referring to the original axiom in
+		// parameter
 		Collection<OWLSubClassOfAxiom> annotatedSubClassOfAxioms = new ArrayList<OWLSubClassOfAxiom>();
-		subClassOfAxioms.forEach(a -> 
-			annotatedSubClassOfAxioms.add((OWLSubClassOfAxiom) AnnotateOrigin.getAnnotatedAxiom(a,ax)));
-		
+		subClassOfAxioms.forEach(
+				a -> annotatedSubClassOfAxioms.add((OWLSubClassOfAxiom) AnnotateOrigin.getAnnotatedAxiom(a, ax)));
+
 		return annotatedSubClassOfAxioms;
 	}
 
@@ -151,7 +151,8 @@ public class NormalizationTools {
 			if (left.getClassExpressionType() == ClassExpressionType.OBJECT_UNION_OF) {
 				Set<OWLClassExpression> disjunctions = left.asDisjunctSet();
 				for (OWLClassExpression d : disjunctions) {
-					OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(d, right, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+					OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(d, right,
+							AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 					axioms.add(sba);
 				}
 			}
@@ -159,7 +160,8 @@ public class NormalizationTools {
 			else if (right.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF) {
 				Set<OWLClassExpression> conjunctions = right.asConjunctSet();
 				for (OWLClassExpression c : conjunctions) {
-					OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(left, c, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+					OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(left, c,
+							AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 					axioms.add(sba);
 				}
 			}
@@ -182,17 +184,20 @@ public class NormalizationTools {
 							newConjuncts.add(fresh);
 
 							// adding fresh -> conj
-							OWLSubClassOfAxiom sbaFreshOce = new OWLSubClassOfAxiomImpl(fresh, conj, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+							OWLSubClassOfAxiom sbaFreshOce = new OWLSubClassOfAxiomImpl(fresh, conj,
+									AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 							axioms.add(sbaFreshOce);
 							// adding conj -> fresh
-							OWLSubClassOfAxiom sbaOceFresh = new OWLSubClassOfAxiomImpl(conj, fresh, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+							OWLSubClassOfAxiom sbaOceFresh = new OWLSubClassOfAxiomImpl(conj, fresh,
+									AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 							axioms.add(sbaOceFresh);
 
 						}
 					}
 					// adding new_conjunction -> right
 					OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(
-							new OWLObjectIntersectionOfImpl(newConjuncts.stream()), right, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+							new OWLObjectIntersectionOfImpl(newConjuncts.stream()), right,
+							AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 					axioms.add(sba);
 				}
 
@@ -213,17 +218,20 @@ public class NormalizationTools {
 							newDisjuncts.add(fresh);
 
 							// adding fresh -> disj
-							OWLSubClassOfAxiom sbaFreshOce = new OWLSubClassOfAxiomImpl(fresh, disj, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+							OWLSubClassOfAxiom sbaFreshOce = new OWLSubClassOfAxiomImpl(fresh, disj,
+									AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 							axioms.add(sbaFreshOce);
 							// adding disj -> fresh
-							OWLSubClassOfAxiom sbaOceFresh = new OWLSubClassOfAxiomImpl(disj, fresh, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+							OWLSubClassOfAxiom sbaOceFresh = new OWLSubClassOfAxiomImpl(disj, fresh,
+									AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 							axioms.add(sbaOceFresh);
 
 						}
 					}
 					// adding left -> new_disjunction
 					OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(left,
-							new OWLObjectUnionOfImpl(newDisjuncts.stream()), AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+							new OWLObjectUnionOfImpl(newDisjuncts.stream()),
+							AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 					axioms.add(sba);
 				}
 			}
@@ -240,7 +248,8 @@ public class NormalizationTools {
 				operands.add(filler);
 				OWLObjectUnionOfImpl newRight = new OWLObjectUnionOfImpl(operands.stream());
 
-				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(TOP, newRight, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(TOP, newRight,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sba);
 			}
 			// right is negation
@@ -253,7 +262,8 @@ public class NormalizationTools {
 				operands.add(filler);
 				OWLObjectIntersectionOfImpl newLeft = new OWLObjectIntersectionOfImpl(operands.stream());
 
-				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(newLeft, BOT, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(newLeft, BOT,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sba);
 			}
 
@@ -270,15 +280,18 @@ public class NormalizationTools {
 
 				// we add exists property fresh -> right
 				OWLObjectSomeValuesFromImpl evf = new OWLObjectSomeValuesFromImpl(property, fresh);
-				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(evf, right, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(evf, right,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sba);
 
 				// we add fresh -> filler
-				OWLSubClassOfAxiom sbaFreshFiller = new OWLSubClassOfAxiomImpl(fresh, filler, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sbaFreshFiller = new OWLSubClassOfAxiomImpl(fresh, filler,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sbaFreshFiller);
 
 				// we add filler -> fresh
-				OWLSubClassOfAxiom sbaFillerFresh = new OWLSubClassOfAxiomImpl(filler, fresh, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sbaFillerFresh = new OWLSubClassOfAxiomImpl(filler, fresh,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sbaFillerFresh);
 			} else if ((right.getClassExpressionType() == ClassExpressionType.OBJECT_SOME_VALUES_FROM)
 					&& !NormalForm.isExistentialOfAtom(right)) { // right existential atom is fine
@@ -291,15 +304,18 @@ public class NormalizationTools {
 
 				// we add left -> exists property fresh
 				OWLObjectSomeValuesFromImpl evf = new OWLObjectSomeValuesFromImpl(property, fresh);
-				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(left, evf, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(left, evf,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sba);
 
 				// we add fresh -> filler
-				OWLSubClassOfAxiom sbaFreshFiller = new OWLSubClassOfAxiomImpl(fresh, filler, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sbaFreshFiller = new OWLSubClassOfAxiomImpl(fresh, filler,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sbaFreshFiller);
 
 				// we add filler -> fresh
-				OWLSubClassOfAxiom sbaFillerFresh = new OWLSubClassOfAxiomImpl(filler, fresh, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sbaFillerFresh = new OWLSubClassOfAxiomImpl(filler, fresh,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sbaFillerFresh);
 			}
 
@@ -321,15 +337,18 @@ public class NormalizationTools {
 
 				// we add left -> forall property fresh
 				OWLObjectAllValuesFromImpl avf = new OWLObjectAllValuesFromImpl(property, fresh);
-				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(left, avf, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(left, avf,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sba);
 
 				// we add fresh -> filler
-				OWLSubClassOfAxiom sbaFreshFiller = new OWLSubClassOfAxiomImpl(fresh, filler, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sbaFreshFiller = new OWLSubClassOfAxiomImpl(fresh, filler,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sbaFreshFiller);
 
 				// we add filler -> fresh
-				OWLSubClassOfAxiom sbaFillerFresh = new OWLSubClassOfAxiomImpl(filler, fresh, AnnotateOrigin.getAxiomAnnotations(currentAxiom));
+				OWLSubClassOfAxiom sbaFillerFresh = new OWLSubClassOfAxiomImpl(filler, fresh,
+						AnnotateOrigin.getAxiomAnnotations(currentAxiom));
 				axioms.add(sbaFillerFresh);
 			} else {
 				throw new RuntimeException("I don't know what to do with " + ax);

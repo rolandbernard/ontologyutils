@@ -9,7 +9,7 @@ public class SetUtils {
 	// Prevent instantiation
 	private SetUtils() {
 	}
-	
+
 	public static <T> Set<Set<T>> powerSet(Set<T> set) {
 		T[] element = (T[]) set.toArray();
 		final int SET_LENGTH = 1 << element.length;
@@ -31,5 +31,5 @@ public class SetUtils {
 		int randomPick = ThreadLocalRandom.current().nextInt(0, set.size());
 		return (T) (set.toArray())[randomPick];
 	}
-	
+
 }

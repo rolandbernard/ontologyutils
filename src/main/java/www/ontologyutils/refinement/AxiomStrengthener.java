@@ -23,18 +23,13 @@ public class AxiomStrengthener {
 	private RefinementOperator specOp;
 
 	/**
-	 * @param ontology
-	 *            a reference ontology to make inferences.
+	 * @param ontology a reference ontology to make inferences.
 	 */
 	public AxiomStrengthener(OWLOntology ontology) {
 		this.ontology = ontology;
 		Covers covers = new Covers(ontology);
-		this.genOp = new RefinementOperator( 
-				covers.getUpCoverOperator(), 
-				covers.getDownCoverOperator());
-		this.specOp = new RefinementOperator(
-				covers.getDownCoverOperator(),
-				covers.getUpCoverOperator());
+		this.genOp = new RefinementOperator(covers.getUpCoverOperator(), covers.getDownCoverOperator());
+		this.specOp = new RefinementOperator(covers.getDownCoverOperator(), covers.getUpCoverOperator());
 	}
 
 	/**
@@ -70,11 +65,11 @@ public class AxiomStrengthener {
 
 	/**
 	 * @param axiom
-	 * @return all strengthenings of axiom obtained by specialising its class expression
-	 *         (using the {@code SpecialisationOperator} {@code specOp} of this
-	 *         {@code JavaWeakener} object). Given an axiom A(i), the function
-	 *         returns the set containing all the axioms A'(i) where A' is in
-	 *         {@code genOp.specialise(A)}.
+	 * @return all strengthenings of axiom obtained by specialising its class
+	 *         expression (using the {@code SpecialisationOperator} {@code specOp}
+	 *         of this {@code JavaWeakener} object). Given an axiom A(i), the
+	 *         function returns the set containing all the axioms A'(i) where A' is
+	 *         in {@code genOp.specialise(A)}.
 	 */
 	public Set<OWLAxiom> getStrongerClassAssertionAxioms(OWLClassAssertionAxiom axiom) {
 		HashSet<OWLAxiom> result = new HashSet<OWLAxiom>();

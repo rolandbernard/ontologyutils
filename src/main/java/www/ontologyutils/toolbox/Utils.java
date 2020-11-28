@@ -25,6 +25,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyAlreadyExistsException;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.model.parameters.OntologyCopy;
@@ -45,27 +46,33 @@ public class Utils {
 	private static long IRI_ID = 0;
 
 	private static int UGLY_AXIOM_SET_CONSISTENCY_CACHE_SIZE = 1024;
-	
+
 	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
 
 	private static Boolean uglyAxiomSetConsistencyCheck(Set<OWLAxiom> axioms) {
 		return uglyAxiomSetConsistencyCache.get(axioms);
 	}
-	
+
 	private static void uglyAxiomsSetConsistencyAdd(Set<OWLAxiom> axioms, Boolean consistency) {
 		if (uglyAxiomSetConsistencyCache.size() >= UGLY_AXIOM_SET_CONSISTENCY_CACHE_SIZE) {
 			uglyAxiomSetConsistencyCache.clear();
 		}
 		uglyAxiomSetConsistencyCache.put(Collections.unmodifiableSet(axioms), consistency);
 	}
-	
-	// Prevent instantiation
-	private Utils() {
-	}
 
 	public static void log(String tag, String message) {
 		System.out.println(tag + " : " + message);
 	}
+
+	// Prevent instantiation
+	private Utils() {
+	}
+
+	public enum ReasonerName {
+		FACT, HERMIT, OPENLLET
+	}
+
+	public static ReasonerName DEFAULT_REASONER = ReasonerName.OPENLLET;
 
 	/**
 	 * @param owlString
@@ -97,6 +104,9 @@ public class Utils {
 
 	private static final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 
+	/**
+	 * @return
+	 */
 	public static OWLOntology newEmptyOntology() {
 		OWLOntology newOntology = null;
 		try {
@@ -111,18 +121,30 @@ public class Utils {
 		return newOntology;
 	}
 
+	/**
+	 * @param axioms
+	 * @return
+	 */
 	public static OWLOntology newOntology(Stream<OWLAxiom> axioms) {
 		OWLOntology ontology = newEmptyOntology();
 		ontology.addAxioms(axioms);
 		return ontology;
 	}
 
+	/**
+	 * @param axioms
+	 * @return
+	 */
 	public static OWLOntology newOntology(Set<OWLAxiom> axioms) {
 		OWLOntology ontology = newEmptyOntology();
 		ontology.addAxioms(axioms);
 		return ontology;
 	}
 
+	/**
+	 * @param ontologyFilePath
+	 * @return
+	 */
 	public static OWLOntology newOntology(String ontologyFilePath) {
 		File ontologyFile = new File(ontologyFilePath);
 		IRI ontologyIRI = IRI.create(ontologyFile);
@@ -137,12 +159,20 @@ public class Utils {
 		return ontology;
 	}
 
+	/**
+	 * @param ontologyFilePath
+	 * @return
+	 */
 	public static OWLOntology newOntologyExcludeNonLogicalAxioms(String ontologyFilePath) {
 		OWLOntology ontology = newOntology(ontologyFilePath);
 		// exclude non-logical axioms: keeping ABox, TBox, RBox axioms
 		return newOntology(ontology.axioms().filter(ax -> ax.isLogicalAxiom()));
 	}
 
+	/**
+	 * @param ontology
+	 * @return
+	 */
 	public static OWLOntology copyOntology(OWLOntology ontology) {
 		try {
 			return OWLManager.createOWLOntologyManager().copyOntology(ontology, OntologyCopy.SHALLOW);
@@ -183,15 +213,38 @@ public class Utils {
 	public static OWLReasoner getOpenlletReasoner(OWLOntology ontology) {
 		return reasonerFactoryOpenllet.createNonBufferingReasoner(ontology);
 	}
-	
-	public enum ReasonerName {
-		FACT, HERMIT, OPENLLET
+
+	/**
+	 * @param ontology
+	 * @return A default reasoner for {@code ontology}. Returns null if the default
+	 *         reasoner is not recognised.Ò
+	 */
+	public static OWLReasoner getReasoner(OWLOntology ontology) {
+		switch (DEFAULT_REASONER) {
+		case HERMIT:
+			return getHermitReasoner(ontology);
+		case FACT:
+			return getFactReasoner(ontology);
+		case OPENLLET:
+			return getOpenlletReasoner(ontology);
+		default:
+			return null;
+		}
 	}
 
+	/**
+	 * @param ontology
+	 * @return
+	 */
 	public static boolean isConsistent(OWLOntology ontology) {
-		return isConsistent(ontology, ReasonerName.FACT);
+		return isConsistent(ontology, DEFAULT_REASONER);
 	}
 
+	/**
+	 * @param ontology
+	 * @param reasonerName
+	 * @return
+	 */
 	public static boolean isConsistent(OWLOntology ontology, ReasonerName reasonerName) {
 		Set<OWLAxiom> axioms = ontology.axioms().collect(Collectors.toSet());
 		Boolean consistency = uglyAxiomSetConsistencyCheck(axioms);
@@ -210,7 +263,7 @@ public class Utils {
 			reasoner = getOpenlletReasoner(ontology);
 			break;
 		default:
-			reasoner = getOpenlletReasoner(ontology);
+			reasoner = getReasoner(ontology);
 		}
 		consistency = reasoner.isConsistent();
 		reasoner.dispose();
@@ -219,6 +272,10 @@ public class Utils {
 		return consistency;
 	}
 
+	/**
+	 * @param axioms
+	 * @return
+	 */
 	public static boolean isConsistent(Set<OWLAxiom> axioms) {
 		Boolean consistency = uglyAxiomSetConsistencyCache.get(axioms);
 		if (consistency != null) {
@@ -227,6 +284,12 @@ public class Utils {
 		return isConsistent(newOntology(axioms));
 	}
 
+	/**
+	 * @param ontology
+	 * @param axiom
+	 * @param reasonerName
+	 * @return
+	 */
 	public static boolean isEntailed(OWLOntology ontology, OWLAxiom axiom, ReasonerName reasonerName) {
 		OWLReasoner reasoner;
 		switch (reasonerName) {
@@ -240,7 +303,7 @@ public class Utils {
 			reasoner = getOpenlletReasoner(ontology);
 			break;
 		default:
-			reasoner = getOpenlletReasoner(ontology);
+			reasoner = getReasoner(ontology);
 		}
 		boolean entailment = reasoner.isEntailed(axiom);
 		reasoner.dispose();
@@ -248,8 +311,13 @@ public class Utils {
 		return entailment;
 	}
 
+	/**
+	 * @param ontology
+	 * @param axiom
+	 * @return
+	 */
 	public static boolean isEntailed(OWLOntology ontology, OWLAxiom axiom) {
-		return isEntailed(ontology, axiom, ReasonerName.FACT);
+		return isEntailed(ontology, axiom, DEFAULT_REASONER);
 	}
 
 	/**
@@ -283,8 +351,7 @@ public class Utils {
 	 */
 	public static Set<OWLAxiom> inferredClassSubClassClassAxioms(OWLOntology ontology) {
 		final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
-		OWLReasonerFactory reasonerFactory = new JFactFactory();
-		OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
+		OWLReasoner reasoner = getReasoner(ontology);
 		boolean isConsistent = reasoner.isConsistent();
 		Set<OWLAxiom> result = new HashSet<>();
 		ontology.classesInSignature(Imports.EXCLUDED).forEach((left) -> {
@@ -292,8 +359,7 @@ public class Utils {
 				OWLSubClassOfAxiom scoa = new OWLSubClassOfAxiomImpl(left, right, EMPTY_ANNOTATION);
 				if (!isConsistent) {
 					result.add(scoa);
-				}
-				else if (reasoner.isEntailed(scoa)) {
+				} else if (reasoner.isEntailed(scoa)) {
 					result.add(scoa);
 				}
 			});
@@ -370,6 +436,21 @@ public class Utils {
 		}
 		default:
 			throw new RuntimeException();
+		}
+
+	}
+
+	/**
+	 * @param ontology
+	 * @param fileName
+	 */
+	public static void saveOntology(OWLOntology ontology, String fileName) {
+		File file = new File(fileName);
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		try {
+			manager.saveOntology(ontology, ontology.getFormat(), IRI.create(file.toURI()));
+		} catch (OWLOntologyStorageException e) {
+			e.printStackTrace();
 		}
 
 	}

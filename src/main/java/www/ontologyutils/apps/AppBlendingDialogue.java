@@ -1,7 +1,6 @@
 package www.ontologyutils.apps;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
@@ -13,12 +12,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
@@ -78,18 +73,6 @@ public class AppBlendingDialogue {
 		list.addAll(s);
 	}
 
-	public static void saveOntology(OWLOntology ontology, String fileName) {
-		File file = new File(fileName);
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		try {
-			manager.saveOntology(ontology, ontology.getFormat(), IRI.create(file.toURI()));
-			System.out.println("Ontology saved as " + fileName);
-		} catch (OWLOntologyStorageException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	/**
 	 * @param ontology
 	 * @return an estimation of the "amount of information" in {@code ontology}. We
@@ -113,7 +96,7 @@ public class AppBlendingDialogue {
 		Set<OWLAxiom> axioms = Utils.inferredClassSubClassClassAxioms(agent);
 		axioms.addAll(agent.axioms().collect(Collectors.toSet()));
 
-		OWLReasoner reasoner = Utils.getFactReasoner(ontology);
+		OWLReasoner reasoner = Utils.getReasoner(ontology);
 		long countSatisfiedAxioms = axioms.stream().filter(a -> reasoner.isEntailed(a)).count();
 
 		reasoner.dispose();
@@ -256,7 +239,7 @@ public class AppBlendingDialogue {
 			System.out.println("\n--- RESULT ONTOLOGY\n");
 			result.axioms().forEach(a -> System.out.println("- " + Utils.prettyPrintAxiom(a)));
 
-			OWLReasoner reasoner = Utils.getOpenlletReasoner(result);
+			OWLReasoner reasoner = Utils.getReasoner(result);
 			if (!reasoner.isConsistent()) {
 				System.out.println("THERE WAS A PROBLEM. THE RESULT ONTOLOGY IS NOT CONSISTENT.");
 				System.exit(1);
@@ -285,7 +268,9 @@ public class AppBlendingDialogue {
 
 			if (args.length == 8 && args[6].equals("-o")) {
 				System.out.println("\n--- Saving result ontology.");
-				saveOntology(result, i + " " + args[7]);
+				String fileName = i + " " + args[7];
+				Utils.saveOntology(result, fileName);
+				System.out.println("Ontology saved as " + fileName);
 			}
 		}
 

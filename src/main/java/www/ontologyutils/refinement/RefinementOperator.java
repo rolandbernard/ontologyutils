@@ -38,19 +38,18 @@ public class RefinementOperator {
 	/**
 	 * @param way
 	 * @param back
-	 * @param flags
-	 *            Use flag {@code FLAG_NNF_STRICT} to enforce inputs as NNF
-	 *            formulas. Use {@code FLAG_ALC_STRICT} to enforce inputs as ALC
-	 *            formulas (with strict binary conjunctions and disjunctions).
-	 *            Combine them with {@code FLAG_NNF_STRICT | FLAG_ALC_STRICT}. Use
-	 *            {@code FLAG_NON_STRICT} otherwise.
+	 * @param flags Use flag {@code FLAG_NNF_STRICT} to enforce inputs as NNF
+	 *              formulas. Use {@code FLAG_ALC_STRICT} to enforce inputs as ALC
+	 *              formulas (with strict binary conjunctions and disjunctions).
+	 *              Combine them with {@code FLAG_NNF_STRICT | FLAG_ALC_STRICT}. Use
+	 *              {@code FLAG_NON_STRICT} otherwise.
 	 */
 	public RefinementOperator(Cover way, Cover back, int flags) {
 		this.way = way;
 		this.back = back;
 		this.flags_strict = flags;
 	}
-		
+
 	public RefinementOperator(Cover way, Cover back) {
 		this(way, back, FLAG_NON_STRICT);
 	}
@@ -58,9 +57,9 @@ public class RefinementOperator {
 	/**
 	 * @param concept
 	 * @return
-	 * @throws IllegalArgumentException
-	 *             if {@code concept} is not a well-formed formula respecting the
-	 *             flags passed to the constructor.
+	 * @throws IllegalArgumentException if {@code concept} is not a well-formed
+	 *                                  formula respecting the flags passed to the
+	 *                                  constructor.
 	 */
 	public Set<OWLClassExpression> refine(OWLClassExpression concept) throws IllegalArgumentException {
 
@@ -294,20 +293,18 @@ public class RefinementOperator {
 		return result;
 	}
 
-	
-	
 	/**
 	 * This class implements the Set Java interface as a MultiSet.
 	 * 
-	 * This allows us create formulas like OWLObjectIntersectionOfImp({owl:Thing, owl:Thing})
-	 * or OWLObjectUnionOfImpl({:A,:B,:A}) with the OWL API uk.ac.manchester.cs.owl.owlapi.
+	 * This allows us create formulas like OWLObjectIntersectionOfImp({owl:Thing,
+	 * owl:Thing}) or OWLObjectUnionOfImpl({:A,:B,:A}) with the OWL API
+	 * uk.ac.manchester.cs.owl.owlapi.
 	 *
 	 * @param <E>
 	 */
 	class MyMultiSet<E> implements Set<E> {
 
 		ArrayList<E> elements = new ArrayList<E>();
-		
 
 		@Override
 		public int size() {
@@ -373,8 +370,7 @@ public class RefinementOperator {
 		public void clear() {
 			elements.clear();
 		}
-		
-	}
 
+	}
 
 }

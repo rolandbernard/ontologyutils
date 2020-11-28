@@ -23,17 +23,12 @@ public class AxiomWeakener {
 	private RefinementOperator specOp;
 
 	/**
-	 * @param ontology
-	 *            a reference ontology to make inferences.
+	 * @param ontology a reference ontology to make inferences.
 	 */
 	public AxiomWeakener(OWLOntology ontology) {
 		Covers covers = new Covers(ontology);
-		this.genOp = new RefinementOperator( 
-				covers.getUpCoverOperator(), 
-				covers.getDownCoverOperator());
-		this.specOp = new RefinementOperator(
-				covers.getDownCoverOperator(),
-				covers.getUpCoverOperator());
+		this.genOp = new RefinementOperator(covers.getUpCoverOperator(), covers.getDownCoverOperator());
+		this.specOp = new RefinementOperator(covers.getDownCoverOperator(), covers.getUpCoverOperator());
 	}
 
 	/**
@@ -89,10 +84,12 @@ public class AxiomWeakener {
 
 		return result;
 	}
-	
+
 	/**
 	 * @param axiom which must be a subclass axiom or an assertion axiom.
-	 * @return the set containing all the weaker axioms, obtained with {@code getWeakerSubClassAxioms(axiom)} or {@code getWeakerClassAssertionAxioms(axiom)}.
+	 * @return the set containing all the weaker axioms, obtained with
+	 *         {@code getWeakerSubClassAxioms(axiom)} or
+	 *         {@code getWeakerClassAssertionAxioms(axiom)}.
 	 */
 	public Set<OWLAxiom> getWeakerAxioms(OWLAxiom axiom) {
 		if (axiom.getAxiomType().equals(AxiomType.CLASS_ASSERTION)) {
@@ -103,6 +100,5 @@ public class AxiomWeakener {
 			throw new IllegalArgumentException(axiom + " must be a class assertion axiom or a subclass axiom.");
 		}
 	}
-
 
 }

@@ -15,7 +15,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 public class Covers {
-	
+
 	private OWLReasoner reasoner;
 	private OWLOntology ontology;
 	private ArrayList<OWLClassExpression> subConcepts;
@@ -46,11 +46,9 @@ public class Covers {
 	 * @param ontology
 	 */
 	public Covers(OWLOntology ontology) {
-		//this(Utils.getFactReasoner(Utils.copyOntology(ontology)));
-		//this(Utils.getHermitReasoner(Utils.copyOntology(ontology)));
-		this(Utils.getOpenlletReasoner(Utils.copyOntology(ontology)));
+		this(Utils.getReasoner(Utils.copyOntology(ontology)));
 	}
-	
+
 	/**
 	 * @param concept
 	 */
@@ -122,22 +120,21 @@ public class Covers {
 		OWLAxiom ax = new OWLSubClassOfAxiomImpl(concept2, concept1, EMPTY_ANNOTATION);
 		return reasoner.isEntailed(ax);
 	}
-	
-	
-	
+
 	enum Direction {
-		UP,
-		DOWN
+		UP, DOWN
 	}
-	
+
 	class Cover {
 		Direction dir;
+
 		Cover(Direction dir) {
 			this.dir = dir;
 		}
+
 		Set<OWLClassExpression> getCover(OWLClassExpression concept) {
-			switch(dir) {
-			case UP: 
+			switch (dir) {
+			case UP:
 				return getUpCover(concept);
 			case DOWN:
 				return getDownCover(concept);
@@ -146,11 +143,11 @@ public class Covers {
 			}
 		}
 	}
-	
+
 	public Cover getUpCoverOperator() {
 		return new Cover(Direction.UP);
 	}
-	
+
 	public Cover getDownCoverOperator() {
 		return new Cover(Direction.DOWN);
 	}

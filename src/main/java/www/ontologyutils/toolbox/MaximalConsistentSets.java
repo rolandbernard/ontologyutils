@@ -26,8 +26,7 @@ public class MaximalConsistentSets {
 	}
 
 	/**
-	 * @param axioms
-	 *            a set of axioms
+	 * @param axioms a set of axioms
 	 * @return the set of maximal consistent subsets of axioms from {@code axioms}.
 	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsetsNaive(Set<OWLAxiom> axioms) {
@@ -35,10 +34,9 @@ public class MaximalConsistentSets {
 	}
 
 	/**
-	 * @param axioms
-	 *            a set of axioms
-	 * @param howMany
-	 *            the maximal number of maximal consistent subsets to be returned
+	 * @param axioms  a set of axioms
+	 * @param howMany the maximal number of maximal consistent subsets to be
+	 *                returned
 	 * @return a set of at most {@code howMany} maximal consistent subsets of axioms
 	 *         from {@code axioms}.
 	 */
@@ -47,13 +45,11 @@ public class MaximalConsistentSets {
 	}
 
 	/**
-	 * @param axioms
-	 *            a set of axioms
-	 * @param howMany
-	 *            the maximal number of maximal consistent subsets to be returned
-	 * @param contained
-	 *            a set of axioms that must be contained by the returned maximal
-	 *            consistent sets.
+	 * @param axioms    a set of axioms
+	 * @param howMany   the maximal number of maximal consistent subsets to be
+	 *                  returned
+	 * @param contained a set of axioms that must be contained by the returned
+	 *                  maximal consistent sets.
 	 * @return a set of at most {@code howMany} maximal consistent subsets of axioms
 	 *         from {@code axioms} containing {@code contained}.
 	 */
@@ -94,8 +90,7 @@ public class MaximalConsistentSets {
 	}
 
 	/**
-	 * @param axioms
-	 *            a set of axioms
+	 * @param axioms a set of axioms
 	 * @return the set of maximal consistent subsets of axioms from {@code axioms}.
 	 */
 	private static Set<Set<OWLAxiom>> maximalConsistentSubsetsOriginal(Set<OWLAxiom> axioms) {
@@ -141,8 +136,7 @@ public class MaximalConsistentSets {
 	}
 
 	/**
-	 * @param axioms
-	 *            a set of axioms
+	 * @param axioms a set of axioms
 	 * @return the set of maximal consistent subsets of axioms from {@code axioms}.
 	 */
 	public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Set<OWLAxiom> axioms) {
@@ -151,10 +145,9 @@ public class MaximalConsistentSets {
 	}
 
 	/**
-	 * @param axioms
-	 *            a set of axioms
-	 * @param howMany
-	 *            the maximal number of maximal consistent subsets to be returned
+	 * @param axioms  a set of axioms
+	 * @param howMany the maximal number of maximal consistent subsets to be
+	 *                returned
 	 * @return a set of at most {@code howMany} maximal consistent subsets of axioms
 	 *         from {@code axioms}.
 	 */
@@ -163,13 +156,11 @@ public class MaximalConsistentSets {
 	}
 
 	/**
-	 * @param axioms
-	 *            a set of axioms
-	 * @param howMany
-	 *            the maximal number of maximal consistent subsets to be returned
-	 * @param contained
-	 *            a set of axioms that must be contained by the returned maximal
-	 *            consistent sets.
+	 * @param axioms    a set of axioms
+	 * @param howMany   the maximal number of maximal consistent subsets to be
+	 *                  returned
+	 * @param contained a set of axioms that must be contained by the returned
+	 *                  maximal consistent sets.
 	 * @return a set of at most {@code howMany} maximal consistent subsets of axioms
 	 *         from {@code axioms} containing {@code contained}.
 	 */

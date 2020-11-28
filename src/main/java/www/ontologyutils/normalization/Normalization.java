@@ -41,8 +41,7 @@ public class Normalization {
 	private static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
 
 	/**
-	 * @param ontology
-	 *            with TBox axioms all in subclass form.
+	 * @param ontology with TBox axioms all in subclass form.
 	 * @see {@code asSubClassOfAxioms}
 	 * @return A normalized version of {@code ontology}.
 	 * @throws OWLOntologyCreationException
@@ -62,8 +61,7 @@ public class Normalization {
 	}
 
 	/**
-	 * @param ontology
-	 *            with TBox axioms all in subclass form.
+	 * @param ontology with TBox axioms all in subclass form.
 	 * @see {@code asSubClassOfAxioms}
 	 * @return A normalized version of {@code ontology}, following the procedure of
 	 *         Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies"
@@ -122,17 +120,13 @@ public class Normalization {
 	}
 
 	/**
-	 * @param e
-	 *            a forall expression
-	 * @param substitute
-	 *            a substitute not exists no expression for {@code e}
-	 * @param in
-	 *            the expression in which to substitute {@code e} with
-	 *            {@code substitute}
-	 * @param polarity
-	 *            substitute {@code e} with {@code substitute} when {@code e}
-	 *            appears positively ({@code polarity} is true) or negatively
-	 *            ({@code polarity} is false) in {@code in}
+	 * @param e          a forall expression
+	 * @param substitute a substitute not exists no expression for {@code e}
+	 * @param in         the expression in which to substitute {@code e} with
+	 *                   {@code substitute}
+	 * @param polarity   substitute {@code e} with {@code substitute} when {@code e}
+	 *                   appears positively ({@code polarity} is true) or negatively
+	 *                   ({@code polarity} is false) in {@code in}
 	 * @return the resulting expression
 	 */
 	private static OWLClassExpression replaceIfPolarity(OWLObjectAllValuesFrom e, OWLObjectComplementOf substitute,
@@ -178,8 +172,7 @@ public class Normalization {
 	}
 
 	/**
-	 * @param ontology
-	 *            with TBox axioms all in subclass form.
+	 * @param ontology with TBox axioms all in subclass form.
 	 * @see {@code asSubClassOfAxioms}
 	 * @return A new ontology with the TBox axioms structurally transformed,
 	 *         following the procedure of Simancik et al. "Consequence-Based
