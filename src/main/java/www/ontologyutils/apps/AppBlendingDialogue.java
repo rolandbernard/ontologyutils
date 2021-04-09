@@ -1,19 +1,26 @@
 package www.ontologyutils.apps;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
@@ -26,6 +33,18 @@ import www.ontologyutils.toolbox.Utils;
 /**
  * @author nico
  *
+ *         App to experiment with asymmetric hybrids dialogues.
+ *
+ *         One must specify two ontologies for both agents in the dialogue, an
+ *         initial ontology, an alignment ontology, and an ontology containing
+ *         axioms whose entailment will be checked after a run. Each one can be
+ *         an empty ontology.
+ *
+ *         The app allows the user to specify preferences even partially
+ *         (specify the highest-ranked axioms and let the computer choose the
+ *         others at random at each run), and to run a specified number of
+ *         experiments with the same settings.
+ * 
  */
 public class AppBlendingDialogue {
 
@@ -34,6 +53,9 @@ public class AppBlendingDialogue {
 	OWLOntology initialOntology;
 	OWLOntology alignmentOntology;
 	OWLOntology testOntology;
+
+	private static final int STOP = -1;
+	private static final int INIT_NUM = 0;
 
 	private static final String MSG_USAGE = "Usage: the program expects five (paths to) ontologies in parameter, "
 			+ "a number of desired runs, and optionally, "
@@ -60,6 +82,9 @@ public class AppBlendingDialogue {
 			} catch (IOException e) {
 				continue;
 			}
+			if (num == STOP) {
+				return STOP;
+			}
 			if (num < min || num > max) {
 				continue;
 			}
@@ -71,6 +96,17 @@ public class AppBlendingDialogue {
 		Set<A> s = new LinkedHashSet<A>(list);
 		list.clear();
 		list.addAll(s);
+	}
+
+	public static void saveOntology(OWLOntology ontology, String fileName) {
+		File file = new File(fileName);
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		try {
+			manager.saveOntology(ontology, ontology.getFormat(), IRI.create(file.toURI()));
+			System.out.println("Ontology saved as " + fileName);
+		} catch (OWLOntologyStorageException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -122,8 +158,8 @@ public class AppBlendingDialogue {
 	 *                                   be part of the moves of both agent one and
 	 *                                   agent two.
 	 */
-	public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2, String initialOntologyFilePath,
-			String alignmentsOntologyFilePath, String testOntologyFilePath) {
+	public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2,
+			String initialOntologyFilePath, String alignmentsOntologyFilePath, String testOntologyFilePath) {
 
 		OWLOntology base1 = ontologyOne = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
 		OWLOntology base2 = ontologyTwo = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
@@ -150,11 +186,39 @@ public class AppBlendingDialogue {
 		this.testOntology = Utils.newOntologyExcludeNonLogicalAxioms(testOntologyFilePath);
 	}
 
+	/**
+	 * @param pf
+	 * @param init
+	 * @return a ranking of axioms in pf.getAgenda() respecting {@param init} for
+	 *         highest-ranked axioms, while the other axioms appear at random.
+	 */
+	private static List<Integer> randomRanking(PreferenceFactory pf, List<Integer> init) {
+
+		List<Integer> ranking = new ArrayList<>();
+		int maxSpecSoFar = 0;
+		for (int i = 0; i < pf.getAgenda().size(); i++) {
+			int inInit = init.get(i);
+			ranking.add(inInit);
+			if (inInit != INIT_NUM) {
+				maxSpecSoFar++;
+			}
+		}
+		for (int k = maxSpecSoFar + 1; k <= pf.getAgenda().size(); k++) {
+			int where = ThreadLocalRandom.current().nextInt(0, pf.getAgenda().size());
+			while (ranking.get(where) != INIT_NUM) {
+				where = ThreadLocalRandom.current().nextInt(0, pf.getAgenda().size());
+			}
+			ranking.set(where, k);
+		}
+		return ranking;
+	}
+
 	public static void main(String[] args) {
 
 		usage(args);
 
-		AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3], args[4]);
+		AppBlendingDialogue mApp = new AppBlendingDialogue(
+				args[0], args[1], args[2], args[3], args[4]);
 		int numberOfTestRuns = Integer.parseInt(args[5]);
 
 		// Preferences
@@ -172,48 +236,51 @@ public class AppBlendingDialogue {
 		PreferenceFactory prefFactoryOne = new PreferenceFactory(listAxiomsOne);
 		PreferenceFactory prefFactoryTwo = new PreferenceFactory(listAxiomsTwo);
 
-		System.out.println("\n--- Preferences.");
+		System.out.println("\n--- Preferences will be generated at random at each run.");
 
-		// preferences agent one
+		System.out.println("\n--- You can specify the top preferences of agent one.");
+
 		System.out.println("- These are the base moves of agent one:");
 		for (int i = 0; i < prefFactoryOne.getAgenda().size(); i++) {
 			System.out.println((i + 1) + " : " + Utils.prettyPrintAxiom(prefFactoryOne.getAgenda().get(i)));
 		}
-		List<Integer> rankingOne = Stream.generate(String::new).limit(prefFactoryOne.getAgenda().size()).map(s -> 0)
-				.collect(Collectors.toList());
+		List<Integer> initRankingOne = Stream.generate(String::new).limit(prefFactoryOne.getAgenda().size())
+				.map(s -> INIT_NUM).collect(Collectors.toList());
 		for (int j = 1; j <= prefFactoryOne.getAgenda().size(); j++) {
-			System.out.println("- Current ranking: " + rankingOne);
-			int axiomIndex = readNumber("Next favorite axiom?", 1, prefFactoryOne.getAgenda().size());
-			if (rankingOne.get(axiomIndex - 1) != 0) {
+			System.out.println("- Current ranking: " + initRankingOne);
+			int axiomIndex = readNumber("Next favorite axiom of agent one (enter " + STOP + " to stop)?", 1,
+					prefFactoryOne.getAgenda().size());
+			if (axiomIndex == STOP) {
+				break;
+			}
+			if (initRankingOne.get(axiomIndex - 1) != 0) {
 				j--;
 				continue;
 			}
-			rankingOne.set(axiomIndex - 1, j);
+			initRankingOne.set(axiomIndex - 1, j);
 		}
-		Preference preferenceOne = prefFactoryOne.makePreference(rankingOne);
-		System.out.println("- Preferences agent one: " + preferenceOne);
 
-		// preferences agent two
+		System.out.println("\n--- You can specify the top preferences of agent two.");
+
 		System.out.println("- These are the base moves of agent two:");
 		for (int i = 0; i < prefFactoryTwo.getAgenda().size(); i++) {
 			System.out.println((i + 1) + " : " + Utils.prettyPrintAxiom(prefFactoryTwo.getAgenda().get(i)));
 		}
-		List<Integer> rankingTwo = Stream.generate(String::new).limit(prefFactoryTwo.getAgenda().size()).map(s -> 0)
-				.collect(Collectors.toList());
+		List<Integer> initRankingTwo = Stream.generate(String::new).limit(prefFactoryTwo.getAgenda().size())
+				.map(s -> INIT_NUM).collect(Collectors.toList());
 		for (int j = 1; j <= prefFactoryTwo.getAgenda().size(); j++) {
-			System.out.println("- Current ranking: " + rankingTwo);
-			int axiomIndex = readNumber("Next favorite axiom?", 1, prefFactoryTwo.getAgenda().size());
-			if (rankingTwo.get(axiomIndex - 1) != 0) {
+			System.out.println("- Current ranking: " + initRankingTwo);
+			int axiomIndex = readNumber("Next favorite axiom of agent two (enter " + STOP + " to stop)?", 1,
+					prefFactoryTwo.getAgenda().size());
+			if (axiomIndex == STOP) {
+				break;
+			}
+			if (initRankingTwo.get(axiomIndex - 1) != 0) {
 				j--;
 				continue;
 			}
-			rankingTwo.set(axiomIndex - 1, j);
+			initRankingTwo.set(axiomIndex - 1, j);
 		}
-		Preference preferenceTwo = prefFactoryTwo.makePreference(rankingTwo);
-		System.out.println("- Preferences agent two: " + preferenceTwo);
-
-		BlendingDialogue bdg = new BlendingDialogue(prefFactoryOne.getAgenda(), preferenceOne,
-				prefFactoryTwo.getAgenda(), preferenceTwo, mApp.initialOntology);
 
 		int importanceOne = readNumber("Importance of agent one?", 1, 100);
 		int importanceTwo = readNumber("Importance of agent two?", 1, 100);
@@ -234,6 +301,17 @@ public class AppBlendingDialogue {
 
 		for (int i = 0; i < numberOfTestRuns; i++) {
 			System.out.println("\n\n*********************** RUN " + (i + 1));
+
+			System.out.println("\n--- Preferences.");
+			System.out.println("(Reminder: How to read them: [rank axiom 1, rank axiom 2, ..., rank axiom last])");
+			Preference preferenceOne = prefFactoryOne.makePreference(randomRanking(prefFactoryOne, initRankingOne));
+			System.out.println("- Preferences agent one: " + preferenceOne);
+			Preference preferenceTwo = prefFactoryTwo.makePreference(randomRanking(prefFactoryTwo, initRankingTwo));
+			System.out.println("- Preferences agent two: " + preferenceTwo);
+
+			BlendingDialogue bdg = new BlendingDialogue(prefFactoryOne.getAgenda(), preferenceOne,
+					prefFactoryTwo.getAgenda(), preferenceTwo, mApp.initialOntology);
+
 			OWLOntology result = bdg.setVerbose(true).get(probabilityTurnOne);
 
 			System.out.println("\n--- RESULT ONTOLOGY\n");
@@ -268,9 +346,7 @@ public class AppBlendingDialogue {
 
 			if (args.length == 8 && args[6].equals("-o")) {
 				System.out.println("\n--- Saving result ontology.");
-				String fileName = i + " " + args[7];
-				Utils.saveOntology(result, fileName);
-				System.out.println("Ontology saved as " + fileName);
+				saveOntology(result, i + " " + args[7]);
 			}
 		}
 
