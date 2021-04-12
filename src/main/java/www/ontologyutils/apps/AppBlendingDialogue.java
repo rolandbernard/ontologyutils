@@ -158,8 +158,8 @@ public class AppBlendingDialogue {
 	 *                                   be part of the moves of both agent one and
 	 *                                   agent two.
 	 */
-	public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2,
-			String initialOntologyFilePath, String alignmentsOntologyFilePath, String testOntologyFilePath) {
+	public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2, String initialOntologyFilePath,
+			String alignmentsOntologyFilePath, String testOntologyFilePath) {
 
 		OWLOntology base1 = ontologyOne = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
 		OWLOntology base2 = ontologyTwo = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
@@ -217,8 +217,7 @@ public class AppBlendingDialogue {
 
 		usage(args);
 
-		AppBlendingDialogue mApp = new AppBlendingDialogue(
-				args[0], args[1], args[2], args[3], args[4]);
+		AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3], args[4]);
 		int numberOfTestRuns = Integer.parseInt(args[5]);
 
 		// Preferences
@@ -346,7 +345,8 @@ public class AppBlendingDialogue {
 
 			if (args.length == 8 && args[6].equals("-o")) {
 				System.out.println("\n--- Saving result ontology.");
-				saveOntology(result, i + " " + args[7]);
+				String leadingZeros = "%0" + (int) (Math.floor(Math.log10(numberOfTestRuns)) + 1) + "d";
+				saveOntology(result, String.format(leadingZeros, (i + 1)) + "_" + args[7]);
 			}
 		}
 
