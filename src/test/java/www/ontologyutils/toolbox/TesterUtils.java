@@ -262,4 +262,25 @@ public class TesterUtils extends TestCase {
 
 		}
 	}
+	
+	public void testInferredClassSibClassClassAxioms() {
+		System.out.println("%%% TEST InferredClassSibClassClassAxioms");
+
+		OWLAxiom ax1a = new OWLSubClassOfAxiomImpl(entity1, entity2, EMPTY_ANNOTATION);
+		OWLAxiom ax2a = new OWLSubClassOfAxiomImpl(entity2, entity3, EMPTY_ANNOTATION);
+		OWLAxiom axa = new OWLSubClassOfAxiomImpl(entity2, entity1, EMPTY_ANNOTATION);
+
+		HashSet<OWLAxiom> axioms = new HashSet<OWLAxiom>();
+		
+		axioms.add(ax1a);
+		axioms.add(ax2a);
+		OWLOntology onto = Utils.newOntology(axioms);
+		int sizeInf = Utils.inferredClassSubClassClassAxioms(onto).size();
+		assertTrue(sizeInf == 6);
+		
+		axioms.add(axa);
+		onto = Utils.newOntology(axioms);
+		sizeInf = Utils.inferredClassSubClassClassAxioms(onto).size();
+		assertTrue(sizeInf == 7);
+	}
 }
