@@ -84,7 +84,7 @@ public class AppBlendingDialogue {
 	private static final String MSG_USAGE = "Usage: the program expects five (paths to) ontologies in parameter, "
 			+ "a number of desired runs, the IRI of the first source concept, the IRI of the second source concept, and the IRI of the target concept, "
 			+ "and optionally, "
-			+ "a file pathname to save the result of the blending dialog, preceded by the flag -o: "
+			+ "a file pathname to save the result of the blending dialogue, preceded by the flag -o: "
 			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
 			+ "<IRI1> <IRI2> <IRITarget> "
 			+ "<numberOfRuns> -o <outputOntologyFilePath>";
