@@ -86,6 +86,7 @@ public class AppBlendingDialogue {
 			+ "and optionally, "
 			+ "a file pathname to save the result of the blending dialog, preceded by the flag -o: "
 			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
+			+ "<IRI1> <IRI2> <IRITarget> "
 			+ "<numberOfRuns> -o <outputOntologyFilePath>";
 
 	private static void usage(String[] args) {
