@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,14 +17,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.EntityType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
+import uk.ac.manchester.cs.owl.owlapi.OWLObjectIntersectionOfImpl;
+import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
 import www.ontologyutils.collective.PreferenceFactory;
 import www.ontologyutils.collective.PreferenceFactory.Preference;
 import www.ontologyutils.collective.blending.BlendingDialogue;
@@ -45,6 +52,16 @@ import www.ontologyutils.toolbox.Utils;
  *         others at random at each run), and to run a specified number of
  *         experiments with the same settings.
  * 
+ * 
+ *         E.g., run with parameters ./resources/FishVehicle/Vehicle.owl
+ *         ./resources/FishVehicle/Fish.owl
+ *         ./resources/FishVehicle/InitialOntology.owl
+ *         ./resources/FishVehicle/AlignmentAndDisalignment.owl
+ *         ./resources/FishVehicle/HybridTestQuestionsFishVehicle.owl
+ *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle
+ *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish
+ *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle 15
+ *         -o Result.owl
  */
 public class AppBlendingDialogue {
 
@@ -54,17 +71,25 @@ public class AppBlendingDialogue {
 	OWLOntology alignmentOntology;
 	OWLOntology testOntology;
 
+	OWLClassExpression conceptOne;
+	OWLClassExpression conceptTwo;
+	OWLClassExpression conceptTarget;
+
+	Set<OWLClassExpression> ascendantsDescendantsOne; // ascendants and descendants of conceptOne in ontologyOne
+	Set<OWLClassExpression> ascendantsDescendantsTwo; // ascendants and descendants of conceptTwo in ontologyTwo
+
 	private static final int STOP = -1;
 	private static final int INIT_NUM = 0;
 
 	private static final String MSG_USAGE = "Usage: the program expects five (paths to) ontologies in parameter, "
-			+ "a number of desired runs, and optionally, "
+			+ "a number of desired runs, the IRI of the first source concept, the IRI of the second source concept, and the IRI of the target concept, "
+			+ "and optionally, "
 			+ "a file pathname to save the result of the blending dialog, preceded by the flag -o: "
 			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
 			+ "<numberOfRuns> -o <outputOntologyFilePath>";
 
 	private static void usage(String[] args) {
-		if ((args.length != 6 && args.length != 8) || (args.length == 8 && !args[6].equals("-o"))) {
+		if ((args.length != 9 && args.length != 11) || (args.length == 11 && !args[9].equals("-o"))) {
 			System.out.println(MSG_USAGE);
 			System.exit(1);
 		}
@@ -117,7 +142,7 @@ public class AppBlendingDialogue {
 	 * 
 	 */
 	private static int quantifyInformation(OWLOntology ontology) {
-		return Utils.inferredClassSubClassClassAxioms(ontology).size() + ontology.getAxiomCount();
+		return Utils.inferredTaxonomyAxioms(ontology).size() + ontology.getAxiomCount();
 	}
 
 	/**
@@ -129,7 +154,7 @@ public class AppBlendingDialogue {
 	 *         ontology}.
 	 */
 	private static double happiness(OWLOntology agent, OWLOntology ontology) {
-		Set<OWLAxiom> axioms = Utils.inferredClassSubClassClassAxioms(agent);
+		Set<OWLAxiom> axioms = Utils.inferredTaxonomyAxioms(agent);
 		axioms.addAll(agent.axioms().collect(Collectors.toSet()));
 
 		OWLReasoner reasoner = Utils.getReasoner(ontology);
@@ -137,6 +162,67 @@ public class AppBlendingDialogue {
 
 		reasoner.dispose();
 		return (double) countSatisfiedAxioms / axioms.size();
+	}
+
+	/**
+	 * @param ontology      an ontology result of hybridization of agent1 and agent2
+	 * @param conceptTarget the target hybrid concept
+	 * @param ad1           the set of ascendants and descendants of agent 1
+	 * @param ad2           the set of ascendants and descendants of agent 2
+	 * @return an estimation of the hybridization of ontology {@code ontology}.
+	 */
+	private static double hybridization(OWLOntology ontology, OWLClassExpression conceptTarget,
+			Set<OWLClassExpression> ad1, Set<OWLClassExpression> ad2) {
+		OWLReasoner reasoner = Utils.getReasoner(ontology);
+
+		int countPositiveChecks = 0;
+
+		for (OWLClassExpression ce1 : ad1) {
+			for (OWLClassExpression ce2 : ad2) {
+				OWLClassExpression conj = new OWLObjectIntersectionOfImpl(ce1, ce2);
+				OWLSubClassOfAxiom scoac = new OWLSubClassOfAxiomImpl(conceptTarget, conj, Utils.EMPTY_ANNOTATION);
+
+				System.out.print(Utils.prettyPrintAxiom(scoac) + " ?\t");
+				if (reasoner.isEntailed(scoac)) {
+					countPositiveChecks++;
+					System.out.println("yes");
+				} else {
+					System.out.println("no");
+				}
+			}
+		}
+
+		reasoner.dispose();
+		System.out.println("Hybridization ratio : " + countPositiveChecks + " / " + (ad1.size() * ad2.size()));
+		return (double) countPositiveChecks / (ad1.size() * ad2.size());
+	}
+
+	/**
+	 * @param ontology
+	 * @param concept
+	 * @return the set of subconcepts in ontology {@code ontology} that are included
+	 *         in or include the concept {@code concept}.
+	 */
+	private static Set<OWLClassExpression> computeAscendanstDescendants(OWLOntology ontology,
+			OWLClassExpression concept) {
+
+		OWLReasoner reasoner = Utils.getReasoner(ontology);
+		OWLSubClassOfAxiom scoa;
+
+		Set<OWLClassExpression> oces = new HashSet<OWLClassExpression>();
+
+		for (OWLClassExpression ce : Utils.getSubClasses(ontology)) {
+			scoa = new OWLSubClassOfAxiomImpl(concept, ce, Utils.EMPTY_ANNOTATION);
+			if (reasoner.isEntailed(scoa)) {
+				oces.add(ce);
+			}
+			scoa = new OWLSubClassOfAxiomImpl(ce, concept, Utils.EMPTY_ANNOTATION);
+			if (reasoner.isEntailed(scoa)) {
+				oces.add(ce);
+			}
+		}
+		reasoner.dispose();
+		return oces;
 	}
 
 	/**
@@ -157,9 +243,13 @@ public class AppBlendingDialogue {
 	 *                                   (normalized) axioms of this ontology will
 	 *                                   be part of the moves of both agent one and
 	 *                                   agent two.
+	 * @param IRI1
+	 * @param IRI2
+	 * @param IRITarget
 	 */
 	public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2, String initialOntologyFilePath,
-			String alignmentsOntologyFilePath, String testOntologyFilePath) {
+			String alignmentsOntologyFilePath, String testOntologyFilePath, String IRI1, String IRI2,
+			String IRITarget) {
 
 		OWLOntology base1 = ontologyOne = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
 		OWLOntology base2 = ontologyTwo = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
@@ -184,6 +274,14 @@ public class AppBlendingDialogue {
 				.forEach(a -> this.alignmentOntology.add(NormalizationTools.asSubClassOfAxioms(a)));
 
 		this.testOntology = Utils.newOntologyExcludeNonLogicalAxioms(testOntologyFilePath);
+
+		OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
+		this.conceptOne = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create(IRI1));
+		this.conceptTwo = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create(IRI2));
+		this.conceptTarget = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create(IRITarget));
+
+		this.ascendantsDescendantsOne = computeAscendanstDescendants(this.ontologyOne, this.conceptOne);
+		this.ascendantsDescendantsTwo = computeAscendanstDescendants(this.ontologyTwo, this.conceptTwo);
 	}
 
 	/**
@@ -217,8 +315,9 @@ public class AppBlendingDialogue {
 
 		usage(args);
 
-		AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3], args[4]);
-		int numberOfTestRuns = Integer.parseInt(args[5]);
+		AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3], args[4], args[5],
+				args[6], args[7]);
+		int numberOfTestRuns = Integer.parseInt(args[8]);
 
 		// Preferences
 		List<OWLAxiom> listAxiomsOne = mApp.ontologyOne.axioms().collect(Collectors.toList());
@@ -281,8 +380,8 @@ public class AppBlendingDialogue {
 			initRankingTwo.set(axiomIndex - 1, j);
 		}
 
-		int importanceOne = readNumber("Importance of agent one?", 1, 100);
-		int importanceTwo = readNumber("Importance of agent two?", 1, 100);
+		int importanceOne = readNumber("Importance of agent one?", 1, 101);
+		int importanceTwo = readNumber("Importance of agent two?", 1, 101);
 
 		// deciding the probability of each agent to take turn in the dialogue
 		int infoInOne = quantifyInformation(Utils.newOntology(prefFactoryOne.getAgenda().stream()));
@@ -294,6 +393,9 @@ public class AppBlendingDialogue {
 		// happiness and testing
 		double sumHappinessOne = 0.0;
 		double sumHappinessTwo = 0.0;
+		double sumAsymmetry = 0.0;
+		double sumHybridization = 0.0;
+
 		List<OWLAxiom> listAxiomsTest = mApp.testOntology.axioms().collect(Collectors.toList());
 		Collections.sort(listAxiomsTest);
 		Map<OWLAxiom, Integer> counts = new HashMap<OWLAxiom, Integer>();
@@ -325,10 +427,17 @@ public class AppBlendingDialogue {
 			System.out.println("\n-- EVALUATION RUN " + (i + 1) + "\n");
 			double happinessOne = happiness(mApp.ontologyOne, result);
 			double happinessTwo = happiness(mApp.ontologyTwo, result);
+			double asymmetry = happinessOne - happinessTwo;
+			double hybridization = hybridization(result, mApp.conceptTarget, mApp.ascendantsDescendantsOne,
+					mApp.ascendantsDescendantsTwo);
 			sumHappinessOne += happinessOne;
 			sumHappinessTwo += happinessTwo;
+			sumAsymmetry += asymmetry;
+			sumHybridization += hybridization;
 			System.out.println("Happiness of one: " + happinessOne);
 			System.out.println("Happiness of two: " + happinessTwo);
+			System.out.println("Asymmetry: " + asymmetry);
+			System.out.println("Hybridization: " + hybridization);
 
 			System.out.println("\n-- TESTS RUN " + (i + 1) + "\n");
 			for (OWLAxiom a : listAxiomsTest) {
@@ -343,7 +452,7 @@ public class AppBlendingDialogue {
 			}
 			reasoner.dispose();
 
-			if (args.length == 8 && args[6].equals("-o")) {
+			if (args.length == 11 && args[9].equals("-o")) {
 				System.out.println("\n--- Saving result ontology.");
 				String leadingZeros = "%0" + (int) (Math.floor(Math.log10(numberOfTestRuns)) + 1) + "d";
 				saveOntology(result, String.format(leadingZeros, (i + 1)) + "_" + args[7]);
@@ -358,6 +467,8 @@ public class AppBlendingDialogue {
 		System.out.println("(\"Happiness\" of an agent with the result is estimated as "
 				+ "the ratio of the number of axioms and inferred taxonomy axioms "
 				+ "in the ontology of the agent that are inferred by the result ontology.)");
+		System.out.println("Average Asymmetry: " + sumAsymmetry / numberOfTestRuns);
+		System.out.println("Average Hybridization: " + sumHybridization / numberOfTestRuns);
 
 		for (OWLAxiom a : listAxiomsTest) {
 			Integer num = counts.get(a);

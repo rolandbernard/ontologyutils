@@ -74,6 +74,8 @@ public class Utils {
 
 	public static ReasonerName DEFAULT_REASONER = ReasonerName.OPENLLET;
 
+	public static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
+
 	/**
 	 * @param owlString
 	 * @return
@@ -333,6 +335,18 @@ public class Utils {
 	}
 
 	/**
+	 * @param ontology
+	 * @return the set of {@code OWLClassExpression} in {@code ontology}
+	 */
+	public static Set<OWLClassExpression> getSubClasses(OWLOntology ontology) {
+		Set<OWLClassExpression> subConcepts = new HashSet<>();
+		ontology.axioms(Imports.EXCLUDED)
+				.forEach((ax) -> subConcepts.addAll(ax.nestedClassExpressions().collect(Collectors.toSet())));
+
+		return subConcepts;
+	}
+
+	/**
 	 * @param c1
 	 * @param c2
 	 * @param ontology
@@ -349,7 +363,7 @@ public class Utils {
 	 * @return the set of C1 subclass C2 axioms, C1 and C2 classes in the signature
 	 *         of {@code ontology}, entailed by {@code ontology}.
 	 */
-	public static Set<OWLAxiom> inferredClassSubClassClassAxioms(OWLOntology ontology) {
+	public static Set<OWLAxiom> inferredTaxonomyAxioms(OWLOntology ontology) {
 		final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
 		OWLReasoner reasoner = getReasoner(ontology);
 		boolean isConsistent = reasoner.isConsistent();
