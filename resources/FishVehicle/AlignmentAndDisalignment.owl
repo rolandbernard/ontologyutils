@@ -21,9 +21,9 @@
     
 
 
-    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#need -->
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs -->
 
-    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#need"/>
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs"/>
     
 
 
@@ -50,26 +50,26 @@
     
 
 
-    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#NeedFood -->
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#NeedFood -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#NeedFood">
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#NeedFood">
         <owl:equivalentClass>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#need"/>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs"/>
                 <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Food"/>
             </owl:Restriction>
         </owl:equivalentClass>
-        <owl:disjointWith rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#NeedFuel"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#NeedFuel"/>
     </owl:Class>
     
 
 
-    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#NeedFuel -->
+    <!-- http://www.semanticweb.org/anonym/ontologies/2020/2/fv#NeedFuel -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#NeedFuel">
+    <owl:Class rdf:about="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#NeedFuel">
         <owl:equivalentClass>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/alignment#need"/>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#needs"/>
                 <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fuel"/>
             </owl:Restriction>
         </owl:equivalentClass>
