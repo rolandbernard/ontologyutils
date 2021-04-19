@@ -40,7 +40,9 @@ import www.ontologyutils.toolbox.Utils;
 /**
  * @author nico
  *
- *         App to experiment with asymmetric hybrids dialogues.
+ *         App to experiment with
+ *         www.ontologyutils.collective.blending.BlendingDialogue to make
+ *         asymmetric hybrids dialogues.
  *
  *         One must specify two ontologies for both agents in the dialogue, an
  *         initial ontology, an alignment ontology, and an ontology containing
@@ -86,8 +88,7 @@ public class AppBlendingDialogue {
 			+ "and optionally, "
 			+ "a file pathname to save the result of the blending dialogue, preceded by the flag -o: "
 			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
-			+ "<IRI1> <IRI2> <IRITarget> "
-			+ "<numberOfRuns> -o <outputOntologyFilePath>";
+			+ "<IRI1> <IRI2> <IRITarget> " + "<numberOfRuns> -o <outputOntologyFilePath>";
 
 	private static void usage(String[] args) {
 		if ((args.length != 9 && args.length != 11) || (args.length == 11 && !args[9].equals("-o"))) {
@@ -166,14 +167,15 @@ public class AppBlendingDialogue {
 	}
 
 	/**
-	 * @param ontology      an ontology result of hybridization of agent1 and agent2
+	 * @param ontology      an ontology, typically the result of hybridization of
+	 *                      agent1 and agent2
 	 * @param conceptTarget the target hybrid concept
 	 * @param ad1           the set of ascendants and descendants of agent 1
 	 * @param ad2           the set of ascendants and descendants of agent 2
 	 * @return an estimation of the hybridization of ontology {@code ontology}.
 	 */
-	private static double hybridization(OWLOntology ontology, OWLClassExpression conceptTarget,
-			Set<OWLClassExpression> ad1, Set<OWLClassExpression> ad2) {
+	private static double hybridity(OWLOntology ontology, OWLClassExpression conceptTarget, Set<OWLClassExpression> ad1,
+			Set<OWLClassExpression> ad2) {
 		OWLReasoner reasoner = Utils.getReasoner(ontology);
 
 		int countPositiveChecks = 0;
@@ -194,7 +196,7 @@ public class AppBlendingDialogue {
 		}
 
 		reasoner.dispose();
-		System.out.println("Hybridization ratio : " + countPositiveChecks + " / " + (ad1.size() * ad2.size()));
+		System.out.println("Hybridity ratio : " + countPositiveChecks + " / " + (ad1.size() * ad2.size()));
 		return (double) countPositiveChecks / (ad1.size() * ad2.size());
 	}
 
@@ -395,7 +397,7 @@ public class AppBlendingDialogue {
 		double sumHappinessOne = 0.0;
 		double sumHappinessTwo = 0.0;
 		double sumAsymmetry = 0.0;
-		double sumHybridization = 0.0;
+		double sumHybridity = 0.0;
 
 		List<OWLAxiom> listAxiomsTest = mApp.testOntology.axioms().collect(Collectors.toList());
 		Collections.sort(listAxiomsTest);
@@ -429,16 +431,16 @@ public class AppBlendingDialogue {
 			double happinessOne = happiness(mApp.ontologyOne, result);
 			double happinessTwo = happiness(mApp.ontologyTwo, result);
 			double asymmetry = happinessOne - happinessTwo;
-			double hybridization = hybridization(result, mApp.conceptTarget, mApp.ascendantsDescendantsOne,
+			double hybridity = hybridity(result, mApp.conceptTarget, mApp.ascendantsDescendantsOne,
 					mApp.ascendantsDescendantsTwo);
 			sumHappinessOne += happinessOne;
 			sumHappinessTwo += happinessTwo;
 			sumAsymmetry += asymmetry;
-			sumHybridization += hybridization;
+			sumHybridity += hybridity;
 			System.out.println("Happiness of one: " + happinessOne);
 			System.out.println("Happiness of two: " + happinessTwo);
 			System.out.println("Asymmetry: " + asymmetry);
-			System.out.println("Hybridization: " + hybridization);
+			System.out.println("Hybridity: " + hybridity);
 
 			System.out.println("\n-- TESTS RUN " + (i + 1) + "\n");
 			for (OWLAxiom a : listAxiomsTest) {
@@ -469,7 +471,7 @@ public class AppBlendingDialogue {
 				+ "the ratio of the number of axioms and inferred taxonomy axioms "
 				+ "in the ontology of the agent that are inferred by the result ontology.)");
 		System.out.println("Average Asymmetry: " + sumAsymmetry / numberOfTestRuns);
-		System.out.println("Average Hybridization: " + sumHybridization / numberOfTestRuns);
+		System.out.println("Average Hybridization: " + sumHybridity / numberOfTestRuns);
 
 		for (OWLAxiom a : listAxiomsTest) {
 			Integer num = counts.get(a);
