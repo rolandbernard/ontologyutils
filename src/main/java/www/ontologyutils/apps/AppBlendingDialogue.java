@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.EntityType;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -148,14 +150,45 @@ public class AppBlendingDialogue {
 	}
 
 	/**
+	 * @param ontology
+	 * @return the set of C1 subclass C2 axioms, C1 and C2 classes in the signature
+	 *         of {@code ontology}, that are not entailed by {@code ontology}.
+	 */
+	public static Set<OWLAxiom> notInferredTaxonomyAxioms(OWLOntology ontology) {
+		final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
+		OWLReasoner reasoner = Utils.getReasoner(ontology);
+		Set<OWLAxiom> result = new HashSet<>();
+		if (!reasoner.isConsistent()) {
+			return result;
+		}
+		ontology.classesInSignature(Imports.EXCLUDED).forEach((left) -> {
+			ontology.classesInSignature(Imports.EXCLUDED).forEach((right) -> {
+				OWLSubClassOfAxiom scoa = new OWLSubClassOfAxiomImpl(left, right, EMPTY_ANNOTATION);
+				if (!reasoner.isEntailed(scoa)) {
+					result.add(scoa);
+				}
+			});
+		});
+
+		reasoner.dispose();
+		return result;
+	}
+
+	/**
 	 * @param agent
 	 * @param ontology
 	 * @return an estimation of the "happiness" of ontology {@code agent} with
 	 *         ontology {@code two}. The ratio of the number of axioms and inferred
 	 *         taxonomy axioms in {@code agent} that are inferred by {code
 	 *         ontology}.
+	 *
+	 *         See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
+	 *         Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
+	 *         Ontology Aggregation Based on Axiom Weakening. In 27th International
+	 *         Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
+	 *         pages 1942-1948.
 	 */
-	private static double happiness(OWLOntology agent, OWLOntology ontology) {
+	private static double happinessTolerant(OWLOntology agent, OWLOntology ontology) {
 		Set<OWLAxiom> axioms = Utils.inferredTaxonomyAxioms(agent);
 		axioms.addAll(agent.axioms().collect(Collectors.toSet()));
 
@@ -167,8 +200,55 @@ public class AppBlendingDialogue {
 	}
 
 	/**
+	 * @param agent
+	 * @param ontology
+	 * @return an estimation of the "happiness" of ontology {@code agent} with
+	 *         ontology {@code two}. The ratio of the number non inferred taxonomy
+	 *         axioms in {@code agent} that are not inferred by {code ontology}.
+	 */
+	private static double happinessTolerantNeg(OWLOntology agent, OWLOntology ontology) {
+		Set<OWLAxiom> nonAxioms = notInferredTaxonomyAxioms(agent);
+
+		OWLReasoner reasoner = Utils.getReasoner(ontology);
+		long countNotSatisfiedAxioms = nonAxioms.stream().filter(a -> !reasoner.isEntailed(a)).count();
+
+		reasoner.dispose();
+		return (double) countNotSatisfiedAxioms / nonAxioms.size();
+	}
+
+	/**
+	 * @param agent
+	 * @param ontology
+	 * @return an estimation of the "happiness" of ontology {@code agent} with
+	 *         ontology {@code two}. The ratio of the number of axioms and inferred
+	 *         taxonomy axioms in {@code agent} and {@code ontology} that are
+	 *         inferred by {code ontology} and {@code agent}.
+	 *
+	 *         See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
+	 *         Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
+	 *         Ontology Aggregation Based on Axiom Weakening. In 27th International
+	 *         Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
+	 *         pages 1942-1948.
+	 */
+	private static double happinessStrict(OWLOntology agent, OWLOntology ontology) {
+		Set<OWLAxiom> axioms = Utils.inferredTaxonomyAxioms(agent);
+		axioms.addAll(agent.axioms().collect(Collectors.toSet()));
+		axioms.addAll(Utils.inferredTaxonomyAxioms(ontology));
+		axioms.addAll(ontology.axioms().collect(Collectors.toSet()));
+
+		OWLReasoner reasoner1 = Utils.getReasoner(agent);
+		OWLReasoner reasoner2 = Utils.getReasoner(ontology);
+		long countSatisfiedAxioms = axioms.stream().filter(a -> reasoner1.isEntailed(a) && reasoner2.isEntailed(a))
+				.count();
+
+		reasoner1.dispose();
+		reasoner2.dispose();
+		return (double) countSatisfiedAxioms / axioms.size();
+	}
+
+	/**
 	 * @param ontology      an ontology, typically the result of hybridization of
-	 *                      agent1 and agent2
+	 *                      agent 1 and agent 2
 	 * @param conceptTarget the target hybrid concept
 	 * @param ad1           the set of ascendants and descendants of agent 1
 	 * @param ad2           the set of ascendants and descendants of agent 2
@@ -394,9 +474,15 @@ public class AppBlendingDialogue {
 		System.out.println("\n--- At each turn, probability for agent one to act: " + probabilityTurnOne);
 
 		// happiness and testing
-		double sumHappinessOne = 0.0;
-		double sumHappinessTwo = 0.0;
-		double sumAsymmetry = 0.0;
+		double sumHappinessTolerantOne = 0.0;
+		double sumHappinessTolerantTwo = 0.0;
+		double sumHappinessStrictOne = 0.0;
+		double sumHappinessStrictTwo = 0.0;
+		double sumHappinessTolerantNegOne = 0.0;
+		double sumHappinessTolerantNegTwo = 0.0;
+		double sumAsymmetryTolerant = 0.0;
+		double sumAsymmetryStrict = 0.0;
+		double sumAsymmetryTolerantNeg = 0.0;
 		double sumHybridity = 0.0;
 
 		List<OWLAxiom> listAxiomsTest = mApp.testOntology.axioms().collect(Collectors.toList());
@@ -428,18 +514,36 @@ public class AppBlendingDialogue {
 			}
 
 			System.out.println("\n-- EVALUATION RUN " + (i + 1) + "\n");
-			double happinessOne = happiness(mApp.ontologyOne, result);
-			double happinessTwo = happiness(mApp.ontologyTwo, result);
-			double asymmetry = happinessOne - happinessTwo;
+			double happinessTolerantOne = happinessTolerant(mApp.ontologyOne, result);
+			double happinessTolerantTwo = happinessTolerant(mApp.ontologyTwo, result);
+			double happinessStrictOne = happinessStrict(mApp.ontologyOne, result);
+			double happinessStrictTwo = happinessStrict(mApp.ontologyTwo, result);
+			double happinessTolerantNegOne = happinessTolerantNeg(mApp.ontologyOne, result);
+			double happinessTolerantNegTwo = happinessTolerantNeg(mApp.ontologyTwo, result);
+			double asymmetryTolerant = happinessTolerantOne - happinessTolerantTwo;
+			double asymmetryStrict = happinessStrictOne - happinessStrictTwo;
+			double asymmetryTolerantNeg = happinessTolerantNegOne - happinessTolerantNegTwo;
 			double hybridity = hybridity(result, mApp.conceptTarget, mApp.ascendantsDescendantsOne,
 					mApp.ascendantsDescendantsTwo);
-			sumHappinessOne += happinessOne;
-			sumHappinessTwo += happinessTwo;
-			sumAsymmetry += asymmetry;
+			sumHappinessTolerantOne += happinessTolerantOne;
+			sumHappinessTolerantTwo += happinessTolerantTwo;
+			sumHappinessStrictOne += happinessStrictOne;
+			sumHappinessStrictTwo += happinessStrictTwo;
+			sumHappinessTolerantNegOne += happinessTolerantNegOne;
+			sumHappinessTolerantNegTwo += happinessTolerantNegTwo;
+			sumAsymmetryTolerant += asymmetryTolerant;
+			sumAsymmetryStrict += asymmetryStrict;
+			sumAsymmetryTolerantNeg += asymmetryTolerantNeg;
 			sumHybridity += hybridity;
-			System.out.println("Happiness of one: " + happinessOne);
-			System.out.println("Happiness of two: " + happinessTwo);
-			System.out.println("Asymmetry: " + asymmetry);
+			System.out.println("Happiness Tolerant of one: " + happinessTolerantOne);
+			System.out.println("Happiness Tolerant of two: " + happinessTolerantTwo);
+			System.out.println("Happiness Strict of one: " + happinessStrictOne);
+			System.out.println("Happiness Strict of two: " + happinessStrictTwo);
+			System.out.println("Happiness TolerantNeg of one: " + happinessTolerantNegOne);
+			System.out.println("Happiness TolerantNeg of two: " + happinessTolerantNegTwo);
+			System.out.println("Asymmetry Tolerant: " + asymmetryTolerant);
+			System.out.println("Asymmetry Strict: " + asymmetryStrict);
+			System.out.println("Asymmetry TolerantNeg: " + asymmetryTolerantNeg);
 			System.out.println("Hybridity: " + hybridity);
 
 			System.out.println("\n-- TESTS RUN " + (i + 1) + "\n");
@@ -465,13 +569,30 @@ public class AppBlendingDialogue {
 		// SUMMARY
 		System.out.println("\n-- SUMMARY");
 
-		System.out.println("Average Happiness of one: " + sumHappinessOne / numberOfTestRuns);
-		System.out.println("Average Happiness of two: " + sumHappinessTwo / numberOfTestRuns);
-		System.out.println("(\"Happiness\" of an agent with the result is estimated as "
+		System.out.println("Average Happiness Tolerant of one: " + sumHappinessTolerantOne / numberOfTestRuns);
+		System.out.println("Average Happiness Tolerant of two: " + sumHappinessTolerantTwo / numberOfTestRuns);
+		System.out.println("Average Happiness Strict of one: " + sumHappinessStrictOne / numberOfTestRuns);
+		System.out.println("Average Happiness Strict of two: " + sumHappinessStrictTwo / numberOfTestRuns);
+		System.out.println("Average Happiness TolerantNeg of one: " + sumHappinessTolerantNegOne / numberOfTestRuns);
+		System.out.println("Average Happiness TolerantNeg of two: " + sumHappinessTolerantNegTwo / numberOfTestRuns);
+		System.out.println("Average Asymmetry Tolerant: " + sumAsymmetryTolerant / numberOfTestRuns);
+		System.out.println("Average Asymmetry Strict: " + sumAsymmetryStrict / numberOfTestRuns);
+		System.out.println("Average Asymmetry TolerantNeg: " + sumAsymmetryTolerantNeg / numberOfTestRuns);
+		System.out.println("Average Hybrididty: " + sumHybridity / numberOfTestRuns);
+		System.out.println("(\"Happiness Tolerant\" of an agent with the result is estimated as "
 				+ "the ratio of the number of axioms and inferred taxonomy axioms "
 				+ "in the ontology of the agent that are inferred by the result ontology.)");
-		System.out.println("Average Asymmetry: " + sumAsymmetry / numberOfTestRuns);
-		System.out.println("Average Hybridization: " + sumHybridity / numberOfTestRuns);
+		System.out.println("(\"Happiness Strict\" of an agent with the result is estimated as "
+				+ "the ratio of the number of axioms and inferred taxonomy axioms "
+				+ "in the ontology of the agent and of the result ontology that are inferred "
+				+ "by both the agent and the result ontology.)");
+		System.out.println("(\"Happiness TolerantNeg\" of an agent with the result is estimated "
+				+ "as the ratio of non-inferred taxonomy axioms in the ontology of the agent that "
+				+ "are not inferred by the result ontology.)");
+		System.out.println("(\"Asymmetry\" of the result ontology is the difference between agent one's "
+				+ "happiness and agent two's happiness.)");
+		System.out.println(
+				"(\"Hybrididty\" of the result ontology is the ratio of \"hybrid\" axioms that " + "are inferred.)");
 
 		for (OWLAxiom a : listAxiomsTest) {
 			Integer num = counts.get(a);
