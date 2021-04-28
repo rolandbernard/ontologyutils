@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/guenda/ontologies/2020/2/alignment#"
+     xml:base="http://www.semanticweb.org/guenda/ontologies/2020/2/alignment"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/alignment"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#eats -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#eats"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#goesOn -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#goesOn"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#swimsIn -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#swimsIn"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air">
+        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground"/>
+        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food">
+        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground">
+        <owl:equivalentClass rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:Class>
+        <owl:intersectionOf rdf:parseType="Collection">
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#swimsIn"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
+            </owl:Restriction>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#swimsIn"/>
+                <owl:allValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
+            </owl:Restriction>
+        </owl:intersectionOf>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#goesOn"/>
+                <owl:someValuesFrom>
+                    <owl:Class>
+                        <owl:unionOf rdf:parseType="Collection">
+                            <rdf:Description rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air"/>
+                            <rdf:Description rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground"/>
+                            <rdf:Description rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
+                        </owl:unionOf>
+                    </owl:Class>
+                </owl:someValuesFrom>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Class>
+    <owl:Restriction>
+        <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#eats"/>
+        <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Food"/>
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#needs"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Fuel"/>
+            </owl:Restriction>
+        </owl:equivalentClass>
+    </owl:Restriction>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

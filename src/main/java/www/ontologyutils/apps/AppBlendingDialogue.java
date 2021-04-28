@@ -63,8 +63,8 @@ import www.ontologyutils.toolbox.Utils.ReasonerName;
  *         E.g., run with parameters ./resources/FishVehicle/Vehicle.owl
  *         ./resources/FishVehicle/Fish.owl
  *         ./resources/FishVehicle/InitialOntology.owl
- *         ./resources/FishVehicle/AlignmentAndDisalignment.owl
- *         ./resources/FishVehicle/HybridTestQuestionsFishVehicle.owl
+ *         ./resources/FishVehicle/Alignment.owl
+ *         ./resources/FishVehicle/Test_hybrid.owl
  *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle
  *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish
  *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle 15
