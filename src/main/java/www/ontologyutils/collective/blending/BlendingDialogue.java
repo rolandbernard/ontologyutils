@@ -24,6 +24,8 @@ public class BlendingDialogue {
 	private Preference pone;
 	private Preference ptwo;
 	private OWLOntology initialOntology;
+	private int numWeakeningOne;
+	private int numWeakeningTwo;
 
 	private boolean verbose = false;
 
@@ -58,6 +60,26 @@ public class BlendingDialogue {
 		this.atwo = atwo;
 		this.pone = pone;
 		this.ptwo = ptwo;
+		this.numWeakeningOne = 0;
+		this.numWeakeningTwo = 0;
+	}
+
+	/**
+	 * @return the number of axiom weakening action performed by ontology one since
+	 *         the last call to {@code get}.
+	 * @see get()
+	 */
+	public int getNumWeakeningOne() {
+		return numWeakeningOne;
+	}
+
+	/**
+	 * @return the number of axiom weakening action performed by ontology two since
+	 *         the last call to {@code get}.
+	 * @see get()
+	 */
+	public int getNumWeakeningTwo() {
+		return numWeakeningTwo;
 	}
 
 	/**
@@ -86,6 +108,9 @@ public class BlendingDialogue {
 	 * @return a consistent ontology resulting from the dialogue.
 	 */
 	public OWLOntology get(double probabilityTurnOne) {
+
+		this.numWeakeningOne = 0;
+		this.numWeakeningTwo = 0;
 
 		OWLOntology result = Utils.newOntology(this.initialOntology.axioms());
 
@@ -131,6 +156,11 @@ public class BlendingDialogue {
 			result.add(consideredAxiom);
 			while (!Utils.isConsistent(result)) {
 				log("\n** Weakening. **");
+				if (turn == 1) {
+					numWeakeningOne++;
+				} else {
+					numWeakeningTwo++;
+				}
 				result.remove(consideredAxiom);
 				AxiomWeakener axiomWeakener = new AxiomWeakener(result);
 

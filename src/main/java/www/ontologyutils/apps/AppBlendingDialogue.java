@@ -11,10 +11,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -38,6 +40,7 @@ import www.ontologyutils.collective.PreferenceFactory.Preference;
 import www.ontologyutils.collective.blending.BlendingDialogue;
 import www.ontologyutils.normalization.NormalizationTools;
 import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.Utils.ReasonerName;
 
 /**
  * @author nico
@@ -176,6 +179,31 @@ public class AppBlendingDialogue {
 
 	/**
 	 * @param agent
+	 * @param concept
+	 * @param ontology
+	 * @return an estimation of the "happiness" with {@code ontology} of
+	 *         {@code agent} defining concept {@code concept}.
+	 */
+	private static double happinessTolerant(OWLOntology agent, OWLClassExpression concept, OWLOntology ontology) {
+		Set<OWLAxiom> axiomsAllInf = Utils.inferredTaxonomyAxioms(agent);
+		Set<OWLAxiom> axioms = new HashSet<>();
+		for (OWLAxiom a : axiomsAllInf) {
+			if (concept.equals(((OWLSubClassOfAxiom) a).getSubClass())
+					|| concept.equals(((OWLSubClassOfAxiom) a).getSuperClass())) {
+				axioms.add(a);
+			}
+		}
+
+		System.out.println(axioms.size() + "Axioms For Happiness:  " + axioms);
+		OWLReasoner reasoner = Utils.getReasoner(ontology);
+		long countSatisfiedAxioms = axioms.stream().filter(a -> reasoner.isEntailed(a)).count();
+
+		reasoner.dispose();
+		return (double) countSatisfiedAxioms / axioms.size();
+	}
+
+	/**
+	 * @param agent
 	 * @param ontology
 	 * @return an estimation of the "happiness" of ontology {@code agent} with
 	 *         ontology {@code two}. The ratio of the number of axioms and inferred
@@ -283,18 +311,25 @@ public class AppBlendingDialogue {
 	/**
 	 * @param ontology
 	 * @param concept
-	 * @return the set of subconcepts in ontology {@code ontology} that are included
-	 *         in or include the concept {@code concept}.
+	 * @param notHere
+	 * @return the set of subconcepts in ontology {@code ontology}, not in
+	 *         {@code notHere}, that are included in or include the concept
+	 *         {@code concept}.
 	 */
-	private static Set<OWLClassExpression> computeAscendanstDescendants(OWLOntology ontology,
-			OWLClassExpression concept) {
+	private static Set<OWLClassExpression> computeSpecificAscendanstDescendants(OWLOntology ontology,
+			OWLClassExpression concept, OWLOntology notHere) {
 
 		OWLReasoner reasoner = Utils.getReasoner(ontology);
 		OWLSubClassOfAxiom scoa;
 
 		Set<OWLClassExpression> oces = new HashSet<OWLClassExpression>();
 
+		Set<OWLClassExpression> notThose = Utils.getSubClasses(notHere);
+
 		for (OWLClassExpression ce : Utils.getSubClasses(ontology)) {
+			if (notThose.contains(ce)) {
+				continue;
+			}
 			scoa = new OWLSubClassOfAxiomImpl(concept, ce, Utils.EMPTY_ANNOTATION);
 			if (reasoner.isEntailed(scoa)) {
 				oces.add(ce);
@@ -334,9 +369,9 @@ public class AppBlendingDialogue {
 			String alignmentsOntologyFilePath, String testOntologyFilePath, String IRI1, String IRI2,
 			String IRITarget) {
 
-		OWLOntology base1 = ontologyOne = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
-		OWLOntology base2 = ontologyTwo = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
-		OWLOntology baseAlignments = ontologyTwo = Utils.newOntologyExcludeNonLogicalAxioms(alignmentsOntologyFilePath);
+		OWLOntology base1 = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
+		OWLOntology base2 = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
+		OWLOntology baseAlignments = Utils.newOntologyExcludeNonLogicalAxioms(alignmentsOntologyFilePath);
 
 		this.initialOntology = Utils.newOntologyExcludeNonLogicalAxioms(initialOntologyFilePath);
 
@@ -363,8 +398,10 @@ public class AppBlendingDialogue {
 		this.conceptTwo = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create(IRI2));
 		this.conceptTarget = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create(IRITarget));
 
-		this.ascendantsDescendantsOne = computeAscendanstDescendants(this.ontologyOne, this.conceptOne);
-		this.ascendantsDescendantsTwo = computeAscendanstDescendants(this.ontologyTwo, this.conceptTwo);
+		this.ascendantsDescendantsOne = computeSpecificAscendanstDescendants(this.ontologyOne, this.conceptOne,
+				this.ontologyTwo);
+		this.ascendantsDescendantsTwo = computeSpecificAscendanstDescendants(this.ontologyTwo, this.conceptTwo,
+				this.ontologyOne);
 	}
 
 	/**
@@ -396,12 +433,15 @@ public class AppBlendingDialogue {
 
 	public static void main(String[] args) {
 
+		Utils.DEFAULT_REASONER = ReasonerName.OPENLLET;
+
 		usage(args);
 
 		AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7]);
 		int numberOfTestRuns = Integer.parseInt(args[8]);
-
+		ArrayList<String> metricsResults = new ArrayList<String>();
+		metricsResults.add("run,hT1  ,hT2  ,hS1  ,hS2  ,hTN1 ,hTN2 ,aT   ,aS   ,aTN  ,hyb  ,numW1,numW2");
 		// Preferences
 		List<OWLAxiom> listAxiomsOne = mApp.ontologyOne.axioms().collect(Collectors.toList());
 		List<OWLAxiom> listAxiomsTwo = mApp.ontologyTwo.axioms().collect(Collectors.toList());
@@ -484,6 +524,8 @@ public class AppBlendingDialogue {
 		double sumAsymmetryStrict = 0.0;
 		double sumAsymmetryTolerantNeg = 0.0;
 		double sumHybridity = 0.0;
+		int sumNumWeakeningsOne = 0;
+		int sumNumWeakeningsTwo = 0;
 
 		List<OWLAxiom> listAxiomsTest = mApp.testOntology.axioms().collect(Collectors.toList());
 		Collections.sort(listAxiomsTest);
@@ -493,11 +535,20 @@ public class AppBlendingDialogue {
 			System.out.println("\n\n*********************** RUN " + (i + 1));
 
 			System.out.println("\n--- Preferences.");
-			System.out.println("(Reminder: How to read them: [rank axiom 1, rank axiom 2, ..., rank axiom last])");
 			Preference preferenceOne = prefFactoryOne.makePreference(randomRanking(prefFactoryOne, initRankingOne));
-			System.out.println("- Preferences agent one: " + preferenceOne);
+			System.out.println("\n- Preferences agent one: ");
+			IntStream.range(0, preferenceOne.getRanking().size()).forEach(j -> {
+				System.out.print("Ax " + String.format("%3d", (j + 1)) + " has rank "
+						+ String.format("%3d", preferenceOne.getRanking().get(j)) + ", ");
+				System.out.print(((j + 1) % 5 == 0) ? "\n" : "");
+			});
 			Preference preferenceTwo = prefFactoryTwo.makePreference(randomRanking(prefFactoryTwo, initRankingTwo));
-			System.out.println("- Preferences agent two: " + preferenceTwo);
+			System.out.println("\n- Preferences agent two: ");
+			IntStream.range(0, preferenceTwo.getRanking().size()).forEach(j -> {
+				System.out.print("Ax " + String.format("%3d", (j + 1)) + " has rank "
+						+ String.format("%3d", preferenceTwo.getRanking().get(j)) + ", ");
+				System.out.print(((j + 1) % 5 == 0) ? "\n" : "");
+			});
 
 			BlendingDialogue bdg = new BlendingDialogue(prefFactoryOne.getAgenda(), preferenceOne,
 					prefFactoryTwo.getAgenda(), preferenceTwo, mApp.initialOntology);
@@ -525,6 +576,19 @@ public class AppBlendingDialogue {
 			double asymmetryTolerantNeg = happinessTolerantNegOne - happinessTolerantNegTwo;
 			double hybridity = hybridity(result, mApp.conceptTarget, mApp.ascendantsDescendantsOne,
 					mApp.ascendantsDescendantsTwo);
+			int numWeakeningsOne = bdg.getNumWeakeningOne();
+			int numWeakeningsTwo = bdg.getNumWeakeningTwo();
+			metricsResults.add(String.format("%03d", (i + 1)) + ","
+					+ String.format(Locale.US, "%.3f", happinessTolerantOne) + ","
+					+ String.format(Locale.US, "%.3f", happinessTolerantTwo) + ","
+					+ String.format(Locale.US, "%.3f", happinessStrictOne) + ","
+					+ String.format(Locale.US, "%.3f", happinessStrictTwo) + ","
+					+ String.format(Locale.US, "%.3f", happinessTolerantNegOne) + ","
+					+ String.format(Locale.US, "%.3f", happinessTolerantNegTwo) + ","
+					+ String.format(Locale.US, "%.3f", asymmetryTolerant) + ","
+					+ String.format(Locale.US, "%.3f", asymmetryStrict) + ","
+					+ String.format(Locale.US, "%.3f", asymmetryTolerantNeg) + ","
+					+ String.format(Locale.US, "%.3f", hybridity) + "," + numWeakeningsOne + "," + numWeakeningsTwo);
 			sumHappinessTolerantOne += happinessTolerantOne;
 			sumHappinessTolerantTwo += happinessTolerantTwo;
 			sumHappinessStrictOne += happinessStrictOne;
@@ -535,6 +599,8 @@ public class AppBlendingDialogue {
 			sumAsymmetryStrict += asymmetryStrict;
 			sumAsymmetryTolerantNeg += asymmetryTolerantNeg;
 			sumHybridity += hybridity;
+			sumNumWeakeningsOne += numWeakeningsOne;
+			sumNumWeakeningsTwo += numWeakeningsTwo;
 			System.out.println("Happiness Tolerant of one: " + happinessTolerantOne);
 			System.out.println("Happiness Tolerant of two: " + happinessTolerantTwo);
 			System.out.println("Happiness Strict of one: " + happinessStrictOne);
@@ -545,6 +611,8 @@ public class AppBlendingDialogue {
 			System.out.println("Asymmetry Strict: " + asymmetryStrict);
 			System.out.println("Asymmetry TolerantNeg: " + asymmetryTolerantNeg);
 			System.out.println("Hybridity: " + hybridity);
+			System.out.println("Number of weakenings one: " + numWeakeningsOne);
+			System.out.println("Number of weakenings two: " + numWeakeningsTwo);
 
 			System.out.println("\n-- TESTS RUN " + (i + 1) + "\n");
 			for (OWLAxiom a : listAxiomsTest) {
@@ -569,6 +637,10 @@ public class AppBlendingDialogue {
 		// SUMMARY
 		System.out.println("\n-- SUMMARY");
 
+		for (String res : metricsResults) {
+			System.out.println(res);
+		}
+
 		System.out.println("Average Happiness Tolerant of one: " + sumHappinessTolerantOne / numberOfTestRuns);
 		System.out.println("Average Happiness Tolerant of two: " + sumHappinessTolerantTwo / numberOfTestRuns);
 		System.out.println("Average Happiness Strict of one: " + sumHappinessStrictOne / numberOfTestRuns);
@@ -579,6 +651,9 @@ public class AppBlendingDialogue {
 		System.out.println("Average Asymmetry Strict: " + sumAsymmetryStrict / numberOfTestRuns);
 		System.out.println("Average Asymmetry TolerantNeg: " + sumAsymmetryTolerantNeg / numberOfTestRuns);
 		System.out.println("Average Hybrididty: " + sumHybridity / numberOfTestRuns);
+		System.out.println("Average number of weakenings of one: " + sumNumWeakeningsOne / numberOfTestRuns);
+		System.out.println("Average number of weakenings of two: " + sumNumWeakeningsTwo / numberOfTestRuns);
+
 		System.out.println("(\"Happiness Tolerant\" of an agent with the result is estimated as "
 				+ "the ratio of the number of axioms and inferred taxonomy axioms "
 				+ "in the ontology of the agent that are inferred by the result ontology.)");
