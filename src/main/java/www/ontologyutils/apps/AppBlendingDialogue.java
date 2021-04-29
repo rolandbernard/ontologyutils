@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -125,7 +124,7 @@ public class AppBlendingDialogue {
 	}
 
 	private static <A> void removeDuplicates(List<A> list) {
-		Set<A> s = new LinkedHashSet<A>(list);
+		Set<A> s = new HashSet<A>(list);
 		list.clear();
 		list.addAll(s);
 	}
