@@ -19,6 +19,8 @@ import www.ontologyutils.toolbox.Utils;
  */
 public class BlendingDialogue {
 
+	public static int NO_TURN_LIMIT = -1;
+
 	private List<OWLAxiom> aone;
 	private List<OWLAxiom> atwo;
 	private Preference pone;
@@ -107,7 +109,14 @@ public class BlendingDialogue {
 	 *                           in the blending dialogue.
 	 * @return a consistent ontology resulting from the dialogue.
 	 */
-	public OWLOntology get(double probabilityTurnOne) {
+	/**
+	 * @param probabilityTurnOne the probability of the first ontology to take turn
+	 *                           in the blending dialogue.
+	 * @param maxTurns           number of maximum turns of dialogue. Use
+	 *                           {@link NO_TURN_LIMIT} for no limits.
+	 * @return a consistent ontology resulting from the dialogue.
+	 */
+	public OWLOntology get(double probabilityTurnOne, int maxTurns) {
 
 		this.numWeakeningOne = 0;
 		this.numWeakeningTwo = 0;
@@ -120,21 +129,24 @@ public class BlendingDialogue {
 		boolean hasFinishedOne = false;
 		boolean hasFinishedTwo = false;
 
-		int turn;
+		int numTurns = 0; // turns so far
+		int turnAgent; // will contain 1 or 2, referring to the agent whose turn it is
 
 		while (!hasFinishedOne || !hasFinishedTwo) {
+			if (maxTurns != NO_TURN_LIMIT && ++numTurns > maxTurns)
+				break;
 
 			if (hasFinishedOne) {
-				turn = 2;
+				turnAgent = 2;
 			} else if (hasFinishedTwo) {
-				turn = 1;
+				turnAgent = 1;
 			} else {
-				turn = (ThreadLocalRandom.current().nextDouble() <= probabilityTurnOne) ? 1 : 2;
+				turnAgent = (ThreadLocalRandom.current().nextDouble() <= probabilityTurnOne) ? 1 : 2;
 			}
-			log("\nTurn: " + turn);
+			log("\nTurn: " + turnAgent);
 
 			OWLAxiom consideredAxiom = null;
-			if (turn == 1) {
+			if (turnAgent == 1) {
 				consideredAxiom = favorite(remainone, this.pone, result);
 				if (consideredAxiom == null) {
 					log("\nAll axioms considered or already entailed.");
@@ -143,7 +155,7 @@ public class BlendingDialogue {
 				}
 				remainone.remove(consideredAxiom);
 			} else {
-				assert (turn == 2);
+				assert (turnAgent == 2);
 				consideredAxiom = favorite(remaintwo, this.ptwo, result);
 				if (consideredAxiom == null) {
 					log("\nAll axioms considered or already entailed.");
@@ -156,7 +168,7 @@ public class BlendingDialogue {
 			result.add(consideredAxiom);
 			while (!Utils.isConsistent(result)) {
 				log("\n** Weakening. **");
-				if (turn == 1) {
+				if (turnAgent == 1) {
 					numWeakeningOne++;
 				} else {
 					numWeakeningTwo++;
@@ -174,7 +186,15 @@ public class BlendingDialogue {
 		}
 
 		return result;
+	}
 
+	/**
+	 * @param probabilityTurnOne the probability of the first ontology to take turn
+	 *                           in the blending dialogue.
+	 * @return a consistent ontology resulting from the dialogue.
+	 */
+	public OWLOntology get(double probabilityTurnOne) {
+		return this.get(probabilityTurnOne, NO_TURN_LIMIT);
 	}
 
 }

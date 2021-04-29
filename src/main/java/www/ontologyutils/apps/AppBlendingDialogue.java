@@ -505,6 +505,7 @@ public class AppBlendingDialogue {
 
 		int importanceOne = readNumber("Importance of agent one?", 1, 101);
 		int importanceTwo = readNumber("Importance of agent two?", 1, 101);
+		int maxTurns = readNumber("Maximum number of turns?", 1, 100000);
 
 		// deciding the probability of each agent to take turn in the dialogue
 		int infoInOne = quantifyInformation(Utils.newOntology(prefFactoryOne.getAgenda().stream()));
@@ -553,7 +554,7 @@ public class AppBlendingDialogue {
 			BlendingDialogue bdg = new BlendingDialogue(prefFactoryOne.getAgenda(), preferenceOne,
 					prefFactoryTwo.getAgenda(), preferenceTwo, mApp.initialOntology);
 
-			OWLOntology result = bdg.setVerbose(true).get(probabilityTurnOne);
+			OWLOntology result = bdg.setVerbose(true).get(probabilityTurnOne, maxTurns);
 
 			System.out.println("\n--- RESULT ONTOLOGY\n");
 			result.axioms().forEach(a -> System.out.println("- " + Utils.prettyPrintAxiom(a)));
