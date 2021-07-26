@@ -500,7 +500,7 @@ ClassAssertion(ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <a
 
 # App example: AppBlendingDialogue #
 
-This app showcases the technique of asymmetric dialogical concept hybridisations.
+This app showcases the technique of asymmetric dialogical concept hybridisations, presented in Guendalina Righetti, Daniele Porello, Nicolas Troquard, Oliver Kutz, Maria M. Hedblom, Pietro Galliani. Asymmetric Hybrids: Dialogues for Computational Concept Combination. 12th International Conference on Formal Ontology in Information Systems (FOIS 2021). IOS Press.
 
 
 # App example: AppMakeInconsistent #

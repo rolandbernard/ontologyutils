@@ -14,7 +14,11 @@ import www.ontologyutils.refinement.AxiomWeakener;
 import www.ontologyutils.toolbox.Utils;
 
 /**
- * @author nico
+ * 
+ * Guendalina Righetti, Daniele Porello, Nicolas Troquard, Oliver Kutz, Maria M.
+ * Hedblom, Pietro Galliani. Asymmetric Hybrids: Dialogues for Computational
+ * Concept Combination. 12th International Conference on Formal Ontology in
+ * Information Systems (FOIS 2021). IOS Press.
  *
  */
 public class BlendingDialogue {

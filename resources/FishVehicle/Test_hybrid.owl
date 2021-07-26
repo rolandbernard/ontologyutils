@@ -229,6 +229,7 @@
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#GrassCarp"/>
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#NonLivingTransport"/>
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Shark"/>
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle"/>
         <rdfs:subClassOf>
             <owl:Class>
                 <owl:intersectionOf rdf:parseType="Collection">
@@ -343,7 +344,19 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#goesOn"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Air"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#goesOn"/>
                 <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Ground"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#goesOn"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Water"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -358,6 +371,12 @@
                         </owl:unionOf>
                     </owl:Class>
                 </owl:someValuesFrom>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#hasBodyPart"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#BodyPart"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -382,6 +401,18 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#hasBodyPart"/>
                 <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Scale"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#hasBodyPart"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#VehiclePart"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#hasComponent"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#BodyPart"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -428,6 +459,12 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#hasComponent"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Wing"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#hasFeature"/>
                 <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#SlipperySurface"/>
             </owl:Restriction>
@@ -440,8 +477,20 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#isMotivatedBy"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Human"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lays"/>
                 <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Egg"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#lays"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Metal"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -578,6 +627,12 @@
     <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#SteeringWheel -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#SteeringWheel"/>
+    
+
+
+    <!-- http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Vehicle"/>
     
 
 

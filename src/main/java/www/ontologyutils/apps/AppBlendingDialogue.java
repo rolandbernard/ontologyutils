@@ -42,32 +42,39 @@ import www.ontologyutils.toolbox.Utils;
 import www.ontologyutils.toolbox.Utils.ReasonerName;
 
 /**
- * @author nico
- *
- *         App to experiment with
- *         www.ontologyutils.collective.blending.BlendingDialogue to make
- *         asymmetric hybrids dialogues.
- *
- *         One must specify two ontologies for both agents in the dialogue, an
- *         initial ontology, an alignment ontology, and an ontology containing
- *         axioms whose entailment will be checked after a run. Each one can be
- *         an empty ontology.
- *
- *         The app allows the user to specify preferences even partially
- *         (specify the highest-ranked axioms and let the computer choose the
- *         others at random at each run), and to run a specified number of
- *         experiments with the same settings.
  * 
+ * <p>
+ * App to experiment with www.ontologyutils.collective.blending.BlendingDialogue
+ * to make asymmetric hybrids dialogues. See: <br>
+ * Guendalina Righetti, Daniele Porello, Nicolas Troquard, Oliver Kutz, Maria M.
+ * Hedblom, Pietro Galliani. Asymmetric Hybrids: Dialogues for Computational
+ * Concept Combination. 12th International Conference on Formal Ontology in
+ * Information Systems (FOIS 2021). IOS Press.
+ * </p>
+ * <p>
+ * One must specify two ontologies for both agents in the dialogue, an initial
+ * ontology, an alignment ontology, and an ontology containing axioms whose
+ * entailment will be checked after a run. Each one can be an empty ontology.
+ * <br>
+ * The app allows the user to specify preferences even partially (specify the
+ * highest-ranked axioms and let the computer choose the others at random at
+ * each run), and to run a specified number of experiments with the same
+ * settings. <br>
+ * Optionally, -o <FileName.owl> can be used at the end of the command to save
+ * each run numbered N, into an owl file of the form <N_FileName.owl>.
+ * </p>
  * 
- *         E.g., run with parameters ./resources/FishVehicle/Vehicle.owl
- *         ./resources/FishVehicle/Fish.owl
- *         ./resources/FishVehicle/InitialOntology.owl
- *         ./resources/FishVehicle/Alignment.owl
- *         ./resources/FishVehicle/Test_hybrid.owl
- *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle
- *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish
- *         http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle 15
- *         -o Result.owl
+ * <p>
+ * E.g., run with parameters ./resources/FishVehicle/Vehicle.owl
+ * ./resources/FishVehicle/Fish.owl ./resources/FishVehicle/InitialOntology.owl
+ * ./resources/FishVehicle/Disalignment.owl
+ * ./resources/FishVehicle/Test_hybrid.owl
+ * http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle
+ * http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish
+ * http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle 15 -o
+ * Result.owl
+ * </p>
+ * 
  */
 public class AppBlendingDialogue {
 

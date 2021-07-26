@@ -42,7 +42,7 @@
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#hasComponent">
         <rdfs:domain rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Artefact"/>
-        <rdfs:range rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#VehiclePart"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/guenda/ontologies/2020/2/fv#Artefact"/>
     </owl:ObjectProperty>
     
 
