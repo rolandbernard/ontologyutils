@@ -72,8 +72,9 @@ public class OntologyRepairWeakening implements OntologyRepair {
 			} else if (badAxiom.isOfType(AxiomType.CLASS_ASSERTION)) {
 				weakerAxioms = aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) badAxiom);
 			} else {
-				throw new RuntimeException("Cannot weaken axiom that is neither a subclass nor an assertion axiom. "
-						+ "Could not repair the ontology.");
+				throw new RuntimeException(
+						"Cannot weaken axiom that is neither a subclass nor a class assertion axiom. "
+								+ "Could not repair the ontology.");
 			}
 			// we remove the bad axiom and add one of its weakenings
 			axioms.remove(badAxiom);
