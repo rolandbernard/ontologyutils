@@ -1,11 +1,9 @@
 package www.ontologyutils.refinement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
-import www.ontologyutils.toolbox.Utils;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -14,7 +12,49 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
+import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
+import www.ontologyutils.toolbox.Utils;
+
 public class Covers {
+
+	private static Boolean CACHE = true;
+
+	private static int UPCOVER_CACHE_SIZE = 1024;
+	private static int DOWNCOVER_CACHE_SIZE = 1024;
+
+	/**
+	 * A naive cache for upcovers and downcovers of class expressions.
+	 *
+	 */
+	private class Cache {
+
+		private HashMap<OWLClassExpression, Set<OWLClassExpression>> upCoverCache = new HashMap<>();
+		private HashMap<OWLClassExpression, Set<OWLClassExpression>> downCoverCache = new HashMap<>();
+
+		Set<OWLClassExpression> upCoverGet(OWLClassExpression e) {
+			return upCoverCache.get(e);
+		}
+
+		Set<OWLClassExpression> downCoverGet(OWLClassExpression e) {
+			return downCoverCache.get(e);
+		}
+
+		void upCoverAdd(OWLClassExpression e, Set<OWLClassExpression> upCover) {
+			if (upCoverCache.size() >= UPCOVER_CACHE_SIZE) {
+				upCoverCache.clear();
+			}
+			upCoverCache.put(e, upCover);
+		}
+
+		void basicDownCoverAdd(OWLClassExpression e, Set<OWLClassExpression> downCover) {
+			if (downCoverCache.size() >= DOWNCOVER_CACHE_SIZE) {
+				downCoverCache.clear();
+			}
+			downCoverCache.put(e, downCover);
+		}
+	}
+
+	Cache cache;
 
 	private OWLReasoner reasoner;
 	private OWLOntology ontology;
@@ -28,6 +68,7 @@ public class Covers {
 	 * @param reasoner
 	 */
 	private Covers(OWLReasoner reasoner) {
+		cache = new Cache();
 		this.ontology = reasoner.getRootOntology();
 		this.reasoner = reasoner;
 
@@ -53,14 +94,32 @@ public class Covers {
 	 * @param concept
 	 */
 	protected Set<OWLClassExpression> getUpCover(OWLClassExpression concept) {
-		return subConcepts.stream().parallel().filter(c -> inUpCover(concept, c)).collect(Collectors.toSet());
+		if (!CACHE) {
+			return subConcepts.stream().parallel().filter(c -> inUpCover(concept, c)).collect(Collectors.toSet());
+		}
+		Set<OWLClassExpression> upCover = cache.upCoverGet(concept);
+		if (upCover != null) {
+			return upCover;
+		}
+		upCover = subConcepts.stream().parallel().filter(c -> inUpCover(concept, c)).collect(Collectors.toSet());
+		cache.upCoverAdd(concept, upCover);
+		return upCover;
 	}
 
 	/**
 	 * @param concept
 	 */
 	protected Set<OWLClassExpression> getDownCover(OWLClassExpression concept) {
-		return subConcepts.stream().parallel().filter(c -> inDownCover(concept, c)).collect(Collectors.toSet());
+		if (!CACHE) {
+			return subConcepts.stream().parallel().filter(c -> inDownCover(concept, c)).collect(Collectors.toSet());
+		}
+		Set<OWLClassExpression> downCover = cache.downCoverGet(concept);
+		if (downCover != null) {
+			return downCover;
+		}
+		downCover = subConcepts.stream().parallel().filter(c -> inDownCover(concept, c)).collect(Collectors.toSet());
+		cache.basicDownCoverAdd(concept, downCover);
+		return downCover;
 	}
 
 	/**

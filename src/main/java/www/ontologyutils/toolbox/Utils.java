@@ -43,21 +43,36 @@ import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
  */
 public class Utils {
 
+	private static Boolean CACHE = true;
+
+	private static int AXIOM_SET_CONSISTENCY_CACHE_SIZE = 1024;
+
 	private static long IRI_ID = 0;
 
-	private static int UGLY_AXIOM_SET_CONSISTENCY_CACHE_SIZE = 1024;
+	/**
+	 * A naive cache for consistency checks of sets of axioms.
+	 *
+	 */
+	private static class Cache {
 
-	private static HashMap<Set<OWLAxiom>, Boolean> uglyAxiomSetConsistencyCache = new HashMap<>();
+		private static HashMap<Set<OWLAxiom>, Boolean> axiomSetConsistencyCache = new HashMap<>();
 
-	private static Boolean uglyAxiomSetConsistencyCheck(Set<OWLAxiom> axioms) {
-		return uglyAxiomSetConsistencyCache.get(axioms);
-	}
-
-	private static void uglyAxiomsSetConsistencyAdd(Set<OWLAxiom> axioms, Boolean consistency) {
-		if (uglyAxiomSetConsistencyCache.size() >= UGLY_AXIOM_SET_CONSISTENCY_CACHE_SIZE) {
-			uglyAxiomSetConsistencyCache.clear();
+		private static Boolean axiomSetConsistencyCheck(Set<OWLAxiom> axioms) {
+			if (CACHE) {
+				return axiomSetConsistencyCache.get(axioms);
+			} else {
+				return null;
+			}
 		}
-		uglyAxiomSetConsistencyCache.put(Collections.unmodifiableSet(axioms), consistency);
+
+		private static void axiomsSetConsistencyAdd(Set<OWLAxiom> axioms, Boolean consistency) {
+			if (CACHE) {
+				if (axiomSetConsistencyCache.size() >= AXIOM_SET_CONSISTENCY_CACHE_SIZE) {
+					axiomSetConsistencyCache.clear();
+				}
+				axiomSetConsistencyCache.put(Collections.unmodifiableSet(axioms), consistency);
+			}
+		}
 	}
 
 	public static void log(String tag, String message) {
@@ -249,7 +264,7 @@ public class Utils {
 	 */
 	public static boolean isConsistent(OWLOntology ontology, ReasonerName reasonerName) {
 		Set<OWLAxiom> axioms = ontology.axioms().collect(Collectors.toSet());
-		Boolean consistency = uglyAxiomSetConsistencyCheck(axioms);
+		Boolean consistency = Cache.axiomSetConsistencyCheck(axioms);
 		if (consistency != null) {
 			return consistency;
 		}
@@ -270,7 +285,7 @@ public class Utils {
 		consistency = reasoner.isConsistent();
 		reasoner.dispose();
 
-		uglyAxiomsSetConsistencyAdd(Collections.unmodifiableSet(axioms), consistency);
+		Cache.axiomsSetConsistencyAdd(Collections.unmodifiableSet(axioms), consistency);
 		return consistency;
 	}
 
@@ -279,7 +294,7 @@ public class Utils {
 	 * @return
 	 */
 	public static boolean isConsistent(Set<OWLAxiom> axioms) {
-		Boolean consistency = uglyAxiomSetConsistencyCache.get(axioms);
+		Boolean consistency = Cache.axiomSetConsistencyCache.get(axioms);
 		if (consistency != null) {
 			return consistency;
 		}
