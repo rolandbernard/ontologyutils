@@ -2,6 +2,7 @@ package www.ontologyutils.refinement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,13 +24,16 @@ public class Covers {
 	private static int DOWNCOVER_CACHE_SIZE = 1024;
 
 	/**
-	 * A naive cache for upcovers and downcovers of class expressions.
+	 * A naive FIFO cache for upcovers and downcovers of class expressions.
 	 *
 	 */
 	private class Cache {
 
 		private HashMap<OWLClassExpression, Set<OWLClassExpression>> upCoverCache = new HashMap<>();
 		private HashMap<OWLClassExpression, Set<OWLClassExpression>> downCoverCache = new HashMap<>();
+		
+		private LinkedList<OWLClassExpression> contentUpCoverCache = new LinkedList<>();
+		private LinkedList<OWLClassExpression> contentDownCoverCache = new LinkedList<>();
 
 		Set<OWLClassExpression> upCoverGet(OWLClassExpression e) {
 			return upCoverCache.get(e);
@@ -41,14 +45,17 @@ public class Covers {
 
 		void upCoverAdd(OWLClassExpression e, Set<OWLClassExpression> upCover) {
 			if (upCoverCache.size() >= UPCOVER_CACHE_SIZE) {
-				upCoverCache.clear();
+				OWLClassExpression c = contentUpCoverCache.removeFirst();
+				upCoverCache.remove(c);
 			}
 			upCoverCache.put(e, upCover);
+			contentUpCoverCache.addLast(e);
 		}
 
 		void basicDownCoverAdd(OWLClassExpression e, Set<OWLClassExpression> downCover) {
 			if (downCoverCache.size() >= DOWNCOVER_CACHE_SIZE) {
-				downCoverCache.clear();
+				OWLClassExpression c = contentDownCoverCache.removeFirst();
+				downCoverCache.remove(c);
 			}
 			downCoverCache.put(e, downCover);
 		}

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,12 +51,14 @@ public class Utils {
 	private static long IRI_ID = 0;
 
 	/**
-	 * A naive cache for consistency checks of sets of axioms.
+	 * A naive FIFO cache for consistency checks of sets of axioms.
 	 *
 	 */
 	private static class Cache {
 
 		private static HashMap<Set<OWLAxiom>, Boolean> axiomSetConsistencyCache = new HashMap<>();
+
+		private static LinkedList<Set<OWLAxiom>> contentAxiomSetConsistencyCache = new LinkedList<>();
 
 		private static Boolean axiomSetConsistencyCheck(Set<OWLAxiom> axioms) {
 			if (CACHE) {
@@ -68,9 +71,13 @@ public class Utils {
 		private static void axiomsSetConsistencyAdd(Set<OWLAxiom> axioms, Boolean consistency) {
 			if (CACHE) {
 				if (axiomSetConsistencyCache.size() >= AXIOM_SET_CONSISTENCY_CACHE_SIZE) {
+					Set<OWLAxiom> s = contentAxiomSetConsistencyCache.removeFirst();
+					contentAxiomSetConsistencyCache.remove(s);
 					axiomSetConsistencyCache.clear();
 				}
-				axiomSetConsistencyCache.put(Collections.unmodifiableSet(axioms), consistency);
+				Set<OWLAxiom> s = Collections.unmodifiableSet(axioms);
+				axiomSetConsistencyCache.put(s, consistency);
+				contentAxiomSetConsistencyCache.addLast(s);
 			}
 		}
 	}
