@@ -1,0 +1,328 @@
+Prefix: : <http://example.org/C50_R10_0.001_0.001_0.001_62888.owl#>
+Prefix: owl: <http://www.w3.org/2002/07/owl#>
+Ontology: <http://example.org/C50_R10_0.001_0.001_0.001_62888.owl>
+
+Individual: :indCtxknrh
+  Types: :Ctxknrh
+Individual: :indCydmngb
+  Types: :Cydmngb
+Individual: :indCfrwqod
+  Types: :Cfrwqod
+Individual: :indCmepxhh
+  Types: :Cmepxhh
+Individual: :indCnpfhkp
+  Types: :Cnpfhkp
+Individual: :indCjskhfv
+  Types: :Cjskhfv
+Individual: :indCdguplx
+  Types: :Cdguplx
+Individual: :indCzilcqw
+  Types: :Czilcqw
+Individual: :indCcqdivk
+  Types: :Ccqdivk
+Individual: :indCjiingb
+  Types: :Cjiingb
+Individual: :indCgqlhmt
+  Types: :Cgqlhmt
+Individual: :indCuzwewc
+  Types: :Cuzwewc
+Individual: :indCdxifxu
+  Types: :Cdxifxu
+Individual: :indCsmpjex
+  Types: :Csmpjex
+Individual: :indCuduwfp
+  Types: :Cuduwfp
+Individual: :indCqjrzsf
+  Types: :Cqjrzsf
+Individual: :indCtddfjk
+  Types: :Ctddfjk
+Individual: :indCfrhkww
+  Types: :Cfrhkww
+Individual: :indCyzjeke
+  Types: :Cyzjeke
+Individual: :indCkdtihl
+  Types: :Ckdtihl
+Individual: :indCydjkbm
+  Types: :Cydjkbm
+Individual: :indCbckfeg
+  Types: :Cbckfeg
+Individual: :indCypmspl
+  Types: :Cypmspl
+Individual: :indCukevfl
+  Types: :Cukevfl
+Individual: :indCcnbqpj
+  Types: :Ccnbqpj
+Individual: :indCaxygte
+  Types: :Caxygte
+Individual: :indCirhabp
+  Types: :Cirhabp
+Individual: :indCglwpnw
+  Types: :Cglwpnw
+Individual: :indCutdhww
+  Types: :Cutdhww
+Individual: :indCktpkvd
+  Types: :Cktpkvd
+Individual: :indCnrenlp
+  Types: :Cnrenlp
+Individual: :indCgigiag
+  Types: :Cgigiag
+Individual: :indCyqsndb
+  Types: :Cyqsndb
+Individual: :indCjqbwio
+  Types: :Cjqbwio
+Individual: :indCamzyuc
+  Types: :Camzyuc
+Individual: :indCriujtd
+  Types: :Criujtd
+Individual: :indCadrgkv
+  Types: :Cadrgkv
+Individual: :indCwsydlr
+  Types: :Cwsydlr
+Individual: :indClrptcd
+  Types: :Clrptcd
+Individual: :indCfbnunv
+  Types: :Cfbnunv
+Individual: :indCxgppnc
+  Types: :Cxgppnc
+Individual: :indCfckmnn
+  Types: :Cfckmnn
+Individual: :indCllvdus
+  Types: :Cllvdus
+Individual: :indCxzarmy
+  Types: :Cxzarmy
+Individual: :indCzkirmi
+  Types: :Czkirmi
+Individual: :indCxvmhph
+  Types: :Cxvmhph
+Individual: :indCvwzmig
+  Types: :Cvwzmig
+Individual: :indCorcnrf
+  Types: :Corcnrf
+Individual: :indCetgnqt
+  Types: :Cetgnqt
+Individual: :indCohpsit
+  Types: :Cohpsit
+ObjectProperty: :Rwnaqj
+ObjectProperty: :Rbplsm
+ObjectProperty: :Ruetxi
+ObjectProperty: :Rvscww
+ObjectProperty: :Rhmoof
+ObjectProperty: :Reejmn
+ObjectProperty: :Rmyshg
+ObjectProperty: :Rwgbfj
+ObjectProperty: :Rcoapk
+ObjectProperty: :Rxmynm
+Class: :Ctxknrh
+  SubClassOf:
+    not (:Rhmoof some :Ctddfjk),
+    (:Reejmn some :Cyzjeke),
+    owl:Thing
+Class: :Cydmngb
+  SubClassOf:
+    not :Ctddfjk,
+    not :Cfbnunv,
+    owl:Thing
+Class: :Cfrwqod
+  SubClassOf:
+    (:Rbplsm some :Corcnrf),
+    not (:Rbplsm some :Cohpsit),
+    (:Ruetxi some :Ctxknrh),
+    not (:Rhmoof some :Ctxknrh),
+    owl:Thing
+Class: :Cmepxhh
+  SubClassOf:
+    (:Rvscww some :Cxzarmy),
+    not (:Rvscww some :Cllvdus),
+    owl:Thing
+Class: :Cnpfhkp
+  SubClassOf:
+    not (:Rcoapk some :Cfrhkww),
+    owl:Thing
+Class: :Cjskhfv
+  SubClassOf:
+    owl:Thing
+Class: :Cdguplx
+  SubClassOf:
+    (:Rmyshg some :Ctddfjk),
+    owl:Thing
+Class: :Czilcqw
+  SubClassOf:
+    not (:Rwgbfj some :Cuzwewc),
+    (:Rxmynm some :Cfrwqod),
+    owl:Thing
+Class: :Ccqdivk
+  SubClassOf:
+    :Cfrwqod,
+    not (:Rvscww some :Cyqsndb),
+    not (:Rwgbfj some :Cktpkvd),
+    (:Rcoapk some :Cydjkbm),
+    owl:Thing
+Class: :Cjiingb
+  SubClassOf:
+    (:Rbplsm some :Czilcqw),
+    (:Rbplsm some :Cypmspl),
+    (:Rcoapk some :Cgigiag),
+    owl:Thing
+Class: :Cgqlhmt
+  SubClassOf:
+    (:Rxmynm some :Cnrenlp),
+    owl:Thing
+Class: :Cuzwewc
+  SubClassOf:
+    (:Rwnaqj some :Cdguplx),
+    owl:Thing
+Class: :Cdxifxu
+  SubClassOf:
+    not (:Rmyshg some :Cukevfl),
+    owl:Thing
+Class: :Csmpjex
+  SubClassOf:
+    not (:Ruetxi some :Cadrgkv),
+    owl:Thing
+Class: :Cuduwfp
+  SubClassOf:
+    owl:Thing
+Class: :Cqjrzsf
+  SubClassOf:
+    (:Rvscww some :Camzyuc),
+    owl:Thing
+Class: :Ctddfjk
+  SubClassOf:
+    not (:Rhmoof some :Cadrgkv),
+    owl:Thing
+Class: :Cfrhkww
+  SubClassOf:
+    (:Rwnaqj some :Corcnrf),
+    (:Rhmoof some :Cxvmhph),
+    owl:Thing
+Class: :Cyzjeke
+  SubClassOf:
+    owl:Thing
+Class: :Ckdtihl
+  SubClassOf:
+    owl:Thing
+Class: :Cydjkbm
+  SubClassOf:
+    owl:Thing
+Class: :Cbckfeg
+  SubClassOf:
+    (:Rvscww some :Cnpfhkp),
+    (:Rxmynm some :Cjiingb),
+    (:Rxmynm some :Cyqsndb),
+    owl:Thing
+Class: :Cypmspl
+  SubClassOf:
+    not :Cllvdus,
+    (:Rcoapk some :Cgqlhmt),
+    owl:Thing
+Class: :Cukevfl
+  SubClassOf:
+    not (:Rwnaqj some :Czilcqw),
+    not (:Ruetxi some :Cwsydlr),
+    owl:Thing
+Class: :Ccnbqpj
+  SubClassOf:
+    owl:Thing
+Class: :Caxygte
+  SubClassOf:
+    (:Rcoapk some :Criujtd),
+    (:Rcoapk some :Cetgnqt),
+    owl:Thing
+Class: :Cirhabp
+  SubClassOf:
+    (:Reejmn some :Cydjkbm),
+    not (:Reejmn some :Cvwzmig),
+    not (:Rmyshg some :Cyqsndb),
+    (:Rcoapk some :Cjqbwio),
+    not (:Rcoapk some :Cqjrzsf),
+    owl:Thing
+Class: :Cglwpnw
+  SubClassOf:
+    (:Rxmynm some :Cxvmhph),
+    owl:Thing
+Class: :Cutdhww
+  SubClassOf:
+    owl:Thing
+Class: :Cktpkvd
+  SubClassOf:
+    not (:Rhmoof some :Ckdtihl),
+    owl:Thing
+Class: :Cnrenlp
+  SubClassOf:
+    not (:Rhmoof some :Cllvdus),
+    owl:Thing
+Class: :Cgigiag
+  SubClassOf:
+    owl:Thing
+Class: :Cyqsndb
+  SubClassOf:
+    owl:Thing
+Class: :Cjqbwio
+  SubClassOf:
+    owl:Thing
+Class: :Camzyuc
+  SubClassOf:
+    (:Rbplsm some :Cgigiag),
+    owl:Thing
+Class: :Criujtd
+  SubClassOf:
+    not (:Ruetxi some :Cdxifxu),
+    (:Rhmoof some :Cktpkvd),
+    (:Rmyshg some :Czkirmi),
+    owl:Thing
+Class: :Cadrgkv
+  SubClassOf:
+    not (:Rhmoof some :Ctxknrh),
+    owl:Thing
+Class: :Cwsydlr
+  SubClassOf:
+    owl:Thing
+Class: :Clrptcd
+  SubClassOf:
+    owl:Thing
+Class: :Cfbnunv
+  SubClassOf:
+    owl:Thing
+Class: :Cxgppnc
+  SubClassOf:
+    not (:Rwnaqj some :Cktpkvd),
+    owl:Thing
+Class: :Cfckmnn
+  SubClassOf:
+    not (:Rcoapk some :Cdxifxu),
+    not (:Rxmynm some :Cjqbwio),
+    owl:Thing
+Class: :Cllvdus
+  SubClassOf:
+    not (:Rvscww some :Cbckfeg),
+    (:Rxmynm some :Cgigiag),
+    owl:Thing
+Class: :Cxzarmy
+  SubClassOf:
+    (:Rmyshg some :Criujtd),
+    owl:Thing
+Class: :Czkirmi
+  SubClassOf:
+    owl:Thing
+Class: :Cxvmhph
+  SubClassOf:
+    (:Rxmynm some :Cgigiag),
+    not (:Rxmynm some :Cjiingb),
+    not (:Rxmynm some :Cyzjeke),
+    owl:Thing
+Class: :Cvwzmig
+  SubClassOf:
+    (:Rxmynm some :Czkirmi),
+    owl:Thing
+Class: :Corcnrf
+  SubClassOf:
+    not :Czilcqw,
+    owl:Thing
+Class: :Cetgnqt
+  SubClassOf:
+    not (:Ruetxi some :Cetgnqt),
+    owl:Thing
+Class: :Cohpsit
+  SubClassOf:
+    not (:Rwnaqj some :Ccqdivk),
+    owl:Thing
