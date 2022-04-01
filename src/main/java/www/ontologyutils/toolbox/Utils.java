@@ -376,7 +376,7 @@ public class Utils {
 	 *         in {@code ontology}.
 	 */
 	public static boolean areEquivalent(OWLClassExpression c1, OWLClassExpression c2, OWLOntology ontology) {
-		OWLAxiom equiv = new OWLEquivalentClassesAxiomImpl(new HashSet<>(Arrays.asList(c1, c2)), new HashSet<>());
+		OWLAxiom equiv = new OWLEquivalentClassesAxiomImpl(Arrays.asList(c1, c2), new HashSet<>());
 		return isEntailed(ontology, equiv);
 	}
 
