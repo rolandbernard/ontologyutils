@@ -452,13 +452,13 @@ public class AppBlendingDialogue {
 		List<OWLAxiom> listAxiomsOne = mApp.ontologyOne.axioms().collect(Collectors.toList());
 		List<OWLAxiom> listAxiomsTwo = mApp.ontologyTwo.axioms().collect(Collectors.toList());
 		List<OWLAxiom> listAxiomsAlignments = mApp.alignmentOntology.axioms().collect(Collectors.toList());
-		Collections.sort(listAxiomsOne);
-		Collections.sort(listAxiomsTwo);
-		Collections.sort(listAxiomsAlignments);
 		listAxiomsOne.addAll(listAxiomsAlignments);
 		listAxiomsTwo.addAll(listAxiomsAlignments);
 		removeDuplicates(listAxiomsOne);
 		removeDuplicates(listAxiomsTwo);
+		Collections.sort(listAxiomsOne);
+		Collections.sort(listAxiomsTwo);
+		Collections.sort(listAxiomsAlignments);
 
 		PreferenceFactory prefFactoryOne = new PreferenceFactory(listAxiomsOne);
 		PreferenceFactory prefFactoryTwo = new PreferenceFactory(listAxiomsTwo);
@@ -511,7 +511,7 @@ public class AppBlendingDialogue {
 
 		int importanceOne = readNumber("Importance of agent one?", 1, 101);
 		int importanceTwo = readNumber("Importance of agent two?", 1, 101);
-		int maxTurns = readNumber("Maximum number of turns?", 1, 100000);
+		int maxTurns = readNumber("Maximum number of turns?", 1, 10000000);
 
 		// deciding the probability of each agent to take turn in the dialogue
 		int infoInOne = quantifyInformation(Utils.newOntology(prefFactoryOne.getAgenda().stream()));
