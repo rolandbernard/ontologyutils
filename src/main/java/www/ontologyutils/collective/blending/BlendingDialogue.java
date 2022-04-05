@@ -147,7 +147,7 @@ public class BlendingDialogue {
 			} else {
 				turnAgent = (ThreadLocalRandom.current().nextDouble() <= probabilityTurnOne) ? 1 : 2;
 			}
-			log("\nTurn: " + turnAgent);
+			log("\nTurn number: " + numTurns + ". Turn of agent: " + turnAgent);
 
 			OWLAxiom consideredAxiom = null;
 			if (turnAgent == 1) {
