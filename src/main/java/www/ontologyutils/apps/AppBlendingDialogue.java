@@ -463,6 +463,11 @@ public class AppBlendingDialogue {
 		PreferenceFactory prefFactoryOne = new PreferenceFactory(listAxiomsOne);
 		PreferenceFactory prefFactoryTwo = new PreferenceFactory(listAxiomsTwo);
 
+		System.out.println("************************\nRunning app with arguments:");
+		for (String s : args) {
+			System.out.println(s);
+		}
+		System.out.println("************************");
 		System.out.println("\n--- Preferences will be generated at random at each run.");
 
 		System.out.println("\n--- You can specify the top preferences of agent one.");
