@@ -72,8 +72,7 @@ public class Utils {
 			if (CACHE) {
 				if (axiomSetConsistencyCache.size() >= AXIOM_SET_CONSISTENCY_CACHE_SIZE) {
 					Set<OWLAxiom> s = contentAxiomSetConsistencyCache.removeFirst();
-					contentAxiomSetConsistencyCache.remove(s);
-					axiomSetConsistencyCache.clear();
+					axiomSetConsistencyCache.remove(s);
 				}
 				Set<OWLAxiom> s = Collections.unmodifiableSet(axioms);
 				axiomSetConsistencyCache.put(s, consistency);
