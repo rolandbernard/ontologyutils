@@ -19,6 +19,7 @@ public class AxiomWeakener {
 
 	private final static ArrayList<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
 
+	private Covers covers;
 	private RefinementOperator genOp;
 	private RefinementOperator specOp;
 
@@ -26,7 +27,7 @@ public class AxiomWeakener {
 	 * @param ontology a reference ontology to make inferences.
 	 */
 	public AxiomWeakener(OWLOntology ontology) {
-		Covers covers = new Covers(ontology);
+		this.covers = new Covers(ontology);
 		this.genOp = new RefinementOperator(covers.getUpCoverOperator(), covers.getDownCoverOperator());
 		this.specOp = new RefinementOperator(covers.getDownCoverOperator(), covers.getUpCoverOperator());
 	}
@@ -99,6 +100,13 @@ public class AxiomWeakener {
 		} else {
 			throw new IllegalArgumentException(axiom + " must be a class assertion axiom or a subclass axiom.");
 		}
+	}
+
+	/**
+	 * Free the resources of the reasoner used for this axiom weakener.
+	 */
+	public void dispose() {
+		covers.dispose();
 	}
 
 }

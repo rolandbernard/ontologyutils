@@ -38,6 +38,7 @@ public class BlendingDialogue {
 	private void log(String message) {
 		if (verbose) {
 			System.out.print(message);
+			System.out.flush();
 		}
 	}
 
@@ -179,11 +180,14 @@ public class BlendingDialogue {
 				}
 				result.remove(consideredAxiom);
 				AxiomWeakener axiomWeakener = new AxiomWeakener(result);
-
+				log(" .");
 				Set<OWLAxiom> weakerAxioms = axiomWeakener.getWeakerAxioms(consideredAxiom);
-
+				axiomWeakener.dispose();
+				log(".("+weakerAxioms.size()+" refinements)");
 				int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
+				log(". ");
 				consideredAxiom = (OWLAxiom) (weakerAxioms.toArray())[randomPick];
+				log(" ===> " + Utils.prettyPrintAxiom(consideredAxiom));
 				result.add(consideredAxiom);
 			}
 			log("\nAdding axiom: " + Utils.prettyPrintAxiom(consideredAxiom));

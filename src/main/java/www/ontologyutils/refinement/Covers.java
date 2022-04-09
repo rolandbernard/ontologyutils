@@ -1,7 +1,6 @@
 package www.ontologyutils.refinement;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
@@ -218,6 +217,13 @@ public class Covers {
 
 	public Cover getDownCoverOperator() {
 		return new Cover(Direction.DOWN);
+	}
+
+	/**
+	 * Free the resources of the reasoner used for these covers.
+	 */
+	public void dispose() {
+		reasoner.dispose();
 	}
 
 }

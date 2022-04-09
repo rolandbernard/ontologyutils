@@ -84,6 +84,7 @@ public class OntologyRepairWeakening implements OntologyRepair {
 			// we log the operation
 			log("- Weaken: \t " + badAxiom + "\n  Into:   \t " + weakerAxiom + "\n");
 		}
+		aw.dispose();
 		return Utils.newOntology(axioms);
 	}
 

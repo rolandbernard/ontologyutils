@@ -217,6 +217,7 @@ public class TurnBasedMechanism {
 				AxiomWeakener axiomWeakener = new AxiomWeakener(referenceOntology);
 
 				Set<OWLAxiom> weakerAxioms = axiomWeakener.getWeakerAxioms(favorite);
+				axiomWeakener.dispose();
 
 				int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
 				favorite = (OWLAxiom) (weakerAxioms.toArray())[randomPick];
