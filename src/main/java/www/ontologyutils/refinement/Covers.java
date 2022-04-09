@@ -1,6 +1,7 @@
 package www.ontologyutils.refinement;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
@@ -18,10 +19,10 @@ import www.ontologyutils.toolbox.Utils;
 
 public class Covers {
 
-	private static Boolean CACHE = true;
+	private static Boolean CACHE = false;
 
-	private static int UPCOVER_CACHE_SIZE = 1024;
-	private static int DOWNCOVER_CACHE_SIZE = 1024;
+	private static int UPCOVER_CACHE_SIZE = 4096;
+	private static int DOWNCOVER_CACHE_SIZE = 4096;
 
 	/**
 	 * A naive FIFO cache for upcovers and downcovers of class expressions.
@@ -52,12 +53,13 @@ public class Covers {
 			contentUpCoverCache.addLast(e);
 		}
 
-		void basicDownCoverAdd(OWLClassExpression e, Set<OWLClassExpression> downCover) {
+		void downCoverAdd(OWLClassExpression e, Set<OWLClassExpression> downCover) {
 			if (downCoverCache.size() >= DOWNCOVER_CACHE_SIZE) {
 				OWLClassExpression c = contentDownCoverCache.removeFirst();
 				downCoverCache.remove(c);
 			}
 			downCoverCache.put(e, downCover);
+			contentUpCoverCache.addLast(e);
 		}
 	}
 
@@ -125,7 +127,7 @@ public class Covers {
 			return downCover;
 		}
 		downCover = subConcepts.stream().parallel().filter(c -> inDownCover(concept, c)).collect(Collectors.toSet());
-		cache.basicDownCoverAdd(concept, downCover);
+		cache.downCoverAdd(concept, downCover);
 		return downCover;
 	}
 

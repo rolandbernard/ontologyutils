@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.semanticweb.HermiT.Reasoner;
+import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
@@ -44,7 +44,7 @@ import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
  */
 public class Utils {
 
-	private static Boolean CACHE = true;
+	private static Boolean CACHE = false;
 
 	private static int AXIOM_SET_CONSISTENCY_CACHE_SIZE = 1024;
 
@@ -213,17 +213,32 @@ public class Utils {
 	 * @return a JFact reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getFactReasoner(OWLOntology ontology) {
+		return reasonerFactoryFact.createReasoner(ontology);
+	}
+	
+	/**
+	 * @param ontology
+	 * @return a JFact non buffering reasoner for {@code ontology}
+	 */
+	public static OWLReasoner getFactNonBufferingReasoner(OWLOntology ontology) {
 		return reasonerFactoryFact.createNonBufferingReasoner(ontology);
 	}
 
-	@SuppressWarnings("deprecation")
-	private static final OWLReasonerFactory reasonerFactoryHermit = new Reasoner.ReasonerFactory();
+	private static final OWLReasonerFactory reasonerFactoryHermit = new ReasonerFactory();
 
 	/**
 	 * @param ontology
 	 * @return a Hermit reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getHermitReasoner(OWLOntology ontology) {
+		return reasonerFactoryHermit.createReasoner(ontology);
+	}
+	
+	/**
+	 * @param ontology
+	 * @return a Hermit non buffering reasoner for {@code ontology}
+	 */
+	public static OWLReasoner getHermitNonBufferingReasoner(OWLOntology ontology) {
 		return reasonerFactoryHermit.createNonBufferingReasoner(ontology);
 	}
 
@@ -234,6 +249,14 @@ public class Utils {
 	 * @return a Openllet reasoner for {@code ontology}
 	 */
 	public static OWLReasoner getOpenlletReasoner(OWLOntology ontology) {
+		return reasonerFactoryOpenllet.createReasoner(ontology);
+	}
+	
+	/**
+	 * @param ontology
+	 * @return a Openllet non buffering reasoner for {@code ontology}
+	 */
+	public static OWLReasoner getOpenlletNonBufferingReasoner(OWLOntology ontology) {
 		return reasonerFactoryOpenllet.createNonBufferingReasoner(ontology);
 	}
 
@@ -291,7 +314,8 @@ public class Utils {
 		consistency = reasoner.isConsistent();
 		reasoner.dispose();
 
-		Cache.axiomsSetConsistencyAdd(Collections.unmodifiableSet(axioms), consistency);
+		Cache.axiomsSetConsistencyAdd(axioms, consistency);
+
 		return consistency;
 	}
 
