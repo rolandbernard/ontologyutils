@@ -66,8 +66,8 @@ import www.ontologyutils.toolbox.Utils.ReasonerName;
  * highest-ranked axioms and let the computer choose the others at random at
  * each run), and to run a specified number of experiments with the same
  * settings. <br>
- * Optionally, -o <outputsBaseFilePath> can be used at the end of the command to save
- * statistics and the result of each run.
+ * Optionally, -o <outputsBaseFilePath> can be used at the end of the command to
+ * save statistics and the result of each run.
  * </p>
  * 
  * <p>
@@ -101,14 +101,16 @@ public class AppBlendingDialogue {
 
 	private static final int STOP = -1;
 	private static final int INIT_NUM = 0;
-	
-	private static final String STATS_HEADER = "run,hT1  ,hT2  ,hS1  ,hS2  ,hTN1 ,hTN2 ,aT   ,aS   ,aTN  ,hyb  ,numW1,numW2";
+
+	private static final String STATS_HEADER = "run,hT1  ,hT2  ,hS1  ,hS2  ,hTN1 ,hTN2 ,aT   ,aS   ,aTN  ,hyb  ,numW1,numW2,imp1,imp2,maxT";
+
+	private static final String STATS_HEADER_COMPACT = "ontoName,run,hT1,hT2,hS1,hS2,hTN1,hTN2,aT,aS,aTN,hyb,numW1,numW2,imp1,imp2,maxT";
 
 	private static final String MSG_USAGE = "Usage: the program expects five (paths to) ontologies in parameter, "
 			+ "the IRI of the first source concept, the IRI of the second source concept, and the IRI of the target concept, "
 			+ "a number of desired runs. Optionally, a base file pathname to save the results of the blending dialogue, preceded by the flag -o "
-			+ "(stats will be saved in an csv file containing the columns " 
-			+ "[ontoFile     ," + STATS_HEADER + "] , and ontologies in owl files, labeled with the time when the app was launched in millis - https://currentmillis.com/): "
+			+ "(stats will be saved in an csv file containing the columns " + "[ontoFile     ," + STATS_HEADER
+			+ "] , and ontologies in owl files, labeled with the time when the app was launched in millis - https://currentmillis.com/): "
 			+ "\n<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
 			+ "<IRI1> <IRI2> <IRITarget> <numberOfRuns> -o <outputsBaseFilePath>";
 
@@ -155,6 +157,25 @@ public class AppBlendingDialogue {
 			System.out.println("Ontology saved as " + fileName);
 		} catch (OWLOntologyStorageException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private static void addRecord(String outputsBaseFilePath, String statistics, String ontologyName) {
+		Path path = Paths.get(outputsBaseFilePath + ".stats.csv");
+		if (!Files.exists(path)) {
+			List<String> data = Arrays.asList(STATS_HEADER_COMPACT, ontologyName + "," + statistics);
+			try {
+				Files.write(path, data, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				List<String> data = Arrays.asList(ontologyName + "," + statistics);
+				Files.write(path, data, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -588,7 +609,8 @@ public class AppBlendingDialogue {
 					+ String.format(Locale.US, "%.3f", asymmetryTolerant) + ","
 					+ String.format(Locale.US, "%.3f", asymmetryStrict) + ","
 					+ String.format(Locale.US, "%.3f", asymmetryTolerantNeg) + ","
-					+ String.format(Locale.US, "%.3f", hybridity) + "," + numWeakeningsOne + "," + numWeakeningsTwo;
+					+ String.format(Locale.US, "%.3f", hybridity) + "," + numWeakeningsOne + "," + numWeakeningsTwo
+					+ "," + importanceOne + "," + importanceTwo + "," + maxTurns;
 			metricsResults.add(statistics);
 			sumHappinessTolerantOne += happinessTolerantOne;
 			sumHappinessTolerantTwo += happinessTolerantTwo;
@@ -634,14 +656,7 @@ public class AppBlendingDialogue {
 				String ontologyName = mApp.whenLaunched + "_" + String.format(leadingZeros, (i + 1)) + "_" + args[10]
 						+ ".owl";
 				saveOntology(result, ontologyName);
-
-				Path file = Paths.get(args[10] + ".stats.csv");
-				try {
-					Files.write(file, Arrays.asList(ontologyName + "," + statistics), StandardCharsets.UTF_8,
-							StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				addRecord(args[10], statistics, ontologyName);
 			}
 		}
 
