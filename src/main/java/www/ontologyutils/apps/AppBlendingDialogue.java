@@ -4,7 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,8 +66,8 @@ import www.ontologyutils.toolbox.Utils.ReasonerName;
  * highest-ranked axioms and let the computer choose the others at random at
  * each run), and to run a specified number of experiments with the same
  * settings. <br>
- * Optionally, -o <FileName.owl> can be used at the end of the command to save
- * each run numbered N, into an owl file of the form <N_FileName.owl>.
+ * Optionally, -o <outputsBaseFilePath> can be used at the end of the command to save
+ * statistics and the result of each run.
  * </p>
  * 
  * <p>
@@ -72,7 +78,7 @@ import www.ontologyutils.toolbox.Utils.ReasonerName;
  * http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Vehicle
  * http://www.semanticweb.org/anonym/ontologies/2020/2/fv#Fish
  * http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle 15 -o
- * Result.owl
+ * fv-outputs
  * </p>
  * 
  */
@@ -88,18 +94,23 @@ public class AppBlendingDialogue {
 	OWLClassExpression conceptTwo;
 	OWLClassExpression conceptTarget;
 
+	long whenLaunched;
+
 	Set<OWLClassExpression> ascendantsDescendantsOne; // ascendants and descendants of conceptOne in ontologyOne
 	Set<OWLClassExpression> ascendantsDescendantsTwo; // ascendants and descendants of conceptTwo in ontologyTwo
 
 	private static final int STOP = -1;
 	private static final int INIT_NUM = 0;
+	
+	private static final String STATS_HEADER = "run,hT1  ,hT2  ,hS1  ,hS2  ,hTN1 ,hTN2 ,aT   ,aS   ,aTN  ,hyb  ,numW1,numW2";
 
 	private static final String MSG_USAGE = "Usage: the program expects five (paths to) ontologies in parameter, "
-			+ "a number of desired runs, the IRI of the first source concept, the IRI of the second source concept, and the IRI of the target concept, "
-			+ "and optionally, "
-			+ "a file pathname to save the result of the blending dialogue, preceded by the flag -o: "
-			+ "<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
-			+ "<IRI1> <IRI2> <IRITarget> " + "<numberOfRuns> -o <outputOntologyFilePath>";
+			+ "the IRI of the first source concept, the IRI of the second source concept, and the IRI of the target concept, "
+			+ "a number of desired runs. Optionally, a base file pathname to save the results of the blending dialogue, preceded by the flag -o "
+			+ "(stats will be saved in an csv file containing the columns " 
+			+ "[ontoFile     ," + STATS_HEADER + "] , and ontologies in owl files, labeled with the time when the app was launched in millis - https://currentmillis.com/): "
+			+ "\n<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
+			+ "<IRI1> <IRI2> <IRITarget> <numberOfRuns> -o <outputsBaseFilePath>";
 
 	private static void usage(String[] args) {
 		if ((args.length != 9 && args.length != 11) || (args.length == 11 && !args[9].equals("-o"))) {
@@ -181,31 +192,6 @@ public class AppBlendingDialogue {
 
 		reasoner.dispose();
 		return result;
-	}
-
-	/**
-	 * @param agent
-	 * @param concept
-	 * @param ontology
-	 * @return an estimation of the "happiness" with {@code ontology} of
-	 *         {@code agent} defining concept {@code concept}.
-	 */
-	private static double happinessTolerant(OWLOntology agent, OWLClassExpression concept, OWLOntology ontology) {
-		Set<OWLAxiom> axiomsAllInf = Utils.inferredTaxonomyAxioms(agent);
-		Set<OWLAxiom> axioms = new HashSet<>();
-		for (OWLAxiom a : axiomsAllInf) {
-			if (concept.equals(((OWLSubClassOfAxiom) a).getSubClass())
-					|| concept.equals(((OWLSubClassOfAxiom) a).getSuperClass())) {
-				axioms.add(a);
-			}
-		}
-
-		System.out.println(axioms.size() + "Axioms For Happiness:  " + axioms);
-		OWLReasoner reasoner = Utils.getReasoner(ontology);
-		long countSatisfiedAxioms = axioms.stream().filter(a -> reasoner.isEntailed(a)).count();
-
-		reasoner.dispose();
-		return (double) countSatisfiedAxioms / axioms.size();
 	}
 
 	/**
@@ -375,6 +361,8 @@ public class AppBlendingDialogue {
 			String alignmentsOntologyFilePath, String testOntologyFilePath, String IRI1, String IRI2,
 			String IRITarget) {
 
+		whenLaunched = System.currentTimeMillis();
+
 		OWLOntology base1 = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
 		OWLOntology base2 = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
 		OWLOntology baseAlignments = Utils.newOntologyExcludeNonLogicalAxioms(alignmentsOntologyFilePath);
@@ -447,7 +435,7 @@ public class AppBlendingDialogue {
 				args[6], args[7]);
 		int numberOfTestRuns = Integer.parseInt(args[8]);
 		ArrayList<String> metricsResults = new ArrayList<String>();
-		metricsResults.add("run,hT1  ,hT2  ,hS1  ,hS2  ,hTN1 ,hTN2 ,aT   ,aS   ,aTN  ,hyb  ,numW1,numW2");
+		metricsResults.add(STATS_HEADER);
 		// Preferences
 		List<OWLAxiom> listAxiomsOne = mApp.ontologyOne.axioms().collect(Collectors.toList());
 		List<OWLAxiom> listAxiomsTwo = mApp.ontologyTwo.axioms().collect(Collectors.toList());
@@ -590,7 +578,7 @@ public class AppBlendingDialogue {
 					mApp.ascendantsDescendantsTwo);
 			int numWeakeningsOne = bdg.getNumWeakeningOne();
 			int numWeakeningsTwo = bdg.getNumWeakeningTwo();
-			metricsResults.add(String.format("%03d", (i + 1)) + ","
+			String statistics = String.format("%03d", (i + 1)) + ","
 					+ String.format(Locale.US, "%.3f", happinessTolerantOne) + ","
 					+ String.format(Locale.US, "%.3f", happinessTolerantTwo) + ","
 					+ String.format(Locale.US, "%.3f", happinessStrictOne) + ","
@@ -600,7 +588,8 @@ public class AppBlendingDialogue {
 					+ String.format(Locale.US, "%.3f", asymmetryTolerant) + ","
 					+ String.format(Locale.US, "%.3f", asymmetryStrict) + ","
 					+ String.format(Locale.US, "%.3f", asymmetryTolerantNeg) + ","
-					+ String.format(Locale.US, "%.3f", hybridity) + "," + numWeakeningsOne + "," + numWeakeningsTwo);
+					+ String.format(Locale.US, "%.3f", hybridity) + "," + numWeakeningsOne + "," + numWeakeningsTwo;
+			metricsResults.add(statistics);
 			sumHappinessTolerantOne += happinessTolerantOne;
 			sumHappinessTolerantTwo += happinessTolerantTwo;
 			sumHappinessStrictOne += happinessStrictOne;
@@ -640,9 +629,19 @@ public class AppBlendingDialogue {
 			reasoner.dispose();
 
 			if (args.length == 11 && args[9].equals("-o")) {
-				System.out.println("\n--- Saving result ontology.");
+				System.out.println("\n--- Saving result ontology and recording stats.");
 				String leadingZeros = "%0" + (int) (Math.floor(Math.log10(numberOfTestRuns)) + 1) + "d";
-				saveOntology(result, String.format(leadingZeros, (i + 1)) + "_" + args[7]);
+				String ontologyName = String.format(leadingZeros, (i + 1)) + "_" + mApp.whenLaunched + "_" + args[10]
+						+ ".owl";
+				saveOntology(result, ontologyName);
+
+				Path file = Paths.get(args[10] + ".stats.csv");
+				try {
+					Files.write(file, Arrays.asList(ontologyName + "," + statistics), StandardCharsets.UTF_8,
+							StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -662,7 +661,7 @@ public class AppBlendingDialogue {
 		System.out.println("Average Asymmetry Tolerant: " + sumAsymmetryTolerant / numberOfTestRuns);
 		System.out.println("Average Asymmetry Strict: " + sumAsymmetryStrict / numberOfTestRuns);
 		System.out.println("Average Asymmetry TolerantNeg: " + sumAsymmetryTolerantNeg / numberOfTestRuns);
-		System.out.println("Average Hybrididty: " + sumHybridity / numberOfTestRuns);
+		System.out.println("Average Hybridity: " + sumHybridity / numberOfTestRuns);
 		System.out.println("Average number of weakenings of one: " + sumNumWeakeningsOne / numberOfTestRuns);
 		System.out.println("Average number of weakenings of two: " + sumNumWeakeningsTwo / numberOfTestRuns);
 
