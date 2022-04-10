@@ -631,7 +631,7 @@ public class AppBlendingDialogue {
 			if (args.length == 11 && args[9].equals("-o")) {
 				System.out.println("\n--- Saving result ontology and recording stats.");
 				String leadingZeros = "%0" + (int) (Math.floor(Math.log10(numberOfTestRuns)) + 1) + "d";
-				String ontologyName = String.format(leadingZeros, (i + 1)) + "_" + mApp.whenLaunched + "_" + args[10]
+				String ontologyName = mApp.whenLaunched + "_" + String.format(leadingZeros, (i + 1)) + "_" + args[10]
 						+ ".owl";
 				saveOntology(result, ontologyName);
 
