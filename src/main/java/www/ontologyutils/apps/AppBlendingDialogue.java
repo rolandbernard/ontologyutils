@@ -1,7 +1,6 @@
 package www.ontologyutils.apps;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -32,8 +31,6 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.model.parameters.Imports;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -66,7 +63,7 @@ import www.ontologyutils.toolbox.Utils.ReasonerName;
  * highest-ranked axioms and let the computer choose the others at random at
  * each run), and to run a specified number of experiments with the same
  * settings. <br>
- * Optionally, -o <outputsBaseFilePath> can be used at the end of the command to
+ * Optionally, -o <outputsBaseFileName> can be used at the end of the command to
  * save statistics and the result of each run.
  * </p>
  * 
@@ -108,15 +105,20 @@ public class AppBlendingDialogue {
 
 	private static final String MSG_USAGE = "Usage: the program expects five (paths to) ontologies in parameter, "
 			+ "the IRI of the first source concept, the IRI of the second source concept, and the IRI of the target concept, "
-			+ "a number of desired runs. Optionally, a base file pathname to save the results of the blending dialogue, preceded by the flag -o "
+			+ "a number of desired runs. Optionally, a base filename to save the results of the blending dialogue, preceded by the flag -o "
 			+ "(stats will be saved in an csv file containing the columns " + "[ontoFile     ," + STATS_HEADER
 			+ "] , and ontologies in owl files, labeled with the time when the app was launched in millis - https://currentmillis.com/): "
 			+ "\n<ontologyFilePath1> <ontologyFilePath2> <initialOntologyFilePath> <alignmentsOntologyFilePath> <testOntologyFilePath> "
-			+ "<IRI1> <IRI2> <IRITarget> <numberOfRuns> -o <outputsBaseFilePath>";
+			+ "<IRI1> <IRI2> <IRITarget> <numberOfRuns> -o <outputsBaseFileName>";
 
 	private static void usage(String[] args) {
 		if ((args.length != 9 && args.length != 11) || (args.length == 11 && !args[9].equals("-o"))) {
 			System.out.println(MSG_USAGE);
+			System.exit(1);
+		}
+		if (args.length == 11 && args[9].equals("-o") && args[10].contains("/")) {
+			System.out.println("Sorry, saving the results in another directory is not supported. Please change "
+					+ args[10] + " .");
 			System.exit(1);
 		}
 	}
@@ -149,19 +151,8 @@ public class AppBlendingDialogue {
 		list.addAll(s);
 	}
 
-	public static void saveOntology(OWLOntology ontology, String fileName) {
-		File file = new File(fileName);
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		try {
-			manager.saveOntology(ontology, ontology.getFormat(), IRI.create(file.toURI()));
-			System.out.println("Ontology saved as " + fileName);
-		} catch (OWLOntologyStorageException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void addRecord(String outputsBaseFilePath, String statistics, String ontologyName) {
-		Path path = Paths.get(outputsBaseFilePath + ".stats.csv");
+	private static void addRecord(String outputsBaseFileName, String statistics, String ontologyName) {
+		Path path = Paths.get(outputsBaseFileName + ".stats.csv");
 		if (!Files.exists(path)) {
 			List<String> data = Arrays.asList(STATS_HEADER_COMPACT, ontologyName + "," + statistics);
 			try {
@@ -655,7 +646,7 @@ public class AppBlendingDialogue {
 				String leadingZeros = "%0" + (int) (Math.floor(Math.log10(numberOfTestRuns)) + 1) + "d";
 				String ontologyName = mApp.whenLaunched + "_" + String.format(leadingZeros, (i + 1)) + "_" + args[10]
 						+ ".owl";
-				saveOntology(result, ontologyName);
+				Utils.saveOntology(result, ontologyName);
 				addRecord(args[10], statistics, ontologyName);
 			}
 		}
