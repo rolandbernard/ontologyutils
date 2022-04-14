@@ -393,7 +393,7 @@ public class AppBlendingDialogue {
 		this.ontologyTwo.add(base2.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
 		base2.tboxAxioms(Imports.EXCLUDED).forEach(a -> this.ontologyTwo.add(NormalizationTools.asSubClassOfAxioms(a)));
 		this.alignmentOntology = Utils.newEmptyOntology();
-		this.alignmentOntology.add(base1.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
+		this.alignmentOntology.add(baseAlignments.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
 		baseAlignments.tboxAxioms(Imports.EXCLUDED)
 				.forEach(a -> this.alignmentOntology.add(NormalizationTools.asSubClassOfAxioms(a)));
 
@@ -458,7 +458,6 @@ public class AppBlendingDialogue {
 		removeDuplicates(listAxiomsTwo);
 		Collections.sort(listAxiomsOne);
 		Collections.sort(listAxiomsTwo);
-		Collections.sort(listAxiomsAlignments);
 
 		PreferenceFactory prefFactoryOne = new PreferenceFactory(listAxiomsOne);
 		PreferenceFactory prefFactoryTwo = new PreferenceFactory(listAxiomsTwo);
