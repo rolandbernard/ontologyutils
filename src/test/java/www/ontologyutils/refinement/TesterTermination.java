@@ -78,7 +78,7 @@ public class TesterTermination extends TestCase {
 				Set<OWLClassExpression> gen;
 				if (PROPER) {
 					final OWLClassExpression ee = e;
-					gen = generalisation.refine(e).stream().filter(c -> !areEquivalent(ee, c) || c == TOP)
+					gen = generalisation.refine(e).stream().filter(c -> !areEquivalent(ee, c) || c.equals(TOP))
 							.collect(Collectors.toSet());
 				} else {
 					gen = generalisation.refine(e);
