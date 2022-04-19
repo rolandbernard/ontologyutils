@@ -30,10 +30,9 @@ public class TesterTermination extends TestCase {
 
 	private static final String OWL_FILE_PATH = "resources/a-and-b.owl";
 
-	private final static OWLClassExpression TOP = OWLManager.getOWLDataFactory().getOWLThing();
 	private final static OWLClassExpression BOT = OWLManager.getOWLDataFactory().getOWLNothing();
 	private final int NUMBER_TESTS = 100;
-	private final boolean PROPER = false; // true to force each generalization step to find non-equivalent
+	private final boolean PROPER = true; // true to force each generalization step to find non-equivalent
 											// generalization
 											// concept (unless it is TOP).
 	static OWLOntology ontology;
@@ -72,13 +71,13 @@ public class TesterTermination extends TestCase {
 			int steps = 0;
 			OWLClassExpression e = BOT;
 			System.out.format("**** Test %d. Trying to reach TOP from %s.%n", i, Utils.pretty(e.toString()));
-			while (!e.equals(TOP)) {
+			while (!e.isTopEntity()) {
 				System.out.print(".");
 				steps++;
 				Set<OWLClassExpression> gen;
 				if (PROPER) {
 					final OWLClassExpression ee = e;
-					gen = generalisation.refine(e).stream().filter(c -> !areEquivalent(ee, c) || c.equals(TOP))
+					gen = generalisation.refine(e).stream().filter(c -> !areEquivalent(ee, c) || c.isTopEntity())
 							.collect(Collectors.toSet());
 				} else {
 					gen = generalisation.refine(e);
