@@ -28,8 +28,7 @@ import www.ontologyutils.toolbox.Utils.ReasonerName;
  */
 public class TesterTermination extends TestCase {
 
-	private static final String OWL_FILE_PATH = "resources/goslim_pir.owl"; // "resources/Random/C300_R10_0.0001_0.0001_0.0001_82227.owl";
-																			// "resources/a-and-b.owl";
+	private static final String OWL_FILE_PATH = "resources/a-and-b.owl";
 
 	private final static OWLClassExpression TOP = OWLManager.getOWLDataFactory().getOWLThing();
 	private final static OWLClassExpression BOT = OWLManager.getOWLDataFactory().getOWLNothing();
