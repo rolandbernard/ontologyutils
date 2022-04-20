@@ -71,13 +71,13 @@ public class TesterTermination extends TestCase {
 			int steps = 0;
 			OWLClassExpression e = BOT;
 			System.out.format("**** Test %d. Trying to reach TOP from %s.%n", i, Utils.pretty(e.toString()));
-			while (!e.isTopEntity()) {
+			while (!e.isOWLThing()) {
 				System.out.print(".");
 				steps++;
 				Set<OWLClassExpression> gen;
 				if (PROPER) {
 					final OWLClassExpression ee = e;
-					gen = generalisation.refine(e).stream().filter(c -> !areEquivalent(ee, c) || c.isTopEntity())
+					gen = generalisation.refine(e).stream().filter(c -> !areEquivalent(ee, c) || c.isOWLThing())
 							.collect(Collectors.toSet());
 				} else {
 					gen = generalisation.refine(e);
