@@ -45,7 +45,7 @@ The class `AxiomWeakener` implements the axiom weakening operations presented in
 
 # Test ontologies #
 
-The directory `resources/` contains test OWL ontology.
+The directory `resources/` contains test OWL ontologies.
 
 
 # App example: show ontology #
