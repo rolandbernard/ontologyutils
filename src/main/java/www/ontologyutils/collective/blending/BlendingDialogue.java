@@ -50,7 +50,7 @@ public class BlendingDialogue {
 	/**
 	 * @param aone            a list of axioms
 	 * @param pone            a preference over {@code aone} axioms
-	 * @param otwo            a list of axioms
+	 * @param atwo            a list of axioms
 	 * @param ptwo            a preference over {@code atwo} axioms
 	 * @param initialOntology a consistent ontology
 	 */
