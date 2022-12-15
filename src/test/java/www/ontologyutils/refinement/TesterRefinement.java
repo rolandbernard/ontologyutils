@@ -59,13 +59,13 @@ public class TesterRefinement  extends TestCase {
     {
     		System.currentTimeMillis();
     		System.out.println("\n\n*** UPCOVERS\n\n");
-    		Utils.getSubOfTBox(ontology).forEach(e -> printUpCover(e));
+    		Utils.getSubClasses(ontology).forEach(e -> printUpCover(e));
     		System.out.println("\n\n*** DOWNCOVERS\n\n");
-    		Utils.getSubOfTBox(ontology).forEach(e -> printDownCover(e));
+    		Utils.getSubClasses(ontology).forEach(e -> printDownCover(e));
     		System.out.println("\n\n*** GENERALISATIONS\n\n");
-    		Utils.getSubOfTBox(ontology).forEach(e -> printGeneralisations(e));
+    		Utils.getSubClasses(ontology).forEach(e -> printGeneralisations(e));
     		System.out.println("\n\n*** SPECIALISATIONS\n\n");
-    		Utils.getSubOfTBox(ontology).forEach(e -> printSpecialisations(e));
+    		Utils.getSubClasses(ontology).forEach(e -> printSpecialisations(e));
     		
         assertTrue( true );
     }

@@ -47,9 +47,9 @@ public class TesterCovers
     {
     		System.currentTimeMillis();
     		System.out.println("\n\n*** UPCOVERS\n\n");
-    		Utils.getSubOfTBox(ontology).forEach(e -> printUpCover(e));
+    		Utils.getSubClasses(ontology).forEach(e -> printUpCover(e));
     		System.out.println("\n\n*** DOWNCOVERS\n\n");
-    		Utils.getSubOfTBox(ontology).forEach(e -> printDownCover(e));
+    		Utils.getSubClasses(ontology).forEach(e -> printDownCover(e));
     	
         assertTrue( true );
     }

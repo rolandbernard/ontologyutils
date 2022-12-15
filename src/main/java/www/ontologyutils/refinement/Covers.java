@@ -18,7 +18,7 @@ import www.ontologyutils.toolbox.Utils;
 
 public class Covers {
 
-	private static Boolean CACHE = false;
+	private static Boolean CACHE = true;
 
 	private static int UPCOVER_CACHE_SIZE = 4096;
 	private static int DOWNCOVER_CACHE_SIZE = 4096;
@@ -80,9 +80,9 @@ public class Covers {
 		this.ontology = reasoner.getRootOntology();
 		this.reasoner = reasoner;
 
-		// get all subConcepts in the TBox
+		// get all subConcepts in the ontology
 		subConcepts = new ArrayList<OWLClassExpression>();
-		subConcepts.addAll(Utils.getSubOfTBox(ontology));
+		subConcepts.addAll(Utils.getSubClasses(ontology));
 		if (!subConcepts.contains(TOP)) {
 			subConcepts.add(TOP);
 		}
