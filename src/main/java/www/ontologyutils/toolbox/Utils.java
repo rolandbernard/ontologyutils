@@ -320,6 +320,39 @@ public class Utils {
 	}
 
 	/**
+	 * @param ontology
+	 * @return
+	 */
+	public static boolean isConsistentParallel(OWLOntology ontology) {
+		Set<OWLAxiom> axioms = ontology.axioms().collect(Collectors.toSet());
+		Boolean consistency = Cache.axiomSetConsistencyCheck(axioms);
+		if (consistency != null) {
+			return consistency;
+		}
+		OWLReasoner reasonerH = getHermitReasoner(ontology);
+		OWLReasoner reasonerF = getFactReasoner(ontology);
+		OWLReasoner reasonerO = getOpenlletReasoner(ontology);
+
+		LinkedList<OWLReasoner> listOfReasoners = new LinkedList<>(Arrays.asList(reasonerH, reasonerF, reasonerO));
+
+		BooleanWrapper bw = new BooleanWrapper();
+
+		listOfReasoners.stream().parallel().anyMatch(reasoner ->
+			{
+				bw.value = reasoner.isConsistent();
+				return true;
+			});
+
+		reasonerH.dispose();
+		reasonerF.dispose();
+		reasonerO.dispose();
+
+		Cache.axiomsSetConsistencyAdd(axioms, consistency);
+
+		return bw.value;
+	}
+
+	/**
 	 * @param axioms
 	 * @return
 	 */
@@ -329,6 +362,18 @@ public class Utils {
 			return consistency;
 		}
 		return isConsistent(newOntology(axioms));
+	}
+
+	/**
+	 * @param axioms
+	 * @return
+	 */
+	public static boolean isConsistentParallel(Set<OWLAxiom> axioms) {
+		Boolean consistency = Cache.axiomSetConsistencyCache.get(axioms);
+		if (consistency != null) {
+			return consistency;
+		}
+		return isConsistentParallel(newOntology(axioms));
 	}
 
 	/**
@@ -365,6 +410,33 @@ public class Utils {
 	 */
 	public static boolean isEntailed(OWLOntology ontology, OWLAxiom axiom) {
 		return isEntailed(ontology, axiom, DEFAULT_REASONER);
+	}
+
+	/**
+	 * @param ontology
+	 * @param axiom
+	 * @return
+	 */
+	public static boolean isEntailedParallel(OWLOntology ontology, OWLAxiom axiom) {
+		OWLReasoner reasonerH = getHermitReasoner(ontology);
+		OWLReasoner reasonerF = getFactReasoner(ontology);
+		OWLReasoner reasonerO = getOpenlletReasoner(ontology);
+
+		LinkedList<OWLReasoner> listOfReasoners = new LinkedList<>(Arrays.asList(reasonerH, reasonerF, reasonerO));
+
+		BooleanWrapper bw = new BooleanWrapper();
+
+		listOfReasoners.stream().parallel().anyMatch(reasoner ->
+			{
+				bw.value = reasoner.isEntailed(axiom);
+				return true;
+			});
+
+		reasonerH.dispose();
+		reasonerF.dispose();
+		reasonerO.dispose();
+
+		return bw.value;
 	}
 
 	/**
