@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -23,9 +24,22 @@
           <target>1.8</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>net.revelc.code.formatter</groupId>
+        <artifactId>formatter-maven-plugin</artifactId>
+        <version>2.15.0</version>
+        <configuration>
+          <configFile>${project.basedir}/formatter-config.xml</configFile>
+          <directories>
+            <directory>${project.build.sourceDirectory}</directory>
+            <directory>${project.basedir}/src</directory>
+            <directory>${project.build.directory}/generated-sources</directory>
+          </directories>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-  
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -34,29 +48,29 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-  		<groupId>net.sourceforge.owlapi</groupId>
-  		<artifactId>owlapi-distribution</artifactId>
-  		<version>5.1.9</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>net.sourceforge.owlapi</groupId>
-  		<artifactId>jfact</artifactId>
-		<version>5.0.3</version>
-  	</dependency>
-	<dependency>
-		<groupId>com.github.galigator.openllet</groupId>
-		<artifactId>openllet-distribution</artifactId>
-		<version>2.6.4</version>
-	</dependency>
-  	<dependency>
-  		<groupId>net.sourceforge.owlapi</groupId>
-  		<artifactId>org.semanticweb.hermit</artifactId>
-		<version>1.4.5.519</version>
-  	</dependency>
-  	<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-nop</artifactId>
-    <version>1.7.36</version>
-	</dependency>
-  	</dependencies>
-  	</project>
+      <groupId>net.sourceforge.owlapi</groupId>
+      <artifactId>owlapi-distribution</artifactId>
+      <version>5.1.9</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.owlapi</groupId>
+      <artifactId>jfact</artifactId>
+      <version>5.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.galigator.openllet</groupId>
+      <artifactId>openllet-distribution</artifactId>
+      <version>2.6.4</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.owlapi</groupId>
+      <artifactId>org.semanticweb.hermit</artifactId>
+      <version>1.4.5.519</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>1.7.36</version>
+    </dependency>
+  </dependencies>
+</project>

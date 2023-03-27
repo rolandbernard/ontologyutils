@@ -25,141 +25,139 @@ import www.ontologyutils.toolbox.FreshAtoms;
 import www.ontologyutils.toolbox.Utils;
 
 public class AppCondorRules {
-	private OWLOntology ontology;
+    private OWLOntology ontology;
 
-	public AppCondorRules(String ontologyFilePath) {
+    public AppCondorRules(String ontologyFilePath) {
+        ontology = AnnotateOrigin.newOntology(ontologyFilePath);
+    }
 
-		ontology = AnnotateOrigin.newOntology(ontologyFilePath);
+    private OWLOntology runCondor() {
+        FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
 
-	}
+        OWLOntology copy = Utils.newEmptyOntology();
+        copy.addAxioms(this.ontology.axioms());
 
-	private OWLOntology runCondor() {
-		FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
+        Stream<OWLAxiom> tBoxAxioms = copy.tboxAxioms(Imports.EXCLUDED);
+        tBoxAxioms.forEach((ax) -> {
+            copy.remove(ax);
+            copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));
+        });
 
-		OWLOntology copy = Utils.newEmptyOntology();
-		copy.addAxioms(this.ontology.axioms());
+        OWLOntology condor = null;
+        // condor = Normalization.normalizeCondor(copy);
+        condor = superNormalize(Normalization.normalizeCondor(copy));
 
-		Stream<OWLAxiom> tBoxAxioms = copy.tboxAxioms(Imports.EXCLUDED);
-		tBoxAxioms.forEach((ax) -> {
-			copy.remove(ax);
-			copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));
-		});
+        // check every axiom of the original ontology is entailed in condor
+        OWLReasoner reasoner = Utils.getHermitReasoner(condor);
+        assert (this.ontology.axioms().allMatch(ax -> reasoner.isEntailed(ax)));
+        // check every axiom of condor is entailed in the copy of the original ontology
+        // with extended signature
+        copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
+        OWLReasoner reasonerBis = Utils.getHermitReasoner(copy);
+        assert (condor.axioms().allMatch(ax -> reasonerBis.isEntailed(ax)));
 
-		OWLOntology condor = null;
-		// condor = Normalization.normalizeCondor(copy);
-		condor = superNormalize(Normalization.normalizeCondor(copy));
+        return condor;
+    }
 
-		// check every axiom of the original ontology is entailed in condor
-		OWLReasoner reasoner = Utils.getHermitReasoner(condor);
-		assert (this.ontology.axioms().allMatch(ax -> reasoner.isEntailed(ax)));
-		// check every axiom of condor is entailed in the copy of the original ontology
-		// with extended signature
-		copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
-		OWLReasoner reasonerBis = Utils.getHermitReasoner(copy);
-		assert (condor.axioms().allMatch(ax -> reasonerBis.isEntailed(ax)));
+    /**
+     * @param on
+     *            an ontology in normal form
+     * @return an equivalent ontology where type-1 rules have at most 2 conjuncts on
+     *         the left.
+     */
 
-		return condor;
-	}
+    private static OWLOntology superNormalize(OWLOntology on) {
+        OWLOntology res = Utils.newEmptyOntology();
+        on.tboxAxioms(Imports.EXCLUDED).forEach(a -> {
+            res.addAxioms(superNormalize(a));
+        });
+        res.addAxioms(on.rboxAxioms(Imports.EXCLUDED));
+        res.addAxioms(on.aboxAxioms(Imports.EXCLUDED));
 
-	/**
-	 * @param on
-	 *            an ontology in normal form
-	 * @return an equivalent ontology where type-1 rules have at most 2 conjuncts on
-	 *         the left.
-	 */
+        return res;
+    }
 
-	private static OWLOntology superNormalize(OWLOntology on) {
-		OWLOntology res = Utils.newEmptyOntology();
-		on.tboxAxioms(Imports.EXCLUDED).forEach(a -> {
-			res.addAxioms(superNormalize(a));
-		});
-		res.addAxioms(on.rboxAxioms(Imports.EXCLUDED));
-		res.addAxioms(on.aboxAxioms(Imports.EXCLUDED));
+    private static Set<OWLAxiom> superNormalize(OWLAxiom a) {
+        Set<OWLAxiom> res = new HashSet<>();
+        OWLClassExpression left = ((OWLSubClassOfAxiom) a).getSubClass();
+        OWLClassExpression right = ((OWLSubClassOfAxiom) a).getSuperClass();
+        Set<OWLClassExpression> leftConj = left.asConjunctSet();
+        if (!NormalForm.typeOneSubClassAxiom(left, right) || leftConj.size() <= 2) {
+            // nothing to do
+            res.add(a);
+            return res;
+        }
+        while (true) {
+            Iterator<OWLClassExpression> iter = leftConj.iterator();
+            OWLClassExpression one = iter.next();
+            OWLClassExpression two = iter.next();
 
-		return res;
-	}
+            OWLClassExpression newConj = new OWLObjectIntersectionOfImpl(one, two);
+            assert (newConj.asConjunctSet().size() == 2);
+            if (leftConj.size() == 2) {
+                assert (!iter.hasNext());
+                OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, right, AnnotateOrigin.getAxiomAnnotations(a));
+                res.add(axiom);
+                return res;
+            }
 
-	private static Set<OWLAxiom> superNormalize(OWLAxiom a) {
-		Set<OWLAxiom> res = new HashSet<>();
-		OWLClassExpression left = ((OWLSubClassOfAxiom) a).getSubClass();
-		OWLClassExpression right = ((OWLSubClassOfAxiom) a).getSuperClass();
-		Set<OWLClassExpression> leftConj = left.asConjunctSet();
-		if (!NormalForm.typeOneSubClassAxiom(left, right) || leftConj.size() <= 2) {
-			// nothing to do
-			res.add(a);
-			return res;
-		}
-		while (true) {
-			Iterator<OWLClassExpression> iter = leftConj.iterator();
-			OWLClassExpression one = iter.next();
-			OWLClassExpression two = iter.next();
+            OWLClassExpression newAtom = FreshAtoms.createFreshAtomCopy(newConj);
+            leftConj.remove(one);
+            leftConj.remove(two);
+            leftConj.add(newAtom);
 
-			OWLClassExpression newConj = new OWLObjectIntersectionOfImpl(one, two);
-			assert (newConj.asConjunctSet().size() == 2);
-			if (leftConj.size() == 2) {
-				assert (!iter.hasNext());
-				OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, right, AnnotateOrigin.getAxiomAnnotations(a));
-				res.add(axiom);
-				return res;
-			}
+            OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, newAtom, AnnotateOrigin.getAxiomAnnotations(a));
+            res.add(axiom);
+        }
+    }
 
-			OWLClassExpression newAtom = FreshAtoms.createFreshAtomCopy(newConj);
-			leftConj.remove(one);
-			leftConj.remove(two);
-			leftConj.add(newAtom);
+    /**
+     * @param args
+     *            One argument must be given, corresponding to an OWL ontology file
+     *            path. E.g., run with the parameter resources/bodysystem.owl
+     */
+    public static void main(String[] args) {
+        AppCondorRules mApp = new AppCondorRules(args[0]);
 
-			OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, newAtom, AnnotateOrigin.getAxiomAnnotations(a));
-			res.add(axiom);
-		}
-	}
+        OWLOntology condor = mApp.runCondor();
 
-	/**
-	 * @param args
-	 *            One argument must be given, corresponding to an OWL ontology file
-	 *            path. E.g., run with the parameter resources/bodysystem.owl
-	 */
-	public static void main(String[] args) {
-		AppCondorRules mApp = new AppCondorRules(args[0]);
+        RuleGeneration rgc = new RuleGeneration(condor);
 
-		OWLOntology condor = mApp.runCondor();
+        condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
+            System.out.println(rgc.normalizedSubClassAxiomToRule(ax));
+        });
 
-		RuleGeneration rgc = new RuleGeneration(condor);
-
-		condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
-			System.out.println(rgc.normalizedSubClassAxiomToRule(ax));
-		});
-
-		// we write the mappings in to a file
-		try {
-			FileWriter write = new FileWriter("rules-mappings.txt", false);
-			write.append("ENTITIES\n");
-			rgc.getMapEntities().entrySet().stream().forEach(e -> {
-				try {
-					write.append(e.getValue() + "\t\t" + Utils.pretty(e.getKey().toString()) + "\n");
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			});
-			write.append("AXIOMS GROUPS\n");
-			rgc.getMapAxioms().entrySet().stream().forEach(e -> {
-				try {
-					write.append(e.getValue() + "\t\t");
-					e.getKey().forEach(ann -> {
-						try {
-							write.append(ann.getValue().toString());
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-					});
-					write.append("\n");
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			});
-			write.flush();
-			write.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        // we write the mappings in to a file
+        try {
+            FileWriter write = new FileWriter("rules-mappings.txt", false);
+            write.append("ENTITIES\n");
+            rgc.getMapEntities().entrySet().stream().forEach(e -> {
+                try {
+                    write.append(e.getValue() + "\t\t" + Utils.pretty(e.getKey().toString()) + "\n");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            });
+            write.append("AXIOMS GROUPS\n");
+            rgc.getMapAxioms().entrySet().stream().forEach(e -> {
+                try {
+                    write.append(e.getValue() + "\t\t");
+                    e.getKey().forEach(ann -> {
+                        try {
+                            write.append(ann.getValue().toString());
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    });
+                    write.append("\n");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            });
+            write.flush();
+            write.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

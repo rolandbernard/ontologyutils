@@ -38,249 +38,247 @@ import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
 import www.ontologyutils.normalization.NormalizationTools;
 
 public class TesterUtils extends TestCase {
+    private static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
+    private static final OWLClassExpression TOP = new OWLDataFactoryImpl().getOWLThing();
+    private static final OWLClassExpression BOT = new OWLDataFactoryImpl().getOWLNothing();
 
-	private static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
-	private static final OWLClassExpression TOP = new OWLDataFactoryImpl().getOWLThing();
-	private static final OWLClassExpression BOT = new OWLDataFactoryImpl().getOWLNothing();
+    static OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
+    static OWLClassExpression entity1 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.first.org"));
+    static OWLClassExpression entity2 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.second.org"));
+    static OWLClassExpression entity3 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.third.org"));
+    static OWLClassExpression entity4 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.fourth.org"));
+    static OWLClassExpression entity1bis = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.first.org"));
+    static OWLEntity role = dataFactory.getOWLObjectProperty(IRI.create("www.role.org"));
+    static OWLEntity rolebis = dataFactory.getOWLObjectProperty(IRI.create("www.role.org"));
 
-	static OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
-	static OWLClassExpression entity1 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.first.org"));
-	static OWLClassExpression entity2 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.second.org"));
-	static OWLClassExpression entity3 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.third.org"));
-	static OWLClassExpression entity4 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.fourth.org"));
-	static OWLClassExpression entity1bis = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.first.org"));
-	static OWLEntity role = dataFactory.getOWLObjectProperty(IRI.create("www.role.org"));
-	static OWLEntity rolebis = dataFactory.getOWLObjectProperty(IRI.create("www.role.org"));
-	
-	static OWLIndividual indy1 = dataFactory.getOWLNamedIndividual(IRI.create("www.indy-one.org"));
-	static OWLIndividual indy2 = dataFactory.getOWLNamedIndividual(IRI.create("www.indy-two.org"));
+    static OWLIndividual indy1 = dataFactory.getOWLNamedIndividual(IRI.create("www.indy-one.org"));
+    static OWLIndividual indy2 = dataFactory.getOWLNamedIndividual(IRI.create("www.indy-two.org"));
 
-	static OWLAxiom ax1 = new OWLSubClassOfAxiomImpl(entity1, entity2, EMPTY_ANNOTATION);
-	static OWLAxiom ax2 = new OWLSubClassOfAxiomImpl(entity2, entity3, EMPTY_ANNOTATION);
-	static OWLAxiom ax3 = new OWLSubClassOfAxiomImpl(entity3, entity4, EMPTY_ANNOTATION);
-	static OWLAxiom ax4 = new OWLSubClassOfAxiomImpl(entity4, entity1, EMPTY_ANNOTATION);
-	static OWLAxiom ax5 = new OWLSubClassOfAxiomImpl(TOP, entity1, EMPTY_ANNOTATION);
-	static OWLAxiom ax6 = new OWLSubClassOfAxiomImpl(entity4, BOT, EMPTY_ANNOTATION);
-	static OWLAxiom ax7 = new OWLClassAssertionAxiomImpl(indy1, entity1, EMPTY_ANNOTATION);
-	static OWLAxiom ax8 = new OWLSubClassOfAxiomImpl(TOP, BOT, EMPTY_ANNOTATION);
+    static OWLAxiom ax1 = new OWLSubClassOfAxiomImpl(entity1, entity2, EMPTY_ANNOTATION);
+    static OWLAxiom ax2 = new OWLSubClassOfAxiomImpl(entity2, entity3, EMPTY_ANNOTATION);
+    static OWLAxiom ax3 = new OWLSubClassOfAxiomImpl(entity3, entity4, EMPTY_ANNOTATION);
+    static OWLAxiom ax4 = new OWLSubClassOfAxiomImpl(entity4, entity1, EMPTY_ANNOTATION);
+    static OWLAxiom ax5 = new OWLSubClassOfAxiomImpl(TOP, entity1, EMPTY_ANNOTATION);
+    static OWLAxiom ax6 = new OWLSubClassOfAxiomImpl(entity4, BOT, EMPTY_ANNOTATION);
+    static OWLAxiom ax7 = new OWLClassAssertionAxiomImpl(indy1, entity1, EMPTY_ANNOTATION);
+    static OWLAxiom ax8 = new OWLSubClassOfAxiomImpl(TOP, BOT, EMPTY_ANNOTATION);
 
-	
-	static Set<OWLAxiom> agenda;
+    static Set<OWLAxiom> agenda;
 
-	File[] FILES = { new File("./resources/catsandnumbers.owl"), new File("./resources/bodysystem.owl"),
-			new File("./resources/bfo.owl"), new File("./resources/apo.owl"), new File("./resources/aeo.owl"),
-			new File("./resources/duo.owl") };
-	
-	public TesterUtils(String testName) {
-		super(testName);
+    File[] FILES = { new File("./resources/catsandnumbers.owl"), new File("./resources/bodysystem.owl"),
+            new File("./resources/bfo.owl"), new File("./resources/apo.owl"), new File("./resources/aeo.owl"),
+            new File("./resources/duo.owl") };
 
-		agenda = new HashSet<OWLAxiom>();
-		agenda.add(ax1);
-		agenda.add(ax2);
-		agenda.add(ax3);
-		agenda.add(ax4);
-		agenda.add(ax5);
-		agenda.add(ax6);
-		agenda.add(ax7);
-		agenda.add(ax8);
+    public TesterUtils(String testName) {
+        super(testName);
 
-		System.out.println("AGENDA " + agenda);
-	}
+        agenda = new HashSet<OWLAxiom>();
+        agenda.add(ax1);
+        agenda.add(ax2);
+        agenda.add(ax3);
+        agenda.add(ax4);
+        agenda.add(ax5);
+        agenda.add(ax6);
+        agenda.add(ax7);
+        agenda.add(ax8);
 
-	public static Test suite() {
-		return new TestSuite(TesterUtils.class);
-	}
+        System.out.println("AGENDA " + agenda);
+    }
 
-	public void testPowerset() {
+    public static Test suite() {
+        return new TestSuite(TesterUtils.class);
+    }
 
-		Set<Set<OWLAxiom>> powerSetAgenda = SetUtils.powerSet(agenda);
-		assertTrue(powerSetAgenda.size() == (int) Math.pow(2,agenda.size()));
-		assertTrue(powerSetAgenda.stream().allMatch(subset -> agenda.containsAll(subset)));
-		
-	}
-	
-	public void testMaximalConsistentSetsNaive() {
-		System.out.println("%%% TEST MCSs");
+    public void testPowerset() {
+        Set<Set<OWLAxiom>> powerSetAgenda = SetUtils.powerSet(agenda);
+        assertTrue(powerSetAgenda.size() == (int) Math.pow(2, agenda.size()));
+        assertTrue(powerSetAgenda.stream().allMatch(subset -> agenda.containsAll(subset)));
+    }
 
-		Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsetsNaive(agenda);
+    public void testMaximalConsistentSetsNaive() {
+        System.out.println("%%% TEST MCSs");
 
-		System.out.println("Found " + results.size() + " MCSs in " + agenda);
-		results.stream().forEach(System.out::println);
+        Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsetsNaive(agenda);
 
-		assertTrue(
-				results.stream().allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)));
-		assertTrue(SetUtils.powerSet(agenda).stream()
-				.allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
-						|| results.contains(subset))));
-		assertTrue(results.stream().allMatch(mcs -> mcs.stream().allMatch(ax -> agenda.contains(ax))));
-	}
+        System.out.println("Found " + results.size() + " MCSs in " + agenda);
+        results.stream().forEach(System.out::println);
 
-	public void testMaximalConsistentSets() {
-		System.out.println("%%% TEST MCSs");
+        assertTrue(
+                results.stream().allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)));
+        assertTrue(SetUtils.powerSet(agenda).stream()
+                .allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
+                        || results.contains(subset))));
+        assertTrue(results.stream().allMatch(mcs -> mcs.stream().allMatch(ax -> agenda.contains(ax))));
+    }
 
-		Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda);
+    public void testMaximalConsistentSets() {
+        System.out.println("%%% TEST MCSs");
 
-		System.out.println("Found " + results.size() + " MCSs in " + agenda);
-		results.stream().forEach(System.out::println);
+        Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda);
 
-		assertTrue(
-				results.stream().allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)));
-		assertTrue(SetUtils.powerSet(agenda).stream()
-				.allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
-						|| results.contains(subset))));
-		assertTrue(results.stream().allMatch(mcs -> mcs.stream().allMatch(ax -> agenda.contains(ax))));
-	}
-	
-	/**
-	 * 
-	 */
-	public void testConceptEquality() {
-		System.out.println("%%% TEST Concept Equality");
-		
-		assertTrue(entity1 == entity1bis);
-		assertTrue(Utils.sameConcept((OWLClassExpression) entity1, (OWLClassExpression) entity1bis));
+        System.out.println("Found " + results.size() + " MCSs in " + agenda);
+        results.stream().forEach(System.out::println);
 
-		Set<OWLClassExpression> operands12 = new HashSet<OWLClassExpression>();
-		operands12.add((OWLClassExpression) entity1);
-		operands12.add((OWLClassExpression) entity2);
-		OWLObjectUnionOf union12 = new OWLObjectUnionOfImpl(operands12.stream());
+        assertTrue(
+                results.stream().allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)));
+        assertTrue(SetUtils.powerSet(agenda).stream()
+                .allMatch(subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda)
+                        || results.contains(subset))));
+        assertTrue(results.stream().allMatch(mcs -> mcs.stream().allMatch(ax -> agenda.contains(ax))));
+    }
 
-		Set<OWLClassExpression> operands12bis = new HashSet<OWLClassExpression>();
-		operands12bis.add((OWLClassExpression) entity1bis);
-		operands12bis.add((OWLClassExpression) entity2);
-		OWLObjectUnionOf union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
+    /**
+     * 
+     */
+    public void testConceptEquality() {
+        System.out.println("%%% TEST Concept Equality");
 
-		assertFalse(union12 == union12bis);
-		assertTrue(Utils.sameConcept(union12, union12bis));
+        assertTrue(entity1 == entity1bis);
+        assertTrue(Utils.sameConcept((OWLClassExpression) entity1, (OWLClassExpression) entity1bis));
 
-		operands12.add((OWLClassExpression) entity3);
-		operands12bis.add((OWLClassExpression) entity3);
-		union12 = new OWLObjectUnionOfImpl(operands12.stream());
-		union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
+        Set<OWLClassExpression> operands12 = new HashSet<OWLClassExpression>();
+        operands12.add((OWLClassExpression) entity1);
+        operands12.add((OWLClassExpression) entity2);
+        OWLObjectUnionOf union12 = new OWLObjectUnionOfImpl(operands12.stream());
 
-		assertFalse(union12 == union12bis);
-		assertTrue(Utils.sameConcept(union12, union12bis));
+        Set<OWLClassExpression> operands12bis = new HashSet<OWLClassExpression>();
+        operands12bis.add((OWLClassExpression) entity1bis);
+        operands12bis.add((OWLClassExpression) entity2);
+        OWLObjectUnionOf union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
 
-		OWLObjectSomeValuesFromImpl exist12 = new OWLObjectSomeValuesFromImpl((OWLObjectPropertyExpression) role,
-				union12);
-		OWLObjectSomeValuesFromImpl exist12bis = new OWLObjectSomeValuesFromImpl((OWLObjectPropertyExpression) rolebis,
-				union12bis);
+        assertFalse(union12 == union12bis);
+        assertTrue(Utils.sameConcept(union12, union12bis));
 
-		assertTrue(Utils.sameConcept(exist12, exist12bis));
+        operands12.add((OWLClassExpression) entity3);
+        operands12bis.add((OWLClassExpression) entity3);
+        union12 = new OWLObjectUnionOfImpl(operands12.stream());
+        union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
 
-		operands12.add((OWLClassExpression) exist12);
-		operands12bis.add((OWLClassExpression) exist12bis);
-		union12 = new OWLObjectUnionOfImpl(operands12.stream());
-		union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
+        assertFalse(union12 == union12bis);
+        assertTrue(Utils.sameConcept(union12, union12bis));
 
-		assertFalse(union12 == union12bis);
-		assertTrue(Utils.sameConcept(union12, union12bis));
+        OWLObjectSomeValuesFromImpl exist12 = new OWLObjectSomeValuesFromImpl((OWLObjectPropertyExpression) role,
+                union12);
+        OWLObjectSomeValuesFromImpl exist12bis = new OWLObjectSomeValuesFromImpl((OWLObjectPropertyExpression) rolebis,
+                union12bis);
 
-		OWLObjectAllValuesFromImpl all12 = new OWLObjectAllValuesFromImpl((OWLObjectPropertyExpression) role,
-				(OWLClassExpression) union12);
-		OWLObjectAllValuesFromImpl all12bis = new OWLObjectAllValuesFromImpl((OWLObjectPropertyExpression) rolebis,
-				(OWLClassExpression) union12bis);
+        assertTrue(Utils.sameConcept(exist12, exist12bis));
 
-		operands12.add((OWLClassExpression) all12);
-		operands12bis.add((OWLClassExpression) all12bis);
-		OWLObjectIntersectionOfImpl inter12 = new OWLObjectIntersectionOfImpl(operands12.stream());
-		OWLObjectIntersectionOfImpl inter12bis = new OWLObjectIntersectionOfImpl(operands12bis.stream());
+        operands12.add((OWLClassExpression) exist12);
+        operands12bis.add((OWLClassExpression) exist12bis);
+        union12 = new OWLObjectUnionOfImpl(operands12.stream());
+        union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
 
-		assertFalse(inter12 == inter12bis);
-		assertTrue(Utils.sameConcept(inter12, inter12bis));
-	}
+        assertFalse(union12 == union12bis);
+        assertTrue(Utils.sameConcept(union12, union12bis));
 
-	/**
-	 * 
-	 */
-	public void testFreshAtomsEquality() {
-		System.out.println("%%% TEST Fresh Atoms Equality");
-		
-		OWLClassExpression ef1 = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity1);
-		OWLClassExpression ef2 = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity2);
-		OWLClassExpression ef1bis = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity1);
-		OWLClassExpression ef1bisbis = FreshAtoms.createFreshAtomCopy(ef1bis);
+        OWLObjectAllValuesFromImpl all12 = new OWLObjectAllValuesFromImpl((OWLObjectPropertyExpression) role,
+                (OWLClassExpression) union12);
+        OWLObjectAllValuesFromImpl all12bis = new OWLObjectAllValuesFromImpl((OWLObjectPropertyExpression) rolebis,
+                (OWLClassExpression) union12bis);
 
-		assertTrue(ef1.equals(ef1bis));
-		assertFalse(ef1 == ef2);
-		assertTrue(Utils.sameConcept(ef1, ef1bis));
-		assertTrue(!Utils.sameConcept(ef1, ef1bisbis));
-		assertTrue(!Utils.sameConcept(ef1bis, ef1bisbis));
-	}
+        operands12.add((OWLClassExpression) all12);
+        operands12bis.add((OWLClassExpression) all12bis);
+        OWLObjectIntersectionOfImpl inter12 = new OWLObjectIntersectionOfImpl(operands12.stream());
+        OWLObjectIntersectionOfImpl inter12bis = new OWLObjectIntersectionOfImpl(operands12bis.stream());
 
-	/**
-	 * Test whether we can normalize an ontology in such a way that all TBox axioms
-	 * are replaced with subclass axioms; The new ontology entails all axioms of the
-	 * original ontology, and vice versa.
-	 * 
-	 * @throws OWLOntologyCreationException
-	 */
-	public void testAsSubClass() throws OWLOntologyCreationException {
-		System.out.println("%%% TEST AsSubClass");
-		for (File ontologyFile : FILES) {
+        assertFalse(inter12 == inter12bis);
+        assertTrue(Utils.sameConcept(inter12, inter12bis));
+    }
 
-			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-			OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(ontologyFile));
+    /**
+     * 
+     */
+    public void testFreshAtomsEquality() {
+        System.out.println("%%% TEST Fresh Atoms Equality");
 
-			System.out.println("Testing subclass normalization on " + ontology);
+        OWLClassExpression ef1 = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity1);
+        OWLClassExpression ef2 = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity2);
+        OWLClassExpression ef1bis = FreshAtoms.createFreshAtomCopy((OWLClassExpression) entity1);
+        OWLClassExpression ef1bisbis = FreshAtoms.createFreshAtomCopy(ef1bis);
 
-			Stream<OWLAxiom> tBox = ontology.tboxAxioms(Imports.EXCLUDED);
-			Object[] tBoxArray = tBox.toArray();
+        assertTrue(ef1.equals(ef1bis));
+        assertFalse(ef1 == ef2);
+        assertTrue(Utils.sameConcept(ef1, ef1bis));
+        assertTrue(!Utils.sameConcept(ef1, ef1bisbis));
+        assertTrue(!Utils.sameConcept(ef1bis, ef1bisbis));
+    }
 
-			for (int i = 0; i < tBoxArray.length; i++) {
-				OWLAxiom ax = (OWLAxiom) tBoxArray[i];
-				ontology.remove(ax);
-				ontology.add(NormalizationTools.asSubClassOfAxioms(ax));
-			}
-			// all subclass axioms
-			ontology.tboxAxioms(Imports.EXCLUDED).forEach((ax) -> assertTrue(ax.isOfType(AxiomType.SUBCLASS_OF)));
+    /**
+     * Test whether we can normalize an ontology in such a way that all TBox axioms
+     * are replaced with subclass axioms; The new ontology entails all axioms of the
+     * original ontology, and vice versa.
+     * 
+     * @throws OWLOntologyCreationException
+     */
+    public void testAsSubClass() throws OWLOntologyCreationException {
+        System.out.println("%%% TEST AsSubClass");
+        for (File ontologyFile : FILES) {
 
-			OWLOntologyManager managerOrigin = OWLManager.createOWLOntologyManager();
-			OWLOntology ontologyOrigin = managerOrigin.loadOntologyFromOntologyDocument(IRI.create(ontologyFile));
-			OWLReasoner originReasoner = Utils.getFactReasoner(ontologyOrigin);
-			// the original ontology entails all the axioms of the new ontology.
-			ontology.axioms().forEach((ax) -> assertTrue(originReasoner.isEntailed(ax)));
-			OWLReasoner reasoner = Utils.getFactReasoner(ontology);
-			// the new ontology entails all the axioms of the original ontology.
-			ontologyOrigin.axioms().forEach((ax) -> assertTrue(reasoner.isEntailed(ax)));
-		}
-	}
-	
-	public void testMaximalConsistentSetsSupersetsOf() {
-		System.out.println("%%% TEST MCSs SUPERSETS OF");
+            OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+            OWLOntology ontology = manager.loadOntologyFromOntologyDocument(IRI.create(ontologyFile));
 
-		Set<Set<OWLAxiom>> powerSetAgenda = SetUtils.powerSet(agenda);
-		
-		int i = 0;
-		for (Set<OWLAxiom> subset : powerSetAgenda ) {	
-			i++;
-			Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda, MaximalConsistentSets.ALL_MCSS, subset);
-			Set<Set<OWLAxiom>> resultsNaive = MaximalConsistentSets.maximalConsistentSubsetsNaive(agenda, MaximalConsistentSets.ALL_MCSS, subset);
-			System.out.println("Testing (" + i + ") mcss supersets of " + subset);
-			assertTrue(results.containsAll(resultsNaive));
-			assertTrue(resultsNaive.containsAll(results));
+            System.out.println("Testing subclass normalization on " + ontology);
 
-		}
-	}
-	
-	public void testInferredTaxononmyAxioms() {
-		System.out.println("%%% TEST InferredTaxonoymAxioms");
+            Stream<OWLAxiom> tBox = ontology.tboxAxioms(Imports.EXCLUDED);
+            Object[] tBoxArray = tBox.toArray();
 
-		OWLAxiom ax1a = new OWLSubClassOfAxiomImpl(entity1, entity2, EMPTY_ANNOTATION);
-		OWLAxiom ax2a = new OWLSubClassOfAxiomImpl(entity2, entity3, EMPTY_ANNOTATION);
-		OWLAxiom axa = new OWLSubClassOfAxiomImpl(entity2, entity1, EMPTY_ANNOTATION);
+            for (int i = 0; i < tBoxArray.length; i++) {
+                OWLAxiom ax = (OWLAxiom) tBoxArray[i];
+                ontology.remove(ax);
+                ontology.add(NormalizationTools.asSubClassOfAxioms(ax));
+            }
+            // all subclass axioms
+            ontology.tboxAxioms(Imports.EXCLUDED).forEach((ax) -> assertTrue(ax.isOfType(AxiomType.SUBCLASS_OF)));
 
-		HashSet<OWLAxiom> axioms = new HashSet<OWLAxiom>();
-		
-		axioms.add(ax1a);
-		axioms.add(ax2a);
-		OWLOntology onto = Utils.newOntology(axioms);
-		int sizeInf = Utils.inferredTaxonomyAxioms(onto).size();
-		assertTrue(sizeInf == 6);
-		
-		axioms.add(axa);
-		onto = Utils.newOntology(axioms);
-		sizeInf = Utils.inferredTaxonomyAxioms(onto).size();
-		assertTrue(sizeInf == 7);
-	}
+            OWLOntologyManager managerOrigin = OWLManager.createOWLOntologyManager();
+            OWLOntology ontologyOrigin = managerOrigin.loadOntologyFromOntologyDocument(IRI.create(ontologyFile));
+            OWLReasoner originReasoner = Utils.getFactReasoner(ontologyOrigin);
+            // the original ontology entails all the axioms of the new ontology.
+            ontology.axioms().forEach((ax) -> assertTrue(originReasoner.isEntailed(ax)));
+            OWLReasoner reasoner = Utils.getFactReasoner(ontology);
+            // the new ontology entails all the axioms of the original ontology.
+            ontologyOrigin.axioms().forEach((ax) -> assertTrue(reasoner.isEntailed(ax)));
+        }
+    }
+
+    public void testMaximalConsistentSetsSupersetsOf() {
+        System.out.println("%%% TEST MCSs SUPERSETS OF");
+
+        Set<Set<OWLAxiom>> powerSetAgenda = SetUtils.powerSet(agenda);
+
+        int i = 0;
+        for (Set<OWLAxiom> subset : powerSetAgenda) {
+            i++;
+            Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agenda,
+                    MaximalConsistentSets.ALL_MCSS, subset);
+            Set<Set<OWLAxiom>> resultsNaive = MaximalConsistentSets.maximalConsistentSubsetsNaive(agenda,
+                    MaximalConsistentSets.ALL_MCSS, subset);
+            System.out.println("Testing (" + i + ") mcss supersets of " + subset);
+            assertTrue(results.containsAll(resultsNaive));
+            assertTrue(resultsNaive.containsAll(results));
+
+        }
+    }
+
+    public void testInferredTaxononmyAxioms() {
+        System.out.println("%%% TEST InferredTaxonoymAxioms");
+
+        OWLAxiom ax1a = new OWLSubClassOfAxiomImpl(entity1, entity2, EMPTY_ANNOTATION);
+        OWLAxiom ax2a = new OWLSubClassOfAxiomImpl(entity2, entity3, EMPTY_ANNOTATION);
+        OWLAxiom axa = new OWLSubClassOfAxiomImpl(entity2, entity1, EMPTY_ANNOTATION);
+
+        HashSet<OWLAxiom> axioms = new HashSet<OWLAxiom>();
+
+        axioms.add(ax1a);
+        axioms.add(ax2a);
+        OWLOntology onto = Utils.newOntology(axioms);
+        int sizeInf = Utils.inferredTaxonomyAxioms(onto).size();
+        assertTrue(sizeInf == 6);
+
+        axioms.add(axa);
+        onto = Utils.newOntology(axioms);
+        sizeInf = Utils.inferredTaxonomyAxioms(onto).size();
+        assertTrue(sizeInf == 7);
+    }
 }

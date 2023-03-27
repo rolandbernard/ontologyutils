@@ -17,17 +17,15 @@ import www.ontologyutils.toolbox.Utils;
  *
  */
 public class OntologyRepairRandomMCS implements OntologyRepair {
+    private Set<Set<OWLAxiom>> mcss;
 
-	private Set<Set<OWLAxiom>> mcss;
+    public OntologyRepairRandomMCS(OWLOntology ontology) {
+        Set<OWLAxiom> originalAxioms = ontology.axioms().collect(Collectors.toSet());
+        this.mcss = MaximalConsistentSets.maximalConsistentSubsets(originalAxioms);
+    }
 
-	public OntologyRepairRandomMCS(OWLOntology ontology) {
-		Set<OWLAxiom> originalAxioms = ontology.axioms().collect(Collectors.toSet());
-		this.mcss = MaximalConsistentSets.maximalConsistentSubsets(originalAxioms);
-	}
-
-	@Override
-	public OWLOntology repair() {
-		return Utils.newOntology(SetUtils.getRandom(mcss));
-	}
-
+    @Override
+    public OWLOntology repair() {
+        return Utils.newOntology(SetUtils.getRandom(mcss));
+    }
 }
