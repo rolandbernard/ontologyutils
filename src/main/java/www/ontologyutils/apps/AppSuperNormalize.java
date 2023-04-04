@@ -3,6 +3,7 @@ package www.ontologyutils.apps;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -111,7 +112,7 @@ public class AppSuperNormalize {
 
     /**
      * @param on
-     *            an ontology in normal form
+     *           an ontology in normal form
      * @return an equivalent ontology where type-1 rules have at most 2 conjuncts on
      *         the left.
      */
@@ -142,7 +143,7 @@ public class AppSuperNormalize {
             OWLClassExpression one = iter.next();
             OWLClassExpression two = iter.next();
 
-            OWLClassExpression newConj = new OWLObjectIntersectionOfImpl(one, two);
+            OWLClassExpression newConj = new OWLObjectIntersectionOfImpl(List.of(one, two));
             assert (newConj.asConjunctSet().size() == 2);
             if (leftConj.size() == 2) {
                 assert (!iter.hasNext());
@@ -162,9 +163,10 @@ public class AppSuperNormalize {
     }
 
     /**
+     * One argument must be given, corresponding to an OWL ontology file path. E.g.,
+     * run with the parameter resources/bodysystem.owl
+     * 
      * @param args
-     *            One argument must be given, corresponding to an OWL ontology file
-     *            path. E.g., run with the parameter resources/bodysystem.owl
      */
     public static void main(String[] args) {
         AppSuperNormalize mApp = new AppSuperNormalize(args[0]);

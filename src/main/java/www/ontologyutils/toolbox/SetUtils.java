@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class SetUtils {
+public final class SetUtils {
     // Prevent instantiation
     private SetUtils() {
     }

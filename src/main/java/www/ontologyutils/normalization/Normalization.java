@@ -146,12 +146,12 @@ public class Normalization {
             case OBJECT_UNION_OF: {
                 Set<OWLClassExpression> disjuncts = in.asDisjunctSet();
                 return new OWLObjectUnionOfImpl(
-                        disjuncts.stream().map(d -> replaceIfPolarity(e, substitute, d, polarity)));
+                        disjuncts.stream().map(d -> replaceIfPolarity(e, substitute, d, polarity)).toList());
             }
             case OBJECT_INTERSECTION_OF: {
                 Set<OWLClassExpression> conjuncts = in.asConjunctSet();
                 return new OWLObjectIntersectionOfImpl(
-                        conjuncts.stream().map(c -> replaceIfPolarity(e, substitute, c, polarity)));
+                        conjuncts.stream().map(c -> replaceIfPolarity(e, substitute, c, polarity)).toList());
             }
             case OBJECT_SOME_VALUES_FROM: {
                 OWLClassExpression filler = ((OWLObjectSomeValuesFrom) in).getFiller();
@@ -305,10 +305,10 @@ public class Normalization {
             return new OWLObjectComplementOfImpl(map.get(((OWLObjectComplementOf) e).getOperand()));
         } else if ((e.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF)) {
             Set<OWLClassExpression> conjunctions = e.asConjunctSet();
-            return new OWLObjectIntersectionOfImpl(conjunctions.stream().map((c) -> map.get(c)));
+            return new OWLObjectIntersectionOfImpl(conjunctions.stream().map((c) -> map.get(c)).toList());
         } else if ((e.getClassExpressionType() == ClassExpressionType.OBJECT_UNION_OF)) {
             Set<OWLClassExpression> disjunctions = e.asDisjunctSet();
-            return new OWLObjectUnionOfImpl(disjunctions.stream().map((c) -> map.get(c)));
+            return new OWLObjectUnionOfImpl(disjunctions.stream().map((c) -> map.get(c)).toList());
         } else if ((e.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM)) {
             OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) e).getFiller();
             OWLObjectPropertyExpression property = ((OWLObjectAllValuesFrom) e).getProperty();

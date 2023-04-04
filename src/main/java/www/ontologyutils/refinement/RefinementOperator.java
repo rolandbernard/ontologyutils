@@ -191,7 +191,7 @@ public class RefinementOperator {
                         newConj.add(conjuncts.get(j));
                     }
                 }
-                result.add(new OWLObjectIntersectionOfImpl(newConj.stream()));
+                result.add(new OWLObjectIntersectionOfImpl(newConj.stream().toList()));
             }
         }
 
@@ -231,7 +231,7 @@ public class RefinementOperator {
                         newDisj.add(disjuncts.get(j));
                     }
                 }
-                result.add(new OWLObjectUnionOfImpl(newDisj.stream()));
+                result.add(new OWLObjectUnionOfImpl(newDisj.stream().toList()));
             }
         }
 

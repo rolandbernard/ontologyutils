@@ -46,16 +46,16 @@ public class NormalizationTools {
     private static final OWLClassExpression BOT = new OWLDataFactoryImpl().getOWLNothing();
 
     /**
+     * This is a function that completes {@code asSubClassOfAxioms} that already
+     * exists for {@code OWLEquivalentClassesAxiomImpl} and
+     * {@code OWLDisjointClassesAxiomImpl} and for
+     * {@code OWLSubClassOfAxiomShortCut} in general. It thus obviously works for
+     * axiom types subclass, equivalent class, disjoint class. Moreover, we extend
+     * it to axiom types: disjoint union, object property range, object property
+     * domain.
+     * 
      * @param ax
      * @return a collection of subclass axioms that are equivalent to ax
-     * 
-     *         This is a function that completes {@code asSubClassOfAxioms} that
-     *         already exists for {@code OWLEquivalentClassesAxiomImpl} and
-     *         {@code OWLDisjointClassesAxiomImpl} and for
-     *         {@code OWLSubClassOfAxiomShortCut} in general. It thus obviously
-     *         works for axiom types subclass, equivalent class, disjoint class.
-     *         Moreover, we extend it to axiom types: disjoint union, object
-     *         property range, object property domain.
      */
     public static Collection<OWLSubClassOfAxiom> asSubClassOfAxioms(OWLAxiom ax) throws InvalidParameterException {
         Collection<OWLSubClassOfAxiom> subClassOfAxioms = new ArrayList<OWLSubClassOfAxiom>();
@@ -189,16 +189,14 @@ public class NormalizationTools {
                             OWLSubClassOfAxiom sbaOceFresh = new OWLSubClassOfAxiomImpl(conj, fresh,
                                     AnnotateOrigin.getAxiomAnnotations(currentAxiom));
                             axioms.add(sbaOceFresh);
-
                         }
                     }
                     // adding new_conjunction -> right
                     OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(
-                            new OWLObjectIntersectionOfImpl(newConjuncts.stream()), right,
+                            new OWLObjectIntersectionOfImpl(newConjuncts.stream().toList()), right,
                             AnnotateOrigin.getAxiomAnnotations(currentAxiom));
                     axioms.add(sba);
                 }
-
             }
             // right is disjunction
             else if (right.getClassExpressionType() == ClassExpressionType.OBJECT_UNION_OF) {
@@ -223,12 +221,11 @@ public class NormalizationTools {
                             OWLSubClassOfAxiom sbaOceFresh = new OWLSubClassOfAxiomImpl(disj, fresh,
                                     AnnotateOrigin.getAxiomAnnotations(currentAxiom));
                             axioms.add(sbaOceFresh);
-
                         }
                     }
                     // adding left -> new_disjunction
                     OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(left,
-                            new OWLObjectUnionOfImpl(newDisjuncts.stream()),
+                            new OWLObjectUnionOfImpl(newDisjuncts.stream().toList()),
                             AnnotateOrigin.getAxiomAnnotations(currentAxiom));
                     axioms.add(sba);
                 }
@@ -244,7 +241,7 @@ public class NormalizationTools {
                 // we add : top -> filler or right
                 Set<OWLClassExpression> operands = right.asDisjunctSet();
                 operands.add(filler);
-                OWLObjectUnionOfImpl newRight = new OWLObjectUnionOfImpl(operands.stream());
+                OWLObjectUnionOfImpl newRight = new OWLObjectUnionOfImpl(operands.stream().toList());
 
                 OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(TOP, newRight,
                         AnnotateOrigin.getAxiomAnnotations(currentAxiom));
@@ -258,7 +255,7 @@ public class NormalizationTools {
                 // we add : left and filler -> bot
                 Set<OWLClassExpression> operands = left.asConjunctSet();
                 operands.add(filler);
-                OWLObjectIntersectionOfImpl newLeft = new OWLObjectIntersectionOfImpl(operands.stream());
+                OWLObjectIntersectionOfImpl newLeft = new OWLObjectIntersectionOfImpl(operands.stream().toList());
 
                 OWLSubClassOfAxiom sba = new OWLSubClassOfAxiomImpl(newLeft, BOT,
                         AnnotateOrigin.getAxiomAnnotations(currentAxiom));

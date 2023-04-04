@@ -36,7 +36,7 @@ public class TesterTermination extends TestCase {
                                          // concept (unless it is TOP).
     static OWLOntology ontology;
     static Covers covers;
-    static RefinementOperator generalisation;
+    static RefinementOperator generalization;
     static OWLReasoner equivReasoner;
 
     public TesterTermination(String testName) {
@@ -45,7 +45,7 @@ public class TesterTermination extends TestCase {
 
         ontology = Utils.newOntology(OWL_FILE_PATH);
         covers = new Covers(ontology);
-        generalisation = new RefinementOperator(covers.getUpCoverOperator(), covers.getDownCoverOperator());
+        generalization = new RefinementOperator(covers.getUpCoverOperator(), covers.getDownCoverOperator());
 
         equivReasoner = Utils.getReasoner(ontology);
     }
@@ -75,10 +75,10 @@ public class TesterTermination extends TestCase {
                 Set<OWLClassExpression> gen;
                 if (PROPER) {
                     final OWLClassExpression ee = e;
-                    gen = generalisation.refine(e).stream().filter(c -> !areEquivalent(ee, c) || c.isOWLThing())
+                    gen = generalization.refine(e).stream().filter(c -> !areEquivalent(ee, c) || c.isOWLThing())
                             .collect(Collectors.toSet());
                 } else {
-                    gen = generalisation.refine(e);
+                    gen = generalization.refine(e);
                 }
                 e = SetUtils.getRandom(gen);
                 // System.out.println(Utils.pretty(e.toString()));

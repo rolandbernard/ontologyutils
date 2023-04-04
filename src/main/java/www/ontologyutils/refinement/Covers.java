@@ -24,7 +24,6 @@ public class Covers {
 
     /**
      * A naive FIFO cache for upcovers and downcovers of class expressions.
-     *
      */
     private class Cache {
         private HashMap<OWLClassExpression, Set<OWLClassExpression>> upCoverCache = new HashMap<>();

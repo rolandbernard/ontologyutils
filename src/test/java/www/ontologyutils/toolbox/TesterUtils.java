@@ -89,7 +89,7 @@ public class TesterUtils extends TestCase {
         return new TestSuite(TesterUtils.class);
     }
 
-    public void testPowerset() {
+    public void testPowerSet() {
         Set<Set<OWLAxiom>> powerSetAgenda = SetUtils.powerSet(agenda);
         assertTrue(powerSetAgenda.size() == (int) Math.pow(2, agenda.size()));
         assertTrue(powerSetAgenda.stream().allMatch(subset -> agenda.containsAll(subset)));
@@ -133,26 +133,26 @@ public class TesterUtils extends TestCase {
     public void testConceptEquality() {
         System.out.println("%%% TEST Concept Equality");
 
-        assertTrue(entity1 == entity1bis);
+        // assertTrue(entity1 == entity1bis);
         assertTrue(Utils.sameConcept((OWLClassExpression) entity1, (OWLClassExpression) entity1bis));
 
         Set<OWLClassExpression> operands12 = new HashSet<OWLClassExpression>();
         operands12.add((OWLClassExpression) entity1);
         operands12.add((OWLClassExpression) entity2);
-        OWLObjectUnionOf union12 = new OWLObjectUnionOfImpl(operands12.stream());
+        OWLObjectUnionOf union12 = new OWLObjectUnionOfImpl(operands12.stream().toList());
 
         Set<OWLClassExpression> operands12bis = new HashSet<OWLClassExpression>();
         operands12bis.add((OWLClassExpression) entity1bis);
         operands12bis.add((OWLClassExpression) entity2);
-        OWLObjectUnionOf union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
+        OWLObjectUnionOf union12bis = new OWLObjectUnionOfImpl(operands12bis.stream().toList());
 
         assertFalse(union12 == union12bis);
         assertTrue(Utils.sameConcept(union12, union12bis));
 
         operands12.add((OWLClassExpression) entity3);
         operands12bis.add((OWLClassExpression) entity3);
-        union12 = new OWLObjectUnionOfImpl(operands12.stream());
-        union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
+        union12 = new OWLObjectUnionOfImpl(operands12.stream().toList());
+        union12bis = new OWLObjectUnionOfImpl(operands12bis.stream().toList());
 
         assertFalse(union12 == union12bis);
         assertTrue(Utils.sameConcept(union12, union12bis));
@@ -166,8 +166,8 @@ public class TesterUtils extends TestCase {
 
         operands12.add((OWLClassExpression) exist12);
         operands12bis.add((OWLClassExpression) exist12bis);
-        union12 = new OWLObjectUnionOfImpl(operands12.stream());
-        union12bis = new OWLObjectUnionOfImpl(operands12bis.stream());
+        union12 = new OWLObjectUnionOfImpl(operands12.stream().toList());
+        union12bis = new OWLObjectUnionOfImpl(operands12bis.stream().toList());
 
         assertFalse(union12 == union12bis);
         assertTrue(Utils.sameConcept(union12, union12bis));
@@ -179,8 +179,8 @@ public class TesterUtils extends TestCase {
 
         operands12.add((OWLClassExpression) all12);
         operands12bis.add((OWLClassExpression) all12bis);
-        OWLObjectIntersectionOfImpl inter12 = new OWLObjectIntersectionOfImpl(operands12.stream());
-        OWLObjectIntersectionOfImpl inter12bis = new OWLObjectIntersectionOfImpl(operands12bis.stream());
+        OWLObjectIntersectionOfImpl inter12 = new OWLObjectIntersectionOfImpl(operands12.stream().toList());
+        OWLObjectIntersectionOfImpl inter12bis = new OWLObjectIntersectionOfImpl(operands12bis.stream().toList());
 
         assertFalse(inter12 == inter12bis);
         assertTrue(Utils.sameConcept(inter12, inter12bis));

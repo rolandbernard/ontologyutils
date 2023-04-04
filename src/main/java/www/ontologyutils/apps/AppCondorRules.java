@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -92,7 +93,7 @@ public class AppCondorRules {
             OWLClassExpression one = iter.next();
             OWLClassExpression two = iter.next();
 
-            OWLClassExpression newConj = new OWLObjectIntersectionOfImpl(one, two);
+            OWLClassExpression newConj = new OWLObjectIntersectionOfImpl(List.of(one, two));
             assert (newConj.asConjunctSet().size() == 2);
             if (leftConj.size() == 2) {
                 assert (!iter.hasNext());

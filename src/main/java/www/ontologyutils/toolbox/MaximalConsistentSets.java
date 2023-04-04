@@ -12,7 +12,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 /**
  * TODO: useful and safe cache
  */
-public class MaximalConsistentSets {
+public final class MaximalConsistentSets {
     public static final int ALL_MCSS = -1;
 
     // Prevent instantiation

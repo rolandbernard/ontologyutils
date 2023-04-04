@@ -20,10 +20,10 @@ public class AppAutomatedRepairWeakening {
     }
 
     /**
+     * One argument must be given, corresponding to an OWL ontology file path. E.g.,
+     * run with the parameter resources/inconsistent-leftpolicies-small.owl
+     * 
      * @param args
-     *            One argument must be given, corresponding to an OWL ontology file
-     *            path. E.g., run with the parameter
-     *            resources/inconsistent-leftpolicies-small.owl
      */
     public static void main(String[] args) {
         AppAutomatedRepairWeakening mApp = new AppAutomatedRepairWeakening(args[0]);

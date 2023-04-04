@@ -62,11 +62,11 @@ public class AppTurnBasedMechanism {
     }
 
     /**
+     * One arguments must be given. It must correspond to an OWL ontology file path.
+     * E.g., run with the parameter ./resources/inconsistent-leftpolicies.owl. TODO:
+     * leave the option to interactively build a reference ontology
+     * 
      * @param args
-     *            One arguments must be given. It must correspond to an OWL
-     *            ontology file path. E.g., run with the parameter
-     *            ./resources/inconsistent-leftpolicies.owl. TODO: leave the option
-     *            to interactively build a reference ontology
      */
     public static void main(String[] args) {
         long time = System.currentTimeMillis();

@@ -174,7 +174,6 @@ public class AppBlendingDialogue {
      * @return an estimation of the "amount of information" in {@code ontology}. We
      *         define it as the number of axiom plus the number of sub-class axioms
      *         in the inferred class taxonomy.
-     * 
      */
     private static int quantifyInformation(OWLOntology ontology) {
         return Utils.inferredTaxonomyAxioms(ontology).size() + ontology.getAxiomCount();
@@ -206,18 +205,18 @@ public class AppBlendingDialogue {
     }
 
     /**
+     * See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
+     * Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
+     * Ontology Aggregation Based on Axiom Weakening. In 27th International
+     * Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
+     * pages 1942-1948.
+     * 
      * @param agent
      * @param ontology
      * @return an estimation of the "happiness" of ontology {@code agent} with
      *         ontology {@code two}. The ratio of the number of axioms and inferred
      *         taxonomy axioms in {@code agent} that are inferred by {code
      *         ontology}.
-     *
-     *         See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
-     *         Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
-     *         Ontology Aggregation Based on Axiom Weakening. In 27th International
-     *         Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
-     *         pages 1942-1948.
      */
     private static double happinessTolerant(OWLOntology agent, OWLOntology ontology) {
         Set<OWLAxiom> axioms = Utils.inferredTaxonomyAxioms(agent);
@@ -248,18 +247,18 @@ public class AppBlendingDialogue {
     }
 
     /**
+     * See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
+     * Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
+     * Ontology Aggregation Based on Axiom Weakening. In 27th International
+     * Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
+     * pages 1942-1948.
+     * 
      * @param agent
      * @param ontology
      * @return an estimation of the "happiness" of ontology {@code agent} with
      *         ontology {@code two}. The ratio of the number of axioms and inferred
      *         taxonomy axioms in {@code agent} and {@code ontology} that are
      *         inferred by {code ontology} and {@code agent}.
-     *
-     *         See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
-     *         Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
-     *         Ontology Aggregation Based on Axiom Weakening. In 27th International
-     *         Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
-     *         pages 1942-1948.
      */
     private static double happinessStrict(OWLOntology agent, OWLOntology ontology) {
         Set<OWLAxiom> axioms = Utils.inferredTaxonomyAxioms(agent);
@@ -297,7 +296,7 @@ public class AppBlendingDialogue {
 
         for (OWLClassExpression ce1 : ad1) {
             for (OWLClassExpression ce2 : ad2) {
-                OWLClassExpression conj = new OWLObjectIntersectionOfImpl(ce1, ce2);
+                OWLClassExpression conj = new OWLObjectIntersectionOfImpl(List.of(ce1, ce2));
                 OWLSubClassOfAxiom scoac = new OWLSubClassOfAxiomImpl(conceptTarget, conj, Utils.EMPTY_ANNOTATION);
 
                 System.out.print(Utils.prettyPrintAxiom(scoac) + " ?\t");

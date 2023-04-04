@@ -41,16 +41,19 @@ import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
 /**
  * @author nico
  */
-public class Utils {
+public final class Utils {
     private static Boolean CACHE = false;
 
     private static int AXIOM_SET_CONSISTENCY_CACHE_SIZE = 1024;
 
     private static long IRI_ID = 0;
 
+    // Prevent instantiation
+    private Utils() {
+    }
+
     /**
      * A naive FIFO cache for consistency checks of sets of axioms.
-     *
      */
     private static class Cache {
         private static HashMap<Set<OWLAxiom>, Boolean> axiomSetConsistencyCache = new HashMap<>();
@@ -82,10 +85,6 @@ public class Utils {
         System.out.println(tag + " : " + message);
     }
 
-    // Prevent instantiation
-    private Utils() {
-    }
-
     public enum ReasonerName {
         FACT, HERMIT, OPENLLET
     }
@@ -113,9 +112,9 @@ public class Utils {
     }
 
     /**
-     * @param ontology
+     * Prints the TBox of {@code ontology} on the standard output.
      * 
-     *            Prints the TBox of {@code ontology} on the standard output.
+     * @param ontology
      */
     public static void printTBox(OWLOntology ontology) {
         Stream<OWLAxiom> tBoxAxioms = ontology.tboxAxioms(Imports.EXCLUDED);
