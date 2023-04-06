@@ -356,7 +356,12 @@ public final class Utils {
         if (consistency != null) {
             return consistency;
         }
-        return isConsistent(newOntology(axioms));
+        OWLOntology ontology = newOntology(axioms);
+        try {
+            return isConsistent(ontology);
+        } finally {
+            ontology.getOWLOntologyManager().removeOntology(ontology);
+        }
     }
 
     /**
