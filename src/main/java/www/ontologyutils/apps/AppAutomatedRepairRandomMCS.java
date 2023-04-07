@@ -1,7 +1,7 @@
 package www.ontologyutils.apps;
 
 import www.ontologyutils.normalization.OntologyNormalization;
-import www.ontologyutils.repair.OntologyRepairRandomMcs;
+import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
 
 public class AppAutomatedRepairRandomMCS {
@@ -11,17 +11,22 @@ public class AppAutomatedRepairRandomMCS {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         Ontology ontology = Ontology.loadOntology(args[0]);
         Utils.log("Loaded...");
         OntologyNormalization normalization = new OntologyNormalization();
-        OntologyRepairRandomMcs repair = new OntologyRepairRandomMcs();
+        OntologyRepair repair = OntologyRepairRandomMcs.forConsistency();
         Utils.log("Normalizing...");
         normalization.apply(ontology);
         Utils.log("Repairing...");
         repair.apply(ontology);
-        Utils.log("Repaired");
-        Utils.log("=== RESULT ===");
-        System.out.println(ontology.getOwlOntology());
+        Utils.log("Repaired.");
+        Utils.log("=== BEGIN RESULT ===");
+        ontology.refutableAxioms().forEach(System.out::println);
+        ontology.staticAxioms().forEach(System.out::println);
+        assert ontology.isConsistent();
+        ontology.dispose();
+        Utils.log("==== END RESULT ====");
+        Utils.log("Done.");
     }
 }

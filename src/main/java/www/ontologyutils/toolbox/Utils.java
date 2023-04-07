@@ -1,5 +1,8 @@
 package www.ontologyutils.toolbox;
 
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Stream;
+
 /**
  * Utility class that contains static constants and methods that don't neatly
  * fit anywhere else.
@@ -15,7 +18,7 @@ public final class Utils {
      * Used for exceptions that we don't want to or can't handle.
      *
      * @param e
-     *            The exception that caused the panic.
+     *          The exception that caused the panic.
      */
     public static void panic(final Exception e) {
         e.printStackTrace();
@@ -27,9 +30,16 @@ public final class Utils {
      * output.
      *
      * @param info
-     *            The message to be communicated
+     *             The message to be communicated
      */
     public static void log(final String info) {
         System.err.println(info);
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public static <T> T randomChoice(final Stream<T> stream) {
+        final Object[] flatArray = stream.toArray();
+        final int randomIdx = ThreadLocalRandom.current().nextInt(flatArray.length);
+        return (T) flatArray[randomIdx];
     }
 }
