@@ -1,6 +1,6 @@
 package www.ontologyutils.apps;
 
-import www.ontologyutils.normalization.OntologyNormalization;
+import www.ontologyutils.normalization.TBoxSubclassOfNormalization;
 import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
 
@@ -14,7 +14,7 @@ public class AppAutomatedRepairRandomMCS {
     public static void main(final String[] args) {
         Ontology ontology = Ontology.loadOntology(args[0]);
         Utils.log("Loaded...");
-        OntologyNormalization normalization = new OntologyNormalization();
+        TBoxSubclassOfNormalization normalization = new TBoxSubclassOfNormalization();
         OntologyRepair repair = OntologyRepairRandomMcs.forConsistency();
         Utils.log("Normalizing...");
         normalization.apply(ontology);

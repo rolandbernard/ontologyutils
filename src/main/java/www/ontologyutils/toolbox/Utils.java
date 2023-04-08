@@ -1,5 +1,6 @@
 package www.ontologyutils.toolbox;
 
+import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
@@ -41,5 +42,9 @@ public final class Utils {
         final Object[] flatArray = stream.toArray();
         final int randomIdx = ThreadLocalRandom.current().nextInt(flatArray.length);
         return (T) flatArray[randomIdx];
+    }
+
+    public static <T> T randomChoice(final Collection<T> collection) {
+        return randomChoice(collection.stream());
     }
 }

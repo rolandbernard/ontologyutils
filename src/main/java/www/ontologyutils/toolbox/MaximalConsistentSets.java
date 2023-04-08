@@ -16,7 +16,7 @@ public class MaximalConsistentSets {
 
     private final Predicate<Ontology> isRepaired;
     private final Ontology ontology;
-    private final OWLAxiom[] axioms;
+    private final List<OWLAxiom> axioms;
     private final Deque<QueueItem> queue;
     private final List<Set<OWLAxiom>> results;
     private Set<OWLAxiom> result;
@@ -29,7 +29,7 @@ public class MaximalConsistentSets {
         }
         this.ontology = ontology;
         this.isRepaired = isRepaired;
-        axioms = ontology.refutableAxioms().toArray(n -> new OWLAxiom[n]);
+        axioms = ontology.refutableAxioms().toList();
         queue = new ArrayDeque<>();
         queue.add(new QueueItem(0, Set.of()));
         results = new ArrayList<>();
@@ -76,14 +76,14 @@ public class MaximalConsistentSets {
                         result = current.removed;
                         return true;
                     } else {
-                        subset.removeAxioms(Arrays.stream(axioms).skip(current.k));
-                        for (int i = current.k; i < axioms.length; i++) {
+                        subset.removeAxioms(axioms.stream().skip(current.k));
+                        for (int i = current.k; i < axioms.size(); i++) {
                             final Set<OWLAxiom> removed = new HashSet<>(current.removed);
-                            removed.add(axioms[i]);
+                            final OWLAxiom axiom = axioms.get(i);
+                            removed.add(axiom);
                             queue.add(new QueueItem(i + 1, removed));
-                            subset.addAxioms(axioms[i]);
-                            if (i < axioms.length - 1 && !isRepaired.test(subset)) {
-                                subset.addAxioms(Arrays.stream(axioms).skip(i + 1));
+                            subset.addAxioms(axiom);
+                            if (i < axioms.size() - 1 && !isRepaired.test(subset)) {
                                 break;
                             }
                         }

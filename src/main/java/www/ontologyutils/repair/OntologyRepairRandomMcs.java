@@ -13,7 +13,7 @@ import www.ontologyutils.toolbox.*;
  * of axioms in the input ontology.
  */
 public class OntologyRepairRandomMcs extends OntologyRepair {
-    public OntologyRepairRandomMcs(Predicate<Ontology> isRepaired) {
+    public OntologyRepairRandomMcs(final Predicate<Ontology> isRepaired) {
         super(isRepaired);
     }
 

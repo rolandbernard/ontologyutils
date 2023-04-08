@@ -122,7 +122,7 @@ public class Ontology implements AutoCloseable {
         return ontology.axioms();
     }
 
-    public Stream<? super OWLLogicalAxiom> logicalAxioms() {
+    public Stream<OWLLogicalAxiom> logicalAxioms() {
         return ontology.logicalAxioms().map(a -> a);
     }
 
@@ -158,6 +158,33 @@ public class Ontology implements AutoCloseable {
 
     public void addAxioms(final Stream<? extends OWLAxiom> axioms) {
         addAxioms(axioms.toArray(n -> new OWLAxiom[n]));
+    }
+
+    public OWLAnnotationProperty getOriginAnnotationProperty() {
+        return getDataFactory().getOWLAnnotationProperty("origin");
+    }
+
+    public OWLAnnotation getNewOriginAnnotation(final OWLAxiom origin) {
+        final OWLDataFactory df = getDataFactory();
+        return df.getOWLAnnotation(getOriginAnnotationProperty(), df.getOWLLiteral(origin.toString()));
+    }
+
+    public OWLAxiom getAnnotatedAxiom(final OWLAxiom axiom, final OWLAxiom origin) {
+        if (origin.annotations(getOriginAnnotationProperty()).count() > 0) {
+            return axiom.getAnnotatedAxiom(origin.annotations(getOriginAnnotationProperty()));
+        } else {
+            return axiom.getAnnotatedAxiom(
+                    Stream.concat(axiom.annotations(), Stream.of(getNewOriginAnnotation(origin))));
+        }
+    }
+
+    public void replaceAxiom(final OWLAxiom remove, final Stream<? extends OWLAxiom> replacement) {
+        removeAxioms(remove);
+        addAxioms(replacement.map(a -> getAnnotatedAxiom(a, remove)));
+    }
+
+    public void replaceAxiom(final OWLAxiom remove, final OWLAxiom... replacement) {
+        replaceAxiom(remove, Stream.of(replacement));
     }
 
     public Ontology withoutAxioms(final OWLAxiom... axioms) {
@@ -220,11 +247,11 @@ public class Ontology implements AutoCloseable {
         return getReasoner().isConsistent();
     }
 
-    public boolean isEntailed(OWLAxiom... axioms) {
+    public boolean isEntailed(final OWLAxiom... axioms) {
         return getReasoner().isEntailed(axioms);
     }
 
-    public boolean isSatisfiable(OWLClassExpression concepts) {
+    public boolean isSatisfiable(final OWLClassExpression concepts) {
         return getReasoner().isSatisfiable(concepts);
     }
 
