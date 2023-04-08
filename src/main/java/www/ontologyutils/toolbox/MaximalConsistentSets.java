@@ -22,7 +22,8 @@ public class MaximalConsistentSets {
     private Set<OWLAxiom> result;
 
     public MaximalConsistentSets(final Ontology ontology, final Predicate<Ontology> isRepaired) {
-        try (final Ontology nonRefutable = ontology.withoutRefutableAxioms()) {
+        try (final Ontology nonRefutable = ontology.clone()) {
+            nonRefutable.removeAxioms(nonRefutable.refutableAxioms().toList());
             if (!isRepaired.test(nonRefutable)) {
                 throw new IllegalArgumentException("The ontology is not reparable");
             }
@@ -51,7 +52,7 @@ public class MaximalConsistentSets {
         try (final Ontology copy = ontology.clone()) {
             for (final OWLAxiom axiom : axioms) {
                 copy.addAxioms(axiom);
-                if (copy.getReasoner().isConsistent()) {
+                if (copy.isConsistent()) {
                     return false;
                 }
                 copy.removeAxioms(axiom);
@@ -70,7 +71,8 @@ public class MaximalConsistentSets {
             if (results.stream().anyMatch(current.removed::containsAll)) {
                 continue;
             } else {
-                try (Ontology subset = ontology.withoutAxioms(current.removed.stream())) {
+                try (Ontology subset = ontology.clone()) {
+                    subset.removeAxioms(current.removed);
                     if (isRepaired.test(subset)) {
                         results.add(current.removed);
                         result = current.removed;

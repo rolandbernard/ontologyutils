@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.model.parameters.Imports;
 
 import www.ontologyutils.toolbox.*;
 
@@ -40,10 +39,11 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
 
     @Override
     public void apply(final Ontology ontology) {
-        ontology.getOwlOntology().tboxAxioms(Imports.INCLUDED)
+        final List<OWLAxiom> tBox = ontology.axioms()
                 .filter(axiom -> !axiom.isOfType(AxiomType.SUBCLASS_OF))
-                .forEach(axiom -> {
-                    ontology.replaceAxiom(axiom, asSubclassOfAxioms(axiom, ontology.getDataFactory()));
-                });
+                .filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes)).toList();
+        for (final OWLAxiom axiom : tBox) {
+            ontology.replaceAxiom(axiom, asSubclassOfAxioms(axiom, ontology.getDataFactory()));
+        }
     }
 }

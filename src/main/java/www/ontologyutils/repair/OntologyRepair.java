@@ -19,7 +19,8 @@ public abstract class OntologyRepair implements OntologyModification {
 
     @Override
     public void apply(final Ontology ontology) {
-        try (final Ontology nonRefutable = ontology.withoutRefutableAxioms()) {
+        try (final Ontology nonRefutable = ontology.clone()) {
+            nonRefutable.removeAxioms(nonRefutable.refutableAxioms().toList());
             if (!isRepaired(nonRefutable)) {
                 throw new IllegalArgumentException("The ontology is not reparable");
             }

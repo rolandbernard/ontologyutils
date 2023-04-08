@@ -9,7 +9,7 @@ public interface OntologyModification {
      * Applies the modification represented by this object to the given ontology.
      *
      * @param ontology
-     *     e ontology to modify
+     *            e ontology to modify
      */
     public void apply(Ontology ontology);
 

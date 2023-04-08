@@ -32,6 +32,6 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
     @Override
     public void repair(final Ontology ontology) {
         final Set<OWLAxiom> toRemove = Utils.randomChoice(ontology.optimalClassicalRepairs(isRepaired));
-        ontology.removeAxioms(toRemove.stream());
+        ontology.removeAxioms(toRemove);
     }
 }
