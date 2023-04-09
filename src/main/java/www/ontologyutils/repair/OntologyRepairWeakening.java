@@ -14,7 +14,7 @@ import www.ontologyutils.toolbox.*;
  * strictly) the axiom weakening approach described in Nicolas Troquard, Roberto
  * Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz:
  * "Repairing Ontologies via Axiom Weakening", AAAI 2018.
- * 
+ *
  * The ontology passed in parameter of {@code repair} should only contain
  * assertion or subclass axioms.
  */
@@ -23,30 +23,28 @@ public class OntologyRepairWeakening extends OntologyRepair {
         super(isRepaired);
     }
 
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to make the
+     *         ontology consistent.
+     */
     public static OntologyRepairRandomMcs forConsistency() {
         return new OntologyRepairRandomMcs(Ontology::isConsistent);
     }
 
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to remove
+     *         {@code axiom} from the set of consequences of the ontology.
+     */
     public static OntologyRepairRandomMcs forRemovingConsequence(final OWLAxiom axiom) {
         return new OntologyRepairRandomMcs(o -> o.isEntailed(axiom));
     }
 
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to make
+     *         {@code concept} satisfiable.
+     */
     public static OntologyRepairRandomMcs forConceptSatisfiability(final OWLClassExpression concept) {
         return new OntologyRepairRandomMcs(o -> o.isSatisfiable(concept));
-    }
-
-    @Override
-    public void repair(final Ontology ontology) {
-        final Set<OWLAxiom> randomMcss = Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
-        try (final Ontology refOntology = Ontology.withAxioms(randomMcss)) {
-            try (final AxiomWeakener axiomWeakener = new AxiomWeakener(refOntology)) {
-                while (!isRepaired(ontology)) {
-                    final OWLAxiom badAxiom = Utils.randomChoice(findBadAxioms(ontology));
-                    final OWLAxiom weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
-                    ontology.replaceAxiom(badAxiom, weakerAxiom);
-                }
-            }
-        }
     }
 
     /**
@@ -66,5 +64,19 @@ public class OntologyRepairWeakening extends OntologyRepair {
         return occurrences.entrySet().stream()
                 .filter(entry -> entry.getValue() == max.get())
                 .map(entry -> entry.getKey());
+    }
+
+    @Override
+    public void repair(final Ontology ontology) {
+        final Set<OWLAxiom> randomMcss = Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
+        try (final Ontology refOntology = Ontology.withAxioms(randomMcss)) {
+            try (final AxiomWeakener axiomWeakener = new AxiomWeakener(refOntology)) {
+                while (!isRepaired(ontology)) {
+                    final OWLAxiom badAxiom = Utils.randomChoice(findBadAxioms(ontology));
+                    final OWLAxiom weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
+                    ontology.replaceAxiom(badAxiom, weakerAxiom);
+                }
+            }
+        }
     }
 }

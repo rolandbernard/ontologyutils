@@ -25,7 +25,7 @@ public class AppAutomatedRepairWeakening {
         ontology.refutableAxioms().sorted().forEach(System.out::println);
         ontology.staticAxioms().sorted().forEach(System.out::println);
         assert ontology.isConsistent();
-        ontology.dispose();
+        ontology.close();
         Utils.log("==== END RESULT ====");
         Utils.log("Done.");
     }

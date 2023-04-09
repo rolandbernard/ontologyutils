@@ -12,12 +12,19 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
         public int size;
         public V data;
 
+        /**
+         * Remove all children of the node. This is only safe to be called on the root
+         * node, or when the node contains no actual children.
+         */
         public void clear() {
             children.clear();
             size = 0;
             data = null;
         }
 
+        /**
+         * @return The set of all children of this node.
+         */
         public Set<Entry<K, TrieNode<K, V>>> children() {
             if (children != null) {
                 return children.entrySet();
@@ -26,6 +33,11 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
             }
         }
 
+        /**
+         * Remove the child with the given key.
+         *
+         * @param key
+         */
         public void removeChild(final Object key) {
             if (children != null) {
                 if (children.size() == 1) {
@@ -36,6 +48,10 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
             }
         }
 
+        /**
+         * @param key
+         * @return The child at {@code key} in this node.
+         */
         public TrieNode<K, V> getChild(final Object key) {
             if (children != null) {
                 return children.get(key);
@@ -44,6 +60,13 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
             }
         }
 
+        /**
+         * Get the child node for {@code key}. If the child does not exist, create a new
+         * child node.
+         *
+         * @param key
+         * @return The child at {@code key}.
+         */
         public TrieNode<K, V> getOrCreateChild(final K key) {
             if (children == null) {
                 children = new HashMap<>(1);
@@ -57,6 +80,9 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     private final TrieNode<K, V> root;
 
+    /**
+     * Create a new empty map.
+     */
     public MapOfSets() {
         root = new TrieNode<>();
     }
@@ -169,6 +195,10 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
         }
     }
 
+    /**
+     * @param key
+     * @return True iff any key in the map is a subset of {@code key}:
+     */
     public boolean containsSubset(final Set<K> key) {
         return containsSubsetHelper(root, key);
     }
@@ -189,6 +219,10 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
         }
     }
 
+    /**
+     * @param key
+     * @return True iff any key in the map is a superset of {@code key}:
+     */
     public boolean containsSuperset(final Set<K> key) {
         final List<K> sorted = key.stream().sorted().toList();
         return containsSupersetHelper(root, sorted, 0);
@@ -208,6 +242,10 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
         }
     }
 
+    /**
+     * @param key
+     * @return All entries for which the key is a subset of {@code key}.
+     */
     public Set<Entry<Set<K>, V>> entrySetForSubsets(final Set<K> key) {
         final Set<Entry<Set<K>, V>> result = new HashSet<>();
         entrySetForSubsetHelper(root, key, new ArrayList<>(), result);
@@ -229,6 +267,10 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
         }
     }
 
+    /**
+     * @param key
+     * @return All entries for which the key is a superset of {@code key}.
+     */
     public Set<Entry<Set<K>, V>> entrySetForSupersets(final Set<K> key) {
         final List<K> sorted = key.stream().sorted().toList();
         final Set<Entry<Set<K>, V>> result = new HashSet<>();

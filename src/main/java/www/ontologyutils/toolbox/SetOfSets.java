@@ -11,6 +11,9 @@ import java.util.stream.Stream;
 public class SetOfSets<K extends Comparable<? super K>> extends AbstractSet<Set<K>> {
     private final MapOfSets<K, Boolean> map;
 
+    /**
+     * Creates a new empty set.
+     */
     public SetOfSets() {
         map = new MapOfSets<>();
     }
@@ -45,18 +48,35 @@ public class SetOfSets<K extends Comparable<? super K>> extends AbstractSet<Set<
         return map.entrySet().stream().map(entry -> entry.getKey()).iterator();
     }
 
+    /**
+     * @param key
+     * @return True iff the any element in this set is a subset of {@code key}.
+     */
     public boolean containsSubset(final Set<K> key) {
         return map.containsSubset(key);
     }
 
+    /**
+     * @param key
+     * @return True iff the any element in this set is a superset of {@code key}.
+     */
     public boolean containsSuperset(final Set<K> key) {
         return map.containsSuperset(key);
     }
 
+    /**
+     * @param key
+     * @return A stream of all element in this set that are subsets of {@code key}.
+     */
     public Stream<Set<K>> subsets(final Set<K> key) {
         return map.entrySetForSubsets(key).stream().map(entry -> entry.getKey());
     }
 
+    /**
+     * @param key
+     * @return A stream of all element in this set that are supersets of
+     *         {@code key}.
+     */
     public Stream<Set<K>> supersets(final Set<K> key) {
         return map.entrySetForSupersets(key).stream().map(entry -> entry.getKey());
     }

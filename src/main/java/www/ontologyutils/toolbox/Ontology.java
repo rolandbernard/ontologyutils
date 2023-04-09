@@ -16,6 +16,9 @@ import openllet.owlapi.OpenlletReasonerFactory;
  * The main utility of having this class instead of using {@code OWLOntology} is
  * the ability to reuse reasoner and owl ontology as much as possible. The class
  * also provides some utility functions for loading and saving ontologies.
+ *
+ * The ontology object must be closed in order to free all resources associated
+ * to the {@code OWLOntology} object and the {@code OWLreasoner}.
  */
 public class Ontology implements AutoCloseable {
     private static final OWLOntologyManager DEFAULT_MANAGER = OWLManager.createOWLOntologyManager();
@@ -27,6 +30,11 @@ public class Ontology implements AutoCloseable {
         private Set<OWLAxiom> oldAxioms;
         private OWLReasoner reasoner;
 
+        /**
+         * Create a new reasoner cache using the given reasoner factory.
+         *
+         * @param reasonerFactory
+         */
         public CachedReasoner(final OWLReasonerFactory reasonerFactory) {
             this.reasonerFactory = reasonerFactory;
             this.references = new HashSet<>();
@@ -45,12 +53,23 @@ public class Ontology implements AutoCloseable {
             }
         }
 
+        /**
+         * If an {@code OWLReasoner} was created using {@code getOwlReasoner} it must be
+         * disposed again to free associated resources.
+         *
+         * @param reasoner
+         *            The {@code OWLReasoner} to dispose.
+         */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final OWLOntology owlOntology = reasoner.getRootOntology();
             owlOntology.getOWLOntologyManager().removeOntology(owlOntology);
             reasoner.dispose();
         }
 
+        /**
+         * @param ontology
+         * @return A new {@code OWLReasoner} created using the factory in this cache.
+         */
         public OWLReasoner getOwlReasoner(final Ontology ontology) {
             try {
                 final OWLOntology owlOntology = DEFAULT_MANAGER.createOntology();
@@ -61,6 +80,14 @@ public class Ontology implements AutoCloseable {
             }
         }
 
+        /**
+         * Use the cached reasoner in this object for executing the given action.
+         *
+         * @param <T>
+         * @param ontology
+         * @param action
+         * @return The value returned by {@code action}.
+         */
         public <T> T withReasonerDo(final Ontology ontology, final Function<OWLReasoner, T> action) {
             final Set<OWLAxiom> newAxioms = ontology.axioms().collect(Collectors.toSet());
             if (reasoner == null) {
@@ -97,6 +124,12 @@ public class Ontology implements AutoCloseable {
         this.reasonerCache.addReference(this);
     }
 
+    /**
+     * Create a new ontology that is a copy of {@code toCopy} but using a new
+     * reasoner cache.
+     *
+     * @param toCopy
+     */
     public Ontology(final Ontology toCopy) {
         this.staticAxioms = new HashSet<>(toCopy.staticAxioms);
         this.refutableAxioms = new HashSet<>(toCopy.refutableAxioms);
@@ -151,6 +184,9 @@ public class Ontology implements AutoCloseable {
         return loadOntology(filePath, DEFAULT_FACTORY);
     }
 
+    /**
+     * @return The default data factory to use for creating owl api objects.
+     */
     public static OWLDataFactory getDefaultDataFactory() {
         return DEFAULT_MANAGER.getOWLDataFactory();
     }
@@ -214,6 +250,10 @@ public class Ontology implements AutoCloseable {
         addAxioms(Stream.of(axioms));
     }
 
+    /**
+     * @return The {@code OWLAnnotationProperty} used for the origin annotation when
+     *         replacing axioms.
+     */
     public OWLAnnotationProperty getOriginAnnotationProperty() {
         return getDataFactory().getOWLAnnotationProperty("origin");
     }
@@ -223,6 +263,14 @@ public class Ontology implements AutoCloseable {
         return df.getOWLAnnotation(getOriginAnnotationProperty(), df.getOWLLiteral(origin.toString()));
     }
 
+    /**
+     * Annotate {@code axiom} with the origin annotation indicating that the origin
+     * of {@code axiom} is {@code origin}.
+     *
+     * @param axiom
+     * @param origin
+     * @return A new annotated axiom equivalent to {@code axiom}.
+     */
     private OWLAxiom getAnnotatedAxiom(final OWLAxiom axiom, final OWLAxiom origin) {
         if (origin.annotations(getOriginAnnotationProperty()).count() > 0) {
             return axiom.getAnnotatedAxiom(origin.annotations(getOriginAnnotationProperty()));
@@ -245,10 +293,23 @@ public class Ontology implements AutoCloseable {
         replaceAxiom(remove, Stream.of(replacement));
     }
 
+    /**
+     * The reasoner created by this call must be disposed of again using the
+     * {@code disposeOwlReasoner} method.
+     *
+     * @return A new reasoner for the ontology.
+     */
     public OWLReasoner getOwlReasoner() {
         return reasonerCache.getOwlReasoner(this);
     }
 
+    /**
+     * Dispose of a reasoner to release all resources associated with the
+     * {@code OWLOntology} and {@code OWLReasoner}.
+     *
+     * @param reasoner
+     *            The reasoner to dispose of.
+     */
     public void disposeOwlReasoner(final OWLReasoner reasoner) {
         reasonerCache.disposeOwlReasoner(reasoner);
     }
@@ -277,14 +338,25 @@ public class Ontology implements AutoCloseable {
         return (new MaximalConsistentSets(this, isRepaired)).stream();
     }
 
+    /**
+     * @return A stream of all sets of axioms that when removed from the ontology
+     *         yield an optimal classical repair for consistency of the ontology.
+     */
     public Stream<Set<OWLAxiom>> optimalClassicalRepairs() {
         return (new MaximalConsistentSets(this)).repairsStream();
     }
 
+    /**
+     * @return A stream of all sets of axioms that when removed from the ontology
+     *         yield an optimal classical repair for the given predicate.
+     */
     public Stream<Set<OWLAxiom>> optimalClassicalRepairs(final Predicate<Ontology> isRepaired) {
         return (new MaximalConsistentSets(this)).repairsStream();
     }
 
+    /**
+     * @return A stream providing all subconcepts used in the ontology.
+     */
     public Stream<OWLClassExpression> subConcepts() {
         return axioms().flatMap(axiom -> axiom.nestedClassExpressions());
     }
@@ -294,12 +366,8 @@ public class Ontology implements AutoCloseable {
         return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), reasonerCache);
     }
 
-    public void dispose() {
-        reasonerCache.removeReference(this);
-    }
-
     @Override
     public void close() {
-        dispose();
+        reasonerCache.removeReference(this);
     }
 }

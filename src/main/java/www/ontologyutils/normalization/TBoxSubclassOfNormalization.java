@@ -7,8 +7,19 @@ import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Normalization that converts every axiom in the TBox of the ontology to
+ * subclass axioms.
+ */
 public class TBoxSubclassOfNormalization implements OntologyModification {
+    /**
+     * Visitor class used for converting the axioms. Only the
+     * {@code OWLDisjointUnionAxiom} axioms must be handles specially, other axioms
+     * implement either {@code OWLSubClassOfAxiomSetShortCut} or
+     * {@code OWLSubClassOfAxiomShortCut}.
+     */
     private static class Visitor implements OWLAxiomVisitorEx<Collection<OWLSubClassOfAxiom>> {
+        @Override
         public Collection<OWLSubClassOfAxiom> visit(final OWLDisjointUnionAxiom axiom) {
             // Since OWLDisjointUnionAxiom does not implement OWLSubClassOfAxiomSetShortCut
             // directly, we must first split the axiom into a disjoint class and equivalent
@@ -20,6 +31,7 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
             return axioms;
         }
 
+        @Override
         public <T> Collection<OWLSubClassOfAxiom> doDefault(final T axiom) throws IllegalArgumentException {
             if (axiom instanceof OWLSubClassOfAxiomSetShortCut) {
                 return ((OWLSubClassOfAxiomSetShortCut) axiom).asOWLSubClassOfAxioms();
@@ -39,7 +51,13 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
         visitor = new Visitor();
     }
 
-    public Stream<OWLSubClassOfAxiom> asSubclassOfAxioms(final OWLAxiom axiom, final OWLDataFactory df) {
+    /**
+     * @param axiom
+     *            The axiom that should be split into subclasses.
+     * @return A number of subclass axioms that together are equivalent to
+     *         {@code axiom} in every ontology.
+     */
+    public Stream<OWLSubClassOfAxiom> asSubclassOfAxioms(final OWLAxiom axiom) {
         return axiom.accept(visitor).stream();
     }
 
@@ -49,7 +67,7 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
                 .filter(axiom -> !axiom.isOfType(AxiomType.SUBCLASS_OF))
                 .filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes)).toList();
         for (final OWLAxiom axiom : tBox) {
-            ontology.replaceAxiom(axiom, asSubclassOfAxioms(axiom, ontology.getDataFactory()));
+            ontology.replaceAxiom(axiom, asSubclassOfAxioms(axiom));
         }
     }
 }

@@ -17,14 +17,26 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
         super(isRepaired);
     }
 
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to make the
+     *         ontology consistent.
+     */
     public static OntologyRepairRandomMcs forConsistency() {
         return new OntologyRepairRandomMcs(Ontology::isConsistent);
     }
 
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to remove
+     *         {@code axiom} from the set of consequences of the ontology.
+     */
     public static OntologyRepairRandomMcs forRemovingConsequence(final OWLAxiom axiom) {
         return new OntologyRepairRandomMcs(o -> o.isEntailed(axiom));
     }
 
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to make
+     *         {@code concept} satisfiable.
+     */
     public static OntologyRepairRandomMcs forConceptSatisfiability(final OWLClassExpression concept) {
         return new OntologyRepairRandomMcs(o -> o.isSatisfiable(concept));
     }

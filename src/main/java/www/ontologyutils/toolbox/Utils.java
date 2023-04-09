@@ -42,6 +42,13 @@ public final class Utils {
         System.err.println(info);
     }
 
+    /**
+     * Select a random from a finite stream uniformly at random.
+     *
+     * @param <T>
+     * @param stream
+     * @return A random element in {@code stream}.
+     */
     @SuppressWarnings(value = "unchecked")
     public static <T> T randomChoice(final Stream<T> stream) {
         final Object[] flatArray = stream.toArray();
@@ -49,6 +56,13 @@ public final class Utils {
         return (T) flatArray[randomIdx];
     }
 
+    /**
+     * Select a random element for the collection uniformly ar random.
+     *
+     * @param <T>
+     * @param collection
+     * @return A random element in {@code collection}.
+     */
     public static <T> T randomChoice(final Collection<T> collection) {
         return randomChoice(collection.stream());
     }

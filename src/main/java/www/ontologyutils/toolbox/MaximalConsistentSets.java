@@ -21,7 +21,19 @@ public class MaximalConsistentSets {
     private final SetOfSets<OWLAxiom> results;
     private Set<OWLAxiom> result;
 
-    public MaximalConsistentSets(final Ontology ontology, final Predicate<Ontology> isRepaired) throws IllegalArgumentException {
+    /**
+     * @param ontology
+     *            The ontology for which to compute the maximal consistent
+     *            subsets.
+     * @param isRepaired
+     *            The predicate with which to measure "consistency".
+     * @throws IllegalArgumentException
+     *             If there is no maximal consistent subset.
+     *             This is only possible if the ontology
+     *             contains static axioms.
+     */
+    public MaximalConsistentSets(final Ontology ontology, final Predicate<Ontology> isRepaired)
+            throws IllegalArgumentException {
         try (final Ontology nonRefutable = ontology.clone()) {
             nonRefutable.removeAxioms(nonRefutable.refutableAxioms().toList());
             if (!isRepaired.test(nonRefutable)) {
@@ -36,18 +48,51 @@ public class MaximalConsistentSets {
         results = new SetOfSets<>();
     }
 
-    public MaximalConsistentSets(final Ontology ontology) {
+    /**
+     * @param ontology
+     *            The ontology for which to compute the maximal consistent
+     *            subsets.
+     * @throws IllegalArgumentException
+     *             If there is no maximal consistent subset.
+     */
+    public MaximalConsistentSets(final Ontology ontology) throws IllegalArgumentException {
         this(ontology, Ontology::isConsistent);
     }
 
-    public MaximalConsistentSets(final Set<OWLAxiom> axioms) {
+    /**
+     * @param axioms
+     *            The axioms for which to compute the maximal consistent
+     *            subsets.
+     * @throws IllegalArgumentException
+     *             If there is no maximal consistent subset.
+     */
+    public MaximalConsistentSets(final Set<OWLAxiom> axioms) throws IllegalArgumentException {
         this(Ontology.withAxioms(axioms));
     }
 
-    public MaximalConsistentSets(final Set<OWLAxiom> axioms, final Set<OWLAxiom> contained) {
+    /**
+     * @param axioms
+     *            The axioms for which to compute the maximal consistent
+     *            subsets.
+     * @param contained
+     *            The axioms which must be contained in the subset.
+     * @throws IllegalArgumentException
+     *             If there is no maximal consistent subset.
+     */
+    public MaximalConsistentSets(final Set<OWLAxiom> axioms, final Set<OWLAxiom> contained)
+            throws IllegalArgumentException {
         this(Ontology.withAxioms(contained, axioms));
     }
 
+    /**
+     * Tests whether adding any of the axioms in {@code axioms} to {@code ontology}
+     * make the ontology inconsistent.
+     *
+     * @param ontology
+     * @param axioms
+     * @return True iff {@code ontology} is maximally consistent with respect to
+     *         {@code axioms}.
+     */
     public static boolean isMaximallyConsistentWithRespectTo(final Ontology ontology, final Set<OWLAxiom> axioms) {
         try (final Ontology copy = ontology.clone()) {
             for (final OWLAxiom axiom : axioms) {
@@ -61,10 +106,21 @@ public class MaximalConsistentSets {
         }
     }
 
+    /**
+     * @param subset
+     * @param set
+     * @return True iff {@code subset} is a maximal consistent subset of
+     *         {@code set}.
+     */
     public static boolean isMaximallyConsistentSubset(final Set<OWLAxiom> subset, final Set<OWLAxiom> set) {
         return set.containsAll(subset) && isMaximallyConsistentWithRespectTo(Ontology.withAxioms(subset), set);
     }
 
+    /**
+     * Compute the next result.
+     *
+     * @return True if a new result was found, false otherwise.
+     */
     private boolean computeNextResult() {
         while (!queue.isEmpty()) {
             final QueueItem current = queue.pop();
@@ -96,14 +152,24 @@ public class MaximalConsistentSets {
         return false;
     }
 
+    /**
+     * @param remove
+     * @return The axioms of the ontology without those in {@code remove}.
+     */
     private Set<OWLAxiom> complement(final Set<OWLAxiom> remove) {
         return ontology.axioms().filter(axiom -> !remove.contains(axiom)).collect(Collectors.toSet());
     }
 
+    /**
+     * @return A stream producing all maximal consistent sets.
+     */
     public Stream<Set<OWLAxiom>> stream() {
         return repairsStream().map(this::complement);
     }
 
+    /**
+     * @return A stream producing all complements of maximal consistent sets.
+     */
     public Stream<Set<OWLAxiom>> repairsStream() {
         return Stream.concat(results.stream(),
                 StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<Set<OWLAxiom>>() {
