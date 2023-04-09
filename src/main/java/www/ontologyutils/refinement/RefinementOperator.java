@@ -87,7 +87,7 @@ public class RefinementOperator {
             }
         }
 
-        public Stream<OWLClassExpression> visit(final OWLClassExpression concept) {
+        public Stream<OWLClassExpression> refineVisit(final OWLClassExpression concept) {
             return Stream.concat(way.apply(concept), concept.accept(this)).distinct();
         }
     }
@@ -109,10 +109,10 @@ public class RefinementOperator {
     }
 
     public Stream<OWLClassExpression> refine(final OWLClassExpression concept) throws IllegalArgumentException {
-        return visitor.visit(concept);
+        return visitor.refineVisit(concept);
     }
 
     public Stream<OWLClassExpression> refineReverse(final OWLClassExpression concept) throws IllegalArgumentException {
-        return visitorReverse.visit(concept);
+        return visitorReverse.refineVisit(concept);
     }
 }
