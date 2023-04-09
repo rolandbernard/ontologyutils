@@ -21,11 +21,11 @@ public class MaximalConsistentSets {
     private final SetOfSets<OWLAxiom> results;
     private Set<OWLAxiom> result;
 
-    public MaximalConsistentSets(final Ontology ontology, final Predicate<Ontology> isRepaired) {
+    public MaximalConsistentSets(final Ontology ontology, final Predicate<Ontology> isRepaired) throws IllegalArgumentException {
         try (final Ontology nonRefutable = ontology.clone()) {
             nonRefutable.removeAxioms(nonRefutable.refutableAxioms().toList());
             if (!isRepaired.test(nonRefutable)) {
-                throw new IllegalArgumentException("The ontology is not reparable");
+                throw new IllegalArgumentException("The ontology is not reparable.");
             }
         }
         this.ontology = ontology;

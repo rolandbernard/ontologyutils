@@ -20,7 +20,7 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
             return axioms;
         }
 
-        public <T> Collection<OWLSubClassOfAxiom> doDefault(final T axiom) {
+        public <T> Collection<OWLSubClassOfAxiom> doDefault(final T axiom) throws IllegalArgumentException {
             if (axiom instanceof OWLSubClassOfAxiomSetShortCut) {
                 return ((OWLSubClassOfAxiomSetShortCut) axiom).asOWLSubClassOfAxioms();
             } else if (axiom instanceof OWLSubClassOfAxiomShortCut) {
@@ -28,17 +28,23 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
             } else {
                 final OWLAxiom ax = (OWLAxiom) axiom;
                 throw new IllegalArgumentException("The axiom " + ax + " of type " + ax.getAxiomType()
-                        + " could not be converted into subclass axioms");
+                        + " could not be converted into subclass axioms.");
             }
         }
     }
 
+    private final Visitor visitor;
+
+    public TBoxSubclassOfNormalization() {
+        visitor = new Visitor();
+    }
+
     public Stream<OWLSubClassOfAxiom> asSubclassOfAxioms(final OWLAxiom axiom, final OWLDataFactory df) {
-        return axiom.accept(new Visitor()).stream();
+        return axiom.accept(visitor).stream();
     }
 
     @Override
-    public void apply(final Ontology ontology) {
+    public void apply(final Ontology ontology) throws IllegalArgumentException {
         final List<OWLAxiom> tBox = ontology.axioms()
                 .filter(axiom -> !axiom.isOfType(AxiomType.SUBCLASS_OF))
                 .filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes)).toList();
