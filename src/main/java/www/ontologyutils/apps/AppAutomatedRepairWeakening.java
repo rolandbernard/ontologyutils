@@ -4,7 +4,7 @@ import www.ontologyutils.normalization.TBoxSubclassOfNormalization;
 import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
 
-public class AppAutomatedRepairRandomMCS {
+public class AppAutomatedRepairWeakening {
     /**
      * One argument must be given, corresponding to an OWL ontology file path. E.g.,
      * run with the parameter resources/inconsistent-leftpolicies-small.owl
@@ -15,7 +15,7 @@ public class AppAutomatedRepairRandomMCS {
         Ontology ontology = Ontology.loadOntology(args[0]);
         Utils.log("Loaded...");
         TBoxSubclassOfNormalization normalization = new TBoxSubclassOfNormalization();
-        OntologyRepair repair = OntologyRepairRandomMcs.forConsistency();
+        OntologyRepair repair = OntologyRepairWeakening.forConsistency();
         Utils.log("Normalizing...");
         normalization.apply(ontology);
         Utils.log("Repairing...");

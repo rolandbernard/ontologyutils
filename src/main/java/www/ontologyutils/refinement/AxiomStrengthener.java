@@ -47,12 +47,12 @@ public class AxiomStrengthener implements AutoCloseable {
         specialization = new RefinementOperator(covers::downCover, covers::upCover);
     }
 
-    public Stream<OWLAxiom> strongerAxiom(final OWLAxiom axiom) {
+    public Stream<OWLAxiom> strongerAxioms(final OWLAxiom axiom) {
         return axiom.accept(visitor).distinct();
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         covers.close();
     }
 }

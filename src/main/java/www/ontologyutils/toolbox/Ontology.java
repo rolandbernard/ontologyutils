@@ -218,12 +218,12 @@ public class Ontology implements AutoCloseable {
         return getDataFactory().getOWLAnnotationProperty("origin");
     }
 
-    public OWLAnnotation getNewOriginAnnotation(final OWLAxiom origin) {
+    private OWLAnnotation getNewOriginAnnotation(final OWLAxiom origin) {
         final OWLDataFactory df = getDataFactory();
         return df.getOWLAnnotation(getOriginAnnotationProperty(), df.getOWLLiteral(origin.toString()));
     }
 
-    public OWLAxiom getAnnotatedAxiom(final OWLAxiom axiom, final OWLAxiom origin) {
+    private OWLAxiom getAnnotatedAxiom(final OWLAxiom axiom, final OWLAxiom origin) {
         if (origin.annotations(getOriginAnnotationProperty()).count() > 0) {
             return axiom.getAnnotatedAxiom(origin.annotations(getOriginAnnotationProperty()));
         } else {
@@ -271,6 +271,14 @@ public class Ontology implements AutoCloseable {
 
     public Stream<Set<OWLAxiom>> maximalConsistentSubsets() {
         return (new MaximalConsistentSets(this)).stream();
+    }
+
+    public Stream<Set<OWLAxiom>> maximalConsistentSubsets(final Predicate<Ontology> isRepaired) {
+        return (new MaximalConsistentSets(this, isRepaired)).stream();
+    }
+
+    public Stream<Set<OWLAxiom>> optimalClassicalRepairs() {
+        return (new MaximalConsistentSets(this)).repairsStream();
     }
 
     public Stream<Set<OWLAxiom>> optimalClassicalRepairs(final Predicate<Ontology> isRepaired) {
