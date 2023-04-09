@@ -18,7 +18,7 @@ public class MaximalConsistentSets {
     private final Ontology ontology;
     private final List<OWLAxiom> axioms;
     private final Deque<QueueItem> queue;
-    private final List<Set<OWLAxiom>> results;
+    private final SetOfSets<OWLAxiom> results;
     private Set<OWLAxiom> result;
 
     public MaximalConsistentSets(final Ontology ontology, final Predicate<Ontology> isRepaired) {
@@ -33,7 +33,7 @@ public class MaximalConsistentSets {
         axioms = ontology.refutableAxioms().toList();
         queue = new ArrayDeque<>();
         queue.add(new QueueItem(0, Set.of()));
-        results = new ArrayList<>();
+        results = new SetOfSets<>();
     }
 
     public MaximalConsistentSets(final Ontology ontology) {
@@ -68,7 +68,7 @@ public class MaximalConsistentSets {
     private boolean computeNextResult() {
         while (!queue.isEmpty()) {
             final QueueItem current = queue.pop();
-            if (results.stream().anyMatch(current.removed::containsAll)) {
+            if (results.containsSubset(current.removed)) {
                 continue;
             } else {
                 try (Ontology subset = ontology.clone()) {

@@ -211,6 +211,10 @@ public class Ontology implements AutoCloseable {
         addAxioms(replacement.map(a -> getAnnotatedAxiom(a, remove)));
     }
 
+    public void replaceAxiom(final OWLAxiom remove, final Collection<? extends OWLAxiom> replacement) {
+        replaceAxiom(remove, replacement.stream());
+    }
+
     public void replaceAxiom(final OWLAxiom remove, final OWLAxiom... replacement) {
         replaceAxiom(remove, Stream.of(replacement));
     }
