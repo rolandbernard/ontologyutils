@@ -7,6 +7,7 @@ import java.util.stream.*;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.profiles.Profiles;
 import org.semanticweb.owlapi.reasoner.*;
 
 import openllet.owlapi.OpenlletReasonerFactory;
@@ -58,7 +59,7 @@ public class Ontology implements AutoCloseable {
          * disposed again to free associated resources.
          *
          * @param reasoner
-         *            The {@code OWLReasoner} to dispose.
+         *                 The {@code OWLReasoner} to dispose.
          */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final OWLOntology owlOntology = reasoner.getRootOntology();
@@ -308,7 +309,7 @@ public class Ontology implements AutoCloseable {
      * {@code OWLOntology} and {@code OWLReasoner}.
      *
      * @param reasoner
-     *            The reasoner to dispose of.
+     *                 The reasoner to dispose of.
      */
     public void disposeOwlReasoner(final OWLReasoner reasoner) {
         reasonerCache.disposeOwlReasoner(reasoner);
@@ -328,6 +329,12 @@ public class Ontology implements AutoCloseable {
 
     public boolean isSatisfiable(final OWLClassExpression concepts) {
         return withReasonerDo(reasoner -> reasoner.isSatisfiable(concepts));
+    }
+
+    public List<String> getOwlProfiles() {
+        return withReasonerDo(reasoner -> Arrays.stream(Profiles.values())
+                .map(profile -> profile.checkOntology(reasoner.getRootOntology()).toString())
+                .toList());
     }
 
     public Stream<Set<OWLAxiom>> maximalConsistentSubsets() {

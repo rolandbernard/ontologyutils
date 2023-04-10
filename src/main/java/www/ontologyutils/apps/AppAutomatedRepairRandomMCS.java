@@ -12,7 +12,7 @@ public class AppAutomatedRepairRandomMCS {
      * @param args
      */
     public static void main(final String[] args) {
-        Ontology ontology = Ontology.loadOntology(args[0]);
+        final Ontology ontology = Ontology.loadOntology(args[0]);
         Utils.log("Loaded...");
         TBoxSubclassOfNormalization normalization = new TBoxSubclassOfNormalization();
         OntologyRepair repair = OntologyRepairRandomMcs.forConsistency();
