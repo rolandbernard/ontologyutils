@@ -1,7 +1,6 @@
 package www.ontologyutils.toolbox;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
@@ -13,6 +12,12 @@ import uk.ac.manchester.cs.owl.owlapi.OWLObjectComplementOfImpl;
  * fit anywhere else.
  */
 public final class Utils {
+    private static final ThreadLocal<Random> random = new ThreadLocal<>() {
+        protected Random initialValue() {
+            return new Random();
+        };
+    };
+
     /**
      * Prevents instantiation.
      */
@@ -47,6 +52,15 @@ public final class Utils {
     }
 
     /**
+     * Set the seed for the currently used random instance to {@code seed}.
+     * 
+     * @param seed
+     */
+    public static void randomSeed(final long seed) {
+        random.get().setSeed(seed);
+    }
+
+    /**
      * Select a random from a finite stream uniformly at random.
      *
      * @param <T>
@@ -55,7 +69,7 @@ public final class Utils {
      */
     public static <T> T randomChoice(final Stream<? extends T> stream) {
         final var flatList = stream.toList();
-        final int randomIdx = ThreadLocalRandom.current().nextInt(flatList.size());
+        final int randomIdx = random.get().nextInt(flatList.size());
         return flatList.get(randomIdx);
     }
 

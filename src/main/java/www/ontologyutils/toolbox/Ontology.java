@@ -22,8 +22,8 @@ import openllet.owlapi.OpenlletReasonerFactory;
  * to the {@code OWLOntology} object and the {@code OWLreasoner}.
  */
 public class Ontology implements AutoCloseable {
-    private static final OWLOntologyManager DEFAULT_MANAGER = OWLManager.createOWLOntologyManager();
-    private static final OWLReasonerFactory DEFAULT_FACTORY = OpenlletReasonerFactory.getInstance();
+    private static final OWLOntologyManager defaultManager = OWLManager.createOWLOntologyManager();
+    private static final OWLReasonerFactory defaultFactory = OpenlletReasonerFactory.getInstance();
 
     private static class CachedReasoner {
         private final OWLReasonerFactory reasonerFactory;
@@ -59,7 +59,7 @@ public class Ontology implements AutoCloseable {
          * disposed again to free associated resources.
          *
          * @param reasoner
-         *            The {@code OWLReasoner} to dispose.
+         *                 The {@code OWLReasoner} to dispose.
          */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final var owlOntology = reasoner.getRootOntology();
@@ -73,7 +73,7 @@ public class Ontology implements AutoCloseable {
          */
         public OWLReasoner getOwlReasoner(final Ontology ontology) {
             try {
-                final var owlOntology = DEFAULT_MANAGER.createOntology();
+                final var owlOntology = defaultManager.createOntology();
                 owlOntology.addAxioms(ontology.axioms());
                 return reasonerFactory.createReasoner(owlOntology);
             } catch (final OWLOntologyCreationException e) {
@@ -148,7 +148,7 @@ public class Ontology implements AutoCloseable {
 
     public static Ontology withAxioms(final Collection<? extends OWLAxiom> staticAxioms,
             final Collection<? extends OWLAxiom> refutableAxioms) {
-        return withAxioms(staticAxioms, refutableAxioms, DEFAULT_FACTORY);
+        return withAxioms(staticAxioms, refutableAxioms, defaultFactory);
     }
 
     public static Ontology withAxioms(final Collection<? extends OWLAxiom> refutableAxioms,
@@ -157,7 +157,7 @@ public class Ontology implements AutoCloseable {
     }
 
     public static Ontology withAxioms(final Collection<? extends OWLAxiom> refutableAxioms) {
-        return withAxioms(refutableAxioms, DEFAULT_FACTORY);
+        return withAxioms(refutableAxioms, defaultFactory);
     }
 
     public static Ontology emptyOntology(final OWLReasonerFactory reasonerFactory) {
@@ -165,11 +165,11 @@ public class Ontology implements AutoCloseable {
     }
 
     public static Ontology emptyOntology() {
-        return emptyOntology(DEFAULT_FACTORY);
+        return emptyOntology(defaultFactory);
     }
 
     public static Ontology loadOntology(final String filePath, final OWLReasonerFactory reasonerFactory) {
-        final var manager = DEFAULT_MANAGER;
+        final var manager = defaultManager;
         final var ontologyFile = new File(filePath);
         OWLOntology ontology = null;
         try {
@@ -186,14 +186,14 @@ public class Ontology implements AutoCloseable {
     }
 
     public static Ontology loadOntology(final String filePath) {
-        return loadOntology(filePath, DEFAULT_FACTORY);
+        return loadOntology(filePath, defaultFactory);
     }
 
     /**
      * @return The default data factory to use for creating owl api objects.
      */
     public static OWLDataFactory getDefaultDataFactory() {
-        return DEFAULT_MANAGER.getOWLDataFactory();
+        return defaultManager.getOWLDataFactory();
     }
 
     public OWLDataFactory getDataFactory() {
@@ -313,7 +313,7 @@ public class Ontology implements AutoCloseable {
      * {@code OWLOntology} and {@code OWLReasoner}.
      *
      * @param reasoner
-     *            The reasoner to dispose of.
+     *                 The reasoner to dispose of.
      */
     public void disposeOwlReasoner(final OWLReasoner reasoner) {
         reasonerCache.disposeOwlReasoner(reasoner);
@@ -370,6 +370,23 @@ public class Ontology implements AutoCloseable {
      */
     public Stream<OWLClassExpression> subConcepts() {
         return axioms().flatMap(axiom -> axiom.nestedClassExpressions());
+    }
+
+    /**
+     * @return the set of C1 subclass C2 axioms, C1 and C2 classes in the signature
+     *         of {@code ontology}, entailed by {@code ontology}.
+     */
+    public Set<OWLAxiom> inferredTaxonomyAxioms() {
+        return withReasonerDo(reasoner -> {
+            final var df = getDataFactory();
+            final var ontology = reasoner.getRootOntology();
+            final var isConsistent = reasoner.isConsistent();
+            return ontology.classesInSignature()
+                    .flatMap(left -> ontology.classesInSignature()
+                            .map(right -> df.getOWLSubClassOfAxiom(left, right))
+                            .filter(axiom -> !isConsistent || reasoner.isEntailed(axiom)))
+                    .collect(Collectors.toSet());
+        });
     }
 
     @Override

@@ -15,12 +15,13 @@ public class TBoxSubclassOfNormalizationTest {
     })
     public void allTBoxAxiomsAreSubclassOf(final String resourceName) throws OWLOntologyCreationException {
         final var path = TBoxSubclassOfNormalizationTest.class.getResource(resourceName).getFile();
-        final var ontology = Ontology.loadOntology(path);
-        final var normalization = new TBoxSubclassOfNormalization();
-        normalization.apply(ontology);
-        ontology.axioms()
-                .filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes))
-                .forEach(axiom -> assertEquals(AxiomType.SUBCLASS_OF, axiom.getAxiomType()));
+        try (final var ontology = Ontology.loadOntology(path)) {
+            final var normalization = new TBoxSubclassOfNormalization();
+            normalization.apply(ontology);
+            ontology.axioms()
+                    .filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes))
+                    .forEach(axiom -> assertEquals(AxiomType.SUBCLASS_OF, axiom.getAxiomType()));
+        }
     }
 
     @ParameterizedTest
@@ -29,15 +30,17 @@ public class TBoxSubclassOfNormalizationTest {
     })
     public void normalizedOntologyIsEquivalent(final String resourceName) throws OWLOntologyCreationException {
         final var path = TBoxSubclassOfNormalizationTest.class.getResource(resourceName).getFile();
-        final var originalOntology = Ontology.loadOntology(path);
-        final var normalizedOntology = Ontology.loadOntology(path);
-        final var normalization = new TBoxSubclassOfNormalization();
-        normalization.apply(normalizedOntology);
-        normalizedOntology.axioms()
-                .forEach(normalizedAxiom -> assertTrue(originalOntology.isEntailed(normalizedAxiom)));
-        originalOntology.axioms()
-                .forEach(originalAxiom -> assertTrue(normalizedOntology.isEntailed(originalAxiom)));
-        normalizedOntology.close();
-        originalOntology.close();
+        try (final var originalOntology = Ontology.loadOntology(path)) {
+            try (final var normalizedOntology = Ontology.loadOntology(path)) {
+                final var normalization = new TBoxSubclassOfNormalization();
+                normalization.apply(normalizedOntology);
+                normalizedOntology.axioms()
+                        .forEach(normalizedAxiom -> assertTrue(originalOntology.isEntailed(normalizedAxiom)));
+                originalOntology.axioms()
+                        .forEach(originalAxiom -> assertTrue(normalizedOntology.isEntailed(originalAxiom)));
+                normalizedOntology.close();
+                originalOntology.close();
+            }
+        }
     }
 }
