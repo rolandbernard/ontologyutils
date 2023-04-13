@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
 
-import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.*;
 
 /**
  * Implementation that can be used for weakening an axiom. Must be closed
@@ -55,13 +55,15 @@ public class AxiomWeakener implements AutoCloseable {
      * Create a new axiom weakener with the given reference ontology.
      *
      * @param refOntology
-     *            The reference ontology to use for the up and down covers.
+     *                    The reference ontology to use for the up and down covers.
      */
     public AxiomWeakener(final Ontology refOntology) {
         visitor = new Visitor();
         covers = new Covers(refOntology);
-        generalization = new RefinementOperator(covers::upCover, covers::downCover);
-        specialization = new RefinementOperator(covers::downCover, covers::upCover);
+        final var upCover = LruCache.wrapStreamFunction(covers::upCover);
+        final var downCover = LruCache.wrapStreamFunction(covers::downCover);
+        generalization = new RefinementOperator(upCover, downCover);
+        specialization = new RefinementOperator(downCover, upCover);
     }
 
     /**
@@ -71,7 +73,7 @@ public class AxiomWeakener implements AutoCloseable {
      * - for assertion axioms: generalizing the concept.
      *
      * @param axiom
-     *            The axiom for which we want to find weaker axioms.
+     *              The axiom for which we want to find weaker axioms.
      * @return A stream of axioms that are all weaker than {@code axiom}.
      */
     public Stream<OWLAxiom> weakerAxioms(final OWLAxiom axiom) {
