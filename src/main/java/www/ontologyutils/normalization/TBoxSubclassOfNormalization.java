@@ -24,9 +24,9 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
             // Since OWLDisjointUnionAxiom does not implement OWLSubClassOfAxiomSetShortCut
             // directly, we must first split the axiom into a disjoint class and equivalent
             // class axioms. Then we split the result axioms into subclass axioms.
-            final OWLDisjointClassesAxiom disjointClasses = axiom.getOWLDisjointClassesAxiom();
-            final OWLEquivalentClassesAxiom equivalentClasses = axiom.getOWLEquivalentClassesAxiom();
-            final Collection<OWLSubClassOfAxiom> axioms = disjointClasses.asOWLSubClassOfAxioms();
+            final var disjointClasses = axiom.getOWLDisjointClassesAxiom();
+            final var equivalentClasses = axiom.getOWLEquivalentClassesAxiom();
+            final var axioms = disjointClasses.asOWLSubClassOfAxioms();
             axioms.addAll(equivalentClasses.asOWLSubClassOfAxioms());
             return axioms;
         }
@@ -38,7 +38,7 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
             } else if (axiom instanceof OWLSubClassOfAxiomShortCut) {
                 return Collections.singleton(((OWLSubClassOfAxiomShortCut) axiom).asOWLSubClassOfAxiom());
             } else {
-                final OWLAxiom ax = (OWLAxiom) axiom;
+                final var ax = (OWLAxiom) axiom;
                 throw new IllegalArgumentException("The axiom " + ax + " of type " + ax.getAxiomType()
                         + " could not be converted into subclass axioms.");
             }
@@ -63,10 +63,10 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
 
     @Override
     public void apply(final Ontology ontology) throws IllegalArgumentException {
-        final List<OWLAxiom> tBox = ontology.axioms()
+        final var tBox = ontology.axioms()
                 .filter(axiom -> !axiom.isOfType(AxiomType.SUBCLASS_OF))
                 .filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes)).toList();
-        for (final OWLAxiom axiom : tBox) {
+        for (final var axiom : tBox) {
             ontology.replaceAxiom(axiom, asSubclassOfAxioms(axiom));
         }
     }

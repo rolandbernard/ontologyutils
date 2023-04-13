@@ -21,7 +21,7 @@ public interface OntologyModification {
      * @return The modified ontology
      */
     default public Ontology modified(final Ontology ontology) {
-        final Ontology copy = ontology.clone();
+        final var copy = ontology.clone();
         apply(copy);
         return copy;
     }

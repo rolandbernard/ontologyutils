@@ -36,7 +36,7 @@ public class RefinementOperator {
 
         @Override
         public Stream<OWLClassExpression> visit(final OWLObjectComplementOf concept) {
-            final OWLClassExpression operand = concept.getOperand();
+            final var operand = concept.getOperand();
             if ((flags & FLAG_NNF_STRICT) != 0 && operand.getClassExpressionType() != ClassExpressionType.OWL_CLASS) {
                 throw new IllegalArgumentException("The concept " + concept + " is not in NNF.");
             }
@@ -61,8 +61,8 @@ public class RefinementOperator {
 
         @Override
         public Stream<OWLClassExpression> visit(final OWLObjectIntersectionOf concept) {
-            final OWLDataFactory df = Ontology.getDefaultDataFactory();
-            final List<OWLClassExpression> conjuncts = concept.getOperandsAsList();
+            final var df = Ontology.getDefaultDataFactory();
+            final var conjuncts = concept.getOperandsAsList();
             if ((flags & FLAG_ALC_STRICT) != 0 && conjuncts.size() != 2) {
                 throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
             }
@@ -73,8 +73,8 @@ public class RefinementOperator {
 
         @Override
         public Stream<OWLClassExpression> visit(final OWLObjectUnionOf concept) {
-            final OWLDataFactory df = Ontology.getDefaultDataFactory();
-            final List<OWLClassExpression> disjuncts = concept.getOperandsAsList();
+            final var df = Ontology.getDefaultDataFactory();
+            final var disjuncts = concept.getOperandsAsList();
             if ((flags & FLAG_ALC_STRICT) != 0 && disjuncts.size() != 2) {
                 throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
             }
@@ -85,25 +85,25 @@ public class RefinementOperator {
 
         @Override
         public Stream<OWLClassExpression> visit(final OWLObjectAllValuesFrom concept) {
-            final OWLDataFactory df = Ontology.getDefaultDataFactory();
-            final OWLClassExpression filler = concept.getFiller();
-            final OWLObjectPropertyExpression property = concept.getProperty();
+            final var df = Ontology.getDefaultDataFactory();
+            final var filler = concept.getFiller();
+            final var property = concept.getProperty();
             return refine(filler)
                     .map(c -> df.getOWLObjectAllValuesFrom(property, c));
         }
 
         @Override
         public Stream<OWLClassExpression> visit(final OWLObjectSomeValuesFrom concept) {
-            final OWLDataFactory df = Ontology.getDefaultDataFactory();
-            final OWLClassExpression filler = concept.getFiller();
-            final OWLObjectPropertyExpression property = concept.getProperty();
+            final var df = Ontology.getDefaultDataFactory();
+            final var filler = concept.getFiller();
+            final var property = concept.getProperty();
             return refine(filler)
                     .map(c -> df.getOWLObjectSomeValuesFrom(property, c));
         }
 
         @Override
         public <T> Stream<OWLClassExpression> doDefault(final T obj) throws IllegalArgumentException {
-            final OWLClassExpression concept = (OWLClassExpression) obj;
+            final var concept = (OWLClassExpression) obj;
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
             } else {

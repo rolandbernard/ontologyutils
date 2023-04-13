@@ -18,9 +18,9 @@ public class AxiomWeakener implements AutoCloseable {
     private class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
         @Override
         public Stream<OWLAxiom> visit(final OWLSubClassOfAxiom axiom) {
-            final OWLDataFactory df = Ontology.getDefaultDataFactory();
-            final OWLClassExpression subclass = axiom.getSubClass();
-            final OWLClassExpression superclass = axiom.getSuperClass();
+            final var df = Ontology.getDefaultDataFactory();
+            final var subclass = axiom.getSubClass();
+            final var superclass = axiom.getSuperClass();
             return Stream.concat(
                     specialization.refine(subclass)
                             .map(newSubclass -> df.getOWLSubClassOfAxiom(newSubclass, superclass)),
@@ -30,16 +30,16 @@ public class AxiomWeakener implements AutoCloseable {
 
         @Override
         public Stream<OWLAxiom> visit(final OWLClassAssertionAxiom axiom) {
-            final OWLDataFactory df = Ontology.getDefaultDataFactory();
-            final OWLClassExpression concept = axiom.getClassExpression();
-            final OWLIndividual individual = axiom.getIndividual();
+            final var df = Ontology.getDefaultDataFactory();
+            final var concept = axiom.getClassExpression();
+            final var individual = axiom.getIndividual();
             return generalization.refine(concept)
                     .map(newConcept -> df.getOWLClassAssertionAxiom(newConcept, individual));
         }
 
         @Override
         public <T> Stream<OWLAxiom> doDefault(final T axiom) throws IllegalArgumentException {
-            final OWLAxiom ax = (OWLAxiom) axiom;
+            final var ax = (OWLAxiom) axiom;
             throw new IllegalArgumentException(
                     "The axiom " + ax + " of type " + ax.getAxiomType()
                             + " is not supported for axiom weakening.");

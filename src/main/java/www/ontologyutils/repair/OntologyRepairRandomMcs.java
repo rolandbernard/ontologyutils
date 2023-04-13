@@ -1,6 +1,5 @@
 package www.ontologyutils.repair;
 
-import java.util.Set;
 import java.util.function.Predicate;
 
 import org.semanticweb.owlapi.model.*;
@@ -43,7 +42,7 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
 
     @Override
     public void repair(final Ontology ontology) {
-        final Set<OWLAxiom> toRemove = Utils.randomChoice(ontology.optimalClassicalRepairs(isRepaired));
+        final var toRemove = Utils.randomChoice(ontology.optimalClassicalRepairs(isRepaired));
         ontology.removeAxioms(toRemove);
     }
 }

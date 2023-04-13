@@ -1,6 +1,5 @@
 package www.ontologyutils.repair;
 
-import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -53,10 +52,10 @@ public class OntologyRepairWeakening extends OntologyRepair {
      *         sets of {@code axioms}.
      */
     private Stream<OWLAxiom> findBadAxioms(final Ontology ontology) {
-        final Map<OWLAxiom, Long> occurrences = ontology.optimalClassicalRepairs(isRepaired)
+        final var occurrences = ontology.optimalClassicalRepairs(isRepaired)
                 .flatMap(set -> set.stream())
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-        final Optional<Long> max = occurrences.values().stream().max(Long::compareTo);
+        final var max = occurrences.values().stream().max(Long::compareTo);
         if (max.isEmpty()) {
             throw new RuntimeException(
                     "Did not find a bad subclass or assertion axiom in " + ontology.axioms().toList());
@@ -68,12 +67,12 @@ public class OntologyRepairWeakening extends OntologyRepair {
 
     @Override
     public void repair(final Ontology ontology) {
-        final Set<OWLAxiom> randomMcss = Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
-        try (final Ontology refOntology = Ontology.withAxioms(randomMcss)) {
-            try (final AxiomWeakener axiomWeakener = new AxiomWeakener(refOntology)) {
+        final var randomMcss = Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
+        try (final var refOntology = Ontology.withAxioms(randomMcss)) {
+            try (final var axiomWeakener = new AxiomWeakener(refOntology)) {
                 while (!isRepaired(ontology)) {
-                    final OWLAxiom badAxiom = Utils.randomChoice(findBadAxioms(ontology));
-                    final OWLAxiom weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
+                    final var badAxiom = Utils.randomChoice(findBadAxioms(ontology));
+                    final var weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
                     ontology.replaceAxiom(badAxiom, weakerAxiom);
                 }
             }

@@ -10,7 +10,8 @@ public class AppCheckProfile {
      * @param args
      */
     public static void main(final String[] args) {
-        Ontology ontology = Ontology.loadOntology(args[0]);
-        ontology.getOwlProfiles().forEach(System.out::println);
+        final var ontology = Ontology.loadOntology(args[0]);
+        ontology.checkOwlProfiles().forEach(System.out::println);
+        ontology.close();
     }
 }

@@ -7,15 +7,16 @@ import www.ontologyutils.toolbox.*;
 public class AppAutomatedRepairWeakening {
     /**
      * One argument must be given, corresponding to an OWL ontology file path. E.g.,
-     * run with the parameter resources/inconsistent-leftpolicies-small.owl
+     * run with the parameter
+     * src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
      *
      * @param args
      */
     public static void main(final String[] args) {
-        final Ontology ontology = Ontology.loadOntology(args[0]);
+        final var ontology = Ontology.loadOntology(args[0]);
         Utils.log("Loaded...");
-        TBoxSubclassOfNormalization normalization = new TBoxSubclassOfNormalization();
-        OntologyRepair repair = OntologyRepairWeakening.forConsistency();
+        final var normalization = new TBoxSubclassOfNormalization();
+        final var repair = OntologyRepairWeakening.forConsistency();
         Utils.log("Normalizing...");
         normalization.apply(ontology);
         Utils.log("Repairing...");

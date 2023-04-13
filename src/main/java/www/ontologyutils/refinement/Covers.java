@@ -32,7 +32,7 @@ public class Covers implements AutoCloseable {
         this.refOntology = refOntology;
         this.reasoner = refOntology.getOwlReasoner();
         this.subConcepts = refOntology.subConcepts().collect(Collectors.toSet());
-        final OWLDataFactory df = refOntology.getDataFactory();
+        final var df = refOntology.getDataFactory();
         this.subConcepts.add(df.getOWLThing());
         this.subConcepts.add(df.getOWLNothing());
     }
@@ -44,8 +44,8 @@ public class Covers implements AutoCloseable {
      *         {@code subclass} is a subclass of {@code superclass}.
      */
     private boolean isSubclass(final OWLClassExpression subclass, final OWLClassExpression superclass) {
-        final OWLDataFactory df = refOntology.getDataFactory();
-        final OWLSubClassOfAxiom testAxiom = df.getOWLSubClassOfAxiom(subclass, superclass);
+        final var df = refOntology.getDataFactory();
+        final var testAxiom = df.getOWLSubClassOfAxiom(subclass, superclass);
         return reasoner.isEntailed(testAxiom);
     }
 

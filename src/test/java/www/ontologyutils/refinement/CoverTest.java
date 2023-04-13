@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import java.util.stream.*;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
@@ -18,13 +19,13 @@ public class CoverTest {
     private final Covers covers;
 
     public CoverTest() {
-        final String path = CoverTest.class.getResource("catsandnumbers.owl").getFile();
+        final var path = CoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology);
     }
 
     private static Stream<Arguments> expectedUpCover() {
-        final OWLDataFactory df = Ontology.getDefaultDataFactory();
+        final var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -55,38 +56,56 @@ public class CoverTest {
                                 df.getOWLClass(ONTOLOGY_IRI, "Integer"),
                                 df.getOWLClass(ONTOLOGY_IRI, "PrimeNumber"),
                                 df.getOWLObjectAllValuesFrom(
-                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
-                                        df.getOWLClass(ONTOLOGY_IRI, "Primeness")),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI,
+                                                "hasQuality"),
+                                        df.getOWLClass(ONTOLOGY_IRI,
+                                                "Primeness")),
                                 df.getOWLObjectIntersectionOf(
                                         df.getOWLClass(ONTOLOGY_IRI, "Integer"),
                                         df.getOWLObjectAllValuesFrom(
-                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
-                                                df.getOWLClass(ONTOLOGY_IRI, "Primeness")))),
+                                                df.getOWLObjectProperty(
+                                                        ONTOLOGY_IRI,
+                                                        "hasQuality"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Primeness")))),
                         df.getOWLObjectIntersectionOf(
                                 df.getOWLClass(ONTOLOGY_IRI, "Integer"),
                                 df.getOWLObjectAllValuesFrom(
-                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
-                                        df.getOWLClass(ONTOLOGY_IRI, "Primeness")))),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI,
+                                                "hasQuality"),
+                                        df.getOWLClass(ONTOLOGY_IRI,
+                                                "Primeness")))),
                 Arguments.of(
                         Set.of(
                                 df.getOWLClass(ONTOLOGY_IRI, "BlackCat"),
                                 df.getOWLObjectAllValuesFrom(
-                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI,
+                                                "hasColour"),
                                         df.getOWLClass(ONTOLOGY_IRI, "Black")),
                                 df.getOWLObjectIntersectionOf(
                                         df.getOWLClass(ONTOLOGY_IRI, "Cat"),
                                         df.getOWLObjectSomeValuesFrom(
-                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
-                                                df.getOWLClass(ONTOLOGY_IRI, "Black"))),
+                                                df.getOWLObjectProperty(
+                                                        ONTOLOGY_IRI,
+                                                        "hasColour"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Black"))),
                                 df.getOWLObjectIntersectionOf(
                                         df.getOWLObjectIntersectionOf(
-                                                df.getOWLClass(ONTOLOGY_IRI, "Cat"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Cat"),
                                                 df.getOWLObjectSomeValuesFrom(
-                                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
-                                                        df.getOWLClass(ONTOLOGY_IRI, "Black"))),
+                                                        df.getOWLObjectProperty(
+                                                                ONTOLOGY_IRI,
+                                                                "hasColour"),
+                                                        df.getOWLClass(ONTOLOGY_IRI,
+                                                                "Black"))),
                                         df.getOWLObjectAllValuesFrom(
-                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
-                                                df.getOWLClass(ONTOLOGY_IRI, "Black")))),
+                                                df.getOWLObjectProperty(
+                                                        ONTOLOGY_IRI,
+                                                        "hasColour"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Black")))),
                         df.getOWLClass(ONTOLOGY_IRI, "BlackCat")));
     }
 
@@ -97,7 +116,7 @@ public class CoverTest {
     }
 
     private static Stream<Arguments> expectedDownCover() {
-        final OWLDataFactory df = Ontology.getDefaultDataFactory();
+        final var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -106,8 +125,11 @@ public class CoverTest {
                                 df.getOWLObjectIntersectionOf(
                                         df.getOWLClass(ONTOLOGY_IRI, "Integer"),
                                         df.getOWLObjectAllValuesFrom(
-                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
-                                                df.getOWLClass(ONTOLOGY_IRI, "Primeness")))),
+                                                df.getOWLObjectProperty(
+                                                        ONTOLOGY_IRI,
+                                                        "hasQuality"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Primeness")))),
                         df.getOWLClass(ONTOLOGY_IRI, "Integer")),
                 Arguments.of(
                         Set.of(
@@ -124,14 +146,18 @@ public class CoverTest {
                                 df.getOWLThing(),
                                 df.getOWLClass(ONTOLOGY_IRI, "PhysicalObject"),
                                 df.getOWLObjectAllValuesFrom(
-                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI,
+                                                "hasColour"),
                                         df.getOWLClass(ONTOLOGY_IRI, "White")),
                                 df.getOWLObjectAllValuesFrom(
-                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI,
+                                                "hasColour"),
                                         df.getOWLClass(ONTOLOGY_IRI, "Black")),
                                 df.getOWLObjectAllValuesFrom(
-                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
-                                        df.getOWLClass(ONTOLOGY_IRI, "Primeness"))),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI,
+                                                "hasQuality"),
+                                        df.getOWLClass(ONTOLOGY_IRI,
+                                                "Primeness"))),
                         df.getOWLThing()),
                 Arguments.of(
                         Set.of(
@@ -140,35 +166,52 @@ public class CoverTest {
                                 df.getOWLObjectIntersectionOf(
                                         df.getOWLClass(ONTOLOGY_IRI, "Integer"),
                                         df.getOWLObjectAllValuesFrom(
-                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
-                                                df.getOWLClass(ONTOLOGY_IRI, "Primeness")))),
+                                                df.getOWLObjectProperty(
+                                                        ONTOLOGY_IRI,
+                                                        "hasQuality"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Primeness")))),
                         df.getOWLObjectIntersectionOf(
                                 df.getOWLClass(ONTOLOGY_IRI, "Integer"),
                                 df.getOWLObjectAllValuesFrom(
-                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
-                                        df.getOWLClass(ONTOLOGY_IRI, "Primeness")))),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI,
+                                                "hasQuality"),
+                                        df.getOWLClass(ONTOLOGY_IRI,
+                                                "Primeness")))),
                 Arguments.of(
                         Set.of(
                                 df.getOWLClass(ONTOLOGY_IRI, "BlackCat"),
                                 df.getOWLObjectIntersectionOf(
                                         df.getOWLObjectIntersectionOf(
-                                                df.getOWLClass(ONTOLOGY_IRI, "Cat"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Cat"),
                                                 df.getOWLObjectSomeValuesFrom(
-                                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
-                                                        df.getOWLClass(ONTOLOGY_IRI, "Black"))),
+                                                        df.getOWLObjectProperty(
+                                                                ONTOLOGY_IRI,
+                                                                "hasColour"),
+                                                        df.getOWLClass(ONTOLOGY_IRI,
+                                                                "Black"))),
                                         df.getOWLObjectAllValuesFrom(
-                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
-                                                df.getOWLClass(ONTOLOGY_IRI, "Black"))),
+                                                df.getOWLObjectProperty(
+                                                        ONTOLOGY_IRI,
+                                                        "hasColour"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Black"))),
                                 df.getOWLObjectIntersectionOf(
                                         df.getOWLClass(ONTOLOGY_IRI, "Cat"),
                                         df.getOWLObjectSomeValuesFrom(
-                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
-                                                df.getOWLClass(ONTOLOGY_IRI, "Black")))),
+                                                df.getOWLObjectProperty(
+                                                        ONTOLOGY_IRI,
+                                                        "hasColour"),
+                                                df.getOWLClass(ONTOLOGY_IRI,
+                                                        "Black")))),
                         df.getOWLObjectIntersectionOf(
                                 df.getOWLClass(ONTOLOGY_IRI, "Cat"),
                                 df.getOWLObjectSomeValuesFrom(
-                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour"),
-                                        df.getOWLClass(ONTOLOGY_IRI, "Black")))),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI,
+                                                "hasColour"),
+                                        df.getOWLClass(ONTOLOGY_IRI,
+                                                "Black")))),
                 Arguments.of(
                         Set.of(
                                 df.getOWLClass(ONTOLOGY_IRI, "Colour"),
@@ -180,5 +223,15 @@ public class CoverTest {
     @MethodSource("expectedDownCover")
     public void downCover(final Set<OWLClassExpression> expected, final OWLClassExpression concept) {
         assertEquals(expected, covers.downCover(concept).collect(Collectors.toSet()));
+    }
+
+    @Test
+    public void allUpCover() {
+        ontology.subConcepts().map(covers::upCover).forEach(Stream::count);
+    }
+
+    @Test
+    public void allDownCover() {
+        ontology.subConcepts().map(covers::downCover).forEach(Stream::count);
     }
 }
