@@ -18,8 +18,7 @@ public class TBoxSubclassOfNormalizationTest {
         try (final var ontology = Ontology.loadOntology(path)) {
             final var normalization = new TBoxSubclassOfNormalization();
             normalization.apply(ontology);
-            ontology.axioms()
-                    .filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes))
+            ontology.tBoxAxioms()
                     .forEach(axiom -> assertEquals(AxiomType.SUBCLASS_OF, axiom.getAxiomType()));
         }
     }

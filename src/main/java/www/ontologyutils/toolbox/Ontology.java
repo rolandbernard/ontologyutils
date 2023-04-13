@@ -190,6 +190,24 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * Save the ontology to the file given by the path {@code filePath}.
+     * 
+     * @param filePath
+     */
+    public void saveOntology(String filePath) {
+        this.<Void>withReasonerDo(reasoner -> {
+            final var owlOntology = reasoner.getRootOntology();
+            final var ontologyFile = new File(filePath);
+            try {
+                owlOntology.saveOntology(IRI.create(ontologyFile));
+            } catch (final OWLOntologyStorageException e) {
+                Utils.panic(e);
+            }
+            return null;
+        });
+    }
+
+    /**
      * @return The default data factory to use for creating owl api objects.
      */
     public static OWLDataFactory getDefaultDataFactory() {
@@ -214,6 +232,18 @@ public class Ontology implements AutoCloseable {
 
     public Stream<OWLLogicalAxiom> logicalAxioms() {
         return axioms().filter(axiom -> axiom.isLogicalAxiom()).map(axiom -> (OWLLogicalAxiom) axiom);
+    }
+
+    public Stream<OWLAxiom> tBoxAxioms() {
+        return axioms().filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes));
+    }
+
+    public Stream<OWLAxiom> aBoxAxioms() {
+        return axioms().filter(axiom -> axiom.isOfType(AxiomType.ABoxAxiomTypes));
+    }
+
+    public Stream<OWLAxiom> rBoxAxioms() {
+        return axioms().filter(axiom -> axiom.isOfType(AxiomType.RBoxAxiomTypes));
     }
 
     public void removeAxioms(final Stream<? extends OWLAxiom> axioms) {
