@@ -15,7 +15,7 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
 
     /**
      * Create a new cache with the specified size.
-     * 
+     *
      * @param cacheSize
      */
     public LruCache(final int cacheSize) {
@@ -26,7 +26,7 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
     /**
      * Wrap the given function {@code function} using a {@code LruCache} with a
      * maximum number of {@code cacheSize} entries.
-     * 
+     *
      * @param <K>
      * @param <V>
      * @param function
@@ -43,7 +43,7 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
     /**
      * Wrap the given function {@code function} using a {@code LruCache} with some
      * unspecified maximum size.
-     * 
+     *
      * @param <K>
      * @param <V>
      * @param function
@@ -56,7 +56,7 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
     /**
      * Because streams can not be cached directly, we provide this utility that
      * converts the stream to a list, and then back to a stream whenever needed.
-     * 
+     *
      * @param <K>
      * @param <V>
      * @param function

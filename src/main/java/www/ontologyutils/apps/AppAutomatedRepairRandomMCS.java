@@ -13,21 +13,27 @@ public class AppAutomatedRepairRandomMCS {
      * @param args
      */
     public static void main(final String[] args) {
+        if (args.length != 1) {
+            System.err.println("Usage: java " + AppAutomatedRepairRandomMCS.class.getCanonicalName() + " FILENAME");
+            System.exit(1);
+        }
         final var ontology = Ontology.loadOntology(args[0]);
-        Utils.log("Loaded...");
+        System.err.println("Loaded...");
         final var normalization = new TBoxSubclassOfNormalization();
         final var repair = OntologyRepairRandomMcs.forConsistency();
-        Utils.log("Normalizing...");
+        System.err.println("Normalizing...");
         normalization.apply(ontology);
-        Utils.log("Repairing...");
+        System.err.println("Repairing...");
         repair.apply(ontology);
-        Utils.log("Repaired.");
-        Utils.log("=== BEGIN RESULT ===");
-        ontology.refutableAxioms().sorted().forEach(System.out::println);
-        ontology.staticAxioms().sorted().forEach(System.out::println);
+        System.err.println("Repaired.");
+        System.err.println("=== BEGIN RESULT ===");
+        ontology.refutableAxioms().map(Utils::prettyPrintAxiom)
+                .sorted().forEach(System.out::println);
+        ontology.staticAxioms().map(Utils::prettyPrintAxiom)
+                .sorted().forEach(System.out::println);
         assert ontology.isConsistent();
         ontology.close();
-        Utils.log("==== END RESULT ====");
-        Utils.log("Done.");
+        System.err.println("==== END RESULT ====");
+        System.err.println("Done.");
     }
 }

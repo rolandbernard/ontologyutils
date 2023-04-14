@@ -53,7 +53,7 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
 
     /**
      * @param axiom
-     *              The axiom that should be split into subclasses.
+     *            The axiom that should be split into subclasses.
      * @return A number of subclass axioms that together are equivalent to
      *         {@code axiom} in every ontology.
      */
@@ -63,7 +63,7 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
 
     @Override
     public void apply(final Ontology ontology) throws IllegalArgumentException {
-        final var tBox = ontology.tBoxAxioms()
+        final var tBox = ontology.tboxAxioms()
                 .filter(axiom -> !axiom.isOfType(AxiomType.SUBCLASS_OF)).toList();
         for (final var axiom : tBox) {
             ontology.replaceAxiom(axiom, asSubclassOfAxioms(axiom));

@@ -26,7 +26,7 @@ public class TerminationTest {
     }
 
     public boolean areEquivalent(final OWLClassExpression c1, final OWLClassExpression c2) {
-        final var df = ontology.getDataFactory();
+        final var df = Ontology.getDefaultDataFactory();
         final var lr = df.getOWLSubClassOfAxiom(c1, c2);
         final var rl = df.getOWLSubClassOfAxiom(c2, c1);
         return ontology.isEntailed(lr) && ontology.isEntailed(rl);
@@ -40,7 +40,7 @@ public class TerminationTest {
     @MethodSource("terminationRuns")
     public void testTermination(final int seed) {
         Utils.randomSeed(seed);
-        final var df = ontology.getDataFactory();
+        final var df = Ontology.getDefaultDataFactory();
         OWLClassExpression current = df.getOWLNothing();
         while (!current.isOWLThing()) {
             current = Utils.randomChoice(generalization.refine(current));

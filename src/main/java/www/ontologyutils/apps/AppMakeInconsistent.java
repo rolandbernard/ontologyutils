@@ -16,40 +16,41 @@ public class AppMakeInconsistent {
      * can be given, to indicate the minimal number of strengthening iterations must
      * be done. A third argument can be given, to indicate the minimal number of
      * iterations needed that must be done after reaching inconsistency.
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {
         final var ontology = Ontology.loadOntology(args[0]);
         final var normalization = new TBoxSubclassOfNormalization();
         normalization.apply(ontology);
-        Utils.log("Loaded...");
+        System.err.println("Loaded...");
         if (!ontology.isConsistent()) {
-            Utils.log("Ontology is already inconsistent.");
+            System.err.println("Ontology is already inconsistent.");
             return;
         }
         int minNumIter = 0;
         try {
             minNumIter = Integer.parseInt(args[1]);
-            Utils.log("Minimal number of strengthening iterations: " + minNumIter);
+            System.err.println("Minimal number of strengthening iterations: " + minNumIter);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            Utils.log("No minimal number of strengthening iterations specified.");
+            System.err.println("No minimal number of strengthening iterations specified.");
         }
         int minNumIterAfterInconsistency = 0;
         try {
             minNumIterAfterInconsistency = Integer.parseInt(args[2]);
-            Utils.log("Minimal number of iterations after reaching inconsistency: " + minNumIterAfterInconsistency);
+            System.err.println(
+                    "Minimal number of iterations after reaching inconsistency: " + minNumIterAfterInconsistency);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            Utils.log("No minimal number of iterations after reaching inconsistency specified.");
+            System.err.println("No minimal number of iterations after reaching inconsistency specified.");
         }
         final var emptyOntology = Ontology.emptyOntology();
         final var axiomStrengthener = new AxiomStrengthener(ontology);
         int iter = 0;
         int iterSinceInconsistency = 0;
         boolean isConsistent = ontology.isConsistent();
-        Utils.log(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
+        System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         while (isConsistent || iter < minNumIter || iterSinceInconsistency < minNumIterAfterInconsistency) {
-            final OWLAxiom axiom = Utils.randomChoice(ontology.tBoxAxioms());
+            final OWLAxiom axiom = Utils.randomChoice(ontology.tboxAxioms());
             final var strongerAxioms = axiomStrengthener.strongerAxioms(axiom).collect(Collectors.toSet());
             // We do not consider the axioms already in the ontology.
             strongerAxioms.removeAll(ontology.axioms().toList());
@@ -83,15 +84,18 @@ public class AppMakeInconsistent {
             } else {
                 iterSinceInconsistency = 0;
             }
-            Utils.log(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
+            System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         }
-        Utils.log("=== BEGIN RESULT ===");
-        ontology.axioms().forEach(System.out::println);
-        Utils.log("==== END RESULT ====");
+        System.err.println("=== BEGIN RESULT ===");
+        ontology.refutableAxioms().map(Utils::prettyPrintAxiom)
+                .sorted().forEach(System.out::println);
+        ontology.staticAxioms().map(Utils::prettyPrintAxiom)
+                .sorted().forEach(System.out::println);
+        System.err.println("==== END RESULT ====");
         ontology.saveOntology(args[0].replaceAll(".owl$", "") + "-made-inconsistent.owl");
         axiomStrengthener.close();
         emptyOntology.close();
         ontology.close();
-        Utils.log("Done.");
+        System.err.println("Done.");
     }
 }

@@ -5,8 +5,6 @@ import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectComplementOfImpl;
-
 /**
  * Utility class that contains static constants and methods that don't neatly
  * fit anywhere else.
@@ -29,7 +27,7 @@ public final class Utils {
      * guaranteed to never return.
      *
      * @param e
-     *          The exception that caused the panic.
+     *            The exception that caused the panic.
      * @return Return a runtime exception it is given, so that it can be thrown
      *         again to
      *         avoid control flow checks failing.
@@ -41,19 +39,8 @@ public final class Utils {
     }
 
     /**
-     * Use this method for communicating data to the user that is not part of the
-     * output.
-     *
-     * @param info
-     *             The message to be communicated
-     */
-    public static void log(final String info) {
-        System.err.println(info);
-    }
-
-    /**
      * Set the seed for the currently used random instance to {@code seed}.
-     * 
+     *
      * @param seed
      */
     public static void randomSeed(final long seed) {
@@ -92,8 +79,8 @@ public final class Utils {
      * @param set
      * @return The power set of {@code set}
      * @throws IllegalArgumentException
-     *                                  If {@code set} contains more than 63
-     *                                  elements.
+     *             If {@code set} contains more than 63
+     *             elements.
      */
     public static <T> Stream<Set<T>> powerSet(final Collection<? extends T> set) throws IllegalArgumentException {
         if (set.size() > 63) {
@@ -134,8 +121,8 @@ public final class Utils {
                     return c1.equals(c2);
                 }
                 case OBJECT_COMPLEMENT_OF: {
-                    final var n1 = (OWLObjectComplementOfImpl) c1;
-                    final var n2 = (OWLObjectComplementOfImpl) c2;
+                    final var n1 = (OWLObjectComplementOf) c1;
+                    final var n2 = (OWLObjectComplementOf) c2;
                     return sameConcept(n1.getOperand(), n2.getOperand());
                 }
                 case OBJECT_UNION_OF:
@@ -158,5 +145,24 @@ public final class Utils {
                             "Concept type " + c1.getClassExpressionType() + " not supported for comparison.");
             }
         }
+    }
+
+    /**
+     * @param owlString
+     * @return
+     */
+    public static String pretty(final String owlString) {
+        return owlString.replaceAll("<http.*?#", "").replaceAll(">", "").replaceAll("<", "");
+    }
+
+    /**
+     * @param ax
+     * @return a pretty string representing {@code ax}, without its annotations and
+     *         without namespaces.
+     */
+    public static String prettyPrintAxiom(final OWLAxiom ax) {
+        return ax.getAxiomWithoutAnnotations().toString()
+                .replaceAll("<http.*?#", "").replaceAll(">", "").replaceAll("<", "")
+                .replaceFirst("Annotation(.*?) ", "");
     }
 }

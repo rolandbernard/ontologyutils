@@ -5,12 +5,14 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.profiles.*;
 import org.semanticweb.owlapi.reasoner.*;
 
 import openllet.owlapi.OpenlletReasonerFactory;
+import uk.ac.manchester.cs.jfact.JFactFactory;
 
 /**
  * This class represents an ontology and is used for ontologies in this package.
@@ -59,7 +61,7 @@ public class Ontology implements AutoCloseable {
          * disposed again to free associated resources.
          *
          * @param reasoner
-         *                 The {@code OWLReasoner} to dispose.
+         *            The {@code OWLReasoner} to dispose.
          */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final var owlOntology = reasoner.getRootOntology();
@@ -189,9 +191,23 @@ public class Ontology implements AutoCloseable {
         return loadOntology(filePath, defaultFactory);
     }
 
+    public static Ontology loadOnlyLogicalAxioms(final String filePath) {
+        final var ontology = loadOntology(filePath, defaultFactory);
+        ontology.removeAxioms(ontology.nonLogicalAxioms().toList());
+        return ontology;
+    }
+
+    public static Ontology loadOntologyWithOriginAnnotations(final String filePath) {
+        final var ontology = loadOntology(filePath, defaultFactory);
+        for (final var axiom : ontology.axioms().toList()) {
+            ontology.replaceAxiom(axiom, axiom);
+        }
+        return ontology;
+    }
+
     /**
      * Save the ontology to the file given by the path {@code filePath}.
-     * 
+     *
      * @param filePath
      */
     public void saveOntology(String filePath) {
@@ -214,10 +230,6 @@ public class Ontology implements AutoCloseable {
         return defaultManager.getOWLDataFactory();
     }
 
-    public OWLDataFactory getDataFactory() {
-        return getDefaultDataFactory();
-    }
-
     public Stream<OWLAxiom> staticAxioms() {
         return staticAxioms.stream();
     }
@@ -234,15 +246,19 @@ public class Ontology implements AutoCloseable {
         return axioms().filter(axiom -> axiom.isLogicalAxiom()).map(axiom -> (OWLLogicalAxiom) axiom);
     }
 
-    public Stream<OWLAxiom> tBoxAxioms() {
+    public Stream<OWLAxiom> nonLogicalAxioms() {
+        return axioms().filter(axiom -> !axiom.isLogicalAxiom()).map(axiom -> (OWLAxiom) axiom);
+    }
+
+    public Stream<OWLAxiom> tboxAxioms() {
         return axioms().filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes));
     }
 
-    public Stream<OWLAxiom> aBoxAxioms() {
+    public Stream<OWLAxiom> aboxAxioms() {
         return axioms().filter(axiom -> axiom.isOfType(AxiomType.ABoxAxiomTypes));
     }
 
-    public Stream<OWLAxiom> rBoxAxioms() {
+    public Stream<OWLAxiom> rboxAxioms() {
         return axioms().filter(axiom -> axiom.isOfType(AxiomType.RBoxAxiomTypes));
     }
 
@@ -289,13 +305,24 @@ public class Ontology implements AutoCloseable {
      * @return The {@code OWLAnnotationProperty} used for the origin annotation when
      *         replacing axioms.
      */
-    public OWLAnnotationProperty getOriginAnnotationProperty() {
-        return getDataFactory().getOWLAnnotationProperty("origin");
+    public static OWLAnnotationProperty getOriginAnnotationProperty() {
+        return getDefaultDataFactory().getOWLAnnotationProperty("origin");
     }
 
-    private OWLAnnotation getNewOriginAnnotation(final OWLAxiom origin) {
-        final OWLDataFactory df = getDataFactory();
+    private static OWLAnnotation getNewOriginAnnotation(final OWLAxiom origin) {
+        final OWLDataFactory df = getDefaultDataFactory();
         return df.getOWLAnnotation(getOriginAnnotationProperty(), df.getOWLLiteral(origin.toString()));
+    }
+
+    /**
+     * @return The annotations of {@code axiom}.
+     */
+    public static Stream<OWLAnnotation> axiomOriginAnnotations(final OWLAxiom axiom) {
+        if (axiom.annotations(getOriginAnnotationProperty()).count() > 0) {
+            return axiom.annotations(getOriginAnnotationProperty());
+        } else {
+            return Stream.of(getNewOriginAnnotation(axiom));
+        }
     }
 
     /**
@@ -306,18 +333,13 @@ public class Ontology implements AutoCloseable {
      * @param origin
      * @return A new annotated axiom equivalent to {@code axiom}.
      */
-    private OWLAxiom getAnnotatedAxiom(final OWLAxiom axiom, final OWLAxiom origin) {
-        if (origin.annotations(getOriginAnnotationProperty()).count() > 0) {
-            return axiom.getAnnotatedAxiom(origin.annotations(getOriginAnnotationProperty()));
-        } else {
-            return axiom.getAnnotatedAxiom(
-                    Stream.concat(axiom.annotations(), Stream.of(getNewOriginAnnotation(origin))));
-        }
+    public static OWLAxiom getOriginAnnotatedAxiom(final OWLAxiom axiom, final OWLAxiom origin) {
+        return axiom.getAnnotatedAxiom(axiomOriginAnnotations(origin));
     }
 
     public void replaceAxiom(final OWLAxiom remove, final Stream<? extends OWLAxiom> replacement) {
         removeAxioms(remove);
-        addAxioms(replacement.map(a -> getAnnotatedAxiom(a, remove)));
+        addAxioms(replacement.map(a -> getOriginAnnotatedAxiom(a, remove)));
     }
 
     public void replaceAxiom(final OWLAxiom remove, final Collection<? extends OWLAxiom> replacement) {
@@ -343,7 +365,7 @@ public class Ontology implements AutoCloseable {
      * {@code OWLOntology} and {@code OWLReasoner}.
      *
      * @param reasoner
-     *                 The reasoner to dispose of.
+     *            The reasoner to dispose of.
      */
     public void disposeOwlReasoner(final OWLReasoner reasoner) {
         reasonerCache.disposeOwlReasoner(reasoner);
@@ -399,7 +421,36 @@ public class Ontology implements AutoCloseable {
      * @return A stream providing all subconcepts used in the ontology.
      */
     public Stream<OWLClassExpression> subConcepts() {
-        return axioms().flatMap(axiom -> axiom.nestedClassExpressions());
+        return axioms().flatMap(OWLAxiom::nestedClassExpressions);
+    }
+
+    /**
+     * @return A stream providing all subconcepts used in the ontology's TBox.
+     */
+    public Stream<OWLClassExpression> subConceptsOfTbox() {
+        return tboxAxioms().flatMap(OWLAxiom::nestedClassExpressions);
+    }
+
+    /**
+     * @return A stream containing all entities in the signature of this ontology.
+     */
+    public Stream<OWLEntity> signature() {
+        return axioms().flatMap(OWLAxiom::signature);
+    }
+
+    /**
+     * @return A stream containing all concept names in the signature of this
+     *         ontology.
+     */
+    public Stream<OWLClass> conceptsInSignature() {
+        return axioms().flatMap(OWLAxiom::classesInSignature);
+    }
+
+    /**
+     * @return A stream containing all roles in the signature of this ontology.
+     */
+    public Stream<OWLObjectProperty> rolesInSignature() {
+        return axioms().flatMap(OWLAxiom::objectPropertiesInSignature);
     }
 
     /**
@@ -408,7 +459,7 @@ public class Ontology implements AutoCloseable {
      */
     public Set<OWLAxiom> inferredTaxonomyAxioms() {
         return withReasonerDo(reasoner -> {
-            final var df = getDataFactory();
+            final var df = getDefaultDataFactory();
             final var ontology = reasoner.getRootOntology();
             final var isConsistent = reasoner.isConsistent();
             return ontology.classesInSignature()
@@ -417,6 +468,36 @@ public class Ontology implements AutoCloseable {
                             .filter(axiom -> !isConsistent || reasoner.isEntailed(axiom)))
                     .collect(Collectors.toSet());
         });
+    }
+
+    /**
+     * Clone this ontology, but give it a cache using the hermit reasoner.
+     *
+     * @return The new ontology.
+     */
+    public Ontology cloneWithHermit() {
+        final var reasonerCache = new CachedReasoner(new ReasonerFactory());
+        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), reasonerCache);
+    }
+
+    /**
+     * Clone this ontology, but give it a cache using the openllet reasoner.
+     *
+     * @return The new ontology.
+     */
+    public Ontology cloneWithOpenllet() {
+        final var reasonerCache = new CachedReasoner(OpenlletReasonerFactory.getInstance());
+        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), reasonerCache);
+    }
+
+    /**
+     * Clone this ontology, but give it a cache using the jfact reasoner.
+     *
+     * @return The new ontology.
+     */
+    public Ontology cloneWithJFact() {
+        final var reasonerCache = new CachedReasoner(new JFactFactory());
+        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), reasonerCache);
     }
 
     @Override
