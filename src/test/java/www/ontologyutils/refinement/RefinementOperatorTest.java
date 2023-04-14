@@ -21,7 +21,7 @@ public class RefinementOperatorTest {
     static RefinementOperator specialization;
 
     public RefinementOperatorTest() {
-        final var path = CoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        final var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology);
         generalization = new RefinementOperator(covers::upCover, covers::downCover);

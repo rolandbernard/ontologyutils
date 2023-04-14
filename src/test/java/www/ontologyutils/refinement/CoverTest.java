@@ -19,7 +19,7 @@ public class CoverTest {
     private final Covers covers;
 
     public CoverTest() {
-        final var path = CoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        final var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology);
     }

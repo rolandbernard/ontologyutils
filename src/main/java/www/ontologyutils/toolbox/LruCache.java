@@ -5,10 +5,10 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
- * Implements a simple LRU cache by extending the {@code LinkedHashMap}. Most of
- * the functionality is already provided by {@code LinkedHashMap}, only the
- * method {@code removeEldestEntry} must be overwritten to specify a maximal
- * cache size.
+ * Implements a simple least-recently-used cache by extending the
+ * {@code LinkedHashMap}. Most of the functionality is already provided by
+ * {@code LinkedHashMap}, only the method {@code removeEldestEntry} must be
+ * overwritten to specify a maximal cache size.
  */
 public class LruCache<K, V> extends LinkedHashMap<K, V> {
     private final int cacheSize;

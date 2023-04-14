@@ -26,7 +26,7 @@ public class Covers implements AutoCloseable {
      * Creates a new {@code Cover} object for the given reference object.
      *
      * @param refOntology
-     *            The ontology used for entailment check.
+     *                    The ontology used for entailment check.
      */
     public Covers(final Ontology refOntology) {
         this.refOntology = refOntology;
@@ -50,8 +50,8 @@ public class Covers implements AutoCloseable {
     }
 
     /**
-     * For this function, a class A is a string subclass of B iff A isSubclassOf B
-     * and not B isSubclassOf A.
+     * For this function, a class A is a strict subclass of B iff A isSubclassOf B
+     * is entailed but B isSubclassOf A is not.
      *
      * @param subclass
      * @param superclass
