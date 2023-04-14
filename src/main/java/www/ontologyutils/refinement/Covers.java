@@ -26,7 +26,7 @@ public class Covers implements AutoCloseable {
      * Creates a new {@code Cover} object for the given reference object.
      *
      * @param refOntology
-     *                    The ontology used for entailment check.
+     *            The ontology used for entailment check.
      */
     public Covers(final Ontology refOntology) {
         this.refOntology = refOntology;

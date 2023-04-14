@@ -39,8 +39,26 @@ public class RoleCoverTest {
                         Set.of(),
                         df.getOWLTopObjectProperty()),
                 Arguments.of(
-                        Set.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")),
-                        df.getOWLBottomObjectProperty()));
+                        Set.of(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")),
+                        df.getOWLBottomObjectProperty()),
+                Arguments.of(
+                        Set.of(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty()),
+                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty()),
+                Arguments.of(
+                        Set.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
+                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
+                Arguments.of(
+                        Set.of(),
+                        df.getOWLTopObjectProperty().getInverseProperty()),
+                Arguments.of(
+                        Set.of(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")),
+                        df.getOWLBottomObjectProperty().getInverseProperty()));
     }
 
     @ParameterizedTest
@@ -62,11 +80,29 @@ public class RoleCoverTest {
                                 df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")),
                         df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")),
                 Arguments.of(
-                        Set.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")),
+                        Set.of(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")),
                         df.getOWLTopObjectProperty()),
                 Arguments.of(
                         Set.of(),
-                        df.getOWLBottomObjectProperty()));
+                        df.getOWLBottomObjectProperty()),
+                Arguments.of(
+                        Set.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty()),
+                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty()),
+                Arguments.of(
+                        Set.of(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
+                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
+                Arguments.of(
+                        Set.of(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
+                        df.getOWLTopObjectProperty().getInverseProperty()),
+                Arguments.of(
+                        Set.of(),
+                        df.getOWLBottomObjectProperty().getInverseProperty()));
     }
 
     @ParameterizedTest

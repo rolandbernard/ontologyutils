@@ -28,7 +28,7 @@ public class RoleCovers implements AutoCloseable {
      * Creates a new {@code RoleCover} object for the given reference object.
      *
      * @param refOntology
-     *                    The ontology used for entailment check.
+     *            The ontology used for entailment check.
      */
     public RoleCovers(final Ontology refOntology) {
         this.refOntology = refOntology;
@@ -43,7 +43,8 @@ public class RoleCovers implements AutoCloseable {
      * determined to me non-simple.
      */
     private void computeNonSimpleRoles() {
-        // TODO: move this into seperate class with visitor and make it accesible via a method on Ontology?
+        // TODO: move this into seperate class with visitor and make it accesible via a
+        // method on Ontology?
         final OWLDataFactory df = Ontology.getDefaultDataFactory();
         simpleRoles.remove(df.getOWLTopObjectProperty());
         nonSimpleRoles.add(df.getOWLTopObjectProperty());
@@ -95,6 +96,13 @@ public class RoleCovers implements AutoCloseable {
     }
 
     /**
+     * @return A stream containing all simple roles in the reference ontology.
+     */
+    private Stream<OWLObjectPropertyExpression> allSimpleRoles() {
+        return simpleRoles.stream().flatMap(role -> Stream.of(role, role.getInverseProperty()));
+    }
+
+    /**
      * @param subclass
      * @param superclass
      * @return True iff the reference ontology of this cover entails that
@@ -128,10 +136,10 @@ public class RoleCovers implements AutoCloseable {
      */
     private boolean isInUpCover(final OWLObjectPropertyExpression concept,
             final OWLObjectPropertyExpression candidate) {
-        if (!simpleRoles.contains(candidate) || !isSubclass(concept, candidate)) {
+        if (!simpleRoles.contains(candidate.getNamedProperty()) || !isSubclass(concept, candidate)) {
             return false;
         } else {
-            return !simpleRoles.stream().parallel()
+            return !allSimpleRoles().parallel()
                     .anyMatch(other -> isStrictSubclass(concept, other) && isStrictSubclass(other, candidate));
         }
     }
@@ -141,8 +149,7 @@ public class RoleCovers implements AutoCloseable {
      * @return All concepts that are in the upward cover of {@code concept}.
      */
     public Stream<OWLObjectPropertyExpression> upCover(final OWLObjectPropertyExpression concept) {
-        return simpleRoles.stream().flatMap(role -> Stream.of(role, role.getInverseProperty())).parallel()
-                .filter(candidate -> isInUpCover(concept, candidate));
+        return allSimpleRoles().parallel().filter(candidate -> isInUpCover(concept, candidate));
     }
 
     /**
@@ -153,10 +160,10 @@ public class RoleCovers implements AutoCloseable {
      */
     private boolean isInDownCover(final OWLObjectPropertyExpression concept,
             final OWLObjectPropertyExpression candidate) {
-        if (!simpleRoles.contains(candidate) || !isSubclass(candidate, concept)) {
+        if (!simpleRoles.contains(candidate.getNamedProperty()) || !isSubclass(candidate, concept)) {
             return false;
         } else {
-            return !simpleRoles.stream().parallel()
+            return !allSimpleRoles().parallel()
                     .anyMatch(other -> isStrictSubclass(candidate, other) && isStrictSubclass(other, concept));
         }
     }
@@ -166,8 +173,7 @@ public class RoleCovers implements AutoCloseable {
      * @return All concepts that are in the downward cover of {@code concept}.
      */
     public Stream<OWLObjectPropertyExpression> downCover(final OWLObjectPropertyExpression concept) {
-        return simpleRoles.stream().flatMap(role -> Stream.of(role, role.getInverseProperty())).parallel()
-                .filter(candidate -> isInDownCover(concept, candidate));
+        return allSimpleRoles().parallel().filter(candidate -> isInDownCover(concept, candidate));
     }
 
     @Override
