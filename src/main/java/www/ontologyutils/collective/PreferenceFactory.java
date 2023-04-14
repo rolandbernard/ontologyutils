@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * over an agenda is a list of Integers, e.g., [2,3,1]. [2,3,1] says
  * that ax3 (rank 1) is preferred to ax1 (rank 2), which is preferred to
  * ax2 (rank 3). It must not contain duplicates.
- * 
+ *
  * Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
  * Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
  * Ontology Aggregation Based on Axiom Weakening. In 27th International
@@ -21,10 +21,11 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * Conference on Artificial Intelligence (IJCAI-ECAI 2018).
  * International Joint Conferences on Artificial Intelligence
  * Organization, 2018, pages 1942-1948.
- * 
+ *
  * @author nico
  */
 public class PreferenceFactory {
+
     private List<OWLAxiom> agenda;
 
     public PreferenceFactory(List<OWLAxiom> agenda) {
@@ -43,6 +44,7 @@ public class PreferenceFactory {
     }
 
     private List<Integer> randomRanking() {
+
         List<Integer> ranking = new ArrayList<>();
         for (int i = 0; i < agenda.size(); i++) {
             ranking.add(-1);
@@ -66,13 +68,14 @@ public class PreferenceFactory {
 
     /**
      * @author nico
-     * 
+     *
      *         An agenda is a list of OWLAxioms, e.g., [ax1,ax2,ax3]. A preference
      *         over an agenda is a list of Integers, e.g., [2,3,1]. [2,3,1] says
      *         that ax3 (rank 1) is preferred to ax1 (rank 2), which is preferred to
      *         ax2 (rank 3). It must not contain duplicates.
      */
     public class Preference {
+
         private List<Integer> ranking;
 
         // we forbid direct instantiation
@@ -172,5 +175,7 @@ public class PreferenceFactory {
         public String toString() {
             return ranking.toString();
         }
+
     } // End of Preference
+
 }

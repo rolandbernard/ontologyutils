@@ -18,10 +18,11 @@ import www.ontologyutils.collective.BinaryVoteFactory.BinaryVote;
  * Conference on Artificial Intelligence (IJCAI-ECAI 2018).
  * International Joint Conferences on Artificial Intelligence
  * Organization, 2018, pages 1942-1948.
- * 
+ *
  * @author nico
  */
 public class PollQuotaRule {
+
     List<OWLAxiom> agenda;
     List<Integer> quotas;
     List<BinaryVote> votes;
@@ -34,7 +35,7 @@ public class PollQuotaRule {
      * Creates an instance of a vote or poll, over the set of axioms in
      * {@code agenda}, with the list {@code quotas} of quotas, and {@code votes} as
      * list of votes over the agenda.
-     * 
+     *
      * @param agenda
      * @param quotas
      * @param votes
@@ -90,7 +91,7 @@ public class PollQuotaRule {
     /**
      * Creates a uniform quota rule with the quota of every axiom in the agenda as
      * specified by the parameter {@code uniformQuota}.
-     * 
+     *
      * @param agenda
      * @param uniformQuota
      * @param votes
@@ -115,6 +116,8 @@ public class PollQuotaRule {
                 result.add(agenda.get(i));
             }
         }
+
         return result;
     }
+
 }

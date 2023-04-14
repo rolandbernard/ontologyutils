@@ -1,51 +1,22 @@
 package www.ontologyutils.apps;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.nio.file.*;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.EntityType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.parameters.Imports;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectIntersectionOfImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
 import www.ontologyutils.collective.PreferenceFactory;
 import www.ontologyutils.collective.PreferenceFactory.Preference;
 import www.ontologyutils.collective.blending.BlendingDialogue;
 import www.ontologyutils.normalization.NormalizationTools;
-import www.ontologyutils.toolbox.Utils;
-import www.ontologyutils.toolbox.Utils.ReasonerName;
+import www.ontologyutils.toolbox.*;
 
 /**
- * 
  * <p>
  * App to experiment with www.ontologyutils.collective.blending.BlendingDialogue
  * to make asymmetric hybrids dialogues. See: <br>
@@ -66,7 +37,7 @@ import www.ontologyutils.toolbox.Utils.ReasonerName;
  * Optionally, -o <outputsBaseFileName> can be used at the end of the command to
  * save statistics and the result of each run.
  * </p>
- * 
+ *
  * <p>
  * E.g., run with parameters ./resources/FishVehicle/Vehicle.owl
  * ./resources/FishVehicle/Fish.owl ./resources/FishVehicle/InitialOntology.owl
@@ -77,14 +48,13 @@ import www.ontologyutils.toolbox.Utils.ReasonerName;
  * http://www.semanticweb.org/anonym/ontologies/2020/2/fv#FishVehicle 15 -o
  * fv-outputs
  * </p>
- * 
  */
 public class AppBlendingDialogue {
-    OWLOntology ontologyOne;
-    OWLOntology ontologyTwo;
-    OWLOntology initialOntology;
-    OWLOntology alignmentOntology;
-    OWLOntology testOntology;
+    Ontology ontologyOne;
+    Ontology ontologyTwo;
+    Ontology initialOntology;
+    Ontology alignmentOntology;
+    Ontology testOntology;
 
     OWLClassExpression conceptOne;
     OWLClassExpression conceptTwo;
@@ -174,9 +144,10 @@ public class AppBlendingDialogue {
      * @return an estimation of the "amount of information" in {@code ontology}. We
      *         define it as the number of axiom plus the number of sub-class axioms
      *         in the inferred class taxonomy.
+     *
      */
-    private static int quantifyInformation(OWLOntology ontology) {
-        return Utils.inferredTaxonomyAxioms(ontology).size() + ontology.getAxiomCount();
+    private static int quantifyInformation(Ontology ontology) {
+        return ontology.inferredTaxonomyAxioms().size() + (int) ontology.axioms().count();
     }
 
     /**
@@ -184,48 +155,44 @@ public class AppBlendingDialogue {
      * @return the set of C1 subclass C2 axioms, C1 and C2 classes in the signature
      *         of {@code ontology}, that are not entailed by {@code ontology}.
      */
-    public static Set<OWLAxiom> notInferredTaxonomyAxioms(OWLOntology ontology) {
-        final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
-        OWLReasoner reasoner = Utils.getReasoner(ontology);
+    public static Set<OWLAxiom> notInferredTaxonomyAxioms(Ontology ontology) {
         Set<OWLAxiom> result = new HashSet<>();
-        if (!reasoner.isConsistent()) {
+        if (!ontology.isConsistent()) {
             return result;
         }
-        ontology.classesInSignature(Imports.EXCLUDED).forEach((left) -> {
-            ontology.classesInSignature(Imports.EXCLUDED).forEach((right) -> {
-                OWLSubClassOfAxiom scoa = new OWLSubClassOfAxiomImpl(left, right, EMPTY_ANNOTATION);
-                if (!reasoner.isEntailed(scoa)) {
+        OWLDataFactory df = Ontology.getDefaultDataFactory();
+        ontology.conceptsInSignature().forEach((left) -> {
+            ontology.conceptsInSignature().forEach((right) -> {
+                OWLSubClassOfAxiom scoa = df.getOWLSubClassOfAxiom(left, right);
+                if (!ontology.isEntailed(scoa)) {
                     result.add(scoa);
                 }
             });
         });
 
-        reasoner.dispose();
         return result;
     }
 
     /**
-     * See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
-     * Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
-     * Ontology Aggregation Based on Axiom Weakening. In 27th International
-     * Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
-     * pages 1942-1948.
-     * 
      * @param agent
      * @param ontology
      * @return an estimation of the "happiness" of ontology {@code agent} with
      *         ontology {@code two}. The ratio of the number of axioms and inferred
      *         taxonomy axioms in {@code agent} that are inferred by {code
      *         ontology}.
+     *
+     *         See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
+     *         Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
+     *         Ontology Aggregation Based on Axiom Weakening. In 27th International
+     *         Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
+     *         pages 1942-1948.
      */
-    private static double happinessTolerant(OWLOntology agent, OWLOntology ontology) {
-        Set<OWLAxiom> axioms = Utils.inferredTaxonomyAxioms(agent);
+    private static double happinessTolerant(Ontology agent, Ontology ontology) {
+        Set<OWLAxiom> axioms = agent.inferredTaxonomyAxioms();
         axioms.addAll(agent.axioms().collect(Collectors.toSet()));
 
-        OWLReasoner reasoner = Utils.getReasoner(ontology);
-        long countSatisfiedAxioms = axioms.stream().filter(a -> reasoner.isEntailed(a)).count();
+        long countSatisfiedAxioms = axioms.stream().filter(a -> ontology.isEntailed(a)).count();
 
-        reasoner.dispose();
         return (double) countSatisfiedAxioms / axioms.size();
     }
 
@@ -236,43 +203,37 @@ public class AppBlendingDialogue {
      *         ontology {@code two}. The ratio of the number non inferred taxonomy
      *         axioms in {@code agent} that are not inferred by {code ontology}.
      */
-    private static double happinessTolerantNeg(OWLOntology agent, OWLOntology ontology) {
+    private static double happinessTolerantNeg(Ontology agent, Ontology ontology) {
         Set<OWLAxiom> nonAxioms = notInferredTaxonomyAxioms(agent);
 
-        OWLReasoner reasoner = Utils.getReasoner(ontology);
-        long countNotSatisfiedAxioms = nonAxioms.stream().filter(a -> !reasoner.isEntailed(a)).count();
+        long countNotSatisfiedAxioms = nonAxioms.stream().filter(a -> !ontology.isEntailed(a)).count();
 
-        reasoner.dispose();
         return (double) countNotSatisfiedAxioms / nonAxioms.size();
     }
 
     /**
-     * See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
-     * Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
-     * Ontology Aggregation Based on Axiom Weakening. In 27th International
-     * Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
-     * pages 1942-1948.
-     * 
      * @param agent
      * @param ontology
      * @return an estimation of the "happiness" of ontology {@code agent} with
      *         ontology {@code two}. The ratio of the number of axioms and inferred
      *         taxonomy axioms in {@code agent} and {@code ontology} that are
      *         inferred by {code ontology} and {@code agent}.
+     *
+     *         See Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
+     *         Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to
+     *         Ontology Aggregation Based on Axiom Weakening. In 27th International
+     *         Joint Conference on Artificial Intelligence (IJCAI-ECAI 2018), 2018,
+     *         pages 1942-1948.
      */
-    private static double happinessStrict(OWLOntology agent, OWLOntology ontology) {
-        Set<OWLAxiom> axioms = Utils.inferredTaxonomyAxioms(agent);
+    private static double happinessStrict(Ontology agent, Ontology ontology) {
+        Set<OWLAxiom> axioms = agent.inferredTaxonomyAxioms();
         axioms.addAll(agent.axioms().collect(Collectors.toSet()));
-        axioms.addAll(Utils.inferredTaxonomyAxioms(ontology));
+        axioms.addAll(ontology.inferredTaxonomyAxioms());
         axioms.addAll(ontology.axioms().collect(Collectors.toSet()));
 
-        OWLReasoner reasoner1 = Utils.getReasoner(agent);
-        OWLReasoner reasoner2 = Utils.getReasoner(ontology);
-        long countSatisfiedAxioms = axioms.stream().filter(a -> reasoner1.isEntailed(a) && reasoner2.isEntailed(a))
+        long countSatisfiedAxioms = axioms.stream().filter(a -> agent.isEntailed(a) && ontology.isEntailed(a))
                 .count();
 
-        reasoner1.dispose();
-        reasoner2.dispose();
         return (double) countSatisfiedAxioms / axioms.size();
     }
 
@@ -288,19 +249,18 @@ public class AppBlendingDialogue {
      *            the set of ascendants and descendants of agent 2
      * @return an estimation of the hybridization of ontology {@code ontology}.
      */
-    private static double hybridity(OWLOntology ontology, OWLClassExpression conceptTarget, Set<OWLClassExpression> ad1,
+    private static double hybridity(Ontology ontology, OWLClassExpression conceptTarget, Set<OWLClassExpression> ad1,
             Set<OWLClassExpression> ad2) {
-        OWLReasoner reasoner = Utils.getReasoner(ontology);
-
         int countPositiveChecks = 0;
 
+        OWLDataFactory df = Ontology.getDefaultDataFactory();
         for (OWLClassExpression ce1 : ad1) {
             for (OWLClassExpression ce2 : ad2) {
-                OWLClassExpression conj = new OWLObjectIntersectionOfImpl(List.of(ce1, ce2));
-                OWLSubClassOfAxiom scoac = new OWLSubClassOfAxiomImpl(conceptTarget, conj, Utils.EMPTY_ANNOTATION);
+                OWLClassExpression conj = df.getOWLObjectIntersectionOf(ce1, ce2);
+                OWLSubClassOfAxiom scoac = df.getOWLSubClassOfAxiom(conceptTarget, conj);
 
                 System.out.print(Utils.prettyPrintAxiom(scoac) + " ?\t");
-                if (reasoner.isEntailed(scoac)) {
+                if (ontology.isEntailed(scoac)) {
                     countPositiveChecks++;
                     System.out.println("yes");
                 } else {
@@ -309,7 +269,6 @@ public class AppBlendingDialogue {
             }
         }
 
-        reasoner.dispose();
         System.out.println("Hybridity ratio : " + countPositiveChecks + " / " + (ad1.size() * ad2.size()));
         return (double) countPositiveChecks / (ad1.size() * ad2.size());
     }
@@ -322,30 +281,28 @@ public class AppBlendingDialogue {
      *         {@code notHere}, that are included in or include the concept
      *         {@code concept}.
      */
-    private static Set<OWLClassExpression> computeSpecificAscendanstDescendants(OWLOntology ontology,
-            OWLClassExpression concept, OWLOntology notHere) {
+    private static Set<OWLClassExpression> computeSpecificAscendanstDescendants(Ontology ontology,
+            OWLClassExpression concept, Ontology notHere) {
 
-        OWLReasoner reasoner = Utils.getReasoner(ontology);
         OWLSubClassOfAxiom scoa;
 
         Set<OWLClassExpression> oces = new HashSet<OWLClassExpression>();
 
-        Set<OWLClassExpression> notThose = Utils.getSubClasses(notHere);
-
-        for (OWLClassExpression ce : Utils.getSubClasses(ontology)) {
+        Set<OWLClassExpression> notThose = notHere.subConcepts().collect(Collectors.toSet());
+        OWLDataFactory df = Ontology.getDefaultDataFactory();
+        for (OWLClassExpression ce : ontology.subConcepts().toList()) {
             if (notThose.contains(ce)) {
                 continue;
             }
-            scoa = new OWLSubClassOfAxiomImpl(concept, ce, Utils.EMPTY_ANNOTATION);
-            if (reasoner.isEntailed(scoa)) {
+            scoa = df.getOWLSubClassOfAxiom(concept, ce);
+            if (ontology.isEntailed(scoa)) {
                 oces.add(ce);
             }
-            scoa = new OWLSubClassOfAxiomImpl(ce, concept, Utils.EMPTY_ANNOTATION);
-            if (reasoner.isEntailed(scoa)) {
+            scoa = df.getOWLSubClassOfAxiom(ce, concept);
+            if (ontology.isEntailed(scoa)) {
                 oces.add(ce);
             }
         }
-        reasoner.dispose();
         return oces;
     }
 
@@ -381,29 +338,29 @@ public class AppBlendingDialogue {
 
         whenLaunched = System.currentTimeMillis();
 
-        OWLOntology base1 = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath1);
-        OWLOntology base2 = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath2);
-        OWLOntology baseAlignments = Utils.newOntologyExcludeNonLogicalAxioms(alignmentsOntologyFilePath);
+        Ontology base1 = Ontology.loadOnlyLogicalAxioms(ontologyFilePath1);
+        Ontology base2 = Ontology.loadOnlyLogicalAxioms(ontologyFilePath2);
+        Ontology baseAlignments = Ontology.loadOnlyLogicalAxioms(alignmentsOntologyFilePath);
 
-        this.initialOntology = Utils.newOntologyExcludeNonLogicalAxioms(initialOntologyFilePath);
+        this.initialOntology = Ontology.loadOnlyLogicalAxioms(initialOntologyFilePath);
 
-        if (!Utils.isConsistent(base1) || !Utils.isConsistent(base2) || !Utils.isConsistent(initialOntology)) {
+        if (!base1.isConsistent() || !base2.isConsistent() || !initialOntology.isConsistent()) {
             System.out.println("The ontologies must be consistent.");
             System.exit(1);
         }
 
-        this.ontologyOne = Utils.newEmptyOntology();
-        this.ontologyOne.add(base1.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
-        base1.tboxAxioms(Imports.EXCLUDED).forEach(a -> this.ontologyOne.add(NormalizationTools.asSubClassOfAxioms(a)));
-        this.ontologyTwo = Utils.newEmptyOntology();
-        this.ontologyTwo.add(base2.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
-        base2.tboxAxioms(Imports.EXCLUDED).forEach(a -> this.ontologyTwo.add(NormalizationTools.asSubClassOfAxioms(a)));
-        this.alignmentOntology = Utils.newEmptyOntology();
-        this.alignmentOntology.add(baseAlignments.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
-        baseAlignments.tboxAxioms(Imports.EXCLUDED)
-                .forEach(a -> this.alignmentOntology.add(NormalizationTools.asSubClassOfAxioms(a)));
+        this.ontologyOne = Ontology.emptyOntology();
+        this.ontologyOne.addAxioms(base1.aboxAxioms().collect(Collectors.toSet()));
+        base1.tboxAxioms().forEach(a -> this.ontologyOne.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
+        this.ontologyTwo = Ontology.emptyOntology();
+        this.ontologyTwo.addAxioms(base2.aboxAxioms().collect(Collectors.toSet()));
+        base2.tboxAxioms().forEach(a -> this.ontologyTwo.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
+        this.alignmentOntology = Ontology.emptyOntology();
+        this.alignmentOntology.addAxioms(baseAlignments.aboxAxioms().collect(Collectors.toSet()));
+        baseAlignments.tboxAxioms()
+                .forEach(a -> this.alignmentOntology.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
 
-        this.testOntology = Utils.newOntologyExcludeNonLogicalAxioms(testOntologyFilePath);
+        this.testOntology = Ontology.loadOnlyLogicalAxioms(testOntologyFilePath);
 
         OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
         this.conceptOne = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create(IRI1));
@@ -444,9 +401,6 @@ public class AppBlendingDialogue {
     }
 
     public static void main(String[] args) {
-
-        Utils.DEFAULT_REASONER = ReasonerName.OPENLLET;
-
         usage(args);
 
         AppBlendingDialogue mApp = new AppBlendingDialogue(args[0], args[1], args[2], args[3], args[4], args[5],
@@ -524,8 +478,13 @@ public class AppBlendingDialogue {
         int maxTurns = readNumber("Maximum number of turns?", 1, 10000000);
 
         // deciding the probability of each agent to take turn in the dialogue
-        int infoInOne = quantifyInformation(Utils.newOntology(prefFactoryOne.getAgenda().stream()));
-        int infoInTwo = quantifyInformation(Utils.newOntology(prefFactoryTwo.getAgenda().stream()));
+        int infoInOne, infoInTwo;
+        try (var ontology = Ontology.withAxioms(prefFactoryOne.getAgenda())) {
+            infoInOne = quantifyInformation(ontology);
+        }
+        try (var ontology = Ontology.withAxioms(prefFactoryTwo.getAgenda())) {
+            infoInTwo = quantifyInformation(ontology);
+        }
         double probabilityTurnOne = (double) importanceOne * infoInOne
                 / (importanceOne * infoInOne + importanceTwo * infoInTwo);
         System.out.println("\n--- At each turn, probability for agent one to act: " + probabilityTurnOne);
@@ -570,13 +529,12 @@ public class AppBlendingDialogue {
             BlendingDialogue bdg = new BlendingDialogue(prefFactoryOne.getAgenda(), preferenceOne,
                     prefFactoryTwo.getAgenda(), preferenceTwo, mApp.initialOntology);
 
-            OWLOntology result = bdg.setVerbose(true).get(probabilityTurnOne, maxTurns);
+            Ontology result = bdg.setVerbose(true).get(probabilityTurnOne, maxTurns);
 
             System.out.println("\n--- RESULT ONTOLOGY\n");
             result.axioms().forEach(a -> System.out.println("- " + Utils.prettyPrintAxiom(a)));
 
-            OWLReasoner reasoner = Utils.getReasoner(result);
-            if (!reasoner.isConsistent()) {
+            if (!result.isConsistent()) {
                 System.out.println("THERE WAS A PROBLEM. THE RESULT ONTOLOGY IS NOT CONSISTENT.");
                 System.exit(1);
             }
@@ -636,7 +594,7 @@ public class AppBlendingDialogue {
             System.out.println("\n-- TESTS RUN " + (i + 1) + "\n");
             for (OWLAxiom a : listAxiomsTest) {
                 System.out.print(Utils.prettyPrintAxiom(a) + " ?\t");
-                if (reasoner.isEntailed(a)) {
+                if (result.isEntailed(a)) {
                     System.out.println("yes");
                     Integer num = counts.get(a);
                     counts.put(a, (num == null ? 1 : num + 1));
@@ -644,14 +602,13 @@ public class AppBlendingDialogue {
                     System.out.println("no");
                 }
             }
-            reasoner.dispose();
 
             if (args.length == 11 && args[9].equals("-o")) {
                 System.out.println("\n--- Saving result ontology and recording stats.");
                 String leadingZeros = "%0" + (int) (Math.floor(Math.log10(numberOfTestRuns)) + 1) + "d";
                 String ontologyName = mApp.whenLaunched + "_" + String.format(leadingZeros, (i + 1)) + "_" + args[10]
                         + ".owl";
-                Utils.saveOntology(result, ontologyName);
+                result.saveOntology(ontologyName);
                 addRecord(args[10], statistics, ontologyName);
             }
         }
@@ -696,5 +653,7 @@ public class AppBlendingDialogue {
             System.out.println(
                     Utils.prettyPrintAxiom(a) + " : " + (num == null ? 0 : num) + " out of " + numberOfTestRuns);
         }
+
     }
+
 }

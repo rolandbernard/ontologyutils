@@ -1,28 +1,22 @@
 package www.ontologyutils.apps;
 
 import java.io.File;
-import java.util.stream.Stream;
+import java.util.*;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
-import www.ontologyutils.normalization.Normalization;
-import www.ontologyutils.normalization.NormalizationTools;
+import www.ontologyutils.normalization.*;
 import www.ontologyutils.rules.RuleGeneration;
-import www.ontologyutils.toolbox.FreshAtoms;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
 public class AppNormalize {
     private OWLOntology ontology;
     private String ontologyName;
 
     public AppNormalize(String ontologyFilePath) {
+
         File ontologyFile = new File(ontologyFilePath);
 
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -38,63 +32,57 @@ public class AppNormalize {
         }
     }
 
-    private OWLOntology runCondor() {
+    private Ontology runCondor() {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
 
-        OWLOntology copy = Utils.newEmptyOntology();
+        Ontology copy = Ontology.emptyOntology();
         copy.addAxioms(this.ontology.axioms());
 
-        Stream<OWLAxiom> tBoxAxioms = copy.tboxAxioms(Imports.EXCLUDED);
+        List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
         tBoxAxioms.forEach((ax) -> {
-            copy.remove(ax);
+            copy.removeAxioms(ax);
             copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));
         });
 
         System.out.println("\nCondor Normalized TBox");
-        OWLOntology condor = null;
-        condor = Normalization.normalizeCondor(copy);
+        Ontology condor = Normalization.normalizeCondor(copy);
 
-        condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(Utils.pretty("-- " + ax.toString())));
+        condor.tboxAxioms().forEach(ax -> System.out.println(Utils.pretty("-- " + ax.toString())));
 
         // check every axiom of the original ontology is entailed in condor
-        OWLReasoner reasoner = Utils.getHermitReasoner(condor);
-        assert (this.ontology.axioms().allMatch(ax -> reasoner.isEntailed(ax)));
+        assert (this.ontology.axioms().allMatch(ax -> condor.isEntailed(ax)));
         // check every axiom of condor is entailed in the copy of the original ontology
         // with extended signature
         copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
-        OWLReasoner reasonerBis = Utils.getHermitReasoner(copy);
-        assert (condor.axioms().allMatch(ax -> reasonerBis.isEntailed(ax)));
-
+        assert (condor.axioms().allMatch(ax -> copy.isEntailed(ax)));
+        copy.close();
         return condor;
     }
 
-    private OWLOntology runNaive() {
+    private Ontology runNaive() {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
 
-        OWLOntology copy = Utils.newEmptyOntology();
+        Ontology copy = Ontology.emptyOntology();
         copy.addAxioms(this.ontology.axioms());
 
-        Stream<OWLAxiom> tBoxAxioms = copy.tboxAxioms(Imports.EXCLUDED);
+        List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
         tBoxAxioms.forEach((ax) -> {
-            copy.remove(ax);
+            copy.removeAxioms(ax);
             copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));
         });
 
         System.out.println("\nNaive Normalized TBox");
-        OWLOntology naive = null;
-        naive = Normalization.normalizeNaive(copy);
+        Ontology naive = Normalization.normalizeNaive(copy);
 
-        naive.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(Utils.pretty("-- " + ax.toString())));
+        naive.tboxAxioms().forEach(ax -> System.out.println(Utils.pretty("-- " + ax.toString())));
 
         // check every axiom of the original ontology is entailed in naive
-        OWLReasoner reasoner = Utils.getHermitReasoner(naive);
-        assert (this.ontology.axioms().allMatch(ax -> reasoner.isEntailed(ax)));
+        assert (this.ontology.axioms().allMatch(ax -> naive.isEntailed(ax)));
         // check every axiom of naive is entailed in the copy of the original ontology
         // with extended signature
         copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
-        OWLReasoner reasonerBis = Utils.getHermitReasoner(copy);
-        assert (naive.axioms().allMatch(ax -> reasonerBis.isEntailed(ax)));
-
+        assert (naive.axioms().allMatch(ax -> copy.isEntailed(ax)));
+        copy.close();
         return naive;
     }
 
@@ -107,18 +95,21 @@ public class AppNormalize {
         AppNormalize mApp = new AppNormalize(args[0]);
 
         System.out.println("\nOriginal TBox");
-        Utils.printTBox(mApp.ontology);
+        // Utils.printTBox(mApp.ontology);
+        mApp.ontology.tboxAxioms(Imports.INCLUDED)
+                .map(OWLAxiom::toString).map(Utils::pretty)
+                .forEach(System.out::println);
 
         ///////////////////////////////////////////////////////////////////////////////////
 
         System.out.println("\nNAIVE NORMALIZATION");
-        OWLOntology naive = mApp.runNaive();
+        Ontology naive = mApp.runNaive();
 
         System.out.println("\nTo rules");
         RuleGeneration rgn = new RuleGeneration(naive);
         rgn.getMapEntities().entrySet().stream()
                 .forEach(e -> System.out.println(rgn.entityToRule(e.getKey())));
-        naive.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgn.normalizedSubClassAxiomToRule(ax)));
+        naive.tboxAxioms().forEach(ax -> System.out.println(rgn.normalizedSubClassAxiomToRule(ax)));
 
         System.out.println("\nwhere");
         rgn.getMapEntities().entrySet().stream()
@@ -127,13 +118,13 @@ public class AppNormalize {
         ///////////////////////////////////////////////////////////////////////////////////
 
         System.out.println("\nCONDOR NORMALIZATION");
-        OWLOntology condor = mApp.runCondor();
+        Ontology condor = mApp.runCondor();
 
         System.out.println("\nTo rules");
         RuleGeneration rgc = new RuleGeneration(condor);
         rgc.getMapEntities().entrySet().stream()
                 .forEach(e -> System.out.println(rgc.entityToRule(e.getKey())));
-        condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> System.out.println(rgc.normalizedSubClassAxiomToRule(ax)));
+        condor.tboxAxioms().forEach(ax -> System.out.println(rgc.normalizedSubClassAxiomToRule(ax)));
 
         System.out.println("\nwhere");
         rgc.getMapEntities().entrySet().stream()

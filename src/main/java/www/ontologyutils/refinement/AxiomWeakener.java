@@ -1,112 +1,87 @@
 package www.ontologyutils.refinement;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Stream;
 
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.owl.owlapi.OWLClassAssertionAxiomImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
+import www.ontologyutils.toolbox.*;
 
-public class AxiomWeakener {
-    private final static ArrayList<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
+/**
+ * Implementation that can be used for weakening an axiom. Must be closed
+ * after usage to free up resources used by the inner {@code Covers} object.
+ *
+ * The implementation is based on the approach presented in Troquard, Nicolas,
+ * et al. "Repairing ontologies via axiom weakening." Proceedings of the AAAI
+ * Conference on Artificial Intelligence. Vol. 32. No. 1. 2018. Definition 19.
+ */
+public class AxiomWeakener implements AutoCloseable {
+    private class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
+        @Override
+        public Stream<OWLAxiom> visit(final OWLSubClassOfAxiom axiom) {
+            final var df = Ontology.getDefaultDataFactory();
+            final var subclass = axiom.getSubClass();
+            final var superclass = axiom.getSuperClass();
+            return Stream.concat(
+                    specialization.refine(subclass)
+                            .map(newSubclass -> df.getOWLSubClassOfAxiom(newSubclass, superclass)),
+                    generalization.refine(superclass)
+                            .map(newSuperclass -> df.getOWLSubClassOfAxiom(subclass, newSuperclass)));
+        }
 
-    private Covers covers;
-    private RefinementOperator genOp;
-    private RefinementOperator specOp;
+        @Override
+        public Stream<OWLAxiom> visit(final OWLClassAssertionAxiom axiom) {
+            final var df = Ontology.getDefaultDataFactory();
+            final var concept = axiom.getClassExpression();
+            final var individual = axiom.getIndividual();
+            return generalization.refine(concept)
+                    .map(newConcept -> df.getOWLClassAssertionAxiom(newConcept, individual));
+        }
+
+        @Override
+        public <T> Stream<OWLAxiom> doDefault(final T axiom) throws IllegalArgumentException {
+            final var ax = (OWLAxiom) axiom;
+            throw new IllegalArgumentException(
+                    "The axiom " + ax + " of type " + ax.getAxiomType()
+                            + " is not supported for axiom weakening.");
+        }
+    }
+
+    private final Visitor visitor;
+    private final Covers covers;
+    private final RefinementOperator generalization;
+    private final RefinementOperator specialization;
 
     /**
-     * @param ontology
-     *            a reference ontology to make inferences.
+     * Create a new axiom weakener with the given reference ontology.
+     *
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
      */
-    public AxiomWeakener(OWLOntology ontology) {
-        this.covers = new Covers(ontology);
-        this.genOp = new RefinementOperator(covers.getUpCoverOperator(), covers.getDownCoverOperator());
-        this.specOp = new RefinementOperator(covers.getDownCoverOperator(), covers.getUpCoverOperator());
+    public AxiomWeakener(final Ontology refOntology) {
+        visitor = new Visitor();
+        covers = new Covers(refOntology);
+        final var upCover = LruCache.wrapStreamFunction(covers::upCover);
+        final var downCover = LruCache.wrapStreamFunction(covers::downCover);
+        generalization = new RefinementOperator(upCover, downCover);
+        specialization = new RefinementOperator(downCover, upCover);
     }
 
     /**
+     * Computes all axioms derived by:
+     * - for subclass axioms: either specializing the left hand side or generalizing
+     * the right hand side.
+     * - for assertion axioms: generalizing the concept.
+     *
      * @param axiom
-     * @return all the weakenings of axiom obtained by either specialising the
-     *         left-hand side (using the {@code GeneralisationOperator}
-     *         {@code genOp} of this {@code JavaWeakener} object) or by generalising
-     *         the right-hand side (using the {@code SpecialisationOperator}
-     *         {@code specOp} of this {@code JavaWeakener} object). Given an axiom A
-     *         -> B, the function returns the set containing all the axioms A' -> B
-     *         where A' is in {@code specOp.specialise(A)} and all the axioms A ->
-     *         B' where B' is in {@code genOp.generalise(A)}.
+     *            The axiom for which we want to find weaker axioms.
+     * @return A stream of axioms that are all weaker than {@code axiom}.
      */
-    public Set<OWLAxiom> getWeakerSubClassAxioms(OWLSubClassOfAxiom axiom) {
-        HashSet<OWLAxiom> result = new HashSet<OWLAxiom>();
-
-        OWLClassExpression left = axiom.getSubClass();
-        OWLClassExpression right = axiom.getSuperClass();
-        Set<OWLClassExpression> LeftSpecial = specOp.refine(left);
-        Set<OWLClassExpression> RightGeneral = genOp.refine(right);
-
-        for (OWLClassExpression oce : LeftSpecial) {
-            OWLAxiom ax = new OWLSubClassOfAxiomImpl(oce, right, EMPTY_ANNOTATION);
-            result.add(ax);
-        }
-        for (OWLClassExpression oce : RightGeneral) {
-            OWLAxiom ax = new OWLSubClassOfAxiomImpl(left, oce, EMPTY_ANNOTATION);
-            result.add(ax);
-        }
-
-        return result;
+    public Stream<OWLAxiom> weakerAxioms(final OWLAxiom axiom) {
+        return axiom.accept(visitor).distinct();
     }
 
-    /**
-     * @param axiom
-     * @return all weakenings of axiom obtained by generalising its class expression
-     *         (using the {@code SpecialisationOperator} {@code specOp} of this
-     *         {@code JavaWeakener} object). Given an axiom A(i), the function
-     *         returns the set containing all the axioms A'(i) where A' is in
-     *         {@code genOp.generalise(A)}.
-     */
-    public Set<OWLAxiom> getWeakerClassAssertionAxioms(OWLClassAssertionAxiom axiom) {
-        HashSet<OWLAxiom> result = new HashSet<OWLAxiom>();
-
-        OWLClassExpression expression = axiom.getClassExpression();
-
-        Set<OWLClassExpression> generalisations = genOp.refine(expression);
-
-        for (OWLClassExpression oce : generalisations) {
-            OWLAxiom ax = new OWLClassAssertionAxiomImpl(axiom.getIndividual(), oce, EMPTY_ANNOTATION);
-            result.add(ax);
-        }
-
-        return result;
-    }
-
-    /**
-     * @param axiom
-     *            which must be a subclass axiom or an assertion axiom.
-     * @return the set containing all the weaker axioms, obtained with
-     *         {@code getWeakerSubClassAxioms(axiom)} or
-     *         {@code getWeakerClassAssertionAxioms(axiom)}.
-     */
-    public Set<OWLAxiom> getWeakerAxioms(OWLAxiom axiom) {
-        if (axiom.getAxiomType().equals(AxiomType.CLASS_ASSERTION)) {
-            return getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) axiom);
-        } else if (axiom.getAxiomType().equals(AxiomType.SUBCLASS_OF)) {
-            return getWeakerSubClassAxioms((OWLSubClassOfAxiom) axiom);
-        } else {
-            throw new IllegalArgumentException(axiom + " must be a class assertion axiom or a subclass axiom.");
-        }
-    }
-
-    /**
-     * Free the resources of the reasoner used for this axiom weakener.
-     */
-    public void dispose() {
-        covers.dispose();
+    @Override
+    public void close() {
+        covers.close();
     }
 }

@@ -1,55 +1,28 @@
 package www.ontologyutils.normalization;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import org.semanticweb.owlapi.model.ClassExpressionType;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLObjectAllValuesFrom;
-import org.semanticweb.owlapi.model.OWLObjectComplementOf;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectAllValuesFromImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectComplementOfImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectIntersectionOfImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectSomeValuesFromImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectUnionOfImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLQuantifiedRestrictionImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
-import www.ontologyutils.toolbox.AnnotateOrigin;
-import www.ontologyutils.toolbox.FreshAtoms;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
-/**
- * TODO: reorganize code into interface + implementations
- */
 public class Normalization {
     /**
      * @param ontology
      *            with TBox axioms all in subclass form.
      * @see {@code asSubClassOfAxioms}
      * @return A normalized version of {@code ontology}.
-     * @throws OWLOntologyCreationException
+     * @throws OntologyCreationException
      */
-    public static OWLOntology normalizeNaive(OWLOntology ontology) {
+    public static Ontology normalizeNaive(Ontology ontology) {
         // we make a copy of the ontology without the TBox
-        OWLOntology newOntology = Utils.newEmptyOntology();
-        newOntology.addAxioms(ontology.rboxAxioms(Imports.EXCLUDED));
-        newOntology.addAxioms(ontology.aboxAxioms(Imports.EXCLUDED));
+        Ontology newOntology = Ontology.emptyOntology();
+        newOntology.addAxioms(ontology.rboxAxioms());
+        newOntology.addAxioms(ontology.aboxAxioms());
 
-        Set<OWLAxiom> tBoxAxioms = ontology.tboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet());
+        Set<OWLAxiom> tBoxAxioms = ontology.tboxAxioms().collect(Collectors.toSet());
 
         tBoxAxioms.forEach(
                 ax -> newOntology.addAxioms(NormalizationTools.normalizeSubClassAxiom((OWLSubClassOfAxiom) ax)));
@@ -64,18 +37,19 @@ public class Normalization {
      * @return A normalized version of {@code ontology}, following the procedure of
      *         Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies"
      *         (IJCAI 2011).
-     * @throws OWLOntologyCreationException
+     * @throws OntologyCreationException
      */
-    public static OWLOntology normalizeCondor(OWLOntology ontology) {
-        // we make a copy of the ontology without the TBox
-        OWLOntology newOntology = Utils.newEmptyOntology();
-        newOntology.addAxioms(ontology.rboxAxioms(Imports.EXCLUDED));
-        newOntology.addAxioms(ontology.aboxAxioms(Imports.EXCLUDED));
+    public static Ontology normalizeCondor(Ontology ontology) {
 
-        Set<OWLAxiom> tBoxAxioms = ontology.tboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet());
+        // we make a copy of the ontology without the TBox
+        Ontology newOntology = Ontology.emptyOntology();
+        newOntology.addAxioms(ontology.rboxAxioms());
+        newOntology.addAxioms(ontology.aboxAxioms());
+
+        Set<OWLAxiom> tBoxAxioms = ontology.tboxAxioms().collect(Collectors.toSet());
 
         // we replace negative occurrences of forall p C with not exists p not C
-        Set<OWLClassExpression> subConcepts = Utils.getSubOfTBox(ontology);
+        List<OWLClassExpression> subConcepts = ontology.subConceptsOfTbox().toList();
         for (OWLClassExpression e : subConcepts) {
             Set<OWLAxiom> newtBoxAxioms = new HashSet<OWLAxiom>(tBoxAxioms);
             if (e.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM) {
@@ -88,31 +62,33 @@ public class Normalization {
         newOntology.addAxioms(tBoxAxioms);
 
         // we get the structural transformation of newOntology
-        OWLOntology transformed = structuralTransformation(newOntology);
+        Ontology transformed = structuralTransformation(newOntology);
 
         // replace X -> Y and Z with two axioms X -> Y and X -> Z
         // replace X or Y -> Z with two axioms X -> Z and Y -> Z
         // replace X -> not Y with X and Y -> bot
         // replace not X -> Y with top -> X or Y
-        transformed.tboxAxioms(Imports.EXCLUDED).forEach(axiom -> {
-            transformed.removeAxiom(axiom);
+        transformed.tboxAxioms().toList().forEach(axiom -> {
+            transformed.removeAxioms(axiom);
             transformed.addAxioms(NormalizationTools.normalizeSubClassAxiom((OWLSubClassOfAxiom) axiom));
         });
+
         return transformed;
     }
 
     private static OWLAxiom substituteNegativeForAll(OWLObjectAllValuesFrom e, OWLSubClassOfAxiom a) {
+        OWLDataFactory df = Ontology.getDefaultDataFactory();
         OWLObjectPropertyExpression property = e.getProperty();
         OWLClassExpression filler = e.getFiller();
 
         // new concept: not exists property not filler
-        OWLObjectComplementOf substitute = new OWLObjectComplementOfImpl(
-                new OWLObjectSomeValuesFromImpl(property, new OWLObjectComplementOfImpl(filler)));
+        OWLObjectComplementOf substitute = df.getOWLObjectComplementOf(
+                df.getOWLObjectSomeValuesFrom(property, df.getOWLObjectComplementOf(filler)));
 
         OWLClassExpression newLeft = replaceIfPolarity(e, substitute, a.getSubClass(), true);
         OWLClassExpression newRight = replaceIfPolarity(e, substitute, a.getSuperClass(), false);
 
-        return new OWLSubClassOfAxiomImpl(newLeft, newRight, AnnotateOrigin.getAxiomAnnotations(a));
+        return df.getOWLSubClassOfAxiom(newLeft, newRight, Ontology.axiomOriginAnnotations(a).toList());
     }
 
     /**
@@ -134,29 +110,29 @@ public class Normalization {
         /*
          * if (polarity ? !isPositiveIn(e, in) : !isNegativeIn(e, in)) { return in; }
          */
-
+        OWLDataFactory df = Ontology.getDefaultDataFactory();
         switch (in.getClassExpressionType()) {
             case OWL_CLASS: {
                 return in;
             }
             case OBJECT_COMPLEMENT_OF: {
                 OWLClassExpression op = ((OWLObjectComplementOf) in).getOperand();
-                return new OWLObjectComplementOfImpl(replaceIfPolarity(e, substitute, op, !polarity));
+                return df.getOWLObjectComplementOf(replaceIfPolarity(e, substitute, op, !polarity));
             }
             case OBJECT_UNION_OF: {
                 Set<OWLClassExpression> disjuncts = in.asDisjunctSet();
-                return new OWLObjectUnionOfImpl(
-                        disjuncts.stream().map(d -> replaceIfPolarity(e, substitute, d, polarity)).toList());
+                return df.getOWLObjectUnionOf(
+                        disjuncts.stream().map(d -> replaceIfPolarity(e, substitute, d, polarity)));
             }
             case OBJECT_INTERSECTION_OF: {
                 Set<OWLClassExpression> conjuncts = in.asConjunctSet();
-                return new OWLObjectIntersectionOfImpl(
-                        conjuncts.stream().map(c -> replaceIfPolarity(e, substitute, c, polarity)).toList());
+                return df.getOWLObjectIntersectionOf(
+                        conjuncts.stream().map(c -> replaceIfPolarity(e, substitute, c, polarity)));
             }
             case OBJECT_SOME_VALUES_FROM: {
                 OWLClassExpression filler = ((OWLObjectSomeValuesFrom) in).getFiller();
                 OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) in).getProperty();
-                return new OWLObjectSomeValuesFromImpl(property, replaceIfPolarity(e, substitute, filler, polarity));
+                return df.getOWLObjectSomeValuesFrom(property, replaceIfPolarity(e, substitute, filler, polarity));
             }
             case OBJECT_ALL_VALUES_FROM: {
                 if (Utils.sameConcept(e, in)) {
@@ -164,7 +140,7 @@ public class Normalization {
                 }
                 OWLClassExpression filler = ((OWLObjectAllValuesFrom) in).getFiller();
                 OWLObjectPropertyExpression property = ((OWLObjectAllValuesFrom) in).getProperty();
-                return new OWLObjectAllValuesFromImpl(property, replaceIfPolarity(e, substitute, filler, polarity));
+                return df.getOWLObjectAllValuesFrom(property, replaceIfPolarity(e, substitute, filler, polarity));
 
             }
             default:
@@ -180,13 +156,14 @@ public class Normalization {
      *         following the procedure of Simancik et al. "Consequence-Based
      *         Reasoning beyond Horn Ontologies" (IJCAI 2011).
      */
-    private static OWLOntology structuralTransformation(OWLOntology ontology) {
-        OWLOntology newOntology = Utils.newEmptyOntology();
-        newOntology.addAxioms(ontology.rboxAxioms(Imports.EXCLUDED));
-        newOntology.addAxioms(ontology.aboxAxioms(Imports.EXCLUDED));
+    private static Ontology structuralTransformation(Ontology ontology) {
+        OWLDataFactory df = Ontology.getDefaultDataFactory();
+        Ontology newOntology = Ontology.emptyOntology();
+        newOntology.addAxioms(ontology.rboxAxioms());
+        newOntology.addAxioms(ontology.aboxAxioms());
 
         Collection<OWLSubClassOfAxiom> transformed = new ArrayList<>();
-        Set<OWLClassExpression> subConcepts = Utils.getSubOfTBox(ontology);
+        List<OWLClassExpression> subConcepts = ontology.subConceptsOfTbox().toList();
         Map<OWLClassExpression, OWLClassExpression> map = new HashMap<>();
 
         for (OWLClassExpression e : subConcepts) {
@@ -202,35 +179,35 @@ public class Normalization {
             if (e.isOWLClass()) { // as per the article it shouldn't be skipped
                 continue;
             }
-            if (ontology.tboxAxioms(Imports.EXCLUDED).anyMatch(ax -> isNegativeIn(e, ax))) {
-                ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
+            if (ontology.tboxAxioms().anyMatch(ax -> isNegativeIn(e, ax))) {
+                ontology.tboxAxioms().forEach(ax -> {
                     if (isNegativeIn(e, ax)) {
-                        OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(structuralTransformation(e, map),
-                                map.get(e), AnnotateOrigin.getAxiomAnnotations(ax));
+                        OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(structuralTransformation(e, map),
+                                map.get(e), Ontology.axiomOriginAnnotations(ax).toList());
                         transformed.add(sba);
                     }
                 });
             }
-            if (ontology.tboxAxioms(Imports.EXCLUDED).anyMatch(ax -> isPositiveIn(e, ax))) {
-                ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
+            if (ontology.tboxAxioms().anyMatch(ax -> isPositiveIn(e, ax))) {
+                ontology.tboxAxioms().forEach(ax -> {
                     if (isPositiveIn(e, ax)) {
-                        OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(e),
-                                structuralTransformation(e, map), AnnotateOrigin.getAxiomAnnotations(ax));
+                        OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(map.get(e),
+                                structuralTransformation(e, map), Ontology.axiomOriginAnnotations(ax).toList());
                         transformed.add(sba);
                     }
                 });
             }
         }
 
-        ontology.tboxAxioms(Imports.EXCLUDED).forEach((a) -> {
+        ontology.tboxAxioms().forEach((a) -> {
             if (!(a instanceof OWLSubClassOfAxiom)) {
                 throw new RuntimeException("Axiom " + a + " should be a subclass axiom.");
             } else {
                 OWLClassExpression left = ((OWLSubClassOfAxiom) a).getSubClass();
                 OWLClassExpression right = ((OWLSubClassOfAxiom) a).getSuperClass();
 
-                OWLSubClassOfAxiomImpl sba = new OWLSubClassOfAxiomImpl(map.get(left), map.get(right),
-                        AnnotateOrigin.getAxiomAnnotations(a));
+                OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(map.get(left), map.get(right),
+                        Ontology.axiomOriginAnnotations(a).toList());
                 transformed.add(sba);
             }
         });
@@ -249,9 +226,9 @@ public class Normalization {
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF)) {
             return in.asConjunctSet().stream().anyMatch(conj -> isPositiveIn(e, (OWLClassExpression) conj));
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM)) {
-            return isPositiveIn(e, ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) in).getFiller());
+            return isPositiveIn(e, ((OWLQuantifiedRestriction<OWLClassExpression>) in).getFiller());
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_SOME_VALUES_FROM)) {
-            return isPositiveIn(e, ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) in).getFiller());
+            return isPositiveIn(e, ((OWLQuantifiedRestriction<OWLClassExpression>) in).getFiller());
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_COMPLEMENT_OF)) {
             return isNegativeIn(e, ((OWLObjectComplementOf) in).getOperand());
         }
@@ -275,9 +252,9 @@ public class Normalization {
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF)) {
             return in.asConjunctSet().stream().anyMatch(conj -> isNegativeIn(e, (OWLClassExpression) conj));
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM)) {
-            return isNegativeIn(e, ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) in).getFiller());
+            return isNegativeIn(e, ((OWLQuantifiedRestriction<OWLClassExpression>) in).getFiller());
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_SOME_VALUES_FROM)) {
-            return isNegativeIn(e, ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) in).getFiller());
+            return isNegativeIn(e, ((OWLQuantifiedRestriction<OWLClassExpression>) in).getFiller());
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_COMPLEMENT_OF)) {
             return isPositiveIn(e, ((OWLObjectComplementOf) in).getOperand());
         }
@@ -295,6 +272,7 @@ public class Normalization {
     @SuppressWarnings("unchecked")
     private static OWLClassExpression structuralTransformation(OWLClassExpression e,
             Map<OWLClassExpression, OWLClassExpression> map) {
+        OWLDataFactory df = Ontology.getDefaultDataFactory();
         if (e.isTopEntity()) {
             return e;
         } else if (e.isBottomEntity()) {
@@ -302,23 +280,24 @@ public class Normalization {
         } else if (e.isOWLClass()) {
             return e;
         } else if (e instanceof OWLObjectComplementOf) {
-            return new OWLObjectComplementOfImpl(map.get(((OWLObjectComplementOf) e).getOperand()));
+            return df.getOWLObjectComplementOf(map.get(((OWLObjectComplementOf) e).getOperand()));
         } else if ((e.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF)) {
             Set<OWLClassExpression> conjunctions = e.asConjunctSet();
-            return new OWLObjectIntersectionOfImpl(conjunctions.stream().map((c) -> map.get(c)).toList());
+            return df.getOWLObjectIntersectionOf(conjunctions.stream().map((c) -> map.get(c)));
         } else if ((e.getClassExpressionType() == ClassExpressionType.OBJECT_UNION_OF)) {
             Set<OWLClassExpression> disjunctions = e.asDisjunctSet();
-            return new OWLObjectUnionOfImpl(disjunctions.stream().map((c) -> map.get(c)).toList());
+            return df.getOWLObjectUnionOf(disjunctions.stream().map((c) -> map.get(c)));
         } else if ((e.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM)) {
-            OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) e).getFiller();
+            OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) e).getFiller();
             OWLObjectPropertyExpression property = ((OWLObjectAllValuesFrom) e).getProperty();
-            return new OWLObjectAllValuesFromImpl(property, map.get(filler));
+            return df.getOWLObjectAllValuesFrom(property, map.get(filler));
         } else if ((e.getClassExpressionType() == ClassExpressionType.OBJECT_SOME_VALUES_FROM)) {
-            OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) e).getFiller();
+            OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) e).getFiller();
             OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) e).getProperty();
-            return new OWLObjectSomeValuesFromImpl(property, map.get(filler));
+            return df.getOWLObjectSomeValuesFrom(property, map.get(filler));
         } else {
             throw new InvalidParameterException("The expression " + e + " can not be transformed.");
         }
     }
+
 }

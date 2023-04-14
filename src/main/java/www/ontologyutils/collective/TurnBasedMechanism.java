@@ -1,19 +1,15 @@
 package www.ontologyutils.collective;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.collective.BinaryVoteFactory.BinaryVote;
 import www.ontologyutils.collective.PreferenceFactory.Preference;
 import www.ontologyutils.refinement.AxiomWeakener;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
 /**
  * Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
@@ -23,14 +19,15 @@ import www.ontologyutils.toolbox.Utils;
  * Conference on Artificial Intelligence (IJCAI-ECAI 2018).
  * International Joint Conferences on Artificial Intelligence
  * Organization, 2018, pages 1942-1948.
- * 
+ *
  * @author nico
  */
 public class TurnBasedMechanism {
+
     private List<OWLAxiom> agenda;
     private List<Preference> preferences;
     private List<BinaryVote> approvals;
-    private OWLOntology referenceOntology;
+    private Ontology referenceOntology;
     private int numVoters;
 
     private boolean verbose = false;
@@ -65,7 +62,7 @@ public class TurnBasedMechanism {
      *            a consistent reference ontology.
      */
     public TurnBasedMechanism(List<OWLAxiom> agenda, List<Preference> preferences, List<BinaryVote> approvals,
-            OWLOntology referenceOntology) {
+            Ontology referenceOntology) {
         if (preferences.stream().anyMatch(p -> !p.getAgenda().equals(agenda))) {
             throw new IllegalArgumentException("The preferences must be built from the agenda in parameter.");
         }
@@ -76,7 +73,7 @@ public class TurnBasedMechanism {
         if (preferences.size() != approvals.size()) {
             throw new IllegalArgumentException("There must be as many preferences as approvals.");
         }
-        if (!Utils.isConsistent(referenceOntology)) {
+        if (!referenceOntology.isConsistent()) {
             throw new IllegalArgumentException("The reference ontology must be consistent.");
         }
         this.referenceOntology = referenceOntology;
@@ -149,21 +146,21 @@ public class TurnBasedMechanism {
      *         ontology, or an empty ontology depending on {@code initialization}
      *         parameter.
      */
-    private OWLOntology init(Initialization initialization) {
-        OWLOntology result = null;
+    private Ontology init(Initialization initialization) {
+        Ontology result = null;
 
         switch (initialization) {
             case EMPTY:
-                result = Utils.newEmptyOntology();
+                result = Ontology.emptyOntology();
                 break;
             case REFERENCE:
-                result = referenceOntology;
+                result = referenceOntology.clone();
                 break;
             case REFERENCE_WITH_SUPPORT:
-                result = referenceOntology;
+                result = referenceOntology.clone();
                 for (OWLAxiom ax : referenceOntology.axioms().collect(Collectors.toSet())) {
                     if (!hasSupport(ax)) {
-                        result.remove(ax);
+                        result.removeAxioms(ax);
                     }
                 }
                 break;
@@ -184,8 +181,8 @@ public class TurnBasedMechanism {
      *            </ul>
      * @return the ontology resulting from the turn based mechanism.
      */
-    public OWLOntology get(Initialization initialization) {
-        OWLOntology result = init(initialization);
+    public Ontology get(Initialization initialization) {
+        Ontology result = init(initialization);
 
         List<OWLAxiom> currentAgenda = new ArrayList<>();
         currentAgenda.addAll(agenda.stream().collect(Collectors.toList()));
@@ -214,23 +211,24 @@ public class TurnBasedMechanism {
             // discard axiom favorite from the agenda
             currentAgenda.remove(favorite);
 
-            Set<OWLAxiom> currentAxioms = result.axioms().collect(Collectors.toSet());
-            currentAxioms.add(favorite);
-            while (!Utils.isConsistent(currentAxioms)) {
-                log("\n** Weakening. **");
-                currentAxioms.remove(favorite);
-                // weakening of favorite axiom
-                AxiomWeakener axiomWeakener = new AxiomWeakener(referenceOntology);
+            try (var currentAxioms = result.clone()) {
+                currentAxioms.addAxioms(favorite);
+                while (!currentAxioms.isConsistent()) {
+                    log("\n** Weakening. **");
+                    currentAxioms.removeAxioms(favorite);
+                    // weakening of favorite axiom
+                    AxiomWeakener axiomWeakener = new AxiomWeakener(referenceOntology);
 
-                Set<OWLAxiom> weakerAxioms = axiomWeakener.getWeakerAxioms(favorite);
-                axiomWeakener.dispose();
+                    List<OWLAxiom> weakerAxioms = axiomWeakener.weakerAxioms(favorite).toList();
+                    axiomWeakener.close();
 
-                int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
-                favorite = (OWLAxiom) (weakerAxioms.toArray())[randomPick];
-                currentAxioms.add(favorite);
+                    int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
+                    favorite = weakerAxioms.get(randomPick);
+                    currentAxioms.addAxioms(favorite);
+                }
             }
             log("\nAdding axiom: " + favorite);
-            result.add(favorite);
+            result.addAxioms(favorite);
 
             // next turn
             currentVoter = (currentVoter + 1) % numVoters;
@@ -242,6 +240,8 @@ public class TurnBasedMechanism {
         if (haveGivenUp.size() >= numVoters) {
             log("\n-- End of procedure: all voters have given up.\n");
         }
+
         return result;
     }
+
 }

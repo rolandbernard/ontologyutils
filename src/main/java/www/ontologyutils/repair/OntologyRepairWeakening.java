@@ -1,131 +1,81 @@
 package www.ontologyutils.repair;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.*;
+import java.util.stream.*;
 
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.refinement.AxiomWeakener;
-import www.ontologyutils.toolbox.MaximalConsistentSets;
-import www.ontologyutils.toolbox.SetUtils;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
 /**
  * An implementation of {@code OntologyRepair} following closely (but not
  * strictly) the axiom weakening approach described in Nicolas Troquard, Roberto
  * Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz:
  * "Repairing Ontologies via Axiom Weakening", AAAI 2018.
- * 
- * The ontology passed in parameter of the constructor should only contain
+ *
+ * The ontology passed in parameter of {@code repair} should only contain
  * assertion or subclass axioms.
- * 
- * TODO: ... or axioms that can be converted into subclass axioms via
- * {@code NormalizationTools:asSubClassOfAxioms}.
  */
-public class OntologyRepairWeakening implements OntologyRepair {
-    private OWLOntology originalOntology;
-    private Boolean verbose;
-
-    private void log(String s) {
-        if (verbose) {
-            System.out.print(s);
-        }
+public class OntologyRepairWeakening extends OntologyRepair {
+    public OntologyRepairWeakening(final Predicate<Ontology> isRepaired) {
+        super(isRepaired);
     }
 
-    public OntologyRepairWeakening(OWLOntology ontology, Boolean verbose) {
-        // TODO: normalize TBox?
-        if (ontology.tboxAxioms(Imports.EXCLUDED)
-                .anyMatch(ax -> (!ax.isOfType(AxiomType.SUBCLASS_OF) && !ax.isOfType(AxiomType.CLASS_ASSERTION)))) {
-            throw new RuntimeException(
-                    "Every logical axiom of the ontology to repair must be either a subclass axiom or an assertion axioms.");
-        }
-        this.originalOntology = ontology;
-        this.verbose = verbose;
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to make the
+     *         ontology consistent.
+     */
+    public static OntologyRepairRandomMcs forConsistency() {
+        return new OntologyRepairRandomMcs(Ontology::isConsistent);
     }
 
-    public OntologyRepairWeakening(OWLOntology ontology) {
-        this(ontology, false);
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to remove
+     *         {@code axiom} from the set of consequences of the ontology.
+     */
+    public static OntologyRepairRandomMcs forRemovingConsequence(final OWLAxiom axiom) {
+        return new OntologyRepairRandomMcs(o -> o.isEntailed(axiom));
     }
 
-    @Override
-    public OWLOntology repair() {
-        Set<OWLAxiom> axioms = originalOntology.axioms().collect(Collectors.toSet());
-        // 1- Choosing a reference ontology as a random MCS of the original axioms
-        Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms);
-        OWLOntology referenceOntology = Utils.newOntology(SetUtils.getRandom(mcss));
-        // 2- AxiomWeakener
-        AxiomWeakener aw = new AxiomWeakener(referenceOntology);
-        // 3- Repairing
-        while (!Utils.isConsistent(axioms)) {
-            OWLAxiom badAxiom = SetUtils.getRandom(findBadAxioms(axioms));
-            Set<OWLAxiom> weakerAxioms = null;
-            if (badAxiom.isOfType(AxiomType.SUBCLASS_OF)) {
-                weakerAxioms = aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) badAxiom);
-            } else if (badAxiom.isOfType(AxiomType.CLASS_ASSERTION)) {
-                weakerAxioms = aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) badAxiom);
-            } else {
-                throw new RuntimeException(
-                        "Cannot weaken axiom that is neither a subclass nor a class assertion axiom. "
-                                + "Could not repair the ontology.");
-            }
-            // we remove the bad axiom and add one of its weakenings
-            axioms.remove(badAxiom);
-            weakerAxioms.remove(badAxiom);
-            OWLAxiom weakerAxiom = SetUtils.getRandom(weakerAxioms);
-            axioms.add(weakerAxiom);
-            // we log the operation
-            log("- Weaken: \t " + badAxiom + "\n  Into:   \t " + weakerAxiom + "\n");
-        }
-        aw.dispose();
-        return Utils.newOntology(axioms);
+    /**
+     * @return An instance of {@code OntologyRepairRandomMcs} that tries to make
+     *         {@code concept} satisfiable.
+     */
+    public static OntologyRepairRandomMcs forConceptSatisfiability(final OWLClassExpression concept) {
+        return new OntologyRepairRandomMcs(o -> o.isSatisfiable(concept));
     }
 
     /**
      * @param axioms
-     * @return the set of subclass and assertion axioms occurring in the least
-     *         number of maximal consistent sets of {@code axioms}.
+     * @return the set of axioms occurring in the least number of maximal consistent
+     *         sets of {@code axioms}.
      */
-    private static Set<OWLAxiom> findBadAxioms(Set<OWLAxiom> axioms) {
-        Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms);
-        HashMap<OWLAxiom, Integer> occurences = new HashMap<>();
-        for (OWLAxiom ax : axioms) {
-            occurences.put(ax, 0);
+    private Stream<OWLAxiom> findBadAxioms(final Ontology ontology) {
+        final var occurrences = ontology.optimalClassicalRepairs(isRepaired)
+                .flatMap(set -> set.stream())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        final var max = occurrences.values().stream().max(Long::compareTo);
+        if (max.isEmpty()) {
+            throw new RuntimeException(
+                    "Did not find a bad subclass or assertion axiom in " + ontology.axioms().toList());
         }
-        for (Set<OWLAxiom> mcs : mcss) {
-            mcs.stream().forEach(ax -> {
-                if (!occurences.containsKey(ax)) { // FIXME
-                    throw new RuntimeException("Did not expect " + ax);
-                }
-                occurences.put(ax, occurences.get(ax) + 1);
-            });
-        }
-        int minOcc = Integer.MAX_VALUE;
-        for (OWLAxiom ax : axioms) {
-            if (ax.isOfType(AxiomType.SUBCLASS_OF) || ax.isOfType(AxiomType.CLASS_ASSERTION)) {
-                if (!occurences.containsKey(ax)) { // FIXME
-                    throw new RuntimeException("Did not expect " + ax);
-                }
-                minOcc = Integer.min(minOcc, occurences.get(ax));
-            }
-        }
-        Set<OWLAxiom> badAxioms = new HashSet<>();
-        for (OWLAxiom ax : axioms) {
-            if (ax.isOfType(AxiomType.SUBCLASS_OF) || ax.isOfType(AxiomType.CLASS_ASSERTION)) {
-                if (occurences.get(ax) == minOcc) {
-                    badAxioms.add(ax);
+        return occurrences.entrySet().stream()
+                .filter(entry -> entry.getValue() == max.get())
+                .map(entry -> entry.getKey());
+    }
+
+    @Override
+    public void repair(final Ontology ontology) {
+        final var randomMcss = Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
+        try (final var refOntology = Ontology.withAxioms(randomMcss)) {
+            try (final var axiomWeakener = new AxiomWeakener(refOntology)) {
+                while (!isRepaired(ontology)) {
+                    final var badAxiom = Utils.randomChoice(findBadAxioms(ontology));
+                    final var weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
+                    ontology.replaceAxiom(badAxiom, weakerAxiom);
                 }
             }
         }
-        if (badAxioms.size() < 1) {
-            throw new RuntimeException("Did not find a bad subclass or assertion axiom in " + axioms);
-        }
-        return badAxioms;
     }
 }

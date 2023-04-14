@@ -1,28 +1,17 @@
 package www.ontologyutils.apps;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.model.*;
 
-import www.ontologyutils.collective.BinaryVoteFactory;
-import www.ontologyutils.collective.CollectiveReferenceOntology;
+import www.ontologyutils.collective.*;
 import www.ontologyutils.collective.BinaryVoteFactory.BinaryVote;
-import www.ontologyutils.collective.PreferenceFactory;
 import www.ontologyutils.collective.PreferenceFactory.Preference;
-import www.ontologyutils.collective.TurnBasedMechanism;
 import www.ontologyutils.collective.TurnBasedMechanism.Initialization;
 import www.ontologyutils.normalization.NormalizationTools;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.Ontology;
 
 /**
  * @author nico
@@ -30,16 +19,16 @@ import www.ontologyutils.toolbox.Utils;
 public class AppTurnBasedMechanism {
     private static int MAX_VOTERS = 1000;
 
-    private OWLOntology ontology;
+    private Ontology ontology;
 
     public AppTurnBasedMechanism(String ontologyFilePath) {
 
-        OWLOntology base = Utils.newOntologyExcludeNonLogicalAxioms(ontologyFilePath);
+        Ontology base = Ontology.loadOnlyLogicalAxioms(ontologyFilePath);
 
-        ontology = Utils.newEmptyOntology();
+        ontology = Ontology.emptyOntology();
 
-        ontology.add(base.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
-        base.tboxAxioms(Imports.EXCLUDED).forEach(a -> ontology.add(NormalizationTools.asSubClassOfAxioms(a)));
+        ontology.addAxioms(base.aboxAxioms().collect(Collectors.toSet()));
+        base.tboxAxioms().forEach(a -> ontology.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
     }
 
     private static int readNumber(String query, int min, int max) {
@@ -62,18 +51,17 @@ public class AppTurnBasedMechanism {
     }
 
     /**
-     * One arguments must be given. It must correspond to an OWL ontology file path.
-     * E.g., run with the parameter ./resources/inconsistent-leftpolicies.owl. TODO:
-     * leave the option to interactively build a reference ontology
-     * 
      * @param args
+     *            One arguments must be given. It must correspond to an OWL
+     *            ontology file path. E.g., run with the parameter
+     *            ./resources/inconsistent-leftpolicies.owl.
      */
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
 
         AppTurnBasedMechanism mApp = new AppTurnBasedMechanism(args[0]);
 
-        if (Utils.isConsistent(mApp.ontology)) {
+        if (mApp.ontology.isConsistent()) {
             System.out.println("\n--- The ontology is consistent.");
         } else {
             System.out.println("\n--- The ontology is not consistent.");
@@ -135,11 +123,13 @@ public class AppTurnBasedMechanism {
                     selectedAxioms.add(bvFactory.getAgenda().get(j));
                 }
             }
-            if (!Utils.isConsistent(selectedAxioms)) {
-                System.out.println("WARNING: The set approved axioms is not consistent! You must enter "
-                        + "the approvals for voter " + (i + 1) + " again.");
-                i--;
-                continue;
+            try (var ontology = Ontology.withAxioms(selectedAxioms)) {
+                if (!ontology.isConsistent()) {
+                    System.out.println("WARNING: The set approved axioms is not consistent! You must enter "
+                            + "the approvals for voter " + (i + 1) + " again.");
+                    i--;
+                    continue;
+                }
             }
 
             BinaryVote bv = bvFactory.makeBinaryVote(approval);
@@ -152,11 +142,12 @@ public class AppTurnBasedMechanism {
         time = System.currentTimeMillis();
         TurnBasedMechanism tbm = new TurnBasedMechanism(agenda, preferences, approvals,
                 new CollectiveReferenceOntology(agenda, preferences).get());
-        OWLOntology result = tbm.setVerbose(true).get(Initialization.EMPTY);
+        Ontology result = tbm.setVerbose(true).get(Initialization.EMPTY);
         System.out.println(
                 "\n--- Turn-based mechanism finished in " + (System.currentTimeMillis() - time) / 1000 + " seconds");
 
         System.out.println("\n--- RESULT ONTOLOGY\n");
         result.axioms().forEach(System.out::println);
     }
+
 }

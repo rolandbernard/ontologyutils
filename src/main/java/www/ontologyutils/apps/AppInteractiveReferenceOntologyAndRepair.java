@@ -1,33 +1,21 @@
 package www.ontologyutils.apps;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.normalization.NormalizationTools;
 import www.ontologyutils.refinement.AxiomWeakener;
-import www.ontologyutils.toolbox.AnnotateOrigin;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
 public class AppInteractiveReferenceOntologyAndRepair {
-    OWLOntology ontology;
+    Ontology ontology;
 
     public AppInteractiveReferenceOntologyAndRepair(String ontologyFilePath) {
 
-        ontology = Utils.newOntology(ontologyFilePath);
+        ontology = Ontology.loadOntology(ontologyFilePath);
 
     }
 
@@ -76,11 +64,13 @@ public class AppInteractiveReferenceOntologyAndRepair {
                 smallerAxiomSet.remove(axiom);
                 HashSet<OWLAxiom> smaller = new HashSet<OWLAxiom>(smallerAxiomSet);
                 smaller.addAll(axiomsToKeep);
-                if (!Utils.isConsistent(smaller)) {
-                    foundSmaller = true;
-                    copyAxiomSet.clear();
-                    copyAxiomSet = smallerAxiomSet;
-                    break;
+                try (var ontology = Ontology.withAxioms(smaller)) {
+                    if (!ontology.isConsistent()) {
+                        foundSmaller = true;
+                        copyAxiomSet.clear();
+                        copyAxiomSet = smallerAxiomSet;
+                        break;
+                    }
                 }
             }
         }
@@ -89,6 +79,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
     }
 
     private static Set<OWLAxiom> findSomehowBadAxioms(Set<OWLAxiom> axiomSet, Set<OWLAxiom> axiomsToKeep) {
+
         int precision = (axiomSet.size() - axiomsToKeep.size()) / 2 + 1;
 
         HashMap<OWLAxiom, Integer> hm = new HashMap<OWLAxiom, Integer>();
@@ -147,6 +138,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
     }
 
     static class InconsistentSetException extends RuntimeException {
+
         private static final long serialVersionUID = 1L;
 
         public InconsistentSetException(String message) {
@@ -154,11 +146,11 @@ public class AppInteractiveReferenceOntologyAndRepair {
         }
     }
 
-    private static OWLOntology buildReferenceOntology(Set<OWLAxiom> axioms) throws InconsistentSetException {
+    private static Ontology buildReferenceOntology(Set<OWLAxiom> axioms) throws InconsistentSetException {
         final int STOP = 0;
-        Set<OWLAxiom> axiomsToKeep = new HashSet<>();
         ArrayList<OWLAxiom> orderedAxioms = new ArrayList<OWLAxiom>(axioms);
-        while (Utils.isConsistent(axiomsToKeep)) {
+        Ontology ontology = Ontology.emptyOntology();
+        while (ontology.isConsistent()) {
             System.out.println("Select an axiom you want to keep.");
             System.out.println(STOP + "\t[START REPAIR]");
             for (int i = 0; i < orderedAxioms.size(); i++) {
@@ -166,10 +158,10 @@ public class AppInteractiveReferenceOntologyAndRepair {
             }
             int choice = readNumber("Enter axiom number", STOP, orderedAxioms.size());
             if (choice == STOP) {
-                return Utils.newOntology(axiomsToKeep);
+                return ontology;
             }
             OWLAxiom axiomToKeep = orderedAxioms.get(choice - 1);
-            axiomsToKeep.add(axiomToKeep);
+            ontology.addAxioms(axiomToKeep);
             orderedAxioms.remove(axiomToKeep);
         }
         throw new InconsistentSetException("Inconsistent set of axioms.");
@@ -178,23 +170,17 @@ public class AppInteractiveReferenceOntologyAndRepair {
     private static Set<OWLAxiom> keepAxiom(Set<OWLAxiom> axiomsToKeep, OWLAxiom newAxiom)
             throws InconsistentSetException {
         axiomsToKeep.add(newAxiom);
-        if (!Utils.isConsistent(axiomsToKeep)) {
-            throw new InconsistentSetException("Inconsistent set of axioms.");
+        try (var ontology = Ontology.withAxioms(axiomsToKeep)) {
+            if (!ontology.isConsistent()) {
+                throw new InconsistentSetException("Inconsistent set of axioms.");
+            }
         }
         System.out.println("Keeping " + axiomsToKeep.size() + " axiom" + (axiomsToKeep.size() >= 2 ? "s." : "."));
         return axiomsToKeep;
     }
 
     private static ArrayList<OWLAxiom> getWeakerAxioms(OWLAxiom axiom, AxiomWeakener aw) {
-        ArrayList<OWLAxiom> weakerAxiomsAux = null;
-        if (axiom.isOfType(AxiomType.SUBCLASS_OF)) {
-            weakerAxiomsAux = new ArrayList<OWLAxiom>(aw.getWeakerSubClassAxioms((OWLSubClassOfAxiom) axiom));
-        } else if (axiom.isOfType(AxiomType.CLASS_ASSERTION)) {
-            weakerAxiomsAux = new ArrayList<OWLAxiom>(aw.getWeakerClassAssertionAxioms((OWLClassAssertionAxiom) axiom));
-        } else {
-            throw new RuntimeException("Cannot weaken axiom that is neither a subclass nor an assertion axiom. "
-                    + "Could not repair the ontology.");
-        }
+        ArrayList<OWLAxiom> weakerAxiomsAux = new ArrayList<OWLAxiom>(aw.weakerAxioms(axiom).toList());
         ArrayList<OWLAxiom> weakerAxioms = new ArrayList<OWLAxiom>();
         for (OWLAxiom ax : weakerAxiomsAux) {
             weakerAxioms.add(ax.getAxiomWithoutAnnotations());
@@ -211,7 +197,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
      *            path. E.g., run with the parameter
      *            resources/inconsistent-leftpolicies.owl
      */
-    public static void main(String[] args) { // TODO improve user interaction and code
+    public static void main(String[] args) {
         AppInteractiveReferenceOntologyAndRepair mApp = new AppInteractiveReferenceOntologyAndRepair(args[0]);
         System.out.println("Loaded " + mApp.ontology);
         Set<OWLAxiom> axioms = mApp.ontology.axioms().collect(Collectors.toSet());
@@ -219,15 +205,15 @@ public class AppInteractiveReferenceOntologyAndRepair {
         // 0- We isolate the logical axioms, and make sure the TBox axioms are all
         // subclass axioms, converting them when necessary.
         Set<OWLAxiom> logicalAxioms = new HashSet<>();
-        logicalAxioms.addAll(mApp.ontology.aboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
-        logicalAxioms.addAll(mApp.ontology.rboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet()));
-        mApp.ontology.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
+        logicalAxioms.addAll(mApp.ontology.aboxAxioms().collect(Collectors.toSet()));
+        logicalAxioms.addAll(mApp.ontology.rboxAxioms().collect(Collectors.toSet()));
+        mApp.ontology.tboxAxioms().forEach(ax -> {
             logicalAxioms.addAll(NormalizationTools.asSubClassOfAxioms(ax));
         });
         System.out.println("Converted ontology has " + logicalAxioms.size() + " logical axioms.");
 
         // 1- Choosing a reference ontology
-        OWLOntology referenceOntology = null;
+        Ontology referenceOntology = null;
         try {
             referenceOntology = buildReferenceOntology(logicalAxioms);
         } catch (InconsistentSetException e) {
@@ -240,9 +226,9 @@ public class AppInteractiveReferenceOntologyAndRepair {
 
         // 2- AxiomWeakener
         AxiomWeakener aw = new AxiomWeakener(referenceOntology);
-
+        Ontology currentOntology = Ontology.withAxioms(logicalAxioms);
         // 3- Repairing interactively
-        while (!Utils.isConsistent(logicalAxioms)) {
+        while (!currentOntology.isConsistent()) {
 
             // AXIOM SELECTION MODE
             System.out.println("Select an axiom selection mode:");
@@ -290,10 +276,11 @@ public class AppInteractiveReferenceOntologyAndRepair {
                 OWLAxiom weakerAxiom = weakerAxioms.get(axNumW - 1);
                 // we remove the axiom of interest and add its weakenings
                 logicalAxioms.remove(axiomOfInterest);
-                logicalAxioms.add(AnnotateOrigin.getAnnotatedAxiom(weakerAxiom, axiomOfInterest));
+                currentOntology.replaceAxiom(axiomOfInterest, weakerAxiom);
+                logicalAxioms.add(Ontology.getOriginAnnotatedAxiom(weakerAxiom, axiomOfInterest));
                 // we log the operation
                 System.out.println("- Weaken: \t " + axiomOfInterest + "\n  Into:   \t "
-                        + AnnotateOrigin.getAnnotatedAxiom(weakerAxiom, axiomOfInterest) + "\n");
+                        + Ontology.getOriginAnnotatedAxiom(weakerAxiom, axiomOfInterest) + "\n");
             }
         }
 
@@ -304,4 +291,5 @@ public class AppInteractiveReferenceOntologyAndRepair {
         axiomsToKeep.forEach(System.out::println);
         System.out.println("Done.");
     }
+
 }

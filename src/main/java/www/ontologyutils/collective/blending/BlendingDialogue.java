@@ -1,17 +1,14 @@
 package www.ontologyutils.collective.blending;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
 
 import www.ontologyutils.collective.PreferenceFactory.Preference;
 import www.ontologyutils.refinement.AxiomWeakener;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
 /**
  * Guendalina Righetti, Daniele Porello, Nicolas Troquard, Oliver Kutz, Maria M.
@@ -20,13 +17,14 @@ import www.ontologyutils.toolbox.Utils;
  * Information Systems (FOIS 2021). IOS Press.
  */
 public class BlendingDialogue {
+
     public static int NO_TURN_LIMIT = -1;
 
     private List<OWLAxiom> aone;
     private List<OWLAxiom> atwo;
     private Preference pone;
     private Preference ptwo;
-    private OWLOntology initialOntology;
+    private Ontology initialOntology;
     private int numWeakeningOne;
     private int numWeakeningTwo;
 
@@ -57,8 +55,8 @@ public class BlendingDialogue {
      *            a consistent ontology
      */
     public BlendingDialogue(List<OWLAxiom> aone, Preference pone, List<OWLAxiom> atwo, Preference ptwo,
-            OWLOntology initialOntology) {
-        if (!Utils.isConsistent(initialOntology)) {
+            Ontology initialOntology) {
+        if (!initialOntology.isConsistent()) {
             throw new IllegalArgumentException("The initial ontology must be consistent.");
         }
         if (!aone.equals(pone.getAgenda()) || !atwo.equals(ptwo.getAgenda())) {
@@ -102,11 +100,11 @@ public class BlendingDialogue {
      * @return the favorite axiom in {@code axioms} that is not yet entailed by
      *         {@code context}, if any. Otherwise, returns null.
      */
-    private OWLAxiom favorite(List<OWLAxiom> axioms, Preference pref, OWLOntology context) {
+    private OWLAxiom favorite(List<OWLAxiom> axioms, Preference pref, Ontology context) {
         assert (axioms.stream().allMatch(a -> pref.getAgenda().contains(a)));
 
         OWLAxiom result = null;
-        for (OWLAxiom a : axioms.stream().filter(b -> !Utils.isEntailed(context, b)).collect(Collectors.toList())) {
+        for (OWLAxiom a : axioms.stream().filter(b -> !context.isEntailed(b)).collect(Collectors.toList())) {
             if (result == null || pref.prefers(a, result)) {
                 result = a;
             }
@@ -129,11 +127,12 @@ public class BlendingDialogue {
      *            {@link NO_TURN_LIMIT} for no limits.
      * @return a consistent ontology resulting from the dialogue.
      */
-    public OWLOntology get(double probabilityTurnOne, int maxTurns) {
+    public Ontology get(double probabilityTurnOne, int maxTurns) {
+
         this.numWeakeningOne = 0;
         this.numWeakeningTwo = 0;
 
-        OWLOntology result = Utils.newOntology(this.initialOntology.axioms());
+        Ontology result = this.initialOntology.clone();
 
         List<OWLAxiom> remainone = new ArrayList<>(this.aone);
         List<OWLAxiom> remaintwo = new ArrayList<>(this.atwo);
@@ -177,25 +176,25 @@ public class BlendingDialogue {
                 remaintwo.remove(consideredAxiom);
             }
             log("\nConsidering axiom " + Utils.prettyPrintAxiom(consideredAxiom));
-            result.add(consideredAxiom);
-            while (!Utils.isConsistent(result)) {
+            result.addAxioms(consideredAxiom);
+            while (!result.isConsistent()) {
                 log("\n** Weakening. **");
                 if (turnAgent == 1) {
                     numWeakeningOne++;
                 } else {
                     numWeakeningTwo++;
                 }
-                result.remove(consideredAxiom);
+                result.removeAxioms(consideredAxiom);
                 AxiomWeakener axiomWeakener = new AxiomWeakener(result);
                 log(" .");
-                Set<OWLAxiom> weakerAxioms = axiomWeakener.getWeakerAxioms(consideredAxiom);
-                axiomWeakener.dispose();
+                Set<OWLAxiom> weakerAxioms = axiomWeakener.weakerAxioms(consideredAxiom).collect(Collectors.toSet());
+                axiomWeakener.close();
                 log(".(" + weakerAxioms.size() + " refinements)");
                 int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
                 log(". ");
                 consideredAxiom = (OWLAxiom) (weakerAxioms.toArray())[randomPick];
                 log(" ===> " + Utils.prettyPrintAxiom(consideredAxiom));
-                result.add(consideredAxiom);
+                result.addAxioms(consideredAxiom);
             }
             log("\nAdding axiom: " + Utils.prettyPrintAxiom(consideredAxiom));
         }
@@ -209,7 +208,8 @@ public class BlendingDialogue {
      *            in the blending dialogue.
      * @return a consistent ontology resulting from the dialogue.
      */
-    public OWLOntology get(double probabilityTurnOne) {
+    public Ontology get(double probabilityTurnOne) {
         return this.get(probabilityTurnOne, NO_TURN_LIMIT);
     }
+
 }

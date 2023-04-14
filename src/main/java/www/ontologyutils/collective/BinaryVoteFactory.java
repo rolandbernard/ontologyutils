@@ -1,18 +1,11 @@
 package www.ontologyutils.collective;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
 
-import www.ontologyutils.toolbox.MaximalConsistentSets;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
 /**
  * Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
@@ -22,7 +15,7 @@ import www.ontologyutils.toolbox.Utils;
  * Conference on Artificial Intelligence (IJCAI-ECAI 2018).
  * International Joint Conferences on Artificial Intelligence
  * Organization, 2018, pages 1942-1948.
- * 
+ *
  * @author nico
  */
 public class BinaryVoteFactory {
@@ -72,6 +65,7 @@ public class BinaryVoteFactory {
     }
 
     public class BinaryVote {
+
         private List<Integer> ballot;
 
         // we forbid direct instantiation
@@ -85,16 +79,16 @@ public class BinaryVoteFactory {
             }
 
             // check consistency
-            Set<OWLAxiom> selectedAxioms = new HashSet<>();
-
-            for (int i = 0; i < agenda.size(); i++) {
-                if (ballot.get(i) == 1) {
-                    selectedAxioms.add(agenda.get(i));
+            try (var selectedAxioms = Ontology.emptyOntology()) {
+                for (int i = 0; i < agenda.size(); i++) {
+                    if (ballot.get(i) == 1) {
+                        selectedAxioms.addAxioms(agenda.get(i));
+                    }
                 }
-            }
-            if (!Utils.isConsistent(selectedAxioms)) {
-                throw new IllegalArgumentException(
-                        "A binary vote must specify a selection of a consistent set of axioms from the agenda.");
+                if (!selectedAxioms.isConsistent()) {
+                    throw new IllegalArgumentException(
+                            "A binary vote must specify a selection of a consistent set of axioms from the agenda.");
+                }
             }
 
             this.ballot = ballot;
@@ -109,6 +103,7 @@ public class BinaryVoteFactory {
         }
 
         public Set<OWLAxiom> getBallotAxioms() {
+
             Set<OWLAxiom> selectedAxioms = new HashSet<>();
             for (int i = 0; i < agenda.size(); i++) {
                 if (ballot.get(i) == 1) {
@@ -119,6 +114,7 @@ public class BinaryVoteFactory {
         }
 
         public HashMap<OWLAxiom, Float> getBallotAxiomsPreferences() {
+
             HashMap<OWLAxiom, Float> selectedAxiomsPreferences = new HashMap<OWLAxiom, Float>();
             List<Float> preferences = new ArrayList<Float>();
             int selectedAxiom = 0;
@@ -138,10 +134,10 @@ public class BinaryVoteFactory {
             return selectedAxiomsPreferences;
         }
 
-        public OWLOntology getOnto() {
+        public Ontology getOnto() {
             Set<OWLAxiom> axioms = this.getBallotAxioms();
-            OWLOntology onto = Utils.newOntology(axioms.stream());
-            if (!Utils.isConsistent(onto)) {
+            Ontology onto = Ontology.withAxioms(axioms);
+            if (!onto.isConsistent()) {
                 System.out.println("getOnto returns inconsistent ontology!");
             }
             return onto;
@@ -158,5 +154,7 @@ public class BinaryVoteFactory {
         public String toString() {
             return ballot.toString();
         }
+
     } // End BinaryVote
+
 }

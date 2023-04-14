@@ -1,51 +1,34 @@
 package www.ontologyutils.collective;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.EntityType;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.junit.jupiter.api.Test;
+import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
+import www.ontologyutils.toolbox.*;
 
 /**
  * @author nico
- *
  */
-public class TesterPreferenceFactory {
-    private static final Collection<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
-
-    static OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
-    static OWLClassExpression entity1 = (OWLClassExpression) dataFactory.getOWLEntity(EntityType.CLASS,
+public class PreferenceFactoryTest {
+    static OWLDataFactory df = Ontology.getDefaultDataFactory();
+    static OWLClassExpression entity1 = (OWLClassExpression) df.getOWLEntity(EntityType.CLASS,
             IRI.create("www.first.org"));
-    static OWLClassExpression entity2 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.second.org"));
-    static OWLClassExpression entity3 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.third.org"));
-    static OWLClassExpression entity4 = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create("www.fourth.org"));
+    static OWLClassExpression entity2 = df.getOWLEntity(EntityType.CLASS, IRI.create("www.second.org"));
+    static OWLClassExpression entity3 = df.getOWLEntity(EntityType.CLASS, IRI.create("www.third.org"));
+    static OWLClassExpression entity4 = df.getOWLEntity(EntityType.CLASS, IRI.create("www.fourth.org"));
 
-    static OWLAxiom ax1 = new OWLSubClassOfAxiomImpl(entity1, entity2, EMPTY_ANNOTATION);
-    static OWLAxiom ax2 = new OWLSubClassOfAxiomImpl(entity2, entity3, EMPTY_ANNOTATION);
-    static OWLAxiom ax3 = new OWLSubClassOfAxiomImpl(entity3, entity4, EMPTY_ANNOTATION);
-    static OWLAxiom ax4 = new OWLSubClassOfAxiomImpl(entity4, entity1, EMPTY_ANNOTATION);
+    static OWLAxiom ax1 = df.getOWLSubClassOfAxiom(entity1, entity2);
+    static OWLAxiom ax2 = df.getOWLSubClassOfAxiom(entity2, entity3);
+    static OWLAxiom ax3 = df.getOWLSubClassOfAxiom(entity3, entity4);
+    static OWLAxiom ax4 = df.getOWLSubClassOfAxiom(entity4, entity1);
 
     static PreferenceFactory prefFactory;
     static PreferenceFactory.Preference preference;
 
-    @BeforeClass
-    public static void testSetup() {
+    public PreferenceFactoryTest() {
         ArrayList<OWLAxiom> agenda = new ArrayList<OWLAxiom>();
         agenda.add(ax1);
         agenda.add(ax2);
@@ -55,16 +38,12 @@ public class TesterPreferenceFactory {
         prefFactory = new PreferenceFactory(agenda);
     }
 
-    @AfterClass
-    public static void testCleanup() {
-        // clean stuff
-    }
-
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBadRanking() {
-        ArrayList<Integer> ranking = new ArrayList<>(Arrays.asList(2, 3, 1));
-
-        preference = prefFactory.makePreference(ranking);
+        assertThrows(IllegalArgumentException.class, () -> {
+            ArrayList<Integer> ranking = new ArrayList<>(Arrays.asList(2, 3, 1));
+            preference = prefFactory.makePreference(ranking);
+        });
     }
 
     @Test
@@ -158,12 +137,13 @@ public class TesterPreferenceFactory {
         assertTrue(preference.get(4).equals(ax4));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testBadRankIndex() {
-        ArrayList<Integer> ranking = new ArrayList<>(Arrays.asList(2, 3, 1, 4));
-        preference = prefFactory.makePreference(ranking);
-        // ax3 < ax1 < ax2 < ax4 (smaller is better)
-
-        preference.get(5);
+        assertThrows(IllegalArgumentException.class, () -> {
+            ArrayList<Integer> ranking = new ArrayList<>(Arrays.asList(2, 3, 1, 4));
+            preference = prefFactory.makePreference(ranking);
+            // ax3 < ax1 < ax2 < ax4 (smaller is better)
+            preference.get(5);
+        });
     }
 }

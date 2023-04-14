@@ -1,62 +1,44 @@
 package www.ontologyutils.apps;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.io.*;
+import java.util.*;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.parameters.Imports;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectIntersectionOfImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
-import www.ontologyutils.normalization.NormalForm;
-import www.ontologyutils.normalization.Normalization;
-import www.ontologyutils.normalization.NormalizationTools;
+import www.ontologyutils.normalization.*;
 import www.ontologyutils.rules.RuleGeneration;
-import www.ontologyutils.toolbox.AnnotateOrigin;
-import www.ontologyutils.toolbox.FreshAtoms;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
 public class AppCondorRules {
-    private OWLOntology ontology;
+    private Ontology ontology;
 
     public AppCondorRules(String ontologyFilePath) {
-        ontology = AnnotateOrigin.newOntology(ontologyFilePath);
+
+        ontology = Ontology.loadOntologyWithOriginAnnotations(ontologyFilePath);
+
     }
 
-    private OWLOntology runCondor() {
+    private Ontology runCondor() {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
 
-        OWLOntology copy = Utils.newEmptyOntology();
-        copy.addAxioms(this.ontology.axioms());
+        Ontology copy = this.ontology.clone();
 
-        Stream<OWLAxiom> tBoxAxioms = copy.tboxAxioms(Imports.EXCLUDED);
+        List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
         tBoxAxioms.forEach((ax) -> {
-            copy.remove(ax);
+            copy.removeAxioms(ax);
             copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));
         });
 
-        OWLOntology condor = null;
-        // condor = Normalization.normalizeCondor(copy);
-        condor = superNormalize(Normalization.normalizeCondor(copy));
+        // final var condor = Normalization.normalizeCondor(copy);
+        final var condor = superNormalize(Normalization.normalizeCondor(copy));
 
         // check every axiom of the original ontology is entailed in condor
-        OWLReasoner reasoner = Utils.getHermitReasoner(condor);
-        assert (this.ontology.axioms().allMatch(ax -> reasoner.isEntailed(ax)));
+        assert (this.ontology.axioms().allMatch(ax -> condor.isEntailed(ax)));
         // check every axiom of condor is entailed in the copy of the original ontology
         // with extended signature
         copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
-        OWLReasoner reasonerBis = Utils.getHermitReasoner(copy);
-        assert (condor.axioms().allMatch(ax -> reasonerBis.isEntailed(ax)));
-
+        assert (condor.axioms().allMatch(ax -> copy.isEntailed(ax)));
+        copy.close();
         return condor;
     }
 
@@ -67,18 +49,19 @@ public class AppCondorRules {
      *         the left.
      */
 
-    private static OWLOntology superNormalize(OWLOntology on) {
-        OWLOntology res = Utils.newEmptyOntology();
-        on.tboxAxioms(Imports.EXCLUDED).forEach(a -> {
+    private static Ontology superNormalize(Ontology on) {
+        Ontology res = Ontology.emptyOntology();
+        on.tboxAxioms().forEach(a -> {
             res.addAxioms(superNormalize(a));
         });
-        res.addAxioms(on.rboxAxioms(Imports.EXCLUDED));
-        res.addAxioms(on.aboxAxioms(Imports.EXCLUDED));
+        res.addAxioms(on.rboxAxioms());
+        res.addAxioms(on.aboxAxioms());
 
         return res;
     }
 
     private static Set<OWLAxiom> superNormalize(OWLAxiom a) {
+        OWLDataFactory df = Ontology.getDefaultDataFactory();
         Set<OWLAxiom> res = new HashSet<>();
         OWLClassExpression left = ((OWLSubClassOfAxiom) a).getSubClass();
         OWLClassExpression right = ((OWLSubClassOfAxiom) a).getSuperClass();
@@ -93,11 +76,11 @@ public class AppCondorRules {
             OWLClassExpression one = iter.next();
             OWLClassExpression two = iter.next();
 
-            OWLClassExpression newConj = new OWLObjectIntersectionOfImpl(List.of(one, two));
+            OWLClassExpression newConj = df.getOWLObjectIntersectionOf(one, two);
             assert (newConj.asConjunctSet().size() == 2);
             if (leftConj.size() == 2) {
                 assert (!iter.hasNext());
-                OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, right, AnnotateOrigin.getAxiomAnnotations(a));
+                OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, right, Ontology.axiomOriginAnnotations(a).toList());
                 res.add(axiom);
                 return res;
             }
@@ -107,7 +90,7 @@ public class AppCondorRules {
             leftConj.remove(two);
             leftConj.add(newAtom);
 
-            OWLAxiom axiom = new OWLSubClassOfAxiomImpl(newConj, newAtom, AnnotateOrigin.getAxiomAnnotations(a));
+            OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, newAtom, Ontology.axiomOriginAnnotations(a).toList());
             res.add(axiom);
         }
     }
@@ -120,11 +103,10 @@ public class AppCondorRules {
     public static void main(String[] args) {
         AppCondorRules mApp = new AppCondorRules(args[0]);
 
-        OWLOntology condor = mApp.runCondor();
+        Ontology condor = mApp.runCondor();
 
         RuleGeneration rgc = new RuleGeneration(condor);
-
-        condor.tboxAxioms(Imports.EXCLUDED).forEach(ax -> {
+        condor.tboxAxioms().forEach(ax -> {
             System.out.println(rgc.normalizedSubClassAxiomToRule(ax));
         });
 

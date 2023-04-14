@@ -1,17 +1,12 @@
 package www.ontologyutils.collective;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.collective.PreferenceFactory.Preference;
-import www.ontologyutils.toolbox.MaximalConsistentSets;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.toolbox.*;
 
 /**
  * Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto
@@ -51,11 +46,11 @@ public class CollectiveReferenceOntology {
      * @return a reference ontology that is a lexicographically minimal consistent
      *         subontology of the agenda
      */
-    public OWLOntology get() {
-        Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(new HashSet<>(agenda));
+    public Ontology get() {
+        Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(agenda);
         for (Set<OWLAxiom> set1 : mcss) {
-            if (mcss.stream().allMatch(set2 -> (!lexicographicallySmaller(set2, set1) || !Utils.isConsistent(set2)))) {
-                return Utils.newOntology(set1.stream());
+            if (mcss.stream().allMatch(set2 -> !lexicographicallySmaller(set2, set1))) {
+                return Ontology.withAxioms(set1);
             }
         }
 
@@ -105,4 +100,5 @@ public class CollectiveReferenceOntology {
         }
         return false;
     }
+
 }

@@ -1,42 +1,31 @@
 package www.ontologyutils.rules;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectAllValuesFromImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLObjectSomeValuesFromImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLQuantifiedRestrictionImpl;
 import www.ontologyutils.normalization.NormalForm;
-import www.ontologyutils.toolbox.AnnotateOrigin;
+import www.ontologyutils.toolbox.Ontology;
 
 public class RuleGeneration {
     private Map<OWLEntity, String> mapEntities;
     private Map<Collection<OWLAnnotation>, String> mapAxioms;
 
-    public RuleGeneration(OWLOntology ontology) {
+    public RuleGeneration(Ontology ontology) {
         mapEntities = mapEntitiesToNumberedLetters(ontology);
         mapAxioms = mapAxiomsToGroupNumbers(ontology);
     }
 
     @SuppressWarnings({ "unchecked", "unlikely-arg-type" })
     public String normalizedSubClassAxiomToRule(OWLAxiom ax) {
+
         if (!NormalForm.isNormalFormTBoxAxiom(ax)) {
             throw new IllegalArgumentException("Axiom " + ax + " must be in normal form.");
         }
 
         // a "group of axioms" is identified with the annotation of the original axiom
-        String axiomGroup = mapAxioms.get(AnnotateOrigin.getAxiomAnnotations(ax));
+        String axiomGroup = mapAxioms.get(Ontology.axiomOriginAnnotations(ax).collect(Collectors.toSet()));
 
         OWLClassExpression left = ((OWLSubClassOfAxiom) ax).getSubClass();
         OWLClassExpression right = ((OWLSubClassOfAxiom) ax).getSuperClass();
@@ -76,20 +65,20 @@ public class RuleGeneration {
             return res;
         } else if (NormalForm.typeTwoSubClassAxiom(left, right)) {
             // isAtom(left) && isExistentialOfAtom(right)
-            OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) right).getFiller();
-            OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFromImpl) right).getProperty();
+            OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) right).getFiller();
+            OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) right).getProperty();
             return "a(2, " + axiomGroup + ", " + mapEntities.get(left) + ", " + mapEntities.get(property) + ", "
                     + mapEntities.get(filler) + ").";
         } else if (NormalForm.typeThreeSubClassAxiom(left, right)) {
             // isAtom(left) && isUniversalOfAtom(right)
-            OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) right).getFiller();
-            OWLObjectPropertyExpression property = ((OWLObjectAllValuesFromImpl) right).getProperty();
+            OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) right).getFiller();
+            OWLObjectPropertyExpression property = ((OWLObjectAllValuesFrom) right).getProperty();
             return "a(3, " + axiomGroup + ", " + mapEntities.get(left) + ", " + mapEntities.get(property) + ", "
                     + mapEntities.get(filler) + ").";
         } else if (NormalForm.typeFourSubClassAxiom(left, right)) {
             // isExistentialOfAtom(left) && isAtom(right)
-            OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) left).getFiller();
-            OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFromImpl) left).getProperty();
+            OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) left).getFiller();
+            OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) left).getProperty();
             return "a(4, " + axiomGroup + ", " + mapEntities.get(filler) + ", " + mapEntities.get(property) + ", "
                     + mapEntities.get(right) + ").";
         } else {
@@ -114,7 +103,7 @@ public class RuleGeneration {
         return mapAxioms;
     }
 
-    private static Map<OWLEntity, String> mapEntitiesToNumberedLetters(OWLOntology ontology) {
+    private static Map<OWLEntity, String> mapEntitiesToNumberedLetters(Ontology ontology) {
         HashMap<OWLEntity, String> map = new HashMap<OWLEntity, String>();
 
         Object[] entities = ontology.signature().toArray();
@@ -134,17 +123,19 @@ public class RuleGeneration {
         return map;
     }
 
-    private static Map<Collection<OWLAnnotation>, String> mapAxiomsToGroupNumbers(OWLOntology ontology) {
+    private static Map<Collection<OWLAnnotation>, String> mapAxiomsToGroupNumbers(Ontology ontology) {
         HashMap<Collection<OWLAnnotation>, String> map = new HashMap<Collection<OWLAnnotation>, String>();
 
         int numAxGr = 0;
-        for (OWLAxiom ax : ontology.tboxAxioms(Imports.EXCLUDED).collect(Collectors.toSet())) {
+        for (OWLAxiom ax : ontology.tboxAxioms().collect(Collectors.toSet())) {
             assert (ax.isAnnotated());
-            if (!map.containsKey(AnnotateOrigin.getAxiomAnnotations(ax))) {
-                map.put(AnnotateOrigin.getAxiomAnnotations(ax), "" + ++numAxGr);
+            var annotations = Ontology.axiomOriginAnnotations(ax).collect(Collectors.toSet());
+            if (!map.containsKey(annotations)) {
+                map.put(annotations, "" + ++numAxGr);
             }
         }
 
         return map;
     }
+
 }

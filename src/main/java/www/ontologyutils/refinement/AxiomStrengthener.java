@@ -1,86 +1,81 @@
 package www.ontologyutils.refinement;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Stream;
 
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
+import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.owl.owlapi.OWLClassAssertionAxiomImpl;
-import uk.ac.manchester.cs.owl.owlapi.OWLSubClassOfAxiomImpl;
+import www.ontologyutils.toolbox.Ontology;
 
-public class AxiomStrengthener {
-    private final static ArrayList<OWLAnnotation> EMPTY_ANNOTATION = new ArrayList<OWLAnnotation>();
+/**
+ * Implementation that can be used for strengthening an axiom. Must be closed
+ * after usage to free up resources used by the inner {@code Covers} object.
+ */
+public class AxiomStrengthener implements AutoCloseable {
+    private class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
+        @Override
+        public Stream<OWLAxiom> visit(final OWLSubClassOfAxiom axiom) {
+            final var df = Ontology.getDefaultDataFactory();
+            final var subclass = axiom.getSubClass();
+            final var superclass = axiom.getSuperClass();
+            return Stream.concat(
+                    generalization.refine(subclass)
+                            .map(newSubclass -> df.getOWLSubClassOfAxiom(newSubclass, superclass)),
+                    specialization.refine(superclass)
+                            .map(newSuperclass -> df.getOWLSubClassOfAxiom(subclass, newSuperclass)));
+        }
 
-    private RefinementOperator genOp;
-    private RefinementOperator specOp;
+        @Override
+        public Stream<OWLAxiom> visit(final OWLClassAssertionAxiom axiom) {
+            final var df = Ontology.getDefaultDataFactory();
+            final var concept = axiom.getClassExpression();
+            final var individual = axiom.getIndividual();
+            return specialization.refine(concept)
+                    .map(newConcept -> df.getOWLClassAssertionAxiom(newConcept, individual));
+        }
+
+        @Override
+        public <T> Stream<OWLAxiom> doDefault(final T axiom) throws IllegalArgumentException {
+            final var ax = (OWLAxiom) axiom;
+            throw new IllegalArgumentException(
+                    "The axiom " + ax + " of type " + ax.getAxiomType()
+                            + " is not supported for axiom weakening.");
+        }
+    }
+
+    private final Visitor visitor;
+    private final Covers covers;
+    private final RefinementOperator generalization;
+    private final RefinementOperator specialization;
 
     /**
-     * @param ontology
-     *            a reference ontology to make inferences.
+     * Create a new axiom strengthener with the given reference ontology.
+     *
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
      */
-    public AxiomStrengthener(OWLOntology ontology) {
-        Covers covers = new Covers(ontology);
-        this.genOp = new RefinementOperator(covers.getUpCoverOperator(), covers.getDownCoverOperator());
-        this.specOp = new RefinementOperator(covers.getDownCoverOperator(), covers.getUpCoverOperator());
+    public AxiomStrengthener(final Ontology refOntology) {
+        visitor = new Visitor();
+        covers = new Covers(refOntology);
+        generalization = new RefinementOperator(covers::upCover, covers::downCover);
+        specialization = new RefinementOperator(covers::downCover, covers::upCover);
     }
 
     /**
+     * Computes all axioms derived by:
+     * - for subclass axioms: either generalizing the left hand side or specializing
+     * the right hand side.
+     * - for assertion axioms: specializing the concept.
+     *
      * @param axiom
-     * @return all the strengthenings of axiom obtained by either specialising the
-     *         right-hand side (using the {@code GeneralisationOperator}
-     *         {@code genOp} of this {@code JavaWeakener} object) or by generalising
-     *         the left-hand side (using the {@code SpecialisationOperator}
-     *         {@code specOp} of this {@code JavaWeakener} object). Given an axiom A
-     *         -> B, the function returns the set containing all the axioms A' -> B
-     *         where A' is in {@code specOp.generalise(A)} and all the axioms A ->
-     *         B' where B' is in {@code genOp.specialise(A)}.
+     *            The axiom for which we want to find stronger axioms.
+     * @return A stream of axioms that are all stronger than {@code axiom}.
      */
-    public Set<OWLAxiom> getStrongerSubClassAxioms(OWLSubClassOfAxiom axiom) {
-        HashSet<OWLAxiom> result = new HashSet<OWLAxiom>();
-
-        OWLClassExpression left = axiom.getSubClass();
-        OWLClassExpression right = axiom.getSuperClass();
-        Set<OWLClassExpression> LeftGeneral = genOp.refine(left);
-        Set<OWLClassExpression> RightSpecial = specOp.refine(right);
-
-        for (OWLClassExpression oce : LeftGeneral) {
-            OWLAxiom ax = new OWLSubClassOfAxiomImpl(oce, right, EMPTY_ANNOTATION);
-            result.add(ax);
-        }
-        for (OWLClassExpression oce : RightSpecial) {
-            OWLAxiom ax = new OWLSubClassOfAxiomImpl(left, oce, EMPTY_ANNOTATION);
-            result.add(ax);
-        }
-
-        return result;
+    public Stream<OWLAxiom> strongerAxioms(final OWLAxiom axiom) {
+        return axiom.accept(visitor).distinct();
     }
 
-    /**
-     * @param axiom
-     * @return all strengthenings of axiom obtained by specialising its class
-     *         expression (using the {@code SpecialisationOperator} {@code specOp}
-     *         of this {@code JavaWeakener} object). Given an axiom A(i), the
-     *         function returns the set containing all the axioms A'(i) where A' is
-     *         in {@code genOp.specialise(A)}.
-     */
-    public Set<OWLAxiom> getStrongerClassAssertionAxioms(OWLClassAssertionAxiom axiom) {
-        HashSet<OWLAxiom> result = new HashSet<OWLAxiom>();
-
-        OWLClassExpression expression = axiom.getClassExpression();
-
-        Set<OWLClassExpression> specialisations = specOp.refine(expression);
-
-        for (OWLClassExpression oce : specialisations) {
-            OWLAxiom ax = new OWLClassAssertionAxiomImpl(axiom.getIndividual(), oce, EMPTY_ANNOTATION);
-            result.add(ax);
-        }
-
-        return result;
+    @Override
+    public void close() {
+        covers.close();
     }
 }

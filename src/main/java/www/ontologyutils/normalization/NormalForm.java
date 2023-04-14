@@ -2,13 +2,7 @@ package www.ontologyutils.normalization;
 
 import java.util.Set;
 
-import org.semanticweb.owlapi.model.AxiomType;
-import org.semanticweb.owlapi.model.ClassExpressionType;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClassExpression;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
-
-import uk.ac.manchester.cs.owl.owlapi.OWLQuantifiedRestrictionImpl;
+import org.semanticweb.owlapi.model.*;
 
 /**
  * A TBox axiom in normal form can be of one of four types:
@@ -19,12 +13,11 @@ import uk.ac.manchester.cs.owl.owlapi.OWLQuantifiedRestrictionImpl;
  * <li>Type 3: Subclass(atom, forall property atom)
  * <li>Type 4: Subclass(exists property atom, atom)
  * </ul>
- * 
- * TODO: This is an early prototype and the definitions may change.
- * 
+ *
  * @author nico
  */
 public class NormalForm {
+
     public static boolean isNormalFormTBoxAxiom(OWLAxiom ax) {
         if (!ax.isOfType(AxiomType.SUBCLASS_OF)) {
             return false;
@@ -101,7 +94,7 @@ public class NormalForm {
             return false;
         }
 
-        OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) e).getFiller();
+        OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) e).getFiller();
 
         if (!isAtom(filler)) {
             return false;
@@ -115,11 +108,12 @@ public class NormalForm {
             return false;
         }
 
-        OWLClassExpression filler = ((OWLQuantifiedRestrictionImpl<OWLClassExpression>) e).getFiller();
+        OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) e).getFiller();
 
         if (!isAtom(filler)) {
             return false;
         }
         return true;
     }
+
 }
