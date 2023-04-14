@@ -53,7 +53,8 @@ public class OntologyRepairWeakening extends OntologyRepair {
      */
     private Stream<OWLAxiom> findBadAxioms(final Ontology ontology) {
         final var occurrences = ontology.optimalClassicalRepairs(isRepaired)
-                .flatMap(set -> set.stream())
+                .flatMap(set -> set.stream()
+                        .filter(axiom -> axiom.isOfType(AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION)))
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         final var max = occurrences.values().stream().max(Long::compareTo);
         if (max.isEmpty()) {

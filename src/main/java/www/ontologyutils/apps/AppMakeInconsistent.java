@@ -50,7 +50,8 @@ public class AppMakeInconsistent {
         boolean isConsistent = ontology.isConsistent();
         System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         while (isConsistent || iter < minNumIter || iterSinceInconsistency < minNumIterAfterInconsistency) {
-            final OWLAxiom axiom = Utils.randomChoice(ontology.tboxAxioms());
+            final OWLAxiom axiom = Utils.randomChoice(ontology.axioms()
+                    .filter(ax -> ax.isOfType(AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION)));
             final var strongerAxioms = axiomStrengthener.strongerAxioms(axiom).collect(Collectors.toSet());
             // We do not consider the axioms already in the ontology.
             strongerAxioms.removeAll(ontology.axioms().toList());
