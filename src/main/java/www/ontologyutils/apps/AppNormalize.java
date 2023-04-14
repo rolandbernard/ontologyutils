@@ -88,8 +88,8 @@ public class AppNormalize {
 
     /**
      * @param args
-     *             One argument must be given, corresponding to an OWL ontology file
-     *             path. E.g., run with the parameter resources/bodysystem.owl
+     *            One argument must be given, corresponding to an OWL ontology file
+     *            path. E.g., run with the parameter resources/bodysystem.owl
      */
     public static void main(String[] args) {
         AppNormalize mApp = new AppNormalize(args[0]);

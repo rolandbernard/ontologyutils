@@ -91,7 +91,7 @@ public class AppSuperNormalize {
 
     /**
      * @param on
-     *           an ontology in normal form
+     *            an ontology in normal form
      * @return an equivalent ontology where type-1 rules have at most 2 conjuncts on
      *         the left.
      */
@@ -144,8 +144,8 @@ public class AppSuperNormalize {
 
     /**
      * @param args
-     *             One argument must be given, corresponding to an OWL ontology file
-     *             path. E.g., run with the parameter resources/bodysystem.owl
+     *            One argument must be given, corresponding to an OWL ontology file
+     *            path. E.g., run with the parameter resources/bodysystem.owl
      */
     public static void main(String[] args) {
         AppSuperNormalize mApp = new AppSuperNormalize(args[0]);

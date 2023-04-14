@@ -23,10 +23,10 @@ public class MaximalConsistentSets {
 
     /**
      * @param ontology
-     *                   The ontology for which to compute the maximal consistent
-     *                   subsets.
+     *            The ontology for which to compute the maximal consistent
+     *            subsets.
      * @param isRepaired
-     *                   The predicate with which to measure "consistency".
+     *            The predicate with which to measure "consistency".
      */
     public MaximalConsistentSets(final Ontology ontology, final Predicate<Ontology> isRepaired) {
         this.ontology = ontology;
@@ -39,10 +39,10 @@ public class MaximalConsistentSets {
 
     /**
      * @param ontology
-     *                 The ontology for which to compute the maximal consistent
-     *                 subsets.
+     *            The ontology for which to compute the maximal consistent
+     *            subsets.
      * @throws IllegalArgumentException
-     *                                  If there is no maximal consistent subset.
+     *             If there is no maximal consistent subset.
      */
     public MaximalConsistentSets(final Ontology ontology) throws IllegalArgumentException {
         this(ontology, Ontology::isConsistent);
@@ -92,10 +92,10 @@ public class MaximalConsistentSets {
 
     /**
      * @param axioms
-     *                  A set of axioms
+     *            A set of axioms
      * @param contained
-     *                  A set of axioms that must be contained by the returned
-     *                  maximal consistent sets.
+     *            A set of axioms that must be contained by the returned
+     *            maximal consistent sets.
      * @return A stream of maximal consistent subsets of axioms from {@code axioms}
      *         containing {@code contained}.
      */
@@ -107,13 +107,13 @@ public class MaximalConsistentSets {
 
     /**
      * @param axioms
-     *                  A set of axioms
+     *            A set of axioms
      * @param howMany
-     *                  the maximal number of maximal consistent subsets to be
-     *                  returned
+     *            the maximal number of maximal consistent subsets to be
+     *            returned
      * @param contained
-     *                  A set of axioms that must be contained by the returned
-     *                  maximal consistent sets.
+     *            A set of axioms that must be contained by the returned
+     *            maximal consistent sets.
      * @return A set of at most {@code howMany} maximal consistent subsets of axioms
      *         from {@code axioms} containing {@code contained}.
      */
@@ -126,10 +126,10 @@ public class MaximalConsistentSets {
 
     /**
      * @param axioms
-     *                A set of axioms
+     *            A set of axioms
      * @param howMany
-     *                the maximal number of maximal consistent subsets to be
-     *                returned
+     *            the maximal number of maximal consistent subsets to be
+     *            returned
      * @return A set of at most {@code howMany} maximal consistent subsets of axioms
      *         from {@code axioms}.
      */
@@ -142,10 +142,10 @@ public class MaximalConsistentSets {
 
     /**
      * @param axioms
-     *                  A set of axioms
+     *            A set of axioms
      * @param contained
-     *                  A set of axioms that must be contained by the returned
-     *                  maximal consistent sets.
+     *            A set of axioms that must be contained by the returned
+     *            maximal consistent sets.
      * @return The set of all maximal consistent subsets of axioms from
      *         {@code axioms} containing {@code contained}.
      */
@@ -156,7 +156,7 @@ public class MaximalConsistentSets {
 
     /**
      * @param axioms
-     *               A set of axioms
+     *            A set of axioms
      * @return The set of all maximal consistent subsets of axioms from
      *         {@code axioms} containing {@code contained}.
      */

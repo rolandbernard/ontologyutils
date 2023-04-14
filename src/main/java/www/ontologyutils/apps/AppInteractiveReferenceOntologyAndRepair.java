@@ -193,9 +193,9 @@ public class AppInteractiveReferenceOntologyAndRepair {
 
     /**
      * @param args
-     *             One argument must be given, corresponding to an OWL ontology file
-     *             path. E.g., run with the parameter
-     *             resources/inconsistent-leftpolicies.owl
+     *            One argument must be given, corresponding to an OWL ontology file
+     *            path. E.g., run with the parameter
+     *            resources/inconsistent-leftpolicies.owl
      */
     public static void main(String[] args) {
         AppInteractiveReferenceOntologyAndRepair mApp = new AppInteractiveReferenceOntologyAndRepair(args[0]);

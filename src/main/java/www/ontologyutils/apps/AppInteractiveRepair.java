@@ -22,9 +22,9 @@ public class AppInteractiveRepair {
 
     /**
      * @param args
-     *             One argument must be given, corresponding to an OWL ontology file
-     *             path. E.g., run with the parameter
-     *             resources/inconsistent-leftpolicies.owl
+     *            One argument must be given, corresponding to an OWL ontology file
+     *            path. E.g., run with the parameter
+     *            resources/inconsistent-leftpolicies.owl
      */
     public static void main(String[] args) {
         final int MCS_SAMPLE_SIZE = 1;
