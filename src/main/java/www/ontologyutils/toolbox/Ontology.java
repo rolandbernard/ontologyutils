@@ -65,8 +65,8 @@ public class Ontology implements AutoCloseable {
          */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final var owlOntology = reasoner.getRootOntology();
-            owlOntology.getOWLOntologyManager().removeOntology(owlOntology);
             reasoner.dispose();
+            owlOntology.getOWLOntologyManager().removeOntology(owlOntology);
         }
 
         /**
@@ -476,8 +476,8 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithHermit() {
-        final var reasonerCache = new CachedReasoner(new ReasonerFactory());
-        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), reasonerCache);
+        final var newReasonerCache = new CachedReasoner(new ReasonerFactory());
+        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), newReasonerCache);
     }
 
     /**
@@ -486,8 +486,8 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithOpenllet() {
-        final var reasonerCache = new CachedReasoner(OpenlletReasonerFactory.getInstance());
-        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), reasonerCache);
+        final var newReasonerCache = new CachedReasoner(OpenlletReasonerFactory.getInstance());
+        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), newReasonerCache);
     }
 
     /**
@@ -496,8 +496,8 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithJFact() {
-        final var reasonerCache = new CachedReasoner(new JFactFactory());
-        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), reasonerCache);
+        final var newReasonerCache = new CachedReasoner(new JFactFactory());
+        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), newReasonerCache);
     }
 
     @Override
