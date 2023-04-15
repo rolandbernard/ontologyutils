@@ -7,6 +7,7 @@ import java.util.stream.*;
 
 import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.profiles.*;
 import org.semanticweb.owlapi.reasoner.*;
@@ -119,33 +120,19 @@ public class Ontology implements AutoCloseable {
      * @param refutableAxioms
      * @param reasonerFactory
      */
-    private Ontology(final Set<OWLAxiom> staticAxioms, final Set<OWLAxiom> refutableAxioms,
-            final CachedReasoner reasonerCache) {
-        this.staticAxioms = staticAxioms;
-        this.refutableAxioms = refutableAxioms;
+    private Ontology(final Collection<? extends OWLAxiom> staticAxioms,
+            final Collection<? extends OWLAxiom> refutableAxioms, final CachedReasoner reasonerCache) {
+        this.staticAxioms = new HashSet<>(staticAxioms);
+        this.refutableAxioms = new HashSet<>(refutableAxioms);
         this.refutableAxioms.removeAll(staticAxioms);
         this.reasonerCache = reasonerCache;
-        this.reasonerCache.addReference(this);
-    }
-
-    /**
-     * Create a new ontology that is a copy of {@code toCopy} but using a new
-     * reasoner cache.
-     *
-     * @param toCopy
-     */
-    public Ontology(final Ontology toCopy) {
-        this.staticAxioms = new HashSet<>(toCopy.staticAxioms);
-        this.refutableAxioms = new HashSet<>(toCopy.refutableAxioms);
-        this.reasonerCache = new CachedReasoner(toCopy.reasonerCache.reasonerFactory);
         this.reasonerCache.addReference(this);
     }
 
     public static Ontology withAxioms(final Collection<? extends OWLAxiom> staticAxioms,
             final Collection<? extends OWLAxiom> refutableAxioms,
             final OWLReasonerFactory reasonerFactory) {
-        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms),
-                new CachedReasoner(reasonerFactory));
+        return new Ontology(staticAxioms, refutableAxioms, new CachedReasoner(reasonerFactory));
     }
 
     public static Ontology withAxioms(final Collection<? extends OWLAxiom> staticAxioms,
@@ -171,11 +158,10 @@ public class Ontology implements AutoCloseable {
     }
 
     public static Ontology loadOntology(final String filePath, final OWLReasonerFactory reasonerFactory) {
-        final var manager = defaultManager;
         final var ontologyFile = new File(filePath);
         OWLOntology ontology = null;
         try {
-            ontology = manager.loadOntologyFromOntologyDocument(ontologyFile);
+            ontology = defaultManager.loadOntologyFromOntologyDocument(ontologyFile);
         } catch (final OWLOntologyCreationException e) {
             throw Utils.panic(e);
         }
@@ -183,7 +169,7 @@ public class Ontology implements AutoCloseable {
         final var otherAxioms = ontology.axioms()
                 .filter(axiom -> !logicalAxioms.contains(axiom))
                 .collect(Collectors.toSet());
-        manager.removeOntology(ontology);
+        defaultManager.removeOntology(ontology);
         return withAxioms(otherAxioms, logicalAxioms, reasonerFactory);
     }
 
@@ -215,7 +201,7 @@ public class Ontology implements AutoCloseable {
             final var owlOntology = reasoner.getRootOntology();
             final var ontologyFile = new File(filePath);
             try {
-                owlOntology.saveOntology(IRI.create(ontologyFile));
+                owlOntology.saveOntology(new FunctionalSyntaxDocumentFormat(), IRI.create(ontologyFile));
             } catch (final OWLOntologyStorageException e) {
                 Utils.panic(e);
             }
@@ -502,7 +488,7 @@ public class Ontology implements AutoCloseable {
 
     @Override
     public Ontology clone() {
-        return new Ontology(new HashSet<>(staticAxioms), new HashSet<>(refutableAxioms), reasonerCache);
+        return new Ontology(staticAxioms, refutableAxioms, reasonerCache);
     }
 
     @Override
