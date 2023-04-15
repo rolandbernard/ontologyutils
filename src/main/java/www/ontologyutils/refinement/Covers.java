@@ -26,7 +26,7 @@ public class Covers implements AutoCloseable {
      * Creates a new {@code Cover} object for the given reference object.
      *
      * @param refOntology
-     *            The ontology used for entailment check.
+     *                    The ontology used for entailment check.
      */
     public Covers(final Ontology refOntology) {
         this.refOntology = refOntology;
@@ -71,7 +71,7 @@ public class Covers implements AutoCloseable {
         if (!subConcepts.contains(candidate) || !isSubclass(concept, candidate)) {
             return false;
         } else {
-            return !subConcepts.stream().parallel()
+            return !subConcepts.stream()
                     .anyMatch(other -> isStrictSubclass(concept, other) && isStrictSubclass(other, candidate));
         }
     }
@@ -81,7 +81,7 @@ public class Covers implements AutoCloseable {
      * @return All concepts that are in the upward cover of {@code concept}.
      */
     public Stream<OWLClassExpression> upCover(final OWLClassExpression concept) {
-        return subConcepts.stream().parallel()
+        return subConcepts.stream()
                 .filter(candidate -> isInUpCover(concept, candidate));
     }
 
@@ -95,7 +95,7 @@ public class Covers implements AutoCloseable {
         if (!subConcepts.contains(candidate) || !isSubclass(candidate, concept)) {
             return false;
         } else {
-            return !subConcepts.stream().parallel()
+            return !subConcepts.stream()
                     .anyMatch(other -> isStrictSubclass(candidate, other) && isStrictSubclass(other, concept));
         }
     }
@@ -105,7 +105,7 @@ public class Covers implements AutoCloseable {
      * @return All concepts that are in the downward cover of {@code concept}.
      */
     public Stream<OWLClassExpression> downCover(final OWLClassExpression concept) {
-        return subConcepts.stream().parallel()
+        return subConcepts.stream()
                 .filter(candidate -> isInDownCover(concept, candidate));
     }
 

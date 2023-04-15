@@ -28,7 +28,7 @@ public class RoleCovers implements AutoCloseable {
      * Creates a new {@code RoleCover} object for the given reference object.
      *
      * @param refOntology
-     *            The ontology used for entailment check.
+     *                    The ontology used for entailment check.
      */
     public RoleCovers(final Ontology refOntology) {
         this.refOntology = refOntology;
@@ -139,7 +139,7 @@ public class RoleCovers implements AutoCloseable {
         if (!simpleRoles.contains(candidate.getNamedProperty()) || !isSubclass(concept, candidate)) {
             return false;
         } else {
-            return !allSimpleRoles().parallel()
+            return !allSimpleRoles()
                     .anyMatch(other -> isStrictSubclass(concept, other) && isStrictSubclass(other, candidate));
         }
     }
@@ -149,7 +149,7 @@ public class RoleCovers implements AutoCloseable {
      * @return All concepts that are in the upward cover of {@code concept}.
      */
     public Stream<OWLObjectPropertyExpression> upCover(final OWLObjectPropertyExpression concept) {
-        return allSimpleRoles().parallel().filter(candidate -> isInUpCover(concept, candidate));
+        return allSimpleRoles().filter(candidate -> isInUpCover(concept, candidate));
     }
 
     /**
@@ -163,7 +163,7 @@ public class RoleCovers implements AutoCloseable {
         if (!simpleRoles.contains(candidate.getNamedProperty()) || !isSubclass(candidate, concept)) {
             return false;
         } else {
-            return !allSimpleRoles().parallel()
+            return !allSimpleRoles()
                     .anyMatch(other -> isStrictSubclass(candidate, other) && isStrictSubclass(other, concept));
         }
     }
@@ -173,7 +173,7 @@ public class RoleCovers implements AutoCloseable {
      * @return All concepts that are in the downward cover of {@code concept}.
      */
     public Stream<OWLObjectPropertyExpression> downCover(final OWLObjectPropertyExpression concept) {
-        return allSimpleRoles().parallel().filter(candidate -> isInDownCover(concept, candidate));
+        return allSimpleRoles().filter(candidate -> isInDownCover(concept, candidate));
     }
 
     @Override

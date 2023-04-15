@@ -35,7 +35,7 @@ public class AppCheckConsistency {
         }
         System.err.println("** Consistency check: OPENLLET");
         try (var withOpenllet = ontology.cloneWithOpenllet()) {
-            cons = ontology.isConsistent();
+            cons = withOpenllet.isConsistent();
             printResult(cons);
         } catch (Exception e) {
             System.err.println("ERROR... " + e);
