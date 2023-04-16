@@ -1,11 +1,11 @@
 package www.ontologyutils.refinement;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
 
+import www.ontologyutils.refinement.Covers.Cover;
 import www.ontologyutils.toolbox.Ontology;
 
 /**
@@ -23,9 +23,9 @@ public class RefinementOperator {
     public static final int FLAG_NNF_STRICT = 1 << 1;
 
     private class Visitor implements OWLClassExpressionVisitorEx<Stream<OWLClassExpression>> {
-        private final Function<OWLClassExpression, Stream<OWLClassExpression>> way;
+        private final Cover way;
 
-        public Visitor(final Function<OWLClassExpression, Stream<OWLClassExpression>> way) {
+        public Visitor(final Cover way) {
             this.way = way;
         }
 
@@ -138,15 +138,13 @@ public class RefinementOperator {
      *            is not valid in ALC. If FLAG_NNF_STRICT is set, the input must
      *            be in NNF and the output will also be in NNF.
      */
-    public RefinementOperator(final Function<OWLClassExpression, Stream<OWLClassExpression>> way,
-            final Function<OWLClassExpression, Stream<OWLClassExpression>> back, final int flags) {
+    public RefinementOperator(final Cover way, final Cover back, final int flags) {
         this.flags = flags;
         visitor = new Visitor(way);
         visitorReverse = new Visitor(back);
     }
 
-    public RefinementOperator(final Function<OWLClassExpression, Stream<OWLClassExpression>> way,
-            final Function<OWLClassExpression, Stream<OWLClassExpression>> back) {
+    public RefinementOperator(final Cover way, final Cover back) {
         this(way, back, FLAG_NON_STRICT);
     }
 
