@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.profiles.*;
 import org.semanticweb.owlapi.reasoner.*;
+import org.semanticweb.owlapi.util.OWLObjectPropertyManager;
 
 import openllet.owlapi.OpenlletReasonerFactory;
 import uk.ac.manchester.cs.jfact.JFactFactory;
@@ -62,7 +63,7 @@ public class Ontology implements AutoCloseable {
          * disposed again to free associated resources.
          *
          * @param reasoner
-         *            The {@code OWLReasoner} to dispose.
+         *                 The {@code OWLReasoner} to dispose.
          */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final var owlOntology = reasoner.getRootOntology();
@@ -197,11 +198,10 @@ public class Ontology implements AutoCloseable {
      * @param filePath
      */
     public void saveOntology(String filePath) {
-        this.<Void>withReasonerDo(reasoner -> {
-            final var owlOntology = reasoner.getRootOntology();
+        this.<Void>withOwlOntologyDo(ontology -> {
             final var ontologyFile = new File(filePath);
             try {
-                owlOntology.saveOntology(new FunctionalSyntaxDocumentFormat(), IRI.create(ontologyFile));
+                ontology.saveOntology(new FunctionalSyntaxDocumentFormat(), IRI.create(ontologyFile));
             } catch (final OWLOntologyStorageException e) {
                 Utils.panic(e);
             }
@@ -226,6 +226,10 @@ public class Ontology implements AutoCloseable {
 
     public Stream<OWLAxiom> axioms() {
         return Stream.concat(staticAxioms(), refutableAxioms());
+    }
+
+    public Stream<OWLAxiom> axioms(final AxiomType<?>... types) {
+        return axioms().filter(axiom -> axiom.isOfType(types));
     }
 
     public Stream<OWLLogicalAxiom> logicalAxioms() {
@@ -296,7 +300,7 @@ public class Ontology implements AutoCloseable {
     }
 
     private static OWLAnnotation getNewOriginAnnotation(final OWLAxiom origin) {
-        final OWLDataFactory df = getDefaultDataFactory();
+        final var df = getDefaultDataFactory();
         return df.getOWLAnnotation(getOriginAnnotationProperty(), df.getOWLLiteral(origin.toString()));
     }
 
@@ -351,7 +355,7 @@ public class Ontology implements AutoCloseable {
      * {@code OWLOntology} and {@code OWLReasoner}.
      *
      * @param reasoner
-     *            The reasoner to dispose of.
+     *                 The reasoner to dispose of.
      */
     public void disposeOwlReasoner(final OWLReasoner reasoner) {
         reasonerCache.disposeOwlReasoner(reasoner);
@@ -359,6 +363,10 @@ public class Ontology implements AutoCloseable {
 
     private <T> T withReasonerDo(final Function<OWLReasoner, T> action) {
         return reasonerCache.withReasonerDo(this, action);
+    }
+
+    private <T> T withOwlOntologyDo(final Function<OWLOntology, T> action) {
+        return reasonerCache.withReasonerDo(this, reasoner -> action.apply(reasoner.getRootOntology()));
     }
 
     public boolean isConsistent() {
@@ -374,8 +382,8 @@ public class Ontology implements AutoCloseable {
     }
 
     public List<OWLProfileReport> checkOwlProfiles() {
-        return withReasonerDo(reasoner -> Arrays.stream(Profiles.values())
-                .map(profile -> profile.checkOntology(reasoner.getRootOntology()))
+        return withOwlOntologyDo(ontology -> Arrays.stream(Profiles.values())
+                .map(profile -> profile.checkOntology(ontology))
                 .toList());
     }
 
@@ -411,6 +419,14 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @return A stream containing all non-simple roles.
+     */
+    public Stream<OWLObjectProperty> nonSimpleRoles() {
+        return withOwlOntologyDo(ontology -> (new OWLObjectPropertyManager(ontology)).getNonSimpleProperties()).stream()
+                .map(role -> role.getNamedProperty()).distinct();
+    }
+
+    /**
      * @return A stream providing all subconcepts used in the ontology's TBox.
      */
     public Stream<OWLClassExpression> subConceptsOfTbox() {
@@ -440,10 +456,10 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * @return the set of C1 subclass C2 axioms, C1 and C2 classes in the signature
+     * @return The stream of C1 subclass C2 axioms, C1 and C2 classes in the signature
      *         of {@code ontology}, entailed by {@code ontology}.
      */
-    public Set<OWLAxiom> inferredTaxonomyAxioms() {
+    public Stream<OWLSubClassOfAxiom> inferredTaxonomyAxioms() {
         return withReasonerDo(reasoner -> {
             final var df = getDefaultDataFactory();
             final var ontology = reasoner.getRootOntology();
@@ -453,7 +469,7 @@ public class Ontology implements AutoCloseable {
                             .map(right -> df.getOWLSubClassOfAxiom(left, right))
                             .filter(axiom -> !isConsistent || reasoner.isEntailed(axiom)))
                     .collect(Collectors.toSet());
-        });
+        }).stream();
     }
 
     /**

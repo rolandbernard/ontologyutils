@@ -1,7 +1,6 @@
 package www.ontologyutils.refinement;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
@@ -34,65 +33,8 @@ public class RoleCovers implements AutoCloseable {
         this.refOntology = refOntology;
         this.reasoner = refOntology.getOwlReasoner();
         this.simpleRoles = refOntology.rolesInSignature().collect(Collectors.toSet());
-        this.nonSimpleRoles = new HashSet<>();
-        computeNonSimpleRoles();
-    }
-
-    /**
-     * Move all roles from {@code simpleRoles} to {@code nonSimpleRoles} if they are
-     * determined to me non-simple.
-     */
-    private void computeNonSimpleRoles() {
-        // TODO: move this into seperate class with visitor and make it accesible via a
-        // method on Ontology?
-        final OWLDataFactory df = Ontology.getDefaultDataFactory();
-        simpleRoles.remove(df.getOWLTopObjectProperty());
-        nonSimpleRoles.add(df.getOWLTopObjectProperty());
-        simpleRoles.remove(df.getOWLBottomObjectProperty());
-        nonSimpleRoles.add(df.getOWLBottomObjectProperty());
-        final var references = simpleRoles.stream()
-                .collect(Collectors.toMap(Function.identity(),
-                        role -> refOntology.rboxAxioms().filter(axiom -> axiom.containsEntityInSignature(role))
-                                .toList()));
-        final var toCheck = new HashSet<>(refOntology.tboxAxioms().toList());
-        while (!toCheck.isEmpty()) {
-            final var newNonSimple = new HashSet<OWLObjectProperty>();
-            for (final var axiom : toCheck) {
-                if (axiom.getAxiomType() == AxiomType.SUB_OBJECT_PROPERTY) {
-                    final var ax = (OWLSubObjectPropertyOfAxiom) axiom;
-                    if (nonSimpleRoles.contains(ax.getSubProperty().getNamedProperty())) {
-                        newNonSimple.add(ax.getSuperProperty().getNamedProperty());
-                    }
-                } else if (axiom.getAxiomType() == AxiomType.SUB_PROPERTY_CHAIN_OF) {
-                    final var ax = (OWLSubPropertyChainOfAxiom) axiom;
-                    if (ax.getPropertyChain().size() > 1
-                            || nonSimpleRoles.contains(ax.getPropertyChain().get(0).getNamedProperty())) {
-                        newNonSimple.add(ax.getSuperProperty().getNamedProperty());
-                    }
-                } else if (axiom.getAxiomType() == AxiomType.TRANSITIVE_OBJECT_PROPERTY) {
-                    final var ax = (OWLTransitiveObjectPropertyAxiom) axiom;
-                    newNonSimple.add(ax.getProperty().getNamedProperty());
-                } else if (axiom.getAxiomType() == AxiomType.EQUIVALENT_OBJECT_PROPERTIES) {
-                    final var ax = (OWLEquivalentObjectPropertiesAxiom) axiom;
-                    if (ax.properties().anyMatch(role -> nonSimpleRoles.contains(role.getNamedProperty()))) {
-                        ax.properties().map(OWLObjectPropertyExpression::getNamedProperty).forEach(newNonSimple::add);
-                    }
-                } else if (axiom.getAxiomType() == AxiomType.INVERSE_OBJECT_PROPERTIES) {
-                    final var ax = (OWLInverseObjectPropertiesAxiom) axiom;
-                    if (ax.properties().anyMatch(role -> nonSimpleRoles.contains(role.getNamedProperty()))) {
-                        ax.properties().map(OWLObjectPropertyExpression::getNamedProperty).forEach(newNonSimple::add);
-                    }
-                }
-            }
-            toCheck.clear();
-            for (final var role : newNonSimple) {
-                if (simpleRoles.contains(role)) {
-                    simpleRoles.remove(role);
-                    nonSimpleRoles.add(role);
-                    toCheck.addAll(references.get(role));
-                }
-            }
-        }
+        this.nonSimpleRoles = refOntology.nonSimpleRoles().collect(Collectors.toSet());
+        this.simpleRoles.removeAll(this.nonSimpleRoles);
     }
 
     /**
