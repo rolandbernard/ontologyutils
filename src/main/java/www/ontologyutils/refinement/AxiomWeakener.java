@@ -55,13 +55,13 @@ public class AxiomWeakener implements AutoCloseable {
      * Create a new axiom weakener with the given reference ontology.
      *
      * @param refOntology
-     *            The reference ontology to use for the up and down covers.
+     *                    The reference ontology to use for the up and down covers.
      */
     public AxiomWeakener(final Ontology refOntology) {
         visitor = new Visitor();
         covers = new Covers(refOntology);
-        final var upCover = LruCache.wrapStreamFunction(covers::upCover);
-        final var downCover = LruCache.wrapStreamFunction(covers::downCover);
+        final var upCover = LruCache.<OWLClassExpression, OWLClassExpression>wrapStreamFunction(covers::upCover);
+        final var downCover = LruCache.<OWLClassExpression, OWLClassExpression>wrapStreamFunction(covers::downCover);
         generalization = new RefinementOperator(upCover, downCover);
         specialization = new RefinementOperator(downCover, upCover);
     }
@@ -73,7 +73,7 @@ public class AxiomWeakener implements AutoCloseable {
      * - for assertion axioms: generalizing the concept.
      *
      * @param axiom
-     *            The axiom for which we want to find weaker axioms.
+     *              The axiom for which we want to find weaker axioms.
      * @return A stream of axioms that are all weaker than {@code axiom}.
      */
     public Stream<OWLAxiom> weakerAxioms(final OWLAxiom axiom) {

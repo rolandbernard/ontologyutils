@@ -63,7 +63,7 @@ public class Ontology implements AutoCloseable {
          * disposed again to free associated resources.
          *
          * @param reasoner
-         *                 The {@code OWLReasoner} to dispose.
+         *            The {@code OWLReasoner} to dispose.
          */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final var owlOntology = reasoner.getRootOntology();
@@ -355,7 +355,7 @@ public class Ontology implements AutoCloseable {
      * {@code OWLOntology} and {@code OWLReasoner}.
      *
      * @param reasoner
-     *                 The reasoner to dispose of.
+     *            The reasoner to dispose of.
      */
     public void disposeOwlReasoner(final OWLReasoner reasoner) {
         reasonerCache.disposeOwlReasoner(reasoner);
@@ -456,7 +456,8 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * @return The stream of C1 subclass C2 axioms, C1 and C2 classes in the signature
+     * @return The stream of C1 subclass C2 axioms, C1 and C2 classes in the
+     *         signature
      *         of {@code ontology}, entailed by {@code ontology}.
      */
     public Stream<OWLSubClassOfAxiom> inferredTaxonomyAxioms() {

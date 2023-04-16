@@ -16,12 +16,12 @@ public class RoleCoverTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/ontologies/dl2017_example#";
 
     private final Ontology ontology;
-    private final RoleCovers covers;
+    private final Covers covers;
 
     public RoleCoverTest() {
         final var path = CoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        covers = new RoleCovers(ontology);
+        covers = new Covers(ontology);
     }
 
     private static Stream<Arguments> expectedUpCover() {
@@ -40,23 +40,30 @@ public class RoleCoverTest {
                         df.getOWLTopObjectProperty()),
                 Arguments.of(
                         Set.of(
-                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")
+                                        .getInverseProperty(),
                                 df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")),
                         df.getOWLBottomObjectProperty()),
                 Arguments.of(
                         Set.of(
-                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty(),
-                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty()),
-                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty()),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")
+                                        .getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")
+                                        .getInverseProperty()),
+                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")
+                                .getInverseProperty()),
                 Arguments.of(
-                        Set.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
-                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
+                        Set.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")
+                                .getInverseProperty()),
+                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")
+                                .getInverseProperty()),
                 Arguments.of(
                         Set.of(),
                         df.getOWLTopObjectProperty().getInverseProperty()),
                 Arguments.of(
                         Set.of(
-                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")
+                                        .getInverseProperty(),
                                 df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")),
                         df.getOWLBottomObjectProperty().getInverseProperty()));
     }
@@ -81,24 +88,31 @@ public class RoleCoverTest {
                         df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")),
                 Arguments.of(
                         Set.of(
-                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")
+                                        .getInverseProperty(),
                                 df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")),
                         df.getOWLTopObjectProperty()),
                 Arguments.of(
                         Set.of(),
                         df.getOWLBottomObjectProperty()),
                 Arguments.of(
-                        Set.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty()),
-                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty()),
+                        Set.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")
+                                .getInverseProperty()),
+                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")
+                                .getInverseProperty()),
                 Arguments.of(
                         Set.of(
-                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour").getInverseProperty(),
-                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
-                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasColour")
+                                        .getInverseProperty(),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")
+                                        .getInverseProperty()),
+                        df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")
+                                .getInverseProperty()),
                 Arguments.of(
                         Set.of(
                                 df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality"),
-                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality").getInverseProperty()),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "hasQuality")
+                                        .getInverseProperty()),
                         df.getOWLTopObjectProperty().getInverseProperty()),
                 Arguments.of(
                         Set.of(),

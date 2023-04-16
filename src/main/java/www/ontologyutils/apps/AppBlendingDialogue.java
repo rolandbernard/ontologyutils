@@ -239,14 +239,14 @@ public class AppBlendingDialogue {
 
     /**
      * @param ontology
-     *                      an ontology, typically the result of hybridization of
-     *                      agent 1 and agent 2
+     *            an ontology, typically the result of hybridization of
+     *            agent 1 and agent 2
      * @param conceptTarget
-     *                      the target hybrid concept
+     *            the target hybrid concept
      * @param ad1
-     *                      the set of ascendants and descendants of agent 1
+     *            the set of ascendants and descendants of agent 1
      * @param ad2
-     *                      the set of ascendants and descendants of agent 2
+     *            the set of ascendants and descendants of agent 2
      * @return an estimation of the hybridization of ontology {@code ontology}.
      */
     private static double hybridity(Ontology ontology, OWLClassExpression conceptTarget, Set<OWLClassExpression> ad1,
@@ -308,26 +308,26 @@ public class AppBlendingDialogue {
 
     /**
      * @param ontologyFilePath1
-     *                                   the path to a first ontology to be blended
-     *                                   through a blending dialogue. The moves of
-     *                                   agent one will contain the (normalized)
-     *                                   axioms of this ontology.
+     *            the path to a first ontology to be blended
+     *            through a blending dialogue. The moves of
+     *            agent one will contain the (normalized)
+     *            axioms of this ontology.
      * @param ontologyFilePath2
-     *                                   the path to a second ontology to be blended
-     *                                   through a blending dialogue. The moves of
-     *                                   agent two will contain the (normalized)
-     *                                   axioms of this ontology.
+     *            the path to a second ontology to be blended
+     *            through a blending dialogue. The moves of
+     *            agent two will contain the (normalized)
+     *            axioms of this ontology.
      * @param initialOntologyFilePath
-     *                                   the path to a consistent ontology to serve
-     *                                   as initial ontology. The axioms of this
-     *                                   ontology will be in the blend.
+     *            the path to a consistent ontology to serve
+     *            as initial ontology. The axioms of this
+     *            ontology will be in the blend.
      * @param alignmentsOntologyFilePath
-     *                                   the path to an ontology intended to contain
-     *                                   alignments between the entities occurring
-     *                                   in the first and second ontologies. The
-     *                                   (normalized) axioms of this ontology will
-     *                                   be part of the moves of both agent one and
-     *                                   agent two.
+     *            the path to an ontology intended to contain
+     *            alignments between the entities occurring
+     *            in the first and second ontologies. The
+     *            (normalized) axioms of this ontology will
+     *            be part of the moves of both agent one and
+     *            agent two.
      * @param IRI1
      * @param IRI2
      * @param IRITarget
