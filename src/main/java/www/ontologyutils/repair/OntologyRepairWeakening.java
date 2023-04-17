@@ -99,7 +99,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
             case IN_LEAST_MCS: {
                 final var occurrences = ontology.optimalClassicalRepairs(isRepaired)
                         .flatMap(set -> set.stream()
-                                .filter(axiom -> axiom.isOfType(AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION)))
+                                .filter(axiom -> axiom.isOfType(AxiomWeakener.SUPPORTED_AXIOM_TYPES)))
                         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
                 final var max = occurrences.values().stream().max(Long::compareTo);
                 if (max.isEmpty()) {
@@ -128,7 +128,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
             try (final var axiomWeakener = new AxiomWeakener(refOntology)) {
                 while (!isRepaired(ontology)) {
                     final var badAxioms = findBadAxioms(ontology)
-                            .filter(axiom -> axiom.isOfType(AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION));
+                            .filter(axiom -> axiom.isOfType(AxiomWeakener.SUPPORTED_AXIOM_TYPES));
                     final var badAxiom = Utils.randomChoice(badAxioms);
                     final var weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
                     ontology.replaceAxiom(badAxiom, weakerAxiom);

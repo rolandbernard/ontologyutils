@@ -24,9 +24,11 @@ public class RefinementOperator {
 
     private class Visitor implements OWLClassExpressionVisitorEx<Stream<OWLClassExpression>> {
         private final Cover way;
+        private final Cover back;
 
-        public Visitor(final Cover way) {
+        public Visitor(final Cover way, final Cover back) {
             this.way = way;
+            this.back = back;
         }
 
         @Override
@@ -42,8 +44,8 @@ public class RefinementOperator {
             }
             return refineReverse(operand)
                     .map(c -> (flags & FLAG_NNF_STRICT) != 0
-                            ? concept.getComplementNNF()
-                            : concept.getObjectComplementOf());
+                            ? c.getComplementNNF()
+                            : c.getObjectComplementOf());
         }
 
         /**
@@ -88,8 +90,9 @@ public class RefinementOperator {
             final var df = Ontology.getDefaultDataFactory();
             final var filler = concept.getFiller();
             final var property = concept.getProperty();
-            return refine(filler)
-                    .map(c -> df.getOWLObjectAllValuesFrom(property, c));
+            return Stream.concat(
+                    refine(filler).map(c -> df.getOWLObjectAllValuesFrom(property, c)),
+                    back.apply(property).map(r -> df.getOWLObjectAllValuesFrom(r, filler)));
         }
 
         @Override
@@ -97,8 +100,42 @@ public class RefinementOperator {
             final var df = Ontology.getDefaultDataFactory();
             final var filler = concept.getFiller();
             final var property = concept.getProperty();
-            return refine(filler)
-                    .map(c -> df.getOWLObjectSomeValuesFrom(property, c));
+            return Stream.concat(
+                    refine(filler).map(c -> df.getOWLObjectSomeValuesFrom(property, c)),
+                    way.apply(property).map(r -> df.getOWLObjectSomeValuesFrom(r, filler)));
+        }
+
+        @Override
+        public Stream<OWLClassExpression> visit(final OWLObjectHasSelf concept) {
+            final var df = Ontology.getDefaultDataFactory();
+            final var property = concept.getProperty();
+            return way.apply(property).map(r -> df.getOWLObjectHasSelf(r));
+        }
+
+        @Override
+        public Stream<OWLClassExpression> visit(final OWLObjectMaxCardinality concept) {
+            final var df = Ontology.getDefaultDataFactory();
+            final var number = concept.getCardinality();
+            final var filler = concept.getFiller();
+            final var property = concept.getProperty();
+            return Stream.concat(
+                    refineReverse(filler).map(c -> df.getOWLObjectMaxCardinality(number, property, c)),
+                    Stream.concat(
+                            back.apply(property).map(r -> df.getOWLObjectMaxCardinality(number, r, filler)),
+                            way.apply(number).map(n -> df.getOWLObjectMaxCardinality(n, property, filler))));
+        }
+
+        @Override
+        public Stream<OWLClassExpression> visit(final OWLObjectMinCardinality concept) {
+            final var df = Ontology.getDefaultDataFactory();
+            final var number = concept.getCardinality();
+            final var filler = concept.getFiller();
+            final var property = concept.getProperty();
+            return Stream.concat(
+                    refine(filler).map(c -> df.getOWLObjectMinCardinality(number, property, c)),
+                    Stream.concat(
+                            way.apply(property).map(r -> df.getOWLObjectMinCardinality(number, r, filler)),
+                            back.apply(number).map(n -> df.getOWLObjectMinCardinality(n, property, filler))));
         }
 
         @Override
@@ -140,8 +177,8 @@ public class RefinementOperator {
      */
     public RefinementOperator(final Cover way, final Cover back, final int flags) {
         this.flags = flags;
-        visitor = new Visitor(way);
-        visitorReverse = new Visitor(back);
+        visitor = new Visitor(way, back);
+        visitorReverse = new Visitor(back, way);
     }
 
     public RefinementOperator(final Cover way, final Cover back) {
@@ -167,6 +204,18 @@ public class RefinementOperator {
     }
 
     /**
+     * Apply refinement to a role. This is equivalent to simply applying the way
+     * cover.
+     *
+     * @param role
+     *            The role that should be refined.
+     * @return A stream of all refinements of {@code role} using the covers.
+     */
+    public Stream<OWLObjectPropertyExpression> refine(final OWLObjectPropertyExpression role) {
+        return visitor.way.apply(role);
+    }
+
+    /**
      * This applies the refinement operator with swapped way and back functions.
      * If this is the generalization operator, then this will return all
      * specializations of {@code concept}.
@@ -183,5 +232,17 @@ public class RefinementOperator {
      */
     public Stream<OWLClassExpression> refineReverse(final OWLClassExpression concept) throws IllegalArgumentException {
         return visitorReverse.refineVisit(concept);
+    }
+
+    /**
+     * Apply reverse refinement to a role. This is equivalent to simply applying the
+     * way cover.
+     *
+     * @param role
+     *            The role that should be refined.
+     * @return A stream of all refinements of {@code role} using the covers.
+     */
+    public Stream<OWLObjectPropertyExpression> refineReverse(final OWLObjectPropertyExpression role) {
+        return visitorReverse.way.apply(role);
     }
 }

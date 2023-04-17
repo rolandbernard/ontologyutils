@@ -7,6 +7,7 @@ import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.normalization.TBoxSubclassOfNormalization;
 import www.ontologyutils.refinement.AxiomStrengthener;
+import www.ontologyutils.refinement.AxiomWeakener;
 import www.ontologyutils.toolbox.*;
 
 public class AppMakeInconsistent {
@@ -51,7 +52,7 @@ public class AppMakeInconsistent {
         System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         while (isConsistent || iter < minNumIter || iterSinceInconsistency < minNumIterAfterInconsistency) {
             final OWLAxiom axiom = Utils.randomChoice(ontology.axioms()
-                    .filter(ax -> ax.isOfType(AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION)));
+                    .filter(ax -> ax.isOfType(AxiomWeakener.SUPPORTED_AXIOM_TYPES)));
             final var strongerAxioms = axiomStrengthener.strongerAxioms(axiom).collect(Collectors.toSet());
             // We do not consider the axioms already in the ontology.
             strongerAxioms.removeAll(ontology.axioms().toList());

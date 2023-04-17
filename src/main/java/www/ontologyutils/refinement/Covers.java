@@ -237,7 +237,7 @@ public class Covers implements AutoCloseable {
      * @param number
      * @return All numbers that are in the downward cover of {@code number}.
      */
-    public Stream<Integer> upCover(final int number) {
+    public Stream<Integer> upCover(final Integer number) {
         return Stream.of(number, number + 1);
     }
 
@@ -245,7 +245,7 @@ public class Covers implements AutoCloseable {
      * @param number
      * @return All numbers that are in the downward cover of {@code number}.
      */
-    public Stream<Integer> downCover(final int number) {
+    public Stream<Integer> downCover(final Integer number) {
         if (number == 0) {
             return Stream.of(0);
         } else {

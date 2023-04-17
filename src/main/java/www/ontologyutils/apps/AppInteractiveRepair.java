@@ -154,7 +154,7 @@ public class AppInteractiveRepair {
         }
         int minOcc = Integer.MAX_VALUE;
         for (OWLAxiom ax : axioms) {
-            if (ax.isOfType(AxiomType.SUBCLASS_OF) || ax.isOfType(AxiomType.CLASS_ASSERTION)) {
+            if (ax.isOfType(AxiomWeakener.SUPPORTED_AXIOM_TYPES)) {
                 if (!occurences.containsKey(ax)) {
                     throw new RuntimeException("Did not expect " + ax);
                 }
@@ -163,7 +163,7 @@ public class AppInteractiveRepair {
         }
         Set<OWLAxiom> badAxioms = new HashSet<>();
         for (OWLAxiom ax : axioms) {
-            if (ax.isOfType(AxiomType.SUBCLASS_OF) || ax.isOfType(AxiomType.CLASS_ASSERTION)) {
+            if (ax.isOfType(AxiomWeakener.SUPPORTED_AXIOM_TYPES)) {
                 if (occurences.get(ax) == minOcc) {
                     badAxioms.add(ax);
                 }
