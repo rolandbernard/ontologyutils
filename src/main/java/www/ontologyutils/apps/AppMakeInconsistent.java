@@ -76,7 +76,7 @@ public class AppMakeInconsistent {
             strongerAxioms.removeAll(tautologies);
             if (!strongerAxioms.isEmpty()) {
                 OWLAxiom strongerAxiom = Utils.randomChoice(strongerAxioms);
-                ontology.replaceAxiom(axiom, strongerAxiom);
+                ontology.addAxioms(strongerAxiom);
             }
             isConsistent = ontology.isConsistent();
             iter++;

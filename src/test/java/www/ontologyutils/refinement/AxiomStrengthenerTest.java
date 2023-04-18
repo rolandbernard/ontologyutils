@@ -81,9 +81,10 @@ public class AxiomStrengthenerTest {
                 copy.removeAxioms(weakAxiom);
                 try (final var axiomStrengthener = new AxiomStrengthener(copy)) {
                     axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
-                        copy.addAxioms(strongAxiom);
-                        assertTrue(copy.isEntailed(weakAxiom));
-                        copy.removeAxioms(strongAxiom);
+                        try (final var copy2 = copy.clone()) {
+                            copy2.addAxioms(strongAxiom);
+                            assertTrue(!copy2.isConsistent() || copy2.isEntailed(weakAxiom));
+                        }
                     });
                 }
             }

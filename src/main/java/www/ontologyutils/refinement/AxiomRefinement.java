@@ -65,7 +65,7 @@ public abstract class AxiomRefinement implements AutoCloseable {
             return Stream.concat(
                     up.refine(role)
                             .map(newRole -> df.getOWLObjectPropertyAssertionAxiom(newRole, subject, object)),
-                    Stream.of(noopAxiom()));
+                    Stream.of(axiom, noopAxiom()));
         }
 
         @Override
@@ -76,7 +76,7 @@ public abstract class AxiomRefinement implements AutoCloseable {
             return Stream.concat(
                     down.refine(role)
                             .map(newRole -> df.getOWLNegativeObjectPropertyAssertionAxiom(newRole, subject, object)),
-                    Stream.of(noopAxiom()));
+                    Stream.of(axiom, noopAxiom()));
         }
 
         @Override
