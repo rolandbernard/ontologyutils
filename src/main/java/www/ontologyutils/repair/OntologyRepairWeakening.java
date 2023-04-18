@@ -70,7 +70,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
      * @return The set of axioms to include in the reference ontology to use for
      *         repairs.
      */
-    private Set<OWLAxiom> getRefAxioms(final Ontology ontology) {
+    public Set<OWLAxiom> getRefAxioms(final Ontology ontology) {
         final var mcss = ontology.maximalConsistentSubsets(isRepaired);
         switch (refOntologySource) {
             case INTERSECTION_OF_MCS:
@@ -94,7 +94,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
      * @return The stream of axioms between which to select the next axiom to
      *         weaken.
      */
-    private Stream<OWLAxiom> findBadAxioms(final Ontology ontology) {
+    public Stream<OWLAxiom> findBadAxioms(final Ontology ontology) {
         switch (badAxiomSource) {
             case IN_LEAST_MCS: {
                 final var occurrences = ontology.optimalClassicalRepairs(isRepaired)

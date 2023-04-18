@@ -16,6 +16,11 @@ public class AxiomStrengthener extends AxiomRefinement {
         public Visitor(final RefinementOperator up, final RefinementOperator down) {
             super(up, down);
         }
+
+        @Override
+        protected OWLAxiom noopAxiom() {
+            return df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLNothing());
+        }
     }
 
     private AxiomStrengthener(final Covers covers, final Cover upCover, final Cover downCover) {

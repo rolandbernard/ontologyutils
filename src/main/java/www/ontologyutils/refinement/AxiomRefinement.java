@@ -10,24 +10,36 @@ import www.ontologyutils.toolbox.*;
  * Abstract base class for axiom weakener and axiom strengthener. Most of the
  * functionality is here, only some axiom types require more careful
  * considerations.
+ *
+ * The implementation is based on the approach presented in Troquard, Nicolas,
+ * et al. "Repairing ontologies via axiom weakening." Proceedings of the AAAI
+ * Conference on Artificial Intelligence. Vol. 32. No. 1. 2018. Definition 3.
+ *
+ * The implementation for SROIQ axioms is based on the approach presented in
+ * Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti, G., &
+ * Toquard, N. (2020). Towards even more irresistible axiom weakening.
  */
 public abstract class AxiomRefinement implements AutoCloseable {
     public static final AxiomType<?>[] SUPPORTED_AXIOM_TYPES = new AxiomType<?>[] {
-            AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION
+            AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION, AxiomType.OBJECT_PROPERTY_ASSERTION,
+            AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION, AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS
     };
 
-    protected static class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
-        private final RefinementOperator up;
-        private final RefinementOperator down;
+    protected static abstract class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
+        protected final OWLDataFactory df;
+        protected final RefinementOperator up;
+        protected final RefinementOperator down;
 
         public Visitor(final RefinementOperator up, final RefinementOperator down) {
+            df = Ontology.getDefaultDataFactory();
             this.up = up;
             this.down = down;
         }
 
+        protected abstract OWLAxiom noopAxiom();
+
         @Override
         public Stream<OWLAxiom> visit(final OWLSubClassOfAxiom axiom) {
-            final var df = Ontology.getDefaultDataFactory();
             final var subclass = axiom.getSubClass();
             final var superclass = axiom.getSuperClass();
             return Stream.concat(
@@ -39,11 +51,42 @@ public abstract class AxiomRefinement implements AutoCloseable {
 
         @Override
         public Stream<OWLAxiom> visit(final OWLClassAssertionAxiom axiom) {
-            final var df = Ontology.getDefaultDataFactory();
             final var concept = axiom.getClassExpression();
             final var individual = axiom.getIndividual();
             return up.refine(concept)
                     .map(newConcept -> df.getOWLClassAssertionAxiom(newConcept, individual));
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLObjectPropertyAssertionAxiom axiom) {
+            final var subject = axiom.getSubject();
+            final var role = axiom.getProperty();
+            final var object = axiom.getObject();
+            return Stream.concat(
+                    up.refine(role)
+                            .map(newRole -> df.getOWLObjectPropertyAssertionAxiom(newRole, subject, object)),
+                    Stream.of(noopAxiom()));
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLNegativeObjectPropertyAssertionAxiom axiom) {
+            final var subject = axiom.getSubject();
+            final var role = axiom.getProperty();
+            final var object = axiom.getObject();
+            return Stream.concat(
+                    down.refine(role)
+                            .map(newRole -> df.getOWLNegativeObjectPropertyAssertionAxiom(newRole, subject, object)),
+                    Stream.of(noopAxiom()));
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLSameIndividualAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLDifferentIndividualsAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
         }
 
         @Override
