@@ -51,8 +51,7 @@ public class AppMakeInconsistent {
         boolean isConsistent = ontology.isConsistent();
         System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         while (isConsistent || iter < minNumIter || iterSinceInconsistency < minNumIterAfterInconsistency) {
-            final OWLAxiom axiom = Utils.randomChoice(ontology.axioms()
-                    .filter(ax -> ax.isOfType(AxiomWeakener.SUPPORTED_AXIOM_TYPES)));
+            final OWLAxiom axiom = Utils.randomChoice(ontology.axioms(AxiomWeakener.SUPPORTED_AXIOM_TYPES));
             final var strongerAxioms = axiomStrengthener.strongerAxioms(axiom).collect(Collectors.toSet());
             // We do not consider the axioms already in the ontology.
             strongerAxioms.removeAll(ontology.axioms().toList());
@@ -89,9 +88,9 @@ public class AppMakeInconsistent {
             System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         }
         System.err.println("=== BEGIN RESULT ===");
-        ontology.refutableAxioms().map(Utils::prettyPrintAxiom)
+        ontology.refutableAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                 .sorted().forEach(System.out::println);
-        ontology.staticAxioms().map(Utils::prettyPrintAxiom)
+        ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                 .sorted().forEach(System.out::println);
         System.err.println("==== END RESULT ====");
         ontology.saveOntology(args[0].replaceAll(".owl$", "") + "-made-inconsistent.owl");

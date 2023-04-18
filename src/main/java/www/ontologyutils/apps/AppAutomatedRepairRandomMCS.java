@@ -1,5 +1,7 @@
 package www.ontologyutils.apps;
 
+import org.semanticweb.owlapi.model.OWLAxiom;
+
 import www.ontologyutils.normalization.TBoxSubclassOfNormalization;
 import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
@@ -27,9 +29,9 @@ public class AppAutomatedRepairRandomMCS {
         repair.apply(ontology);
         System.err.println("Repaired.");
         System.err.println("=== BEGIN RESULT ===");
-        ontology.refutableAxioms().map(Utils::prettyPrintAxiom)
+        ontology.refutableAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                 .sorted().forEach(System.out::println);
-        ontology.staticAxioms().map(Utils::prettyPrintAxiom)
+        ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                 .sorted().forEach(System.out::println);
         assert ontology.isConsistent();
         ontology.close();

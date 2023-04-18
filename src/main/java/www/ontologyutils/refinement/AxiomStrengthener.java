@@ -4,48 +4,28 @@ import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
 
+import www.ontologyutils.refinement.Covers.Cover;
 import www.ontologyutils.toolbox.Ontology;
 
 /**
  * Implementation that can be used for strengthening an axiom. Must be closed
  * after usage to free up resources used by the inner {@code Covers} object.
  */
-public class AxiomStrengthener implements AutoCloseable {
-    private class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
-        @Override
-        public Stream<OWLAxiom> visit(final OWLSubClassOfAxiom axiom) {
-            final var df = Ontology.getDefaultDataFactory();
-            final var subclass = axiom.getSubClass();
-            final var superclass = axiom.getSuperClass();
-            return Stream.concat(
-                    generalization.refine(subclass)
-                            .map(newSubclass -> df.getOWLSubClassOfAxiom(newSubclass, superclass)),
-                    specialization.refine(superclass)
-                            .map(newSuperclass -> df.getOWLSubClassOfAxiom(subclass, newSuperclass)));
-        }
-
-        @Override
-        public Stream<OWLAxiom> visit(final OWLClassAssertionAxiom axiom) {
-            final var df = Ontology.getDefaultDataFactory();
-            final var concept = axiom.getClassExpression();
-            final var individual = axiom.getIndividual();
-            return specialization.refine(concept)
-                    .map(newConcept -> df.getOWLClassAssertionAxiom(newConcept, individual));
-        }
-
-        @Override
-        public <T> Stream<OWLAxiom> doDefault(final T axiom) throws IllegalArgumentException {
-            final var ax = (OWLAxiom) axiom;
-            throw new IllegalArgumentException(
-                    "The axiom " + ax + " of type " + ax.getAxiomType()
-                            + " is not supported for axiom weakening.");
+public class AxiomStrengthener extends AxiomRefinement {
+    private static class Visitor extends AxiomRefinement.Visitor {
+        public Visitor(final RefinementOperator up, final RefinementOperator down) {
+            super(up, down);
         }
     }
 
-    private final Visitor visitor;
-    private final Covers covers;
-    private final RefinementOperator generalization;
-    private final RefinementOperator specialization;
+    private AxiomStrengthener(final Covers covers, final Cover upCover, final Cover downCover) {
+        super(new Visitor(new RefinementOperator(downCover, upCover), new RefinementOperator(upCover, downCover)),
+                covers);
+    }
+
+    private AxiomStrengthener(final Covers covers) {
+        this(covers, covers.upCover().cached(), covers.downCover().cached());
+    }
 
     /**
      * Create a new axiom strengthener with the given reference ontology.
@@ -54,12 +34,7 @@ public class AxiomStrengthener implements AutoCloseable {
      *            The reference ontology to use for the up and down covers.
      */
     public AxiomStrengthener(final Ontology refOntology) {
-        visitor = new Visitor();
-        covers = new Covers(refOntology);
-        final var upCover = covers.upCover().cached();
-        final var downCover = covers.downCover().cached();
-        generalization = new RefinementOperator(upCover, downCover);
-        specialization = new RefinementOperator(downCover, upCover);
+        this(new Covers(refOntology));
     }
 
     /**
@@ -73,11 +48,6 @@ public class AxiomStrengthener implements AutoCloseable {
      * @return A stream of axioms that are all stronger than {@code axiom}.
      */
     public Stream<OWLAxiom> strongerAxioms(final OWLAxiom axiom) {
-        return axiom.accept(visitor).distinct();
-    }
-
-    @Override
-    public void close() {
-        covers.close();
+        return refineAxioms(axiom);
     }
 }
