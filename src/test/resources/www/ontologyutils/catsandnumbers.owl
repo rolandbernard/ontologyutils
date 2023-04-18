@@ -13,7 +13,7 @@ Ontology: <http://www.semanticweb.org/ontologies/dl2017_example>
 ObjectProperty: <http://www.semanticweb.org/ontologies/dl2017_example#hasColour>
 
     SubPropertyOf: 
-        <http://www.semanticweb.org/ontologies/dl2017_example#hasQuality>
+        owl:topObjectProperty
     
     Domain: 
         <http://www.semanticweb.org/ontologies/dl2017_example#PhysicalObject>
