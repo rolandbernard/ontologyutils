@@ -1,5 +1,6 @@
 package www.ontologyutils.repair;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.function.*;
 import java.util.stream.*;
@@ -78,8 +79,14 @@ public class OntologyRepairWeakening extends OntologyRepair {
                     a.removeIf(axiom -> !b.contains(axiom));
                     return a;
                 }).get();
-            case LARGEST_MCS:
-                return mcss.findFirst().get();
+            case LARGEST_MCS: {
+                final var sizeHolder = new int[] { 0 };
+                return Utils.randomChoice(mcss.takeWhile(axioms -> {
+                    final var last = sizeHolder[0];
+                    sizeHolder[0] = axioms.size();
+                    return last == 0 || last == axioms.size();
+                }));
+            }
             case RANDOM_MCS:
                 return Utils.randomChoice(mcss);
             case SOME_MCS:
@@ -98,8 +105,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
         switch (badAxiomSource) {
             case IN_LEAST_MCS: {
                 final var occurrences = ontology.optimalClassicalRepairs(isRepaired)
-                        .flatMap(set -> set.stream()
-                                .filter(axiom -> axiom.isOfType(AxiomWeakener.SUPPORTED_AXIOM_TYPES)))
+                        .flatMap(set -> set.stream())
                         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
                 final var max = occurrences.values().stream().max(Long::compareTo);
                 if (max.isEmpty()) {
@@ -110,8 +116,14 @@ public class OntologyRepairWeakening extends OntologyRepair {
                         .filter(entry -> entry.getValue() == max.get())
                         .map(entry -> entry.getKey());
             }
-            case NOT_IN_LARGEST_MCS:
-                return ontology.optimalClassicalRepairs(isRepaired).findFirst().get().stream();
+            case NOT_IN_LARGEST_MCS: {
+                final var sizeHolder = new int[] { 0 };
+                return ontology.optimalClassicalRepairs(isRepaired).takeWhile(axioms -> {
+                    final var last = sizeHolder[0];
+                    sizeHolder[0] = axioms.size();
+                    return last == 0 || last == axioms.size();
+                }).flatMap(axioms -> axioms.stream());
+            }
             case NOT_IN_SOME_MCS:
                 return ontology.optimalClassicalRepairs(isRepaired).findAny().get().stream();
             case RANDOM:
@@ -123,17 +135,28 @@ public class OntologyRepairWeakening extends OntologyRepair {
 
     @Override
     public void repair(final Ontology ontology) {
-        final var refAxioms = getRefAxioms(ontology);
-        try (final var refOntology = Ontology.withAxioms(refAxioms)) {
-            try (final var axiomWeakener = new AxiomWeakener(refOntology)) {
-                while (!isRepaired(ontology)) {
-                    final var badAxioms = findBadAxioms(ontology)
-                            .filter(axiom -> axiom.isOfType(AxiomWeakener.SUPPORTED_AXIOM_TYPES));
-                    final var badAxiom = Utils.randomChoice(badAxioms);
-                    final var weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
-                    ontology.replaceAxiom(badAxiom, weakerAxiom);
+        try (final var copy = ontology.clone()) {
+            // Make all non-reparable axioms static to ensure that they are in the reference
+            // ontology.
+            copy.addStaticAxioms(ontology.refutableAxioms()
+                    .filter(axiom -> !axiom.isOfType(getReparableAxiomTypes())));
+            final var refAxioms = getRefAxioms(copy);
+            try (final var refOntology = Ontology.withAxioms(refAxioms)) {
+                try (final var axiomWeakener = new AxiomWeakener(refOntology)) {
+                    while (!isRepaired(copy)) {
+                        final var badAxioms = findBadAxioms(copy);
+                        final var badAxiom = Utils.randomChoice(badAxioms);
+                        final var weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
+                        ontology.replaceAxiom(badAxiom, weakerAxiom);
+                        copy.replaceAxiom(badAxiom, weakerAxiom);
+                    }
                 }
             }
         }
+    }
+
+    @Override
+    public Collection<AxiomType<?>> getReparableAxiomTypes() {
+        return AxiomWeakener.SUPPORTED_AXIOM_TYPES;
     }
 }

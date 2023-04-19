@@ -183,10 +183,10 @@ public class RefinementOperator {
      * @param way
      * @param back
      * @param flags
-     *              Bitset containing flags for restricting the implementation. If
-     *              FLAG_ALC_STRICT is set, an exception will be raised if a concept
-     *              is not valid in ALC. If FLAG_NNF_STRICT is set, the input must
-     *              be in NNF and the output will also be in NNF.
+     *            Bitset containing flags for restricting the implementation. If
+     *            FLAG_ALC_STRICT is set, an exception will be raised if a concept
+     *            is not valid in ALC. If FLAG_NNF_STRICT is set, the input must
+     *            be in NNF and the output will also be in NNF.
      */
     public RefinementOperator(final Cover way, final Cover back, final int flags) {
         visitor = new Visitor(way, back, flags);
@@ -205,12 +205,12 @@ public class RefinementOperator {
      * specialization of {@code concept}.
      *
      * @param concept
-     *                The concept to which the refinement operator should be
-     *                applied.
+     *            The concept to which the refinement operator should be
+     *            applied.
      * @return A stream with all refinements of {@code concept}.
      * @throws IllegalArgumentException
-     *                                  If the axioms in this ontology are not
-     *                                  supported by the current flags.
+     *             If the axioms in this ontology are not
+     *             supported by the current flags.
      */
     public Stream<OWLClassExpression> refine(final OWLClassExpression concept) throws IllegalArgumentException {
         return visitor.refine(concept);
@@ -221,7 +221,7 @@ public class RefinementOperator {
      * cover.
      *
      * @param role
-     *             The role that should be refined.
+     *            The role that should be refined.
      * @return A stream of all refinements of {@code role} using the covers.
      */
     public Stream<OWLObjectPropertyExpression> refine(final OWLObjectPropertyExpression role) {
@@ -236,12 +236,12 @@ public class RefinementOperator {
      * generalization of {@code concept}.
      *
      * @param concept
-     *                The concept to which the refinement operator should be
-     *                applied.
+     *            The concept to which the refinement operator should be
+     *            applied.
      * @return A stream with all refinements of {@code concept}.
      * @throws IllegalArgumentException
-     *                                  If the axioms in this ontology are not
-     *                                  supported by the current flags.
+     *             If the axioms in this ontology are not
+     *             supported by the current flags.
      */
     public Stream<OWLClassExpression> refineReverse(final OWLClassExpression concept) throws IllegalArgumentException {
         return visitor.reverse.refine(concept);
@@ -252,7 +252,7 @@ public class RefinementOperator {
      * way cover.
      *
      * @param role
-     *             The role that should be refined.
+     *            The role that should be refined.
      * @return A stream of all refinements of {@code role} using the covers.
      */
     public Stream<OWLObjectPropertyExpression> refineReverse(final OWLObjectPropertyExpression role) {

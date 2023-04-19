@@ -11,13 +11,10 @@ import www.ontologyutils.refinement.AxiomWeakener;
 import www.ontologyutils.toolbox.*;
 
 public class AppInteractiveRepair {
-
     Ontology ontology;
 
     public AppInteractiveRepair(String ontologyFilePath) {
-
         ontology = Ontology.loadOntology(ontologyFilePath);
-
     }
 
     /**

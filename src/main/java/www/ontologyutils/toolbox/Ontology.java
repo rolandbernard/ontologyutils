@@ -220,8 +220,24 @@ public class Ontology implements AutoCloseable {
         return staticAxioms.stream();
     }
 
+    public Stream<OWLAxiom> staticAxioms(final AxiomType<?>... types) {
+        return staticAxioms().filter(axiom -> axiom.isOfType(types));
+    }
+
+    public Stream<OWLAxiom> staticAxioms(final Collection<AxiomType<?>> types) {
+        return staticAxioms().filter(axiom -> axiom.isOfType(types));
+    }
+
     public Stream<OWLAxiom> refutableAxioms() {
         return refutableAxioms.stream();
+    }
+
+    public Stream<OWLAxiom> refutableAxioms(final AxiomType<?>... types) {
+        return refutableAxioms().filter(axiom -> axiom.isOfType(types));
+    }
+
+    public Stream<OWLAxiom> refutableAxioms(final Collection<AxiomType<?>> types) {
+        return refutableAxioms().filter(axiom -> axiom.isOfType(types));
     }
 
     public Stream<OWLAxiom> axioms() {
@@ -229,6 +245,10 @@ public class Ontology implements AutoCloseable {
     }
 
     public Stream<OWLAxiom> axioms(final AxiomType<?>... types) {
+        return axioms().filter(axiom -> axiom.isOfType(types));
+    }
+
+    public Stream<OWLAxiom> axioms(final Collection<AxiomType<?>> types) {
         return axioms().filter(axiom -> axiom.isOfType(types));
     }
 
@@ -260,11 +280,17 @@ public class Ontology implements AutoCloseable {
     }
 
     public void addStaticAxioms(final Stream<? extends OWLAxiom> axioms) {
-        axioms.forEach(axiom -> staticAxioms.add(axiom));
+        axioms.forEach(axiom -> {
+            refutableAxioms.remove(axiom);
+            staticAxioms.add(axiom);
+        });
     }
 
     public void addAxioms(final Stream<? extends OWLAxiom> axioms) {
-        axioms.forEach(axiom -> refutableAxioms.add(axiom));
+        axioms.forEach(axiom -> {
+            staticAxioms.remove(axiom);
+            refutableAxioms.add(axiom);
+        });
     }
 
     public void removeAxioms(final Collection<? extends OWLAxiom> axioms) {

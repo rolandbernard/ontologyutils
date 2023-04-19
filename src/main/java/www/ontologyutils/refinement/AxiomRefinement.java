@@ -1,5 +1,6 @@
 package www.ontologyutils.refinement;
 
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
@@ -20,10 +21,9 @@ import www.ontologyutils.toolbox.*;
  * Toquard, N. (2020). Towards even more irresistible axiom weakening.
  */
 public abstract class AxiomRefinement implements AutoCloseable {
-    public static final AxiomType<?>[] SUPPORTED_AXIOM_TYPES = new AxiomType<?>[] {
+    public static final Set<AxiomType<?>> SUPPORTED_AXIOM_TYPES = Set.of(
             AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION, AxiomType.OBJECT_PROPERTY_ASSERTION,
-            AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION, AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS
-    };
+            AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION, AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS);
 
     protected static abstract class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
         protected final OWLDataFactory df;
