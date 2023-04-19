@@ -39,7 +39,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
     }
 
     public OntologyRepairWeakening(final Predicate<Ontology> isRepaired) {
-        this(isRepaired, RefOntologyStrategy.RANDOM_MCS, BadAxiomStrategy.IN_LEAST_MCS);
+        this(isRepaired, RefOntologyStrategy.RANDOM_MCS, BadAxiomStrategy.NOT_IN_SOME_MCS);
     }
 
     /**
@@ -92,7 +92,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
             case SOME_MCS:
                 return mcss.findAny().get();
             default:
-                throw new IllegalArgumentException("Unimplemented reference ontology choice algorithm.");
+                throw new IllegalArgumentException("Unimplemented reference ontology choice strategy.");
         }
     }
 
@@ -129,7 +129,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
             case RANDOM:
                 return ontology.axioms();
             default:
-                throw new IllegalArgumentException("Unimplemented bad axiom choice algorithm.");
+                throw new IllegalArgumentException("Unimplemented bad axiom choice strategy.");
         }
     }
 

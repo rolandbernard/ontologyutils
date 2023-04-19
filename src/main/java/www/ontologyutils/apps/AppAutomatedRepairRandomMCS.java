@@ -2,7 +2,7 @@ package www.ontologyutils.apps;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-import www.ontologyutils.normalization.TBoxSubclassOfNormalization;
+import www.ontologyutils.normalization.TBoxNormalization;
 import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
 
@@ -21,7 +21,7 @@ public class AppAutomatedRepairRandomMCS {
         }
         final var ontology = Ontology.loadOntology(args[0]);
         System.err.println("Loaded...");
-        final var normalization = new TBoxSubclassOfNormalization();
+        final var normalization = new TBoxNormalization();
         final var repair = OntologyRepairRandomMcs.forConsistency();
         System.err.println("Normalizing...");
         normalization.apply(ontology);

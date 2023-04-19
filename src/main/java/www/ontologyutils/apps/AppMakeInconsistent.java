@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.*;
 
-import www.ontologyutils.normalization.TBoxSubclassOfNormalization;
+import www.ontologyutils.normalization.TBoxNormalization;
 import www.ontologyutils.refinement.AxiomStrengthener;
 import www.ontologyutils.toolbox.*;
 
@@ -21,7 +21,7 @@ public class AppMakeInconsistent {
      */
     public static void main(String[] args) {
         final var ontology = Ontology.loadOntology(args[0]);
-        final var normalization = new TBoxSubclassOfNormalization();
+        final var normalization = new TBoxNormalization();
         normalization.apply(ontology);
         System.err.println("Loaded...");
         if (!ontology.isConsistent()) {
