@@ -59,6 +59,7 @@ public class Covers implements AutoCloseable {
         }
     }
 
+    public final OWLDataFactory df;
     public final Ontology refOntology;
     public final Set<OWLClassExpression> subConcepts;
     public final Set<OWLObjectProperty> simpleRoles;
@@ -72,10 +73,10 @@ public class Covers implements AutoCloseable {
      *            The ontology used for entailment check.
      */
     public Covers(final Ontology refOntology) {
+        df = Ontology.getDefaultDataFactory();
         this.refOntology = refOntology;
         this.reasoner = refOntology.getOwlReasoner();
         this.subConcepts = refOntology.subConcepts().collect(Collectors.toSet());
-        final var df = Ontology.getDefaultDataFactory();
         this.subConcepts.add(df.getOWLThing());
         this.subConcepts.add(df.getOWLNothing());
         this.simpleRoles = refOntology.rolesInSignature().collect(Collectors.toSet());
@@ -90,7 +91,6 @@ public class Covers implements AutoCloseable {
      *         {@code subclass} is a subclass of {@code superclass}.
      */
     private boolean isSubclass(final OWLClassExpression subclass, final OWLClassExpression superclass) {
-        final var df = Ontology.getDefaultDataFactory();
         final var testAxiom = df.getOWLSubClassOfAxiom(subclass, superclass);
         return reasoner.isEntailed(testAxiom);
     }
@@ -169,7 +169,6 @@ public class Covers implements AutoCloseable {
      *         {@code subRole} is subsumed by {@code superRole}.
      */
     private boolean isSubRole(final OWLObjectPropertyExpression subRole, final OWLObjectPropertyExpression superRole) {
-        final var df = Ontology.getDefaultDataFactory();
         final var testAxiom = df.getOWLSubObjectPropertyOfAxiom(subRole, superRole);
         return reasoner.isEntailed(testAxiom);
     }
