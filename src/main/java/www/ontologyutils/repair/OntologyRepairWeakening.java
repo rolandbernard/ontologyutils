@@ -25,7 +25,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
     }
 
     public static enum BadAxiomStrategy {
-        RANDOM, NOT_IN_SOME_MCS, NOT_IN_LARGEST_MCS, IN_LEAST_MCS,
+        RANDOM, NOT_IN_SOME_MCS, NOT_IN_LARGEST_MCS, IN_LEAST_MCS, IN_SOME_MUS
     }
 
     private final RefOntologyStrategy refOntologySource;
@@ -39,7 +39,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
     }
 
     public OntologyRepairWeakening(final Predicate<Ontology> isRepaired) {
-        this(isRepaired, RefOntologyStrategy.RANDOM_MCS, BadAxiomStrategy.NOT_IN_SOME_MCS);
+        this(isRepaired, RefOntologyStrategy.SOME_MCS, BadAxiomStrategy.IN_SOME_MUS);
     }
 
     /**
@@ -72,25 +72,19 @@ public class OntologyRepairWeakening extends OntologyRepair {
      *         repairs.
      */
     public Set<OWLAxiom> getRefAxioms(final Ontology ontology) {
-        final var mcss = ontology.maximalConsistentSubsets(isRepaired);
         switch (refOntologySource) {
-            case INTERSECTION_OF_MCS:
-                return mcss.reduce((a, b) -> {
+            case INTERSECTION_OF_MCS: {
+                return ontology.maximalConsistentSubsets(isRepaired).reduce((a, b) -> {
                     a.removeIf(axiom -> !b.contains(axiom));
                     return a;
                 }).get();
-            case LARGEST_MCS: {
-                final var sizeHolder = new int[] { 0 };
-                return Utils.randomChoice(mcss.takeWhile(axioms -> {
-                    final var last = sizeHolder[0];
-                    sizeHolder[0] = axioms.size();
-                    return last == 0 || last == axioms.size();
-                }));
             }
+            case LARGEST_MCS:
+                return Utils.randomChoice(ontology.largestMaximalConsistentSubsets(isRepaired));
             case RANDOM_MCS:
-                return Utils.randomChoice(mcss);
+                return Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
             case SOME_MCS:
-                return mcss.findAny().get();
+                return ontology.maximalConsistentSubset(isRepaired);
             default:
                 throw new IllegalArgumentException("Unimplemented reference ontology choice strategy.");
         }
@@ -104,7 +98,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
     public Stream<OWLAxiom> findBadAxioms(final Ontology ontology) {
         switch (badAxiomSource) {
             case IN_LEAST_MCS: {
-                final var occurrences = ontology.optimalClassicalRepairs(isRepaired)
+                final var occurrences = ontology.minimalCorrectionSubsets(isRepaired)
                         .flatMap(set -> set.stream())
                         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
                 final var max = occurrences.values().stream().max(Long::compareTo);
@@ -117,17 +111,14 @@ public class OntologyRepairWeakening extends OntologyRepair {
                         .map(entry -> entry.getKey());
             }
             case NOT_IN_LARGEST_MCS: {
-                final var sizeHolder = new int[] { 0 };
-                return ontology.optimalClassicalRepairs(isRepaired).takeWhile(axioms -> {
-                    final var last = sizeHolder[0];
-                    sizeHolder[0] = axioms.size();
-                    return last == 0 || last == axioms.size();
-                }).flatMap(axioms -> axioms.stream());
+                return ontology.smallestMinimalCorrectionSubsets(isRepaired).flatMap(axioms -> axioms.stream());
             }
             case NOT_IN_SOME_MCS:
-                return ontology.optimalClassicalRepairs(isRepaired).findAny().get().stream();
+                return ontology.minimalCorrectionSubset(isRepaired).stream();
+            case IN_SOME_MUS:
+                return ontology.minimalUnsatisfiableSubset(isRepaired).stream();
             case RANDOM:
-                return ontology.axioms();
+                return ontology.refutableAxioms();
             default:
                 throw new IllegalArgumentException("Unimplemented bad axiom choice strategy.");
         }

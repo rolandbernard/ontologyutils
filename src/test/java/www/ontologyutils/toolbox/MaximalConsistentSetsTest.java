@@ -43,26 +43,65 @@ public class MaximalConsistentSetsTest {
     @Test
     public void maximalConsistentSubsetsNaive() {
         final var agenda = Set.copyOf(axioms);
-        final var results = MaximalConsistentSets.maximalConsistentSubsetsNaive(agenda, Set.of()).toList();
+        final var results = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(agenda, Set.of()).toList();
         for (final var subset : results) {
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
-            assertTrue(MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda));
+            assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
         }
         for (final var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
-            assertTrue(!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda) || results.contains(subset));
+            assertTrue(
+                    !MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda) || results.contains(subset));
         }
     }
 
     @Test
     public void maximalConsistentSubsets() {
         final var agenda = Set.copyOf(axioms);
-        final var results = MaximalConsistentSets.maximalConsistentSubsets(agenda, Set.of());
+        final var results = MaximalConsistentSubsets.maximalConsistentSubsets(agenda, Set.of());
         for (final var subset : results) {
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
-            assertTrue(MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda));
+            assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
         }
         for (final var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
-            assertTrue(!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agenda) || results.contains(subset));
+            assertTrue(
+                    !MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda) || results.contains(subset));
+        }
+    }
+
+    @Test
+    public void maximalConsistentSubset() {
+        final var agenda = Set.copyOf(axioms);
+        try (final var ontology = Ontology.withAxioms(agenda)) {
+            final var subset = ontology.maximalConsistentSubset(o -> o.isConsistent());
+            assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
+            assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
+        }
+    }
+
+    @Test
+    public void minimalCorrectionSubset() {
+        final var agenda = Set.copyOf(axioms);
+        try (final var ontology = Ontology.withAxioms(agenda)) {
+            final var subset = ontology.minimalCorrectionSubset(o -> o.isConsistent());
+            assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
+            assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(ontology.complement(subset), agenda));
+        }
+    }
+
+    @Test
+    public void minimalUnsatisfiableSubset() {
+        final var agenda = Set.copyOf(axioms);
+        try (final var ontology = Ontology.withAxioms(agenda)) {
+            final var subset = ontology.minimalUnsatisfiableSubset(o -> o.isConsistent());
+            ontology.removeAxioms(ontology.axioms().toList());
+            ontology.addAxioms(subset);
+            assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
+            assertFalse(ontology.isConsistent());
+            for (final var axiom : subset) {
+                ontology.removeAxioms(axiom);
+                assertTrue(ontology.isConsistent());
+                ontology.addAxioms(axiom);
+            }
         }
     }
 
@@ -73,8 +112,8 @@ public class MaximalConsistentSetsTest {
     @ParameterizedTest
     @MethodSource("axiomPowerSet")
     public void maximalConsistentSubsetsContaining(final Set<OWLAxiom> contained) {
-        final var results = MaximalConsistentSets.maximalConsistentSubsets(axioms, contained);
-        final var resultsNaive = MaximalConsistentSets.maximalConsistentSubsetsNaive(axioms, contained)
+        final var results = MaximalConsistentSubsets.maximalConsistentSubsets(axioms, contained);
+        final var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(axioms, contained)
                 .collect(Collectors.toSet());
         assertTrue(results.containsAll(resultsNaive));
         assertTrue(resultsNaive.containsAll(results));

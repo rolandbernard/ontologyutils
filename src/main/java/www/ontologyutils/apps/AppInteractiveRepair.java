@@ -45,7 +45,7 @@ public class AppInteractiveRepair {
 
         // 1- Choosing a reference ontology (randomly)
         System.out.println("Searching some MCSs and electing one as reference ontology...");
-        Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(logicalAxioms, MCS_SAMPLE_SIZE);
+        Set<Set<OWLAxiom>> mcss = MaximalConsistentSubsets.maximalConsistentSubsets(logicalAxioms, MCS_SAMPLE_SIZE);
         Ontology referenceOntology = Ontology.withAxioms(Utils.randomChoice(mcss));
         Ontology currentOntology = Ontology.emptyOntology();
 
@@ -135,7 +135,7 @@ public class AppInteractiveRepair {
     }
 
     private static Set<OWLAxiom> findSomehowBadAxioms(Set<OWLAxiom> axioms, Set<OWLAxiom> axiomsToKeep) {
-        Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(axioms,
+        Set<Set<OWLAxiom>> mcss = MaximalConsistentSubsets.maximalConsistentSubsets(axioms,
                 (int) ((axioms.size() - axiomsToKeep.size()) / 4) + 1, axiomsToKeep);
         HashMap<OWLAxiom, Integer> occurences = new HashMap<>();
         for (OWLAxiom ax : axioms) {

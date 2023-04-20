@@ -63,7 +63,7 @@ public class Ontology implements AutoCloseable {
          * disposed again to free associated resources.
          *
          * @param reasoner
-         *            The {@code OWLReasoner} to dispose.
+         *                 The {@code OWLReasoner} to dispose.
          */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final var owlOntology = reasoner.getRootOntology();
@@ -72,13 +72,13 @@ public class Ontology implements AutoCloseable {
         }
 
         /**
-         * @param ontology
+         * @param axioms
          * @return A new {@code OWLReasoner} created using the factory in this cache.
          */
-        public OWLReasoner getOwlReasoner(final Ontology ontology) {
+        public OWLReasoner getOwlReasoner(final Stream<? extends OWLAxiom> axioms) {
             try {
                 final var owlOntology = defaultManager.createOntology();
-                owlOntology.addAxioms(ontology.axioms());
+                owlOntology.addAxioms(axioms);
                 return reasonerFactory.createReasoner(owlOntology);
             } catch (final OWLOntologyCreationException e) {
                 throw Utils.panic(e);
@@ -95,8 +95,12 @@ public class Ontology implements AutoCloseable {
          */
         public <T> T withReasonerDo(final Ontology ontology, final Function<OWLReasoner, T> action) {
             final var newAxioms = ontology.axioms().collect(Collectors.toSet());
+            return withReasonerDo(newAxioms, action);
+        }
+
+        public <T> T withReasonerDo(final Set<OWLAxiom> newAxioms, final Function<OWLReasoner, T> action) {
             if (reasoner == null) {
-                reasoner = getOwlReasoner(ontology);
+                reasoner = getOwlReasoner(newAxioms.stream());
             } else if (!newAxioms.equals(oldAxioms)) {
                 final var owlOntology = reasoner.getRootOntology();
                 owlOntology.addAxioms(newAxioms.stream().filter(axiom -> !oldAxioms.contains(axiom)));
@@ -367,13 +371,21 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @param remove
+     * @return The axioms of the ontology without those in {@code remove}.
+     */
+    public Set<OWLAxiom> complement(final Set<OWLAxiom> remove) {
+        return axioms().filter(axiom -> !remove.contains(axiom)).collect(Collectors.toSet());
+    }
+
+    /**
      * The reasoner created by this call must be disposed of again using the
      * {@code disposeOwlReasoner} method.
      *
      * @return A new reasoner for the ontology.
      */
     public OWLReasoner getOwlReasoner() {
-        return reasonerCache.getOwlReasoner(this);
+        return reasonerCache.getOwlReasoner(this.axioms());
     }
 
     /**
@@ -381,7 +393,7 @@ public class Ontology implements AutoCloseable {
      * {@code OWLOntology} and {@code OWLReasoner}.
      *
      * @param reasoner
-     *            The reasoner to dispose of.
+     *                 The reasoner to dispose of.
      */
     public void disposeOwlReasoner(final OWLReasoner reasoner) {
         reasonerCache.disposeOwlReasoner(reasoner);
@@ -413,28 +425,55 @@ public class Ontology implements AutoCloseable {
                 .toList());
     }
 
+    /**
+     * @return A single maximal consistent subset.
+     */
+    public Set<OWLAxiom> maximalConsistentSubset(final Predicate<Ontology> isRepaired) {
+        return complement(minimalCorrectionSubset(isRepaired));
+    }
+
     public Stream<Set<OWLAxiom>> maximalConsistentSubsets() {
-        return (new MaximalConsistentSets(this)).stream();
+        return (new MaximalConsistentSubsets(this)).stream();
     }
 
     public Stream<Set<OWLAxiom>> maximalConsistentSubsets(final Predicate<Ontology> isRepaired) {
-        return (new MaximalConsistentSets(this, isRepaired)).stream();
+        return (new MaximalConsistentSubsets(this, isRepaired)).stream();
+    }
+
+    public Stream<Set<OWLAxiom>> largestMaximalConsistentSubsets(final Predicate<Ontology> isRepaired) {
+        return (new MaximalConsistentSubsets(this, isRepaired, true)).stream();
+    }
+
+    /**
+     * @return A single minimal correction subset.
+     */
+    public Set<OWLAxiom> minimalCorrectionSubset(final Predicate<Ontology> isRepaired) {
+        return MaximalConsistentSubsets.minimalSubset(refutableAxioms,
+                axioms -> isRepaired.test(new Ontology(staticAxioms, complement(axioms), reasonerCache)));
+    }
+
+    /**
+     * @return A single set with the refutable axioms of a minimal unsatisfiable subset.
+     */
+    public Set<OWLAxiom> minimalUnsatisfiableSubset(final Predicate<Ontology> isRepaired) {
+        return MaximalConsistentSubsets.minimalSubset(refutableAxioms,
+                axioms -> !isRepaired.test(new Ontology(staticAxioms, axioms, reasonerCache)));
     }
 
     /**
      * @return A stream of all sets of axioms that when removed from the ontology
      *         yield an optimal classical repair for consistency of the ontology.
      */
-    public Stream<Set<OWLAxiom>> optimalClassicalRepairs() {
-        return (new MaximalConsistentSets(this)).repairsStream();
+    public Stream<Set<OWLAxiom>> minimalCorrectionSubsets() {
+        return (new MaximalConsistentSubsets(this)).correctionStream();
     }
 
-    /**
-     * @return A stream of all sets of axioms that when removed from the ontology
-     *         yield an optimal classical repair for the given predicate.
-     */
-    public Stream<Set<OWLAxiom>> optimalClassicalRepairs(final Predicate<Ontology> isRepaired) {
-        return (new MaximalConsistentSets(this)).repairsStream();
+    public Stream<Set<OWLAxiom>> minimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {
+        return (new MaximalConsistentSubsets(this)).correctionStream();
+    }
+
+    public Stream<Set<OWLAxiom>> smallestMinimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {
+        return (new MaximalConsistentSubsets(this)).correctionStream();
     }
 
     /**
