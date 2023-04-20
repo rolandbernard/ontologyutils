@@ -72,6 +72,30 @@ public final class Utils {
     }
 
     /**
+     * Return a random order from the finite stream.
+     *
+     * @param <T>
+     * @param stream
+     * @return A random order of {@code stream}.
+     */
+    public static <T> List<T> randomOrder(final Stream<? extends T> stream) {
+        final var flatList = stream.map(t -> (T) t).collect(Collectors.toList());
+        Collections.shuffle(flatList, random.get());
+        return flatList;
+    }
+
+    /**
+     * Return a random order if the collection.
+     *
+     * @param <T>
+     * @param collection
+     * @return A random order of {@code collection}.
+     */
+    public static <T> List<T> randomOrder(final Collection<? extends T> collection) {
+        return randomOrder(collection.stream());
+    }
+
+    /**
      * Compute the power set of the given collection. The implementation here is
      * only able to handle up to 63 elements in {@code set}.
      *

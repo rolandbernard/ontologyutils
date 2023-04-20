@@ -63,7 +63,7 @@ public class Ontology implements AutoCloseable {
          * disposed again to free associated resources.
          *
          * @param reasoner
-         *                 The {@code OWLReasoner} to dispose.
+         *            The {@code OWLReasoner} to dispose.
          */
         public void disposeOwlReasoner(final OWLReasoner reasoner) {
             final var owlOntology = reasoner.getRootOntology();
@@ -393,7 +393,7 @@ public class Ontology implements AutoCloseable {
      * {@code OWLOntology} and {@code OWLReasoner}.
      *
      * @param reasoner
-     *                 The reasoner to dispose of.
+     *            The reasoner to dispose of.
      */
     public void disposeOwlReasoner(final OWLReasoner reasoner) {
         reasonerCache.disposeOwlReasoner(reasoner);
@@ -425,13 +425,6 @@ public class Ontology implements AutoCloseable {
                 .toList());
     }
 
-    /**
-     * @return A single maximal consistent subset.
-     */
-    public Set<OWLAxiom> maximalConsistentSubset(final Predicate<Ontology> isRepaired) {
-        return complement(minimalCorrectionSubset(isRepaired));
-    }
-
     public Stream<Set<OWLAxiom>> maximalConsistentSubsets() {
         return (new MaximalConsistentSubsets(this)).stream();
     }
@@ -442,22 +435,6 @@ public class Ontology implements AutoCloseable {
 
     public Stream<Set<OWLAxiom>> largestMaximalConsistentSubsets(final Predicate<Ontology> isRepaired) {
         return (new MaximalConsistentSubsets(this, isRepaired, true)).stream();
-    }
-
-    /**
-     * @return A single minimal correction subset.
-     */
-    public Set<OWLAxiom> minimalCorrectionSubset(final Predicate<Ontology> isRepaired) {
-        return MaximalConsistentSubsets.minimalSubset(refutableAxioms,
-                axioms -> isRepaired.test(new Ontology(staticAxioms, complement(axioms), reasonerCache)));
-    }
-
-    /**
-     * @return A single set with the refutable axioms of a minimal unsatisfiable subset.
-     */
-    public Set<OWLAxiom> minimalUnsatisfiableSubset(final Predicate<Ontology> isRepaired) {
-        return MaximalConsistentSubsets.minimalSubset(refutableAxioms,
-                axioms -> !isRepaired.test(new Ontology(staticAxioms, axioms, reasonerCache)));
     }
 
     /**
@@ -474,6 +451,54 @@ public class Ontology implements AutoCloseable {
 
     public Stream<Set<OWLAxiom>> smallestMinimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {
         return (new MaximalConsistentSubsets(this)).correctionStream();
+    }
+
+    /**
+     * @return A single maximal consistent subset.
+     */
+    public Set<OWLAxiom> maximalConsistentSubset(final Predicate<Ontology> isRepaired) {
+        return complement(minimalCorrectionSubset(isRepaired));
+    }
+
+    /**
+     * @return A single minimal correction subset.
+     */
+    public Set<OWLAxiom> minimalCorrectionSubset(final Predicate<Ontology> isRepaired) {
+        return MinimalSubsets.getMinimalSubset(refutableAxioms,
+                axioms -> isRepaired.test(new Ontology(staticAxioms, complement(axioms), reasonerCache)));
+    }
+
+    /**
+     * @return A single set with the refutable axioms of a minimal unsatisfiable
+     *         subset.
+     */
+    public Set<OWLAxiom> minimalUnsatisfiableSubset(final Predicate<Ontology> isRepaired) {
+        return MinimalSubsets.getMinimalSubset(refutableAxioms,
+                axioms -> !isRepaired.test(new Ontology(staticAxioms, axioms, reasonerCache)));
+    }
+
+    /**
+     * @return A single maximal consistent subset.
+     */
+    public Stream<Set<OWLAxiom>> someMaximalConsistentSubsets(final Predicate<Ontology> isRepaired) {
+        return someMinimalCorrectionSubsets(isRepaired).map(this::complement);
+    }
+
+    /**
+     * @return A single minimal correction subset.
+     */
+    public Stream<Set<OWLAxiom>> someMinimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {
+        return MinimalSubsets.getRandomizedMinimalSubsets(refutableAxioms, 8,
+                axioms -> isRepaired.test(new Ontology(staticAxioms, complement(axioms), reasonerCache))).stream();
+    }
+
+    /**
+     * @return A single set with the refutable axioms of a minimal unsatisfiable
+     *         subset.
+     */
+    public Stream<Set<OWLAxiom>> someMinimalUnsatisfiableSubsets(final Predicate<Ontology> isRepaired) {
+        return MinimalSubsets.getRandomizedMinimalSubsets(refutableAxioms, 8,
+                axioms -> !isRepaired.test(new Ontology(staticAxioms, axioms, reasonerCache))).stream();
     }
 
     /**

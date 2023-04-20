@@ -25,13 +25,13 @@ public class MaximalConsistentSubsets {
 
     /**
      * @param ontology
-     *                   The ontology for which to compute the maximal consistent
-     *                   subsets.
+     *            The ontology for which to compute the maximal consistent
+     *            subsets.
      * @param isRepaired
-     *                   The predicate with which to measure "consistency".
+     *            The predicate with which to measure "consistency".
      * @param largest
-     *                   Return only the largest maximal consistent sets (or
-     *                   smallest corrections)
+     *            Return only the largest maximal consistent sets (or
+     *            smallest corrections)
      */
     public MaximalConsistentSubsets(final Ontology ontology, final Predicate<Ontology> isRepaired,
             final boolean largest) {
@@ -46,10 +46,10 @@ public class MaximalConsistentSubsets {
 
     /**
      * @param ontology
-     *                   The ontology for which to compute the maximal consistent
-     *                   subsets.
+     *            The ontology for which to compute the maximal consistent
+     *            subsets.
      * @param isRepaired
-     *                   The predicate with which to measure "consistency".
+     *            The predicate with which to measure "consistency".
      */
     public MaximalConsistentSubsets(final Ontology ontology, final Predicate<Ontology> isRepaired) {
         this(ontology, isRepaired, false);
@@ -57,10 +57,10 @@ public class MaximalConsistentSubsets {
 
     /**
      * @param ontology
-     *                 The ontology for which to compute the maximal consistent
-     *                 subsets.
+     *            The ontology for which to compute the maximal consistent
+     *            subsets.
      * @throws IllegalArgumentException
-     *                                  If there is no maximal consistent subset.
+     *             If there is no maximal consistent subset.
      */
     public MaximalConsistentSubsets(final Ontology ontology) throws IllegalArgumentException {
         this(ontology, Ontology::isConsistent);
@@ -110,10 +110,10 @@ public class MaximalConsistentSubsets {
 
     /**
      * @param axioms
-     *                  A set of axioms
+     *            A set of axioms
      * @param contained
-     *                  A set of axioms that must be contained by the returned
-     *                  maximal consistent sets.
+     *            A set of axioms that must be contained by the returned
+     *            maximal consistent sets.
      * @return A stream of maximal consistent subsets of axioms from {@code axioms}
      *         containing {@code contained}.
      */
@@ -124,33 +124,14 @@ public class MaximalConsistentSubsets {
     }
 
     /**
-     * Computes a single minimal subset of {@code set} that satisfies the
-     * predicate. The predicate must be monotone.
-     * 
-     * @param set
-     * @param isValid
-     * @return A minimal subset that satisfies {@code isValid}.
-     */
-    public static <T> Set<T> minimalSubset(final Collection<T> set, final Predicate<Set<T>> isValid) {
-        final var subset = new HashSet<>(set);
-        for (final var axiom : set) {
-            subset.remove(axiom);
-            if (!isValid.test(subset)) {
-                subset.add(axiom);
-            }
-        }
-        return subset;
-    }
-
-    /**
      * @param axioms
-     *                  A set of axioms
+     *            A set of axioms
      * @param howMany
-     *                  the maximal number of maximal consistent subsets to be
-     *                  returned
+     *            the maximal number of maximal consistent subsets to be
+     *            returned
      * @param contained
-     *                  A set of axioms that must be contained by the returned
-     *                  maximal consistent sets.
+     *            A set of axioms that must be contained by the returned
+     *            maximal consistent sets.
      * @return A set of at most {@code howMany} maximal consistent subsets of axioms
      *         from {@code axioms} containing {@code contained}.
      */
@@ -163,10 +144,10 @@ public class MaximalConsistentSubsets {
 
     /**
      * @param axioms
-     *                A set of axioms
+     *            A set of axioms
      * @param howMany
-     *                the maximal number of maximal consistent subsets to be
-     *                returned
+     *            the maximal number of maximal consistent subsets to be
+     *            returned
      * @return A set of at most {@code howMany} maximal consistent subsets of axioms
      *         from {@code axioms}.
      */
@@ -179,10 +160,10 @@ public class MaximalConsistentSubsets {
 
     /**
      * @param axioms
-     *                  A set of axioms
+     *            A set of axioms
      * @param contained
-     *                  A set of axioms that must be contained by the returned
-     *                  maximal consistent sets.
+     *            A set of axioms that must be contained by the returned
+     *            maximal consistent sets.
      * @return The set of all maximal consistent subsets of axioms from
      *         {@code axioms} containing {@code contained}.
      */
@@ -193,7 +174,7 @@ public class MaximalConsistentSubsets {
 
     /**
      * @param axioms
-     *               A set of axioms
+     *            A set of axioms
      * @return The set of all maximal consistent subsets of axioms from
      *         {@code axioms} containing {@code contained}.
      */

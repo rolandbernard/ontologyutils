@@ -84,7 +84,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
             case RANDOM_MCS:
                 return Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
             case SOME_MCS:
-                return ontology.maximalConsistentSubset(isRepaired);
+                return Utils.randomChoice(ontology.someMaximalConsistentSubsets(isRepaired));
             default:
                 throw new IllegalArgumentException("Unimplemented reference ontology choice strategy.");
         }
@@ -114,9 +114,9 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 return ontology.smallestMinimalCorrectionSubsets(isRepaired).flatMap(axioms -> axioms.stream());
             }
             case NOT_IN_SOME_MCS:
-                return ontology.minimalCorrectionSubset(isRepaired).stream();
+                return ontology.someMinimalCorrectionSubsets(isRepaired).flatMap(mcs -> mcs.stream());
             case IN_SOME_MUS:
-                return ontology.minimalUnsatisfiableSubset(isRepaired).stream();
+                return ontology.someMinimalUnsatisfiableSubsets(isRepaired).flatMap(mus -> mus.stream());
             case RANDOM:
                 return ontology.refutableAxioms();
             default:

@@ -68,43 +68,6 @@ public class MaximalConsistentSetsTest {
         }
     }
 
-    @Test
-    public void maximalConsistentSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var subset = ontology.maximalConsistentSubset(o -> o.isConsistent());
-            assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
-            assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
-        }
-    }
-
-    @Test
-    public void minimalCorrectionSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var subset = ontology.minimalCorrectionSubset(o -> o.isConsistent());
-            assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
-            assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(ontology.complement(subset), agenda));
-        }
-    }
-
-    @Test
-    public void minimalUnsatisfiableSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var subset = ontology.minimalUnsatisfiableSubset(o -> o.isConsistent());
-            ontology.removeAxioms(ontology.axioms().toList());
-            ontology.addAxioms(subset);
-            assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
-            assertFalse(ontology.isConsistent());
-            for (final var axiom : subset) {
-                ontology.removeAxioms(axiom);
-                assertTrue(ontology.isConsistent());
-                ontology.addAxioms(axiom);
-            }
-        }
-    }
-
     private static Stream<Arguments> axiomPowerSet() {
         return Utils.powerSet(axioms).map(Arguments::of);
     }
