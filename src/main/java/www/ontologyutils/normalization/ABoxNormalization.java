@@ -14,7 +14,7 @@ import www.ontologyutils.toolbox.*;
  * This normalization is not strictly necessary, but since the axiom weakener
  * will only remove complete DifferentIndividuals and SameIndividuals axioms,
  * splitting them will make the repair more gentle.
- * 
+ *
  * SameIndividual axioms can be normalized in different ways. If
  * {@code fullEquality} is:
  * true, it will create all n*(n-1) binary equality axioms between two distinct
@@ -83,7 +83,7 @@ public class ABoxNormalization implements OntologyModification {
 
     /**
      * @param axiom
-     *              The axiom that should be converted.
+     *            The axiom that should be converted.
      * @return A number of sroiq axioms that together are equivalent to
      *         {@code axiom} in every ontology.
      */
