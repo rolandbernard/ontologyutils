@@ -59,9 +59,22 @@ public class ABoxNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void allTBoxAxiomsAreSubclassOf(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+    public void allABoxAxiomsAreInSroiq(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
         try (final var ontology = Ontology.withAxioms(axioms)) {
             final var normalization = new ABoxNormalization();
+            normalization.apply(ontology);
+            ontology.axioms(AxiomType.SAME_INDIVIDUAL)
+                    .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).getIndividuals().size()));
+            ontology.axioms(AxiomType.DIFFERENT_INDIVIDUALS)
+                    .forEach(axiom -> assertEquals(2, ((OWLDifferentIndividualsAxiom) axiom).getIndividuals().size()));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("testAxioms")
+    public void allABoxAxiomsAreInSroiqFull(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+        try (final var ontology = Ontology.withAxioms(axioms)) {
+            final var normalization = new ABoxNormalization(true);
             normalization.apply(ontology);
             ontology.axioms(AxiomType.SAME_INDIVIDUAL)
                     .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).getIndividuals().size()));
@@ -76,6 +89,23 @@ public class ABoxNormalizationTest {
         try (final var originalOntology = Ontology.withAxioms(axioms)) {
             try (final var normalizedOntology = Ontology.withAxioms(axioms)) {
                 final var normalization = new ABoxNormalization();
+                normalization.apply(normalizedOntology);
+                normalizedOntology.axioms()
+                        .forEach(normalizedAxiom -> assertTrue(originalOntology.isEntailed(normalizedAxiom)));
+                originalOntology.axioms()
+                        .forEach(originalAxiom -> assertTrue(normalizedOntology.isEntailed(originalAxiom)));
+                normalizedOntology.close();
+                originalOntology.close();
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("testAxioms")
+    public void normalizedOntologyIsEquivalentFull(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+        try (final var originalOntology = Ontology.withAxioms(axioms)) {
+            try (final var normalizedOntology = Ontology.withAxioms(axioms)) {
+                final var normalization = new ABoxNormalization(true);
                 normalization.apply(normalizedOntology);
                 normalizedOntology.axioms()
                         .forEach(normalizedAxiom -> assertTrue(originalOntology.isEntailed(normalizedAxiom)));
