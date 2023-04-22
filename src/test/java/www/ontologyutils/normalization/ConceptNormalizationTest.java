@@ -29,7 +29,7 @@ public class ConceptNormalizationTest {
                                                 df.getOWLClass("A")),
                                         df.getOWLObjectIntersectionOf(
                                                 df.getOWLClass("B"),
-                                                df.getOWLClass("C"),
+                                                df.getOWLClass("C").getObjectComplementOf(),
                                                 df.getOWLClass("D"),
                                                 df.getOWLObjectUnionOf(
                                                         df.getOWLClass("E"),
