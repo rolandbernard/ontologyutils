@@ -26,7 +26,7 @@ public class RBoxNormalization implements OntologyModification {
         }
 
         @Override
-        public Collection<OWLAxiom> visit(final OWLSubClassOfAxiom axiom) {
+        public Collection<OWLAxiom> visit(final OWLSubObjectPropertyOfAxiom axiom) {
             return List.of(axiom);
         }
 
