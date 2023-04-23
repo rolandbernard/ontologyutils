@@ -1,5 +1,6 @@
 package www.ontologyutils.refinement;
 
+import java.util.Set;
 import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
@@ -13,8 +14,9 @@ import www.ontologyutils.toolbox.Ontology;
  */
 public class AxiomStrengthener extends AxiomRefinement {
     private static class Visitor extends AxiomRefinement.Visitor {
-        public Visitor(final RefinementOperator up, final RefinementOperator down) {
-            super(up, down);
+        public Visitor(final RefinementOperator up, final RefinementOperator down,
+                final Set<OWLObjectProperty> simpleRoles) {
+            super(up, down, simpleRoles);
         }
 
         @Override
@@ -23,17 +25,45 @@ public class AxiomStrengthener extends AxiomRefinement {
         }
     }
 
-    private AxiomStrengthener(final Covers covers, final Cover upCover, final Cover downCover) {
-        super(new Visitor(new RefinementOperator(downCover, upCover), new RefinementOperator(upCover, downCover)),
-                covers);
+    private AxiomStrengthener(final Covers covers, final Cover upCover, final Cover downCover,
+            final Set<OWLObjectProperty> simpleRoles) {
+        super(new Visitor(new RefinementOperator(downCover, upCover), new RefinementOperator(upCover, downCover),
+                simpleRoles), covers);
     }
 
-    private AxiomStrengthener(final Covers covers) {
-        this(covers, covers.upCover().cached(), covers.downCover().cached());
+    private AxiomStrengthener(final Covers covers, final Set<OWLObjectProperty> simpleRoles) {
+        this(covers, covers.upCover().cached(), covers.downCover().cached(), simpleRoles);
     }
 
     /**
-     * Create a new axiom strengthener with the given reference ontology. The
+     * Create a new axiom weakener with the given reference ontology. To maintain
+     * global restrictions on roles, all roles in {@code simpleRoles} must be simple
+     * in all ontologies the weakened axioms are used in.
+     *
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
+     * @param simpleRoles
+     *            The roles that are guaranteed to be simple.
+     */
+    public AxiomStrengthener(final Ontology refOntology, final Set<OWLObjectProperty> simpleRoles) {
+        this(new Covers(refOntology, simpleRoles), simpleRoles);
+    }
+
+    /**
+     * Create a new axiom weakener with the given reference ontology.
+     *
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
+     * @param fullOntology
+     *            The maximal ontology in which the weaker axioms will be
+     *            used in.
+     */
+    public AxiomStrengthener(final Ontology refOntology, final Ontology fullOntology) {
+        this(refOntology, fullOntology.simpleRoles().collect(Collectors.toSet()));
+    }
+
+    /**
+     * Create a new axiom strengthener with the given reference ontology.The
      * reference ontology must contain all RBox axioms of all ontologies the
      * stronger axioms are used in, otherwise the resulting axiom is not guaranteed
      * to satisfy global restrictions on roles.
@@ -42,7 +72,7 @@ public class AxiomStrengthener extends AxiomRefinement {
      *            The reference ontology to use for the up and down covers.
      */
     public AxiomStrengthener(final Ontology refOntology) {
-        this(new Covers(refOntology, refOntology.simpleRoles().collect(Collectors.toSet())));
+        this(refOntology, refOntology);
     }
 
     /**

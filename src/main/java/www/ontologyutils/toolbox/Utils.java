@@ -96,6 +96,19 @@ public final class Utils {
     }
 
     /**
+     * @param <T>
+     * @param list
+     * @param idx
+     * @param value
+     * @return A stream that contains all elements in {@code list} but the one at
+     *         {@code idx} which is replace by {@code value}.
+     */
+    public static <T> Stream<T> replaceInList(final List<T> list, final int idx, final T value) {
+        return IntStream.range(0, list.size()).mapToObj(j -> j)
+                .map(j -> idx == j ? value : list.get(j));
+    }
+
+    /**
      * Compute the power set of the given collection. The implementation here is
      * only able to handle up to 63 elements in {@code set}.
      *

@@ -1,12 +1,12 @@
 package www.ontologyutils.refinement;
 
-import java.util.List;
 import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.refinement.Covers.Cover;
 import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.Utils;
 
 /**
  * Implements a abstract refinement operator that given the upward and downward
@@ -53,19 +53,6 @@ public class RefinementOperator {
                             : c.getObjectComplementOf());
         }
 
-        /**
-         * @param <T>
-         * @param list
-         * @param idx
-         * @param value
-         * @return A stream that contains all elements in {@code list} but the one at
-         *         {@code idx} which is replace by {@code value}.
-         */
-        private <T> Stream<T> replaceInList(final List<T> list, final int idx, final T value) {
-            return IntStream.range(0, list.size()).mapToObj(j -> j)
-                    .map(j -> idx == j ? value : list.get(j));
-        }
-
         @Override
         public Stream<OWLClassExpression> visit(final OWLObjectIntersectionOf concept) {
             final var conjuncts = concept.getOperandsAsList();
@@ -74,7 +61,7 @@ public class RefinementOperator {
             }
             return IntStream.range(0, conjuncts.size()).mapToObj(i -> i)
                     .flatMap(i -> refine(conjuncts.get(i))
-                            .map(refined -> df.getOWLObjectIntersectionOf(replaceInList(conjuncts, i, refined))));
+                            .map(refined -> df.getOWLObjectIntersectionOf(Utils.replaceInList(conjuncts, i, refined))));
         }
 
         @Override
@@ -85,7 +72,7 @@ public class RefinementOperator {
             }
             return IntStream.range(0, disjuncts.size()).mapToObj(i -> i)
                     .flatMap(i -> refine(disjuncts.get(i))
-                            .map(refined -> df.getOWLObjectUnionOf(replaceInList(disjuncts, i, refined))));
+                            .map(refined -> df.getOWLObjectUnionOf(Utils.replaceInList(disjuncts, i, refined))));
         }
 
         @Override

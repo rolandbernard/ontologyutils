@@ -166,7 +166,12 @@ public class SroiqAxiomWeakenerTest {
     public void allWeakerAxiomsAreEntailed() {
         ontology.axioms(AxiomWeakener.SUPPORTED_AXIOM_TYPES).forEach(strongAxiom -> {
             axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
-                assertTrue(ontology.isEntailed(weakAxiom));
+                try {
+                    assertTrue(ontology.isEntailed(weakAxiom));
+                } catch (final UnsupportedOperationException e) {
+                    // Some reasoners don't support this kind of entailment.
+                    assertTrue(weakAxiom.isOfType(AxiomType.SUB_PROPERTY_CHAIN_OF));
+                }
             });
         });
     }

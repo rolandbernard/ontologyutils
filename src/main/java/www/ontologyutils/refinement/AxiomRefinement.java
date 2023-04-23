@@ -1,7 +1,7 @@
 package www.ontologyutils.refinement;
 
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -23,17 +23,21 @@ import www.ontologyutils.toolbox.*;
 public abstract class AxiomRefinement implements AutoCloseable {
     public static final Set<AxiomType<?>> SUPPORTED_AXIOM_TYPES = Set.of(
             AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION, AxiomType.OBJECT_PROPERTY_ASSERTION,
-            AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION, AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS);
+            AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION, AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS,
+            AxiomType.SUB_OBJECT_PROPERTY, AxiomType.SUB_PROPERTY_CHAIN_OF, AxiomType.DISJOINT_OBJECT_PROPERTIES);
 
     protected static abstract class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
         protected final OWLDataFactory df;
         protected final RefinementOperator up;
         protected final RefinementOperator down;
+        protected final Set<OWLObjectProperty> simpleRoles;
 
-        public Visitor(final RefinementOperator up, final RefinementOperator down) {
+        public Visitor(final RefinementOperator up, final RefinementOperator down,
+                final Set<OWLObjectProperty> simpleRoles) {
             df = Ontology.getDefaultDataFactory();
             this.up = up;
             this.down = down;
+            this.simpleRoles = simpleRoles;
         }
 
         protected abstract OWLAxiom noopAxiom();
@@ -87,6 +91,39 @@ public abstract class AxiomRefinement implements AutoCloseable {
         @Override
         public Stream<OWLAxiom> visit(final OWLDifferentIndividualsAxiom axiom) {
             return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLSubObjectPropertyOfAxiom axiom) {
+            return Stream.concat(Stream.of(noopAxiom()),
+                    Stream.concat(
+                            down.refine(axiom.getSubProperty())
+                                    .map(role -> df.getOWLSubObjectPropertyOfAxiom(role, axiom.getSuperProperty())),
+                            simpleRoles.contains(axiom.getSubProperty().getNamedProperty())
+                                    ? up.refine(axiom.getSuperProperty())
+                                            .map(role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(),
+                                                    role))
+                                    : Stream.of()));
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLSubPropertyChainOfAxiom axiom) {
+            final var chain = axiom.getPropertyChain();
+            return Stream.concat(Stream.of(noopAxiom()),
+                    IntStream.range(0, chain.size()).mapToObj(i -> i)
+                            .flatMap(i -> down.refine(chain.get(i))
+                                    .map(role -> df.getOWLSubPropertyChainOfAxiom(
+                                            Utils.replaceInList(chain, i, role).toList(), axiom.getSuperProperty()))));
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLDisjointObjectPropertiesAxiom axiom) {
+            final var properties = axiom.properties().toList();
+            return Stream.concat(Stream.of(noopAxiom()),
+                    IntStream.range(0, properties.size()).mapToObj(i -> i)
+                            .flatMap(i -> down.refine(properties.get(i))
+                                    .map(role -> df.getOWLDisjointObjectPropertiesAxiom(
+                                            Utils.replaceInList(properties, i, role).toList()))));
         }
 
         @Override
