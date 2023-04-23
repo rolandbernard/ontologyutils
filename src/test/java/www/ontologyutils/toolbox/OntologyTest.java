@@ -32,12 +32,12 @@ public class OntologyTest {
         axioms.add(ax1);
         axioms.add(ax2);
         try (final var ontology = Ontology.withAxioms(axioms)) {
-            final int infSize = ontology.inferredTaxonomyAxioms().size();
+            final long infSize = ontology.inferredTaxonomyAxioms().count();
             assertEquals(6, infSize);
         }
         axioms.add(ax3);
         try (final var ontology = Ontology.withAxioms(axioms)) {
-            final int infSize = ontology.inferredTaxonomyAxioms().size();
+            final long infSize = ontology.inferredTaxonomyAxioms().count();
             assertEquals(7, infSize);
         }
     }

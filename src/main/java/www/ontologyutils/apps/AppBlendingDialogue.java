@@ -147,7 +147,7 @@ public class AppBlendingDialogue {
      *
      */
     private static int quantifyInformation(Ontology ontology) {
-        return ontology.inferredTaxonomyAxioms().size() + (int) ontology.axioms().count();
+        return (int) (ontology.inferredTaxonomyAxioms().count() + ontology.axioms().count());
     }
 
     /**
@@ -188,7 +188,7 @@ public class AppBlendingDialogue {
      *         pages 1942-1948.
      */
     private static double happinessTolerant(Ontology agent, Ontology ontology) {
-        Set<OWLAxiom> axioms = agent.inferredTaxonomyAxioms();
+        Set<OWLAxiom> axioms = agent.inferredTaxonomyAxioms().collect(Collectors.toSet());
         axioms.addAll(agent.axioms().collect(Collectors.toSet()));
 
         long countSatisfiedAxioms = axioms.stream().filter(a -> ontology.isEntailed(a)).count();
@@ -226,9 +226,9 @@ public class AppBlendingDialogue {
      *         pages 1942-1948.
      */
     private static double happinessStrict(Ontology agent, Ontology ontology) {
-        Set<OWLAxiom> axioms = agent.inferredTaxonomyAxioms();
+        Set<OWLAxiom> axioms = agent.inferredTaxonomyAxioms().collect(Collectors.toSet());
         axioms.addAll(agent.axioms().collect(Collectors.toSet()));
-        axioms.addAll(ontology.inferredTaxonomyAxioms());
+        axioms.addAll(ontology.inferredTaxonomyAxioms().collect(Collectors.toSet()));
         axioms.addAll(ontology.axioms().collect(Collectors.toSet()));
 
         long countSatisfiedAxioms = axioms.stream().filter(a -> agent.isEntailed(a) && ontology.isEntailed(a))

@@ -41,7 +41,7 @@ public class BinaryVoteFactory {
             throw new IllegalArgumentException("The value of probable positivity must be between 0 and 1");
         }
 
-        Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(new HashSet<>(agenda));
+        Set<Set<OWLAxiom>> mcss = MaximalConsistentSubsets.maximalConsistentSubsets(new HashSet<>(agenda));
         int which = ThreadLocalRandom.current().nextInt(0, mcss.size());
 
         // the ballot will be a subset of the mcs chosen next randomly

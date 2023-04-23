@@ -10,7 +10,7 @@ import org.semanticweb.owlapi.model.*;
  * This an adaptation of the algorithm in Robert Malouf's "Maximal Consistent
  * Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.
  */
-public class MaximalConsistentSets {
+public class MaximalConsistentSubsets {
     private static record QueueItem(int k, Set<OWLAxiom> removed) {
     }
 
@@ -19,6 +19,8 @@ public class MaximalConsistentSets {
     private final List<OWLAxiom> axioms;
     private final Deque<QueueItem> queue;
     private final SetOfSets<OWLAxiom> results;
+    private final boolean largest;
+    private Set<OWLAxiom> lastResult;
     private Set<OWLAxiom> result;
 
     /**
@@ -27,14 +29,30 @@ public class MaximalConsistentSets {
      *            subsets.
      * @param isRepaired
      *            The predicate with which to measure "consistency".
+     * @param largest
+     *            Return only the largest maximal consistent sets (or
+     *            smallest corrections)
      */
-    public MaximalConsistentSets(final Ontology ontology, final Predicate<Ontology> isRepaired) {
+    public MaximalConsistentSubsets(final Ontology ontology, final Predicate<Ontology> isRepaired,
+            final boolean largest) {
         this.ontology = ontology;
         this.isRepaired = isRepaired;
         axioms = ontology.refutableAxioms().toList();
         queue = new ArrayDeque<>();
         queue.add(new QueueItem(0, new HashSet<>()));
         results = new SetOfSets<>();
+        this.largest = largest;
+    }
+
+    /**
+     * @param ontology
+     *            The ontology for which to compute the maximal consistent
+     *            subsets.
+     * @param isRepaired
+     *            The predicate with which to measure "consistency".
+     */
+    public MaximalConsistentSubsets(final Ontology ontology, final Predicate<Ontology> isRepaired) {
+        this(ontology, isRepaired, false);
     }
 
     /**
@@ -44,7 +62,7 @@ public class MaximalConsistentSets {
      * @throws IllegalArgumentException
      *             If there is no maximal consistent subset.
      */
-    public MaximalConsistentSets(final Ontology ontology) throws IllegalArgumentException {
+    public MaximalConsistentSubsets(final Ontology ontology) throws IllegalArgumentException {
         this(ontology, Ontology::isConsistent);
     }
 
@@ -172,7 +190,9 @@ public class MaximalConsistentSets {
     private boolean computeNextResult() {
         while (!queue.isEmpty()) {
             final var current = queue.pop();
-            if (results.containsSubset(current.removed)) {
+            if (largest && lastResult != null && current.removed.size() > lastResult.size()) {
+                break;
+            } else if (results.containsSubset(current.removed)) {
                 continue;
             } else {
                 try (final var subset = ontology.clone()) {
@@ -180,6 +200,7 @@ public class MaximalConsistentSets {
                     if (isRepaired.test(subset)) {
                         results.add(current.removed);
                         result = current.removed;
+                        lastResult = result;
                         return true;
                     } else {
                         subset.removeAxioms(axioms.stream().skip(current.k));
@@ -201,24 +222,17 @@ public class MaximalConsistentSets {
     }
 
     /**
-     * @param remove
-     * @return The axioms of the ontology without those in {@code remove}.
-     */
-    private Set<OWLAxiom> complement(final Set<OWLAxiom> remove) {
-        return ontology.axioms().filter(axiom -> !remove.contains(axiom)).collect(Collectors.toSet());
-    }
-
-    /**
      * @return A stream producing all maximal consistent sets.
      */
     public Stream<Set<OWLAxiom>> stream() {
-        return repairsStream().map(this::complement);
+        return correctionStream().map(ontology::complement);
     }
 
     /**
-     * @return A stream producing all complements of maximal consistent sets.
+     * @return A stream producing all complements of maximal consistent subsets
+     *         (i.e. minimal correction subsets).
      */
-    public Stream<Set<OWLAxiom>> repairsStream() {
+    public Stream<Set<OWLAxiom>> correctionStream() {
         return Stream.concat(results.stream(),
                 StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<Set<OWLAxiom>>() {
                     public boolean hasNext() {

@@ -57,12 +57,12 @@ public class CollectiveReferenceOntologyTest {
     @Test
     public void testMaximalConsistentSets() {
         Set<OWLAxiom> agendaSet = new HashSet<>(agenda);
-        Set<Set<OWLAxiom>> results = MaximalConsistentSets.maximalConsistentSubsets(agendaSet);
+        Set<Set<OWLAxiom>> results = MaximalConsistentSubsets.maximalConsistentSubsets(agendaSet);
         assertTrue(results.stream()
-                .allMatch(subset -> MaximalConsistentSets.isMaximallyConsistentSubset(subset,
+                .allMatch(subset -> MaximalConsistentSubsets.isMaximallyConsistentSubset(subset,
                         agendaSet)));
         assertTrue(Utils.powerSet(agendaSet).allMatch(
-                subset -> (!MaximalConsistentSets.isMaximallyConsistentSubset(subset, agendaSet)
+                subset -> (!MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agendaSet)
                         || results.contains(subset))));
     }
 

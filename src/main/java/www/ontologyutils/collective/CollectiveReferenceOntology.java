@@ -47,7 +47,7 @@ public class CollectiveReferenceOntology {
      *         subontology of the agenda
      */
     public Ontology get() {
-        Set<Set<OWLAxiom>> mcss = MaximalConsistentSets.maximalConsistentSubsets(agenda);
+        Set<Set<OWLAxiom>> mcss = MaximalConsistentSubsets.maximalConsistentSubsets(agenda);
         for (Set<OWLAxiom> set1 : mcss) {
             if (mcss.stream().allMatch(set2 -> !lexicographicallySmaller(set2, set1))) {
                 return Ontology.withAxioms(set1);

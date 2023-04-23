@@ -1,6 +1,8 @@
 package www.ontologyutils.apps;
 
-import www.ontologyutils.normalization.TBoxSubclassOfNormalization;
+import org.semanticweb.owlapi.model.OWLAxiom;
+
+import www.ontologyutils.normalization.SroiqNormalization;
 import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
 
@@ -19,7 +21,7 @@ public class AppAutomatedRepairRandomMCS {
         }
         final var ontology = Ontology.loadOntology(args[0]);
         System.err.println("Loaded...");
-        final var normalization = new TBoxSubclassOfNormalization();
+        final var normalization = new SroiqNormalization();
         final var repair = OntologyRepairRandomMcs.forConsistency();
         System.err.println("Normalizing...");
         normalization.apply(ontology);
@@ -27,9 +29,9 @@ public class AppAutomatedRepairRandomMCS {
         repair.apply(ontology);
         System.err.println("Repaired.");
         System.err.println("=== BEGIN RESULT ===");
-        ontology.refutableAxioms().map(Utils::prettyPrintAxiom)
+        ontology.refutableAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                 .sorted().forEach(System.out::println);
-        ontology.staticAxioms().map(Utils::prettyPrintAxiom)
+        ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                 .sorted().forEach(System.out::println);
         assert ontology.isConsistent();
         ontology.close();

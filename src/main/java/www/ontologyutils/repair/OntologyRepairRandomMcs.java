@@ -1,5 +1,6 @@
 package www.ontologyutils.repair;
 
+import java.util.Collection;
 import java.util.function.Predicate;
 
 import org.semanticweb.owlapi.model.*;
@@ -20,7 +21,7 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
      * @return An instance of {@code OntologyRepairRandomMcs} that tries to make the
      *         ontology consistent.
      */
-    public static OntologyRepairRandomMcs forConsistency() {
+    public static OntologyRepair forConsistency() {
         return new OntologyRepairRandomMcs(Ontology::isConsistent);
     }
 
@@ -28,7 +29,7 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
      * @return An instance of {@code OntologyRepairRandomMcs} that tries to remove
      *         {@code axiom} from the set of consequences of the ontology.
      */
-    public static OntologyRepairRandomMcs forRemovingConsequence(final OWLAxiom axiom) {
+    public static OntologyRepair forRemovingConsequence(final OWLAxiom axiom) {
         return new OntologyRepairRandomMcs(o -> o.isEntailed(axiom));
     }
 
@@ -36,13 +37,18 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
      * @return An instance of {@code OntologyRepairRandomMcs} that tries to make
      *         {@code concept} satisfiable.
      */
-    public static OntologyRepairRandomMcs forConceptSatisfiability(final OWLClassExpression concept) {
+    public static OntologyRepair forConceptSatisfiability(final OWLClassExpression concept) {
         return new OntologyRepairRandomMcs(o -> o.isSatisfiable(concept));
     }
 
     @Override
     public void repair(final Ontology ontology) {
-        final var toRemove = Utils.randomChoice(ontology.optimalClassicalRepairs(isRepaired));
+        final var toRemove = Utils.randomChoice(ontology.minimalCorrectionSubsets(isRepaired));
         ontology.removeAxioms(toRemove);
+    }
+
+    @Override
+    public Collection<AxiomType<?>> getReparableAxiomTypes() {
+        return AxiomType.LOGICAL_AXIOM_TYPES;
     }
 }

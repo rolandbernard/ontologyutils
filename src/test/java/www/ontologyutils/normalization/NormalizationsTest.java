@@ -20,7 +20,7 @@ public class NormalizationsTest {
     })
     public void testNormalizeCondor(final String resourceName) throws OWLOntologyCreationException {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms();
-        final var path = TBoxSubclassOfNormalizationTest.class.getResource(resourceName).getFile();
+        final var path = NormalizationsTest.class.getResource(resourceName).getFile();
         try (final var ontology = Ontology.loadOntology(path)) {
             Ontology copy = Ontology.emptyOntology();
             copy.addAxioms(ontology.axioms());
@@ -41,7 +41,7 @@ public class NormalizationsTest {
     })
     public void testNormalizeNaive(final String resourceName) throws OWLOntologyCreationException {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms();
-        final var path = TBoxSubclassOfNormalizationTest.class.getResource(resourceName).getFile();
+        final var path = NormalizationsTest.class.getResource(resourceName).getFile();
         try (final var ontology = Ontology.loadOntology(path)) {
             Ontology copy = Ontology.emptyOntology();
             copy.addAxioms(ontology.axioms());

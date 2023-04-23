@@ -11,7 +11,7 @@ import www.ontologyutils.toolbox.*;
  * Normalization that converts every axiom in the TBox of the ontology to
  * subclass axioms.
  */
-public class TBoxSubclassOfNormalization implements OntologyModification {
+public class TBoxNormalization implements OntologyModification {
     /**
      * Visitor class used for converting the axioms. Only the
      * {@code OWLDisjointUnionAxiom} axioms must be handles specially, other axioms
@@ -47,7 +47,7 @@ public class TBoxSubclassOfNormalization implements OntologyModification {
 
     private final Visitor visitor;
 
-    public TBoxSubclassOfNormalization() {
+    public TBoxNormalization() {
         visitor = new Visitor();
     }
 

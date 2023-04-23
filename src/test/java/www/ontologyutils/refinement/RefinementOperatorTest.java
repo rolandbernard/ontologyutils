@@ -21,11 +21,13 @@ public class RefinementOperatorTest {
     static RefinementOperator specialization;
 
     public RefinementOperatorTest() {
-        final var path = CoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        final var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology);
-        generalization = new RefinementOperator(covers::upCover, covers::downCover);
-        specialization = new RefinementOperator(covers::downCover, covers::upCover);
+        final var upCover = covers.upCover().cached();
+        final var downCover = covers.downCover().cached();
+        generalization = new RefinementOperator(upCover, downCover);
+        specialization = new RefinementOperator(downCover, upCover);
     }
 
     private static Stream<Arguments> expectedGeneralization() {

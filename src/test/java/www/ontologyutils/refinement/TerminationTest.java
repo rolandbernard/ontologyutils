@@ -19,10 +19,12 @@ public class TerminationTest {
     static RefinementOperator generalization;
 
     public TerminationTest() {
-        final var path = CoverTest.class.getResource("../a-and-b.owl").getFile();
+        final var path = RoleCoverTest.class.getResource("../a-and-b.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology);
-        generalization = new RefinementOperator(covers::upCover, covers::downCover);
+        final var upCover = covers.upCover().cached();
+        final var downCover = covers.downCover().cached();
+        generalization = new RefinementOperator(upCover, downCover);
     }
 
     public boolean areEquivalent(final OWLClassExpression c1, final OWLClassExpression c2) {
