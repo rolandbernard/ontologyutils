@@ -153,7 +153,90 @@ public class SroiqAxiomWeakenerTest {
                                         df.getOWLNothing(), df.getOWLThing())),
                         df.getOWLDifferentIndividualsAxiom(
                                 df.getOWLNamedIndividual(ONTOLOGY_IRI, "A"),
-                                df.getOWLNamedIndividual(ONTOLOGY_IRI, "B"))));
+                                df.getOWLNamedIndividual(ONTOLOGY_IRI, "B"))),
+                Arguments.of(
+                        Set.of(
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "grandparentOf")),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "childOf").getInverseProperty(),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "grandparentOf")),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "fatherOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "grandparentOf")),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "motherOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "grandparentOf")),
+                                df.getOWLSubClassOfAxiom(
+                                        df.getOWLNothing(), df.getOWLThing())),
+                        df.getOWLSubObjectPropertyOfAxiom(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "grandparentOf"))),
+                Arguments.of(
+                        Set.of(
+                                df.getOWLSubClassOfAxiom(
+                                        df.getOWLNothing(), df.getOWLThing())),
+                        df.getOWLSubObjectPropertyOfAxiom(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "grandparentOf"),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"))),
+                Arguments.of(
+                        Set.of(
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "childOf").getInverseProperty(),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "fatherOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "motherOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "childOf").getInverseProperty()),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "ancestorOf")),
+                                df.getOWLSubClassOfAxiom(
+                                        df.getOWLNothing(), df.getOWLThing())),
+                        df.getOWLSubObjectPropertyOfAxiom(
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"))),
+                Arguments.of(
+                        Set.of(
+                                df.getOWLSubPropertyChainOfAxiom(
+                                        List.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "ancestorOf")),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubPropertyChainOfAxiom(
+                                        List.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "childOf").getInverseProperty(),
+                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "ancestorOf")),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubPropertyChainOfAxiom(
+                                        List.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "motherOf"),
+                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "ancestorOf")),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubPropertyChainOfAxiom(
+                                        List.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "fatherOf"),
+                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "ancestorOf")),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubPropertyChainOfAxiom(
+                                        List.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubPropertyChainOfAxiom(
+                                        List.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                                df.getOWLObjectProperty(ONTOLOGY_IRI, "childOf").getInverseProperty()),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf")),
+                                df.getOWLSubClassOfAxiom(
+                                        df.getOWLNothing(), df.getOWLThing())),
+                        df.getOWLSubPropertyChainOfAxiom(
+                                List.of(df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"),
+                                        df.getOWLObjectProperty(ONTOLOGY_IRI, "ancestorOf")),
+                                df.getOWLObjectProperty(ONTOLOGY_IRI, "parentOf"))));
     }
 
     @ParameterizedTest
