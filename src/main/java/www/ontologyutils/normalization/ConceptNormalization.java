@@ -194,7 +194,7 @@ public class ConceptNormalization implements OntologyModification {
 
     /**
      * @param axiom
-     *              The axiom that should be converted.
+     *            The axiom that should be converted.
      * @return A axiom that contains only SROIQ concepts.
      */
     public OWLAxiom asSroiqAxiom(final OWLAxiom axiom) {
@@ -203,7 +203,7 @@ public class ConceptNormalization implements OntologyModification {
 
     /**
      * @param concept
-     *                The concept that should be converted.
+     *            The concept that should be converted.
      * @return A SROIQ concepts equivalent to {@code concept}.
      */
     public OWLClassExpression asSroiqConcept(final OWLClassExpression concept) {

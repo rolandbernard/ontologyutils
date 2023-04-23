@@ -1,6 +1,6 @@
 package www.ontologyutils.refinement;
 
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -33,13 +33,16 @@ public class AxiomStrengthener extends AxiomRefinement {
     }
 
     /**
-     * Create a new axiom strengthener with the given reference ontology.
+     * Create a new axiom strengthener with the given reference ontology. The
+     * reference ontology must contain all RBox axioms of all ontologies the
+     * stronger axioms are used in, otherwise the resulting axiom is not guaranteed
+     * to satisfy global restrictions on roles.
      *
      * @param refOntology
      *            The reference ontology to use for the up and down covers.
      */
     public AxiomStrengthener(final Ontology refOntology) {
-        this(new Covers(refOntology));
+        this(new Covers(refOntology, refOntology.simpleRoles().collect(Collectors.toSet())));
     }
 
     /**

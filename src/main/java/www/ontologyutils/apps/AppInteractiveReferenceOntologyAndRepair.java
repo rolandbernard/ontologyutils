@@ -225,7 +225,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
         Set<OWLAxiom> axiomsToKeep = new HashSet<>(referenceOntology.axioms().collect(Collectors.toSet()));
 
         // 2- AxiomWeakener
-        AxiomWeakener aw = new AxiomWeakener(referenceOntology);
+        AxiomWeakener aw = new AxiomWeakener(referenceOntology, mApp.ontology);
         Ontology currentOntology = Ontology.withAxioms(logicalAxioms);
         // 3- Repairing interactively
         while (!currentOntology.isConsistent()) {

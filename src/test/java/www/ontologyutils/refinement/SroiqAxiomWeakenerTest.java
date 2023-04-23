@@ -21,7 +21,7 @@ public class SroiqAxiomWeakenerTest {
     public SroiqAxiomWeakenerTest() {
         final var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        axiomWeakener = new AxiomWeakener(ontology);
+        axiomWeakener = new AxiomWeakener(ontology, ontology);
     }
 
     private static Stream<Arguments> expectedWeakening() {

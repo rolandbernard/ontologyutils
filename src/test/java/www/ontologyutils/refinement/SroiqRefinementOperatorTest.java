@@ -23,7 +23,7 @@ public class SroiqRefinementOperatorTest {
     public SroiqRefinementOperatorTest() {
         final var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        covers = new Covers(ontology);
+        covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
         final var upCover = covers.upCover().cached();
         final var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);

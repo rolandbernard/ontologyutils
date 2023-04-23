@@ -21,7 +21,7 @@ public class CoverTest {
     public CoverTest() {
         final var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        covers = new Covers(ontology);
+        covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
     }
 
     private static Stream<Arguments> expectedUpCover() {

@@ -1,5 +1,7 @@
 package www.ontologyutils.refinement;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
@@ -37,13 +39,43 @@ public class AxiomWeakener extends AxiomRefinement {
     }
 
     /**
+     * Create a new axiom weakener with the given reference ontology. To maintain
+     * global restrictions on roles, all roles in {@code simpleRoles} must be simple
+     * in all ontologies the weakened axioms are used in.
+     *
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
+     * @param simpleRoles
+     *            The roles that are guaranteed to be simple.
+     */
+    public AxiomWeakener(final Ontology refOntology, final Set<OWLObjectProperty> simpleRoles) {
+        this(new Covers(refOntology, simpleRoles));
+    }
+
+    /**
      * Create a new axiom weakener with the given reference ontology.
      *
-     * @param refO
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
+     * @param fullOntology
+     *            The maximal ontology in which the weaker axioms will be
+     *            used in.
+     */
+    public AxiomWeakener(final Ontology refOntology, final Ontology fullOntology) {
+        this(refOntology, fullOntology.simpleRoles().collect(Collectors.toSet()));
+    }
+
+    /**
+     * Create a new axiom weakener with the given reference ontology.The reference
+     * ontology must contain all RBox axioms of all ontologies the weaker axioms
+     * are used in, otherwise the resulting axiom is not guaranteed to satisfy
+     * global restrictions on roles.
+     *
+     * @param refOntology
      *            The reference ontology to use for the up and down covers.
      */
     public AxiomWeakener(final Ontology refOntology) {
-        this(new Covers(refOntology));
+        this(refOntology, refOntology);
     }
 
     /**
