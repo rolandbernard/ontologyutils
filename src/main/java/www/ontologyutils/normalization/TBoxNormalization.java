@@ -38,9 +38,7 @@ public class TBoxNormalization implements OntologyModification {
             } else if (axiom instanceof OWLSubClassOfAxiomShortCut) {
                 return Collections.singleton(((OWLSubClassOfAxiomShortCut) axiom).asOWLSubClassOfAxiom());
             } else {
-                final var ax = (OWLAxiom) axiom;
-                throw new IllegalArgumentException("The axiom " + ax + " of type " + ax.getAxiomType()
-                        + " could not be converted into subclass axioms.");
+                throw new IllegalArgumentException("TBox normalization does not support axiom " + axiom);
             }
         }
     }

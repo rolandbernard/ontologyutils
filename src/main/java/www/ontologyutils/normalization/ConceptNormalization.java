@@ -27,48 +27,48 @@ public class ConceptNormalization implements OntologyModification {
         }
 
         @Override
-        public OWLAxiom visit(OWLSubClassOfAxiom axiom) {
+        public OWLAxiom visit(final OWLSubClassOfAxiom axiom) {
             return df.getOWLSubClassOfAxiom(
                     axiom.getSubClass().accept(visitor),
                     axiom.getSuperClass().accept(visitor));
         }
 
         @Override
-        public OWLAxiom visit(OWLDisjointClassesAxiom axiom) {
+        public OWLAxiom visit(final OWLDisjointClassesAxiom axiom) {
             return df.getOWLDisjointClassesAxiom(
                     axiom.classExpressions().map(concept -> concept.accept(visitor)));
         }
 
         @Override
-        public OWLAxiom visit(OWLObjectPropertyDomainAxiom axiom) {
+        public OWLAxiom visit(final OWLObjectPropertyDomainAxiom axiom) {
             return df.getOWLObjectPropertyDomainAxiom(
                     axiom.getProperty(),
                     axiom.getDomain().accept(visitor));
         }
 
         @Override
-        public OWLAxiom visit(OWLObjectPropertyRangeAxiom axiom) {
+        public OWLAxiom visit(final OWLObjectPropertyRangeAxiom axiom) {
             return df.getOWLObjectPropertyRangeAxiom(
                     axiom.getProperty(),
                     axiom.getRange().accept(visitor));
         }
 
         @Override
-        public OWLAxiom visit(OWLDisjointUnionAxiom axiom) {
+        public OWLAxiom visit(final OWLDisjointUnionAxiom axiom) {
             return df.getOWLDisjointUnionAxiom(
                     axiom.getOWLClass(),
                     axiom.classExpressions().map(concept -> concept.accept(visitor)));
         }
 
         @Override
-        public OWLAxiom visit(OWLClassAssertionAxiom axiom) {
+        public OWLAxiom visit(final OWLClassAssertionAxiom axiom) {
             return df.getOWLClassAssertionAxiom(
                     axiom.getClassExpression().accept(visitor),
                     axiom.getIndividual());
         }
 
         @Override
-        public OWLAxiom visit(OWLEquivalentClassesAxiom axiom) {
+        public OWLAxiom visit(final OWLEquivalentClassesAxiom axiom) {
             return df.getOWLDisjointClassesAxiom(
                     axiom.classExpressions().map(concept -> concept.accept(visitor)));
         }
@@ -92,7 +92,17 @@ public class ConceptNormalization implements OntologyModification {
         }
 
         @Override
-        public OWLClassExpression visit(OWLClass ce) {
+        public OWLClassExpression visit(final OWLClass ce) {
+            return ce;
+        }
+
+        @Override
+        public OWLClassExpression visit(final OWLObjectHasSelf ce) {
+            return ce;
+        }
+
+        @Override
+        public OWLClassExpression visit(final OWLObjectOneOf ce) {
             return ce;
         }
 
@@ -117,44 +127,44 @@ public class ConceptNormalization implements OntologyModification {
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectIntersectionOf ce) {
+        public OWLClassExpression visit(final OWLObjectIntersectionOf ce) {
             final var operands = ce.getOperandsAsList();
             return binaryOperator(operands, ces -> df.getOWLObjectIntersectionOf(ces), () -> df.getOWLThing());
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectUnionOf ce) {
+        public OWLClassExpression visit(final OWLObjectUnionOf ce) {
             final var operands = ce.getOperandsAsList();
             return binaryOperator(operands, ces -> df.getOWLObjectUnionOf(ces), () -> df.getOWLNothing());
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectComplementOf ce) {
+        public OWLClassExpression visit(final OWLObjectComplementOf ce) {
             return df.getOWLObjectComplementOf(ce.getOperand().accept(this));
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectSomeValuesFrom ce) {
+        public OWLClassExpression visit(final OWLObjectSomeValuesFrom ce) {
             return df.getOWLObjectSomeValuesFrom(ce.getProperty(), ce.getFiller().accept(this));
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectAllValuesFrom ce) {
+        public OWLClassExpression visit(final OWLObjectAllValuesFrom ce) {
             return df.getOWLObjectAllValuesFrom(ce.getProperty(), ce.getFiller().accept(this));
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectHasValue ce) {
+        public OWLClassExpression visit(final OWLObjectHasValue ce) {
             return df.getOWLObjectSomeValuesFrom(ce.getProperty(), df.getOWLObjectOneOf(ce.getFiller()));
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectMinCardinality ce) {
+        public OWLClassExpression visit(final OWLObjectMinCardinality ce) {
             return df.getOWLObjectMinCardinality(ce.getCardinality(), ce.getProperty(), ce.getFiller().accept(this));
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectExactCardinality ce) {
+        public OWLClassExpression visit(final OWLObjectExactCardinality ce) {
             final var filler = ce.getFiller().accept(this);
             return df.getOWLObjectIntersectionOf(
                     df.getOWLObjectMinCardinality(ce.getCardinality(), ce.getProperty(), filler),
@@ -162,23 +172,13 @@ public class ConceptNormalization implements OntologyModification {
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectMaxCardinality ce) {
+        public OWLClassExpression visit(final OWLObjectMaxCardinality ce) {
             return df.getOWLObjectMaxCardinality(ce.getCardinality(), ce.getProperty(), ce.getFiller().accept(this));
         }
 
         @Override
-        public OWLClassExpression visit(OWLObjectHasSelf ce) {
-            return ce;
-        }
-
-        @Override
-        public OWLClassExpression visit(OWLObjectOneOf ce) {
-            return ce;
-        }
-
-        @Override
-        public <T> OWLClassExpression doDefault(final T axiom) {
-            throw new IllegalArgumentException("Unsupported concept type for normalization.");
+        public <T> OWLClassExpression doDefault(final T ce) {
+            throw new IllegalArgumentException("Normalization does not support concept " + ce);
         }
     }
 

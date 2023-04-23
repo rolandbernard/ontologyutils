@@ -36,6 +36,21 @@ public class ABoxNormalization implements OntologyModification {
         }
 
         @Override
+        public Collection<OWLAxiom> visit(final OWLClassAssertionAxiom axiom) {
+            return List.of(axiom);
+        }
+
+        @Override
+        public Collection<OWLAxiom> visit(final OWLObjectPropertyAssertionAxiom axiom) {
+            return List.of(axiom);
+        }
+
+        @Override
+        public Collection<OWLAxiom> visit(final OWLNegativeObjectPropertyAssertionAxiom axiom) {
+            return List.of(axiom);
+        }
+
+        @Override
         public Collection<OWLAxiom> visit(final OWLDifferentIndividualsAxiom axiom) {
             final var individuals = axiom.getIndividualsAsList();
             return individuals.stream()
@@ -65,13 +80,17 @@ public class ABoxNormalization implements OntologyModification {
 
         @Override
         public <T> Collection<OWLAxiom> doDefault(final T axiom) {
-            return Set.of((OWLAxiom) axiom);
+            throw new IllegalArgumentException("ABox normalization does not support axiom " + axiom);
         }
     }
 
     private final Visitor visitor;
 
     /**
+     * @param fullEquality
+     *            Set to true if you want equality asserted between all
+     *            pairs of
+     *            individuals.
      */
     public ABoxNormalization(final boolean fullEquality) {
         visitor = new Visitor(fullEquality);
