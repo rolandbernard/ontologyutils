@@ -50,7 +50,7 @@ public class AppInteractiveRepair {
         Ontology currentOntology = Ontology.emptyOntology();
 
         // 2- AxiomWeakener
-        AxiomWeakener aw = new AxiomWeakener(referenceOntology);
+        AxiomWeakener aw = new AxiomWeakener(referenceOntology, mApp.ontology);
 
         // 3- Repairing interactively
         while (!currentOntology.isConsistent()) {

@@ -517,6 +517,16 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @return A stream containing all simple roles.
+     */
+    public Stream<OWLObjectProperty> simpleRoles() {
+        final var nonSimple = withOwlOntologyDo(
+                ontology -> (new OWLObjectPropertyManager(ontology)).getNonSimpleProperties()).stream()
+                .map(role -> role.getNamedProperty()).collect(Collectors.toSet());
+        return rolesInSignature().filter(role -> !nonSimple.contains(role));
+    }
+
+    /**
      * @return A stream providing all subconcepts used in the ontology's TBox.
      */
     public Stream<OWLClassExpression> subConceptsOfTbox() {

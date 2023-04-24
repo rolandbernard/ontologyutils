@@ -63,7 +63,6 @@ public class Covers implements AutoCloseable {
     public final Ontology refOntology;
     public final Set<OWLClassExpression> subConcepts;
     public final Set<OWLObjectProperty> simpleRoles;
-    public final Set<OWLObjectProperty> nonSimpleRoles;
     public OWLReasoner reasoner;
 
     /**
@@ -72,16 +71,14 @@ public class Covers implements AutoCloseable {
      * @param refOntology
      *            The ontology used for entailment check.
      */
-    public Covers(final Ontology refOntology) {
+    public Covers(final Ontology refOntology, final Set<OWLObjectProperty> simpleRoles) {
         df = Ontology.getDefaultDataFactory();
         this.refOntology = refOntology;
         this.reasoner = refOntology.getOwlReasoner();
         this.subConcepts = refOntology.subConcepts().collect(Collectors.toSet());
         this.subConcepts.add(df.getOWLThing());
         this.subConcepts.add(df.getOWLNothing());
-        this.simpleRoles = refOntology.rolesInSignature().collect(Collectors.toSet());
-        this.nonSimpleRoles = refOntology.nonSimpleRoles().collect(Collectors.toSet());
-        this.simpleRoles.removeAll(this.nonSimpleRoles);
+        this.simpleRoles = simpleRoles;
     }
 
     /**

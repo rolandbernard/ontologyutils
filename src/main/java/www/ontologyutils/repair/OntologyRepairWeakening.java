@@ -133,7 +133,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
                     .filter(axiom -> !axiom.isOfType(getReparableAxiomTypes())));
             final var refAxioms = getRefAxioms(copy);
             try (final var refOntology = Ontology.withAxioms(refAxioms)) {
-                try (final var axiomWeakener = new AxiomWeakener(refOntology)) {
+                try (final var axiomWeakener = new AxiomWeakener(refOntology, copy)) {
                     while (!isRepaired(copy)) {
                         final var badAxioms = findBadAxioms(copy);
                         final var badAxiom = Utils.randomChoice(badAxioms);

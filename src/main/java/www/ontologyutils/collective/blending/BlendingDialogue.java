@@ -185,16 +185,17 @@ public class BlendingDialogue {
                     numWeakeningTwo++;
                 }
                 result.removeAxioms(consideredAxiom);
-                AxiomWeakener axiomWeakener = new AxiomWeakener(result);
-                log(" .");
-                Set<OWLAxiom> weakerAxioms = axiomWeakener.weakerAxioms(consideredAxiom).collect(Collectors.toSet());
-                axiomWeakener.close();
-                log(".(" + weakerAxioms.size() + " refinements)");
-                int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
-                log(". ");
-                consideredAxiom = (OWLAxiom) (weakerAxioms.toArray())[randomPick];
-                log(" ===> " + Utils.prettyPrintAxiom(consideredAxiom));
-                result.addAxioms(consideredAxiom);
+                try (AxiomWeakener axiomWeakener = new AxiomWeakener(result)) {
+                    log(" .");
+                    Set<OWLAxiom> weakerAxioms = axiomWeakener.weakerAxioms(consideredAxiom)
+                            .collect(Collectors.toSet());
+                    log(".(" + weakerAxioms.size() + " refinements)");
+                    int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
+                    log(". ");
+                    consideredAxiom = (OWLAxiom) (weakerAxioms.toArray())[randomPick];
+                    log(" ===> " + Utils.prettyPrintAxiom(consideredAxiom));
+                    result.addAxioms(consideredAxiom);
+                }
             }
             log("\nAdding axiom: " + Utils.prettyPrintAxiom(consideredAxiom));
         }
