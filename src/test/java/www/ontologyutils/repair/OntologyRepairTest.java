@@ -58,4 +58,17 @@ public abstract class OntologyRepairTest {
             assertTrue(ontology.isConsistent());
         }
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "../inconsistent-leftpolicies-small.owl", "../inconsistent-leftpolicies.owl" })
+    public void repairInconsistentOntologyFromFile(final String resourceName) {
+        final var path = OntologyRepairTest.class.getResource(resourceName).getFile();
+        try (final var ontology = Ontology.loadOntology(path)) {
+            Utils.randomSeed(0);
+            final var repair = getRepairForConsistency();
+            assertFalse(ontology.isConsistent());
+            repair.apply(ontology);
+            assertTrue(ontology.isConsistent());
+        }
+    }
 }

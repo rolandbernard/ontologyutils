@@ -255,4 +255,27 @@ public class SroiqAxiomWeakenerTest {
             });
         });
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
+            "../a-and-b.owl", "../Empty.owl", "../FishVehicle/Alignment.owl",
+            "../FishVehicle/Disalignment.owl", "../FishVehicle/Fish.owl", "../FishVehicle/InitialOntology.owl",
+            "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
+            "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
+            "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
+    })
+    public void allWeakerAxiomsAreEntailedFromFile(final String resourceName) throws OWLOntologyCreationException {
+        final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        // Using JFact, because Openllet does not support some axioms in entailments.
+        try (final var ontology = Ontology.loadOntology(path)) {
+            try (final var axiomWeakener = new AxiomWeakener(ontology)) {
+                ontology.axioms(AxiomWeakener.SUPPORTED_AXIOM_TYPES).forEach(strongAxiom -> {
+                    axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
+                        assertTrue(ontology.isEntailed(weakAxiom));
+                    });
+                });
+            }
+        }
+    }
 }
