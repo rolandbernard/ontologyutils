@@ -1,58 +1,92 @@
-# Synopsis #
+Ontology Utils
+==============
 
 A suite of utility functions and applications for engineering OWL ontologies.
 
-
-# Setup #
-
-Import as a Maven project.
+This is a heavily modified fork of the code written by Nicolas Troquard. The original code can be found [here](https://bitbucket.org/troquard/ontologyutils/). The code has been extended to handle weakening of ontologies using $\mathcal{SROIQ}$, including weakening of some role inclusion axioms.
 
 
-# Some functions #
+## Getting Started
 
-## Computing maximally consistent sets
+### How to Test
 
-The function `MaximalConsistentSets#maximalConsistentSubsets` takes a set of axioms in parameter and returns the set of maximally consistent subsets.
+To run all the tests for this software, execute the Maven command `mvn test`. This will automatically run all the defined test using JUnit. Note that by default, all tests will be run also as part of the `package` target before the jar is generated.
 
+### How to Build
+
+The project can be build using the Maven command `mvn package`. This will create a jar in the target directory `target/ontologyutils-0.0.1.jar` with all the required code and dependencies. If you want to skip running the tests, you can use `mvn package -DskipTests`.
+
+### How to Run
+
+After you have build the project, the generated jar files are not runnable, you will have to specify which app you want to run explicitly. You can use the Java command `java -cp target/ontologyutils-0.0.1.jar www.ontologyutils.apps.APPNAME` to run a specific app by replacing `APPNAME` with the app you want to run. e.g.,
+```
+java -cp target/ontologyutils-0.0.1.jar www.ontologyutils.apps.AppAutomatedRepairWeakening src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
+```
+
+### Test ontologies
+
+The directory `src/test/resources/www/ontologyutils/` contains test OWL ontologies.
+
+
+## Some functions
+
+### Computing maximally consistent sets
+
+The method `MaximalConsistentSubsets#maximalConsistentSubsets` takes a set of axioms in parameter and returns the set of maximally consistent subsets.
 It is an implementation of the algorithm presented in Robert Malouf's "Maximal Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.`
 
-## TBox Normalization
+Additionally, the methods `MinimalSubsets#getMinimalSubset` and `MinimalSubsets#getMinimalSubsets` can be used to compute the minimal subsets satisfying some monotone predicate. This can be used to find a minimal correction subset, the complement of which is a maximally consistent subset.
+`MinimalSubsets#getMinimalSubset` is based on the algorithms presented in Marques-Silva, Joao, Mikoláš Janota, and Anton Belov. "Minimal sets over monotone predicates in boolean formulae." Computer Aided Verification: 25th International Conference, CAV 2013, Saint Petersburg, Russia, July 13-19, 2013. Proceedings 25. Springer Berlin Heidelberg, 2013.
+`MinimalSubsets#getMinimalSubsets` is a modified version of the MergeXplain algorithm proposed in Shchekotykhin, Kostyantyn, Dietmar Jannach, and Thomas Schmitz. "MergeXplain: Fast computation of multiple conflicts for diagnosis." Twenty-Fourth International Joint Conference on Artificial Intelligence. 2015.
 
-The function `Normalization#normalizeCondor` returns normalized version of the input ontology, following the procedure of Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies" (IJCAI 2011). The function `Normalization#normalizeNaive` is a more naive normalization, which normalizes every subclass axiom individually, using exclusively the function `NormalizationTools#normalizeSubClassAxiom`. If the TBox of the original ontology does not have only subclass types of axioms, some preprocessing is necessary using `NormalizationsTools#asSubClassOfAxioms`. Not every TBox can be converted.
+
+### TBox Normalization
+
+The method `Normalization#normalizeCondor` returns normalized version of the input ontology, following the procedure of Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies" (IJCAI 2011). The method `Normalization#normalizeNaive` is a more naive normalization, which normalizes every subclass axiom individually, using exclusively the method `NormalizationTools#normalizeSubClassAxiom`. If the TBox of the original ontology does not have only subclass types of axioms, some preprocessing is necessary using `NormalizationsTools#asSubClassOfAxioms`. Not every TBox can be converted.
 
 Both normalization functions return an ontology who TBox contains only subclass axioms in normal form: A TBox axiom in normal form can be of one of four types:
 
 * Type1: Subclass(atom or conjunction of atoms, atom or disjunction of atoms)
-
 * Type2: Subclass(atom, exists property atom)
-
 * Type3: Subclass(atom, forall property atom)  
-
 * Type4: Subclass(exists property atom, atom)
 
-
-Furthemore, the function `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. See section "App example: TBox normalizations" for more details.
-
-
-## Refinement
-
-The class `RefinementOperator` contains an implementation of the generic refinement operator presented in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz: "Repairing Ontologies via Axiom Weakening", in Thirty-Second AAAI Conference on Artificial Intelligence (AAAI 2018). It can be instantiated as generalisation operator (with a reference ontology, `way` as UpCover, `back` as DownCover) or as a specialisation operator (with a reference ontology, `way` as DownCover, `back` as UpCover). The function `RefinementOperator#refine` return the set of concepts that immediately refine a concept via the refinement operator.
-
-## Axiom weakening
-
-The class `AxiomWeakener` implements the axiom weakening operations presented in Troquard et al. "Repairing Ontologies via Axiom Weakening" (AAAI 2018). `AxiomWeakener:getWeakerSubClassAxiom` is used for subclass axioms, and `AxiomWeakener:getWeakerClassAssertionAxioms` is used for assertion axioms.
+Furthemore, the method `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. See section "App example: TBox normalizations" for more details.
 
 
-# Test ontologies #
+### Refinement
 
-The directory `resources/` contains test OWL ontologies.
+The class `RefinementOperator` contains an implementation of the generic refinement operator presented in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz: "Repairing Ontologies via Axiom Weakening", in Thirty-Second AAAI Conference on Artificial Intelligence (AAAI 2018). It can be instantiated as generalisation operator (with a reference ontology, `way` as UpCover, `back` as DownCover) or as a specialisation operator (with a reference ontology, `way` as DownCover, `back` as UpCover). The method `RefinementOperator#refine` return the concepts that immediately refine a concept via the refinement operator.
+
+Further, the implementation has been extended to the refinement operator described in Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti, G., & Toquard, N. (2020). Towards even more irresistible axiom weakening. This enables refinement of roles and $\mathcal{SROIQ}$ concepts.
 
 
-# App example: show ontology #
+### Axiom weakening
+
+The class `AxiomWeakener` implements the axiom weakening operations presented in Troquard et al. "Repairing Ontologies via Axiom Weakening" (AAAI 2018). `AxiomWeakener:weakerAxioms` is used for getting the weaker axioms.
+
+The axiom weakener has also been extended to operate on following the procedure in Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti, G., & Toquard, N. (2020). Towards even more irresistible axiom weakening. This enables refinement of roles and $\mathcal{SROIQ}$ concepts. Also, further weakening has been implemented for disjoint role assertions and role inclusion axioms.
+
+### Rule generation
+
+The method `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. 
+It takes an axiom of Type1-4 and returns a string representation. E.g.,
+
+* Type1 axiom SubClass(Conjunction(A B), C) becomes a(1, G, a7, a12, (a13,))
+* Type1 axiom SubClass(Conjunction(A B), Disjunction(C,D)) becomes a(1,G,  a7, a12, (a13, a4))
+* Type1 axiom SubClass(A, Disjunction(C,D)) becomes a(1, G, a7, a7, (a13, a4))
+* Type3 axiom Subclass(A, forall hasProperty B) becomes a(3, G, a7, r3, a12)
+
+where G is an integer representing a group of axioms: two axioms belong to the same group if they result from the normalization of the same axiom in the OWL ontology.
+
+
+## Some Apps
+
+### App example: show ontology
 
 The app `AppShowOntology` allows one to display a "human readable" form of an OWL ontology.
 
-`AppShowOntology resources/bodysystem.owl` prints:
+`AppShowOntology src/test/resources/www/ontologyutils/bodysystem.owl` prints:
 
 ```
 Ontology loaded.
@@ -90,7 +124,7 @@ AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#HaematopoieticSyst
 ```
 
 
-# App example: TBox normalizations #
+### App example: TBox normalizations
 
 We present `AppNormalize`. 
 
@@ -99,46 +133,23 @@ The execution of the app verbosely prints a series of successive normalizations 
 We provide the tools to convert the TBox an ontology into a normalized form. An axiom is in normalized form when it has one of the following forms. This might change in the future.
 
 * Type1: Subclass(atom or conjunction of atoms, atom or disjunction of atoms)
-
 * Type2: Subclass(atom, exists property atom)
-
 * Type3: Subclass(atom, forall property atom)  
-
 * Type4: Subclass(exists property atom, atom)
 
-
 If the TBox of the original ontology does not have only subclass types of axioms, some preprocessing is necessary using `NormalizationsTools.asSubClassOfAxioms`. Not every TBox can be converted.
-
 
 `Normalization.java` contains two normalizing functions:
 
 * `normalizeCondor` which follows the procedure of Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies" (IJCAI 2011).
-
-* `normalizeNaive` which normalizes every subclass axiom individually, using exclusively the function `NormalizationTools.normalizeSubClassAxiom`.
+* `normalizeNaive` which normalizes every subclass axiom individually, using exclusively the method `NormalizationTools.normalizeSubClassAxiom`.
  
 (See also `AppSuperNormalize` which only allows Type1 axioms with at most two conjuncts at the left.)
 
 
-## Rule generation
+### App example:  AppCondorRules
 
-The function `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. 
-It takes an axiom of Type1-4 and returns a string representation. E.g.,
-
-* Type1 axiom SubClass(Conjunction(A B), C) becomes a(1, G, a7, a12, (a13,))
-
-* Type1 axiom SubClass(Conjunction(A B), Disjunction(C,D)) becomes a(1,G,  a7, a12, (a13, a4))
-
-* Type1 axiom SubClass(A, Disjunction(C,D)) becomes a(1, G, a7, a7, (a13, a4))
-
-* Type3 axiom Subclass(A, forall hasProperty B) becomes a(3, G, a7, r3, a12)
-
-where G is an integer representing a group of axioms: two axioms belong to the same group if they result from the normalization of the same axiom in the OWL ontology.
-
-
-
-# App example:  AppCondorRules #
-
-Running `AppCondorRules` with `resources/catsandnumbers.owl` as argument gives this result:
+Running `AppCondorRules` with `src/test/resources/www/ontologyutils/catsandnumbers.owl` as argument gives this result:
 
 ```
 a(2, 3, a25, r1, a7).
@@ -286,12 +297,11 @@ AXIOMS GROUPS
 ```
 
 
-
-# App example: AppAutomatedRepairWeakening #
+### App example: AppAutomatedRepairWeakening
 
 This is an app showcasing `OntologyRepairWeakening` which is an implementation of `OntologyRepair` following closely (although not strictly) the axiom weakening approach described in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz: "Repairing Ontologies via Axiom Weakening", AAAI 2018. See also `AppAutomatedRepairRandomMCS` and `AppInteractiveRepair`.
 
-Ran with the parameter `resources/inconsistent-leftpolicies-small.owl`, it gives:
+Ran with the parameter `src/test/resources/www/ontologyutils/inconsistent-leftpolicies-small.owl`, it gives:
 
 ```
 Loaded... Ontology(OntologyID(OntologyIRI(<agenda:eu>) VersionIRI(<null>))) [Axioms: 10 Logical Axioms: 6] First 20 axioms: {SubClassOf(<agenda:eu#RaiseWelfare> <agenda:eu#LeftPolicy>) SubClassOf(<agenda:eu#RaiseWages> <agenda:eu#LeftPolicy>) Declaration(Class(<agenda:eu#RaiseWages>)) Declaration(NamedIndividual(<agenda:eu#Sweden>)) Declaration(Class(<agenda:eu#RaiseWelfare>)) Declaration(Class(<agenda:eu#LeftPolicy>)) ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>) ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>) ClassAssertion(<agenda:eu#RaiseWages> <agenda:eu#Sweden>) DisjointUnion(<agenda:eu#LeftPolicy> <agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare> ) }
@@ -323,12 +333,12 @@ Declaration(NamedIndividual(<agenda:eu#Sweden>))
 Done.
 ```
 
-# App example: AppTurnBasedMechanism #
 
+### App example: AppTurnBasedMechanism
 
 This app showcases the multiagent turn-based approach for ontology aggregation presented in Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to Ontology Aggregation Based on Axiom Weakening. In 27th International Joint Conference on Artificial Intelligence and 23rd European Conference on Artificial Intelligence (IJCAI-ECAI 2018). International Joint Conferences on Artificial Intelligence Organization, 2018, pages 1942-1948.
 
-Ran with the parameter `resources/inconsistent-leftpolicies-small.owl`, it gives:
+Ran with the parameter `src/test/resources/www/ontologyutils/inconsistent-leftpolicies-small.owl`, it gives:
 
 ```
 --- The ontology is not consistent.
@@ -494,16 +504,15 @@ da:eu#RaiseWages> ObjectComplementOf(<agenda:eu#RaiseWelfare>))
 ClassAssertion(<agenda:eu#RaiseWelfare> <agenda:eu#Sweden>)
 ClassAssertion(<agenda:eu#LeftPolicy> <agenda:eu#Sweden>)
 ClassAssertion(ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <agenda:eu#Sweden>)
-
-
 ```
 
-# App example: AppBlendingDialogue #
+
+### App example: AppBlendingDialogue
 
 This app showcases the technique of asymmetric dialogical concept hybridisations, presented in Guendalina Righetti, Daniele Porello, Nicolas Troquard, Oliver Kutz, Maria M. Hedblom, Pietro Galliani. Asymmetric Hybrids: Dialogues for Computational Concept Combination. 12th International Conference on Formal Ontology in Information Systems (FOIS 2021). IOS Press.
 
 
-# App example: AppMakeInconsistent #
+### App example: AppMakeInconsistent
 
 This app uses axiom strengthening (`AxiomStrengthener`) to obtain an inconsistent ontology from a consistent one. The main intended application is to build inconsistent ontologies from real ones, used for testing repairing methods.
 
@@ -512,6 +521,7 @@ A first argument must be given, corresponding to an OWL ontology file path. A se
 The resulting ontology is saved in a file `<filename>-made-inconsistent.owl`, when the filename of the original ontology is `<filename>.owl`.
 
 
-# Acknowledgments #
+## Acknowledgments
 
-Have contributed to this project: Roberto Confalonieri (UNIBZ), Pietro Galliani (UNIBZ).
+Have contributed to this project: Nicolas Troquard (UNIBZ), Roberto Confalonieri (UNIBZ), Pietro Galliani (UNIBZ).
+
