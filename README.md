@@ -23,14 +23,14 @@ After you have build the project, the generated jar files are not runnable, you 
 java -cp target/ontologyutils-0.0.1.jar www.ontologyutils.apps.AppAutomatedRepairWeakening src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
 ```
 
-### Test ontologies
+### Test Ontologies
 
 The directory `src/test/resources/www/ontologyutils/` contains test OWL ontologies.
 
 
-## Some functions
+## Some Functions
 
-### Computing maximally consistent sets
+### Computing Maximally Consistent Sets
 
 The method `MaximalConsistentSubsets#maximalConsistentSubsets` takes a set of axioms in parameter and returns the set of maximally consistent subsets.
 It is an implementation of the algorithm presented in Robert Malouf's "Maximal Consistent Subsets", Computational Linguistics, vol 33(2), p.153-160, 2007.`
@@ -61,13 +61,13 @@ The class `RefinementOperator` contains an implementation of the generic refinem
 Further, the implementation has been extended to the refinement operator described in Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti, G., & Toquard, N. (2020). Towards even more irresistible axiom weakening. This enables refinement of roles and $\mathcal{SROIQ}$ concepts.
 
 
-### Axiom weakening
+### Axiom Weakening
 
 The class `AxiomWeakener` implements the axiom weakening operations presented in Troquard et al. "Repairing Ontologies via Axiom Weakening" (AAAI 2018). `AxiomWeakener:weakerAxioms` is used for getting the weaker axioms.
 
 The axiom weakener has also been extended to operate on following the procedure in Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti, G., & Toquard, N. (2020). Towards even more irresistible axiom weakening. This enables refinement of roles and $\mathcal{SROIQ}$ concepts. Also, further weakening has been implemented for disjoint role assertions and role inclusion axioms.
 
-### Rule generation
+### Rule Generation
 
 The method `RuleGeneration#normalizedSubClassAxiomToRule` transforms a subclass axiom in normal form into a rule. 
 It takes an axiom of Type1-4 and returns a string representation. E.g.,
@@ -82,7 +82,7 @@ where G is an integer representing a group of axioms: two axioms belong to the s
 
 ## Some Apps
 
-### App example: show ontology
+### App Example: Show Ontology
 
 The app `AppShowOntology` allows one to display a "human readable" form of an OWL ontology.
 
@@ -124,7 +124,7 @@ AnnotationAssertion(rdfs:label <http://who.int/bodysystem.owl#HaematopoieticSyst
 ```
 
 
-### App example: TBox normalizations
+### App Example: TBox Normalizations
 
 We present `AppNormalize`. 
 
@@ -147,7 +147,7 @@ If the TBox of the original ontology does not have only subclass types of axioms
 (See also `AppSuperNormalize` which only allows Type1 axioms with at most two conjuncts at the left.)
 
 
-### App example:  AppCondorRules
+### App Example:  AppCondorRules
 
 Running `AppCondorRules` with `src/test/resources/www/ontologyutils/catsandnumbers.owl` as argument gives this result:
 
@@ -297,7 +297,7 @@ AXIOMS GROUPS
 ```
 
 
-### App example: AppAutomatedRepairWeakening
+### App Example: AppAutomatedRepairWeakening
 
 This is an app showcasing `OntologyRepairWeakening` which is an implementation of `OntologyRepair` following closely (although not strictly) the axiom weakening approach described in Nicolas Troquard, Roberto Confalonieri, Pietro Galliani, Rafael Peñaloza, Daniele Porello, Oliver Kutz: "Repairing Ontologies via Axiom Weakening", AAAI 2018. See also `AppAutomatedRepairRandomMCS` and `AppInteractiveRepair`.
 
@@ -334,7 +334,7 @@ Done.
 ```
 
 
-### App example: AppTurnBasedMechanism
+### App Example: AppTurnBasedMechanism
 
 This app showcases the multiagent turn-based approach for ontology aggregation presented in Daniele Porello, Nicolas Troquard, Rafael Peñaloza, Roberto Confalonieri, Pietro Galliani, and Oliver Kutz. Two Approaches to Ontology Aggregation Based on Axiom Weakening. In 27th International Joint Conference on Artificial Intelligence and 23rd European Conference on Artificial Intelligence (IJCAI-ECAI 2018). International Joint Conferences on Artificial Intelligence Organization, 2018, pages 1942-1948.
 
@@ -507,12 +507,12 @@ ClassAssertion(ObjectUnionOf(<agenda:eu#RaiseWages> <agenda:eu#RaiseWelfare>) <a
 ```
 
 
-### App example: AppBlendingDialogue
+### App Example: AppBlendingDialogue
 
 This app showcases the technique of asymmetric dialogical concept hybridisations, presented in Guendalina Righetti, Daniele Porello, Nicolas Troquard, Oliver Kutz, Maria M. Hedblom, Pietro Galliani. Asymmetric Hybrids: Dialogues for Computational Concept Combination. 12th International Conference on Formal Ontology in Information Systems (FOIS 2021). IOS Press.
 
 
-### App example: AppMakeInconsistent
+### App Example: AppMakeInconsistent
 
 This app uses axiom strengthening (`AxiomStrengthener`) to obtain an inconsistent ontology from a consistent one. The main intended application is to build inconsistent ontologies from real ones, used for testing repairing methods.
 
