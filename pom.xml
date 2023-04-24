@@ -10,6 +10,14 @@
 
     <name>ontologyutils</name>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub rolandbernard Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/rolandbernard/ontologyutils</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -29,6 +37,8 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <outputFile>${project.build.directory}\shaded-${project.artifactId}-${project.version}.jar</outputFile>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>

@@ -14,13 +14,13 @@ To run all the tests for this software, execute the Maven command `mvn test`. Th
 
 ### How to Build
 
-The project can be build using the Maven command `mvn package`. This will create a jar in the target directory `target/ontologyutils-0.0.1.jar` with all the required code and dependencies. If you want to skip running the tests, you can use `mvn package -DskipTests`.
+The project can be build using the Maven command `mvn package`. This will create a jar in the target directory `target/ontologyutils-0.0.1.jar` and a second one in `target/shaded-ontologyutils-0.0.1.jar` with all the required dependencies included. If you want to skip running the tests, you can use `mvn package -DskipTests`.
 
 ### How to Run
 
-After you have build the project, the generated jar files are not runnable, you will have to specify which app you want to run explicitly. You can use the Java command `java -cp target/ontologyutils-0.0.1.jar www.ontologyutils.apps.APPNAME` to run a specific app by replacing `APPNAME` with the app you want to run. e.g.,
+After you have build the project, the generated jar files are not runnable, you will have to specify which app you want to run explicitly. You can use the Java command `java -cp target/shaded-ontologyutils-0.0.1.jar www.ontologyutils.apps.APPNAME` to run a specific app by replacing `APPNAME` with the app you want to run. e.g.,
 ```
-java -cp target/ontologyutils-0.0.1.jar www.ontologyutils.apps.AppAutomatedRepairWeakening src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
+java -cp target/shaded-ontologyutils-0.0.1.jar www.ontologyutils.apps.AppAutomatedRepairWeakening src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
 ```
 
 ### Test Ontologies
