@@ -34,7 +34,8 @@ import www.ontologyutils.toolbox.*;
  * highest-ranked axioms and let the computer choose the others at random at
  * each run), and to run a specified number of experiments with the same
  * settings. <br>
- * Optionally, -o <outputsBaseFileName> can be used at the end of the command to
+ * Optionally, -o &lt;outputsBaseFileName&gt; can be used at the end of the
+ * command to
  * save statistics and the result of each run.
  * </p>
  *

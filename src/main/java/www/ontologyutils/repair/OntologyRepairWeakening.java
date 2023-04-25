@@ -91,7 +91,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
     }
 
     /**
-     * @param axioms
+     * @param ontology
      * @return The stream of axioms between which to select the next axiom to
      *         weaken.
      */

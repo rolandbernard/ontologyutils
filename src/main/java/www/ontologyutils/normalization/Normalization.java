@@ -12,9 +12,8 @@ public class Normalization {
     /**
      * @param ontology
      *            with TBox axioms all in subclass form.
-     * @see {@code asSubClassOfAxioms}
+     * @see NormalizationTools#asSubClassOfAxioms(OWLAxiom)
      * @return A normalized version of {@code ontology}.
-     * @throws OntologyCreationException
      */
     public static Ontology normalizeNaive(Ontology ontology) {
         // we make a copy of the ontology without the TBox
@@ -33,11 +32,10 @@ public class Normalization {
     /**
      * @param ontology
      *            with TBox axioms all in subclass form.
-     * @see {@code asSubClassOfAxioms}
+     * @see NormalizationTools#asSubClassOfAxioms(OWLAxiom)
      * @return A normalized version of {@code ontology}, following the procedure of
      *         Simancik et al. "Consequence-Based Reasoning beyond Horn Ontologies"
      *         (IJCAI 2011).
-     * @throws OntologyCreationException
      */
     public static Ontology normalizeCondor(Ontology ontology) {
 
@@ -151,7 +149,7 @@ public class Normalization {
     /**
      * @param ontology
      *            with TBox axioms all in subclass form.
-     * @see {@code asSubClassOfAxioms}
+     * @see NormalizationTools#asSubClassOfAxioms()
      * @return A new ontology with the TBox axioms structurally transformed,
      *         following the procedure of Simancik et al. "Consequence-Based
      *         Reasoning beyond Horn Ontologies" (IJCAI 2011).

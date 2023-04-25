@@ -33,10 +33,10 @@ public class TBoxNormalization implements OntologyModification {
 
         @Override
         public <T> Collection<OWLSubClassOfAxiom> doDefault(final T axiom) throws IllegalArgumentException {
-            if (axiom instanceof OWLSubClassOfAxiomSetShortCut) {
-                return ((OWLSubClassOfAxiomSetShortCut) axiom).asOWLSubClassOfAxioms();
-            } else if (axiom instanceof OWLSubClassOfAxiomShortCut) {
-                return Collections.singleton(((OWLSubClassOfAxiomShortCut) axiom).asOWLSubClassOfAxiom());
+            if (axiom instanceof OWLSubClassOfAxiomSetShortCut ax) {
+                return ax.asOWLSubClassOfAxioms();
+            } else if (axiom instanceof OWLSubClassOfAxiomShortCut ax) {
+                return Collections.singleton(ax.asOWLSubClassOfAxiom());
             } else {
                 throw new IllegalArgumentException("TBox normalization does not support axiom " + axiom);
             }

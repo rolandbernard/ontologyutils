@@ -121,7 +121,7 @@ public final class MinimalSubsets {
     }
 
     /**
-     * Find a number of minimal subsets from {@set} that together with
+     * Find a number of minimal subsets from {@code set} that together with
      * {@code contained} satisfy the monotone predicate {@code isValid}. Note that
      * this implementation is not designed to find all minimal sets.
      *
@@ -143,7 +143,7 @@ public final class MinimalSubsets {
     }
 
     /**
-     * Find a number of minimal subsets from {@set} that satisfy the monotone
+     * Find a number of minimal subsets from {@code set} that satisfy the monotone
      * predicate {@code isValid}. Note that this implementation is not designed to
      * find all minimal sets.
      *

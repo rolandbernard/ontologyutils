@@ -94,8 +94,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     @Override
     public V get(final Object key) {
-        if (key instanceof Set) {
-            final var set = (Set<?>) key;
+        if (key instanceof Set<?> set) {
             final var sorted = set.stream().sorted().iterator();
             var current = root;
             while (current != null && sorted.hasNext()) {
@@ -129,8 +128,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     @Override
     public V remove(final Object key) {
-        if (key instanceof Set) {
-            final var set = (Set<?>) key;
+        if (key instanceof Set<?> set) {
             final var sorted = set.stream().sorted().iterator();
             final var path = new ArrayList<TrieNode<K, V>>();
             var current = root;

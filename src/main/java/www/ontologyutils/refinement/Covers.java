@@ -20,7 +20,7 @@ import www.ontologyutils.toolbox.*;
  *
  * The implementation of role and number covers is based on the approach
  * presented in Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti,
- * G., & Toquard, N. (2020). Towards even more irresistible axiom weakening.
+ * G., &amp; Toquard, N. (2020). Towards even more irresistible axiom weakening.
  */
 public class Covers implements AutoCloseable {
     public static class Cover {
@@ -70,6 +70,8 @@ public class Covers implements AutoCloseable {
      *
      * @param refOntology
      *            The ontology used for entailment check.
+     * @param simpleRoles
+     *            Return only roles that are in this set.
      */
     public Covers(final Ontology refOntology, final Set<OWLObjectProperty> simpleRoles) {
         df = Ontology.getDefaultDataFactory();

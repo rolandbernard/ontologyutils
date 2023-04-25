@@ -74,7 +74,7 @@ public class BlendingDialogue {
     /**
      * @return the number of axiom weakening action performed by ontology one since
      *         the last call to {@code get}.
-     * @see get()
+     * @see #get(double)
      */
     public int getNumWeakeningOne() {
         return numWeakeningOne;
@@ -83,7 +83,7 @@ public class BlendingDialogue {
     /**
      * @return the number of axiom weakening action performed by ontology two since
      *         the last call to {@code get}.
-     * @see get()
+     * @see #get(double)
      */
     public int getNumWeakeningTwo() {
         return numWeakeningTwo;

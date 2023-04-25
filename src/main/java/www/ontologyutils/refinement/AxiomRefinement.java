@@ -17,7 +17,7 @@ import www.ontologyutils.toolbox.*;
  * Conference on Artificial Intelligence. Vol. 32. No. 1. 2018. Definition 3.
  *
  * The implementation for SROIQ axioms is based on the approach presented in
- * Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti, G., &
+ * Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti, G., &amp;
  * Toquard, N. (2020). Towards even more irresistible axiom weakening.
  */
 public abstract class AxiomRefinement implements AutoCloseable {
