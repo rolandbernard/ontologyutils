@@ -1,7 +1,6 @@
 package www.ontologyutils.repair;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -52,10 +51,10 @@ public class OntologyRepairWeakening extends OntologyRepair {
 
     /**
      * @return An instance of {@code OntologyRepairRandomMcs} that tries to remove
-     *         {@code axiom} from the set of consequences of the ontology.
+     *         all {@code axioms} from being entailed by the ontology.
      */
-    public static OntologyRepair forRemovingConsequence(final OWLAxiom axiom) {
-        return new OntologyRepairWeakening(o -> o.isEntailed(axiom));
+    public static OntologyRepair forRemovingEntailments(final Collection<? extends OWLAxiom> axioms) {
+        return new OntologyRepairWeakening(o -> axioms.stream().allMatch(axiom -> !o.isEntailed(axiom)));
     }
 
     /**

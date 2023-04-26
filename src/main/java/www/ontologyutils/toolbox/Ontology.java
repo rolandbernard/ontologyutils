@@ -415,6 +415,14 @@ public class Ontology implements AutoCloseable {
         return withReasonerDo(reasoner -> reasoner.isEntailed(axioms));
     }
 
+    public boolean isEntailed(final Stream<? extends OWLAxiom> axioms) {
+        return withReasonerDo(reasoner -> reasoner.isEntailed(axioms));
+    }
+
+    public boolean isEntailed(final Ontology other) {
+        return isEntailed(other.logicalAxioms());
+    }
+
     public boolean isSatisfiable(final OWLClassExpression concepts) {
         return withReasonerDo(reasoner -> reasoner.isSatisfiable(concepts));
     }

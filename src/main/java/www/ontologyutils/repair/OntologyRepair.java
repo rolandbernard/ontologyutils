@@ -10,7 +10,7 @@ import www.ontologyutils.toolbox.*;
 /**
  * An ontology is repaired if {@code isRepaired} returns true. The predicate
  * must be such that if an ontology satisfies the predicate, every ontology with
- * fewer consequences will also satisfy the predicate.
+ * fewer consequences will also satisfy the predicate, i.e. it must be monotone.
  */
 public abstract class OntologyRepair implements OntologyModification {
     protected final Predicate<Ontology> isRepaired;

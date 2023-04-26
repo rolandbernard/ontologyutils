@@ -27,10 +27,10 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
 
     /**
      * @return An instance of {@code OntologyRepairRandomMcs} that tries to remove
-     *         {@code axiom} from the set of consequences of the ontology.
+     *         all {@code axioms} from being entailed by the ontology.
      */
-    public static OntologyRepair forRemovingConsequence(final OWLAxiom axiom) {
-        return new OntologyRepairRandomMcs(o -> o.isEntailed(axiom));
+    public static OntologyRepair forRemovingEntailments(final Collection<? extends OWLAxiom> axioms) {
+        return new OntologyRepairRandomMcs(o -> axioms.stream().allMatch(axiom -> !o.isEntailed(axiom)));
     }
 
     /**
