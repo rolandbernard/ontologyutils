@@ -21,11 +21,11 @@ import www.ontologyutils.toolbox.*;
  */
 public class OntologyRepairWeakening extends OntologyRepair {
     public static enum RefOntologyStrategy {
-        RANDOM_MCS, SOME_MCS, LARGEST_MCS, INTERSECTION_OF_MCS,
+        RANDOM_MCS, SOME_MCS, ONE_MCS, LARGEST_MCS, INTERSECTION_OF_MCS,
     }
 
     public static enum BadAxiomStrategy {
-        RANDOM, NOT_IN_SOME_MCS, NOT_IN_LARGEST_MCS, IN_LEAST_MCS, IN_SOME_MUS
+        RANDOM, NOT_IN_SOME_MCS, NOT_IN_LARGEST_MCS, IN_LEAST_MCS, IN_SOME_MUS, IN_ONE_MUS, NOT_IN_ONE_MCS
     }
 
     private final RefOntologyStrategy refOntologySource;
@@ -85,6 +85,8 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 return Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
             case SOME_MCS:
                 return Utils.randomChoice(ontology.someMaximalConsistentSubsets(isRepaired));
+            case ONE_MCS:
+                return ontology.maximalConsistentSubset(isRepaired);
             default:
                 throw new IllegalArgumentException("Unimplemented reference ontology choice strategy.");
         }
@@ -117,6 +119,10 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 return ontology.someMinimalCorrectionSubsets(isRepaired).flatMap(mcs -> mcs.stream());
             case IN_SOME_MUS:
                 return ontology.someMinimalUnsatisfiableSubsets(isRepaired).flatMap(mus -> mus.stream());
+            case IN_ONE_MUS:
+                return ontology.minimalUnsatisfiableSubset(isRepaired).stream();
+            case NOT_IN_ONE_MCS:
+                return ontology.minimalCorrectionSubset(isRepaired).stream();
             case RANDOM:
                 return ontology.refutableAxioms();
             default:

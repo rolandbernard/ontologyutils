@@ -97,6 +97,20 @@ public final class MinimalSubsets {
         return getMinimalSubset(Set.of(), set, isValid);
     }
 
+    /**
+     * Computes a single minimal subset of {@code set} that satisfies the
+     * predicate. The predicate must be monotone. In contrast to
+     * {@code getMinimalSubset} this method randomly shuffles the input set before
+     * searching.
+     *
+     * @param set
+     * @param isValid
+     * @return A minimal subset that satisfies {@code isValid}.
+     */
+    public static <T> Set<T> getRandomizedMinimalSubset(final Collection<T> set, final Predicate<Set<T>> isValid) {
+        return getMinimalSubset(Utils.randomOrder(set), isValid);
+    }
+
     private static <T> MinimalSubsetsResult<T> getMinimalSubsetsHelper(final Set<T> contained, final List<T> set,
             final Predicate<Set<T>> isValid) {
         if (!isValid.test(getUnion(contained, set))) {

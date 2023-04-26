@@ -464,7 +464,7 @@ public class Ontology implements AutoCloseable {
      * @return A single minimal correction subset.
      */
     public Set<OWLAxiom> minimalCorrectionSubset(final Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.getMinimalSubset(refutableAxioms,
+        return MinimalSubsets.getRandomizedMinimalSubset(refutableAxioms,
                 axioms -> isRepaired.test(new Ontology(staticAxioms, complement(axioms), reasonerCache)));
     }
 
@@ -473,7 +473,7 @@ public class Ontology implements AutoCloseable {
      *         subset.
      */
     public Set<OWLAxiom> minimalUnsatisfiableSubset(final Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.getMinimalSubset(refutableAxioms,
+        return MinimalSubsets.getRandomizedMinimalSubset(refutableAxioms,
                 axioms -> !isRepaired.test(new Ontology(staticAxioms, axioms, reasonerCache)));
     }
 
