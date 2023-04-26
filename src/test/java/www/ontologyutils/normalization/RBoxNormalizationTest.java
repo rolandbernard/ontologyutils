@@ -2,12 +2,12 @@ package www.ontologyutils.normalization;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
+import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.toolbox.Ontology;
@@ -18,35 +18,51 @@ public class RBoxNormalizationTest {
         return Stream.of(
                 Arguments.of(
                         Set.of(
-                                df.getOWLEquivalentObjectPropertiesAxiom(df.getOWLObjectProperty("A"),
-                                        df.getOWLObjectProperty("B"), df.getOWLObjectProperty("C"),
-                                        df.getOWLObjectProperty("D"), df.getOWLObjectProperty("E"),
+                                df.getOWLEquivalentObjectPropertiesAxiom(
+                                        df.getOWLObjectProperty("A"),
+                                        df.getOWLObjectProperty("B"),
+                                        df.getOWLObjectProperty("C"),
+                                        df.getOWLObjectProperty("D"),
+                                        df.getOWLObjectProperty("E"),
                                         df.getOWLObjectProperty("F")))),
                 Arguments.of(
                         Set.of(
-                                df.getOWLDisjointObjectPropertiesAxiom(df.getOWLObjectProperty("A"),
-                                        df.getOWLObjectProperty("B"), df.getOWLObjectProperty("C")),
-                                df.getOWLInverseObjectPropertiesAxiom(df.getOWLObjectProperty("D"),
+                                df.getOWLDisjointObjectPropertiesAxiom(
+                                        df.getOWLObjectProperty("A"),
+                                        df.getOWLObjectProperty("B"),
+                                        df.getOWLObjectProperty("C")),
+                                df.getOWLInverseObjectPropertiesAxiom(
+                                        df.getOWLObjectProperty("D"),
                                         df.getOWLObjectProperty("E")))),
                 Arguments.of(
                         Set.of(
-                                df.getOWLSymmetricObjectPropertyAxiom(df.getOWLObjectProperty("A")),
-                                df.getOWLAsymmetricObjectPropertyAxiom(df.getOWLObjectProperty("B")),
-                                df.getOWLTransitiveObjectPropertyAxiom(df.getOWLObjectProperty("C")),
-                                df.getOWLIrreflexiveObjectPropertyAxiom(df.getOWLObjectProperty("D")),
-                                df.getOWLReflexiveObjectPropertyAxiom(df.getOWLObjectProperty("E")))),
+                                df.getOWLSymmetricObjectPropertyAxiom(
+                                        df.getOWLObjectProperty("A")),
+                                df.getOWLAsymmetricObjectPropertyAxiom(
+                                        df.getOWLObjectProperty("B")),
+                                df.getOWLTransitiveObjectPropertyAxiom(
+                                        df.getOWLObjectProperty("C")),
+                                df.getOWLIrreflexiveObjectPropertyAxiom(
+                                        df.getOWLObjectProperty("D")),
+                                df.getOWLReflexiveObjectPropertyAxiom(
+                                        df.getOWLObjectProperty("E")))),
                 Arguments.of(
                         Set.of(
-                                df.getOWLSubObjectPropertyOfAxiom(df.getOWLObjectProperty("A"),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty("A"),
                                         df.getOWLObjectProperty("B")),
                                 df.getOWLSubPropertyChainOfAxiom(
-                                        List.of(df.getOWLObjectProperty("A"), df.getOWLObjectProperty("E")),
+                                        List.of(df.getOWLObjectProperty("A"),
+                                                df.getOWLObjectProperty("E")),
                                         df.getOWLObjectProperty("B")),
-                                df.getOWLSubObjectPropertyOfAxiom(df.getOWLObjectProperty("B"),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty("B"),
                                         df.getOWLObjectProperty("C")),
-                                df.getOWLSubObjectPropertyOfAxiom(df.getOWLObjectProperty("A"),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty("A"),
                                         df.getOWLObjectProperty("C")),
-                                df.getOWLSubObjectPropertyOfAxiom(df.getOWLObjectProperty("C"),
+                                df.getOWLSubObjectPropertyOfAxiom(
+                                        df.getOWLObjectProperty("C"),
                                         df.getOWLObjectProperty("D")))));
     }
 
@@ -82,14 +98,16 @@ public class RBoxNormalizationTest {
     @ParameterizedTest
     @MethodSource("testAxioms")
     public void normalizedOntologyIsEquivalent(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        try (final var originalOntology = Ontology.withAxioms(axioms)) {
-            try (final var normalizedOntology = originalOntology.cloneWithJFact()) {
+        // Using HermiT, because Openllet can not handle entailment of complex role
+        // inclusion axioms. Also, JFact crashes with an index-out-of-bounds exception.
+        try (final var originalOntology = Ontology.withAxioms(axioms, new ReasonerFactory())) {
+            try (final var normalizedOntology = originalOntology.clone()) {
                 final var normalization = new RBoxNormalization();
                 normalization.apply(normalizedOntology);
-                originalOntology.axioms()
-                        .forEach(originalAxiom -> assertTrue(normalizedOntology.isEntailed(originalAxiom)));
-                normalizedOntology.close();
-                originalOntology.close();
+                RBoxNormalization.addSimpleReflexiveRole(originalOntology);
+                RBoxNormalization.addSimpleReflexiveRole(normalizedOntology);
+                assertTrue(originalOntology.isEntailed(normalizedOntology));
+                assertTrue(normalizedOntology.isEntailed(originalOntology));
             }
         }
     }
@@ -97,14 +115,16 @@ public class RBoxNormalizationTest {
     @ParameterizedTest
     @MethodSource("testAxioms")
     public void normalizedOntologyIsEquivalentFull(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        try (final var originalOntology = Ontology.withAxioms(axioms)) {
-            try (final var normalizedOntology = originalOntology.cloneWithJFact()) {
+        // Using HermiT, because Openllet can not handle entailment of complex role
+        // inclusion axioms. Also, JFact crashes with an index-out-of-bounds exception.
+        try (final var originalOntology = Ontology.withAxioms(axioms, new ReasonerFactory())) {
+            try (final var normalizedOntology = originalOntology.clone()) {
                 final var normalization = new RBoxNormalization(true);
                 normalization.apply(normalizedOntology);
-                originalOntology.axioms()
-                        .forEach(originalAxiom -> assertTrue(normalizedOntology.isEntailed(originalAxiom)));
-                normalizedOntology.close();
-                originalOntology.close();
+                RBoxNormalization.addSimpleReflexiveRole(originalOntology);
+                RBoxNormalization.addSimpleReflexiveRole(normalizedOntology);
+                assertTrue(originalOntology.isEntailed(normalizedOntology));
+                assertTrue(normalizedOntology.isEntailed(originalOntology));
             }
         }
     }

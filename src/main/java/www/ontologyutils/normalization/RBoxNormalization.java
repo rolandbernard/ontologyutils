@@ -13,6 +13,8 @@ import www.ontologyutils.toolbox.*;
  * Some axioms are converted to TBox axioms.
  */
 public class RBoxNormalization implements OntologyModification {
+    private static final String REFLEXIVE_SUBROLE_NAME = "http://www.ontologyutils.rbox-normalization#[reflexive-subrole]";
+
     /**
      * Visitor class used for converting the axioms.
      */
@@ -65,11 +67,10 @@ public class RBoxNormalization implements OntologyModification {
         @Override
         public Collection<OWLAxiom> visit(final OWLReflexiveObjectPropertyAxiom axiom) {
             final var property = axiom.getProperty();
-            final var freshProperty = df
-                    .getOWLObjectProperty(property.getNamedProperty().getIRI().toString() + "[reflexive-subrole]");
+            final var reflexiveProperty = df.getOWLObjectProperty(REFLEXIVE_SUBROLE_NAME);
             return List.of(
-                    df.getOWLSubObjectPropertyOfAxiom(freshProperty, property),
-                    df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLObjectHasSelf(freshProperty)));
+                    df.getOWLSubObjectPropertyOfAxiom(reflexiveProperty, property),
+                    df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLObjectHasSelf(reflexiveProperty)));
         }
 
         @Override
@@ -122,8 +123,7 @@ public class RBoxNormalization implements OntologyModification {
     /**
      * @param fullEquality
      *            Set to true if you want equality asserted between all
-     *            pairs of
-     *            individuals.
+     *            pairs of individuals.
      */
     public RBoxNormalization(final boolean fullEquality) {
         visitor = new Visitor(fullEquality);
@@ -131,6 +131,26 @@ public class RBoxNormalization implements OntologyModification {
 
     public RBoxNormalization() {
         this(false);
+    }
+
+    /**
+     * Add an axiom defining the reflexive subrole that is used during
+     * normalization.
+     * Note that this method is intended only for testing, to ensure the original
+     * and normalized ontologies are equivalent it will assert that the returned
+     * object property contains only reflexive connections.
+     *
+     * @param ontology
+     *            The ontology to which the axioms should be added.
+     * @return The reflexive object property.
+     */
+    public static OWLObjectProperty addSimpleReflexiveRole(final Ontology ontology) {
+        final var df = Ontology.getDefaultDataFactory();
+        final var reflexiveProperty = df.getOWLObjectProperty(REFLEXIVE_SUBROLE_NAME);
+        ontology.addAxioms(
+                df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLObjectHasSelf(reflexiveProperty)),
+                df.getOWLSubClassOfAxiom(df.getOWLThing(), df.getOWLObjectMaxCardinality(1, reflexiveProperty)));
+        return reflexiveProperty;
     }
 
     /**

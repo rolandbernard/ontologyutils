@@ -138,6 +138,7 @@ public class SroiqAxiomStrengthenerTest {
                     axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
                         try (final var copy2 = copy.cloneWithJFact()) {
                             copy2.addAxioms(strongAxiom);
+                            // Some reasoners don't like entailment on inconsistent ontologies.
                             assertTrue(!copy2.isConsistent() || copy2.isEntailed(weakAxiom));
                         }
                     });

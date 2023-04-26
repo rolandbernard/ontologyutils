@@ -121,12 +121,8 @@ public class ConceptNormalizationTest {
             try (final var normalizedOntology = Ontology.withAxioms(axioms)) {
                 final var normalization = new ConceptNormalization();
                 normalization.apply(normalizedOntology);
-                normalizedOntology.axioms()
-                        .forEach(normalizedAxiom -> assertTrue(originalOntology.isEntailed(normalizedAxiom)));
-                originalOntology.axioms()
-                        .forEach(originalAxiom -> assertTrue(normalizedOntology.isEntailed(originalAxiom)));
-                normalizedOntology.close();
-                originalOntology.close();
+                assertTrue(originalOntology.isEntailed(normalizedOntology));
+                assertTrue(normalizedOntology.isEntailed(originalOntology));
             }
         }
     }
@@ -138,12 +134,8 @@ public class ConceptNormalizationTest {
             try (final var normalizedOntology = Ontology.withAxioms(axioms)) {
                 final var normalization = new ConceptNormalization(true);
                 normalization.apply(normalizedOntology);
-                normalizedOntology.axioms()
-                        .forEach(normalizedAxiom -> assertTrue(originalOntology.isEntailed(normalizedAxiom)));
-                originalOntology.axioms()
-                        .forEach(originalAxiom -> assertTrue(normalizedOntology.isEntailed(originalAxiom)));
-                normalizedOntology.close();
-                originalOntology.close();
+                assertTrue(originalOntology.isEntailed(normalizedOntology));
+                assertTrue(normalizedOntology.isEntailed(originalOntology));
             }
         }
     }
