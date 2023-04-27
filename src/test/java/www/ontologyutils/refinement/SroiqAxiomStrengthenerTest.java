@@ -146,4 +146,33 @@ public class SroiqAxiomStrengthenerTest {
             }
         });
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl",
+            "../a-and-b.owl", "../Empty.owl", "../FishVehicle/Alignment.owl", "../owl-tests.owl",
+            "../FishVehicle/Disalignment.owl", "../FishVehicle/Fish.owl", "../FishVehicle/InitialOntology.owl",
+            "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
+            "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Vehicle.owl",
+    })
+    public void allStrongAxiomsEntailWeakerAxiomsFromFile(final String resourceName)
+            throws OWLOntologyCreationException {
+        final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (final var ontology = Ontology.loadOntology(path)) {
+            ontology.axioms(AxiomStrengthener.SUPPORTED_AXIOM_TYPES).forEach(weakAxiom -> {
+                try (final var copy = ontology.cloneWithJFact()) {
+                    copy.removeAxioms(weakAxiom);
+                    try (final var axiomStrengthener = new AxiomStrengthener(copy)) {
+                        axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
+                            try (final var copy2 = copy.clone()) {
+                                copy2.addAxioms(strongAxiom);
+                                // Some reasoners don't like entailment on inconsistent ontologies.
+                                assertTrue(!copy2.isConsistent() || copy2.isEntailed(weakAxiom));
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
 }

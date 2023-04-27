@@ -19,8 +19,9 @@ import www.ontologyutils.toolbox.Utils;
  */
 public class RefinementOperator {
     public static final int FLAG_NON_STRICT = 0;
-    public static final int FLAG_ALC_STRICT = 1 << 0;
-    public static final int FLAG_NNF_STRICT = 1 << 1;
+    public static final int FLAG_NNF_STRICT = 1 << 0;
+    public static final int FLAG_ALC_STRICT = 1 << 1;
+    public static final int FLAG_SROIQ_STRICT = 1 << 2;
 
     private static class Visitor implements OWLClassExpressionVisitorEx<Stream<OWLClassExpression>> {
         protected final OWLDataFactory df;
@@ -56,8 +57,8 @@ public class RefinementOperator {
         @Override
         public Stream<OWLClassExpression> visit(final OWLObjectIntersectionOf concept) {
             final var conjuncts = concept.getOperandsAsList();
-            if ((flags & FLAG_ALC_STRICT) != 0 && conjuncts.size() != 2) {
-                throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
+            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0 && conjuncts.size() != 2) {
+                throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             }
             return IntStream.range(0, conjuncts.size()).mapToObj(i -> i)
                     .flatMap(i -> refine(conjuncts.get(i))
@@ -67,8 +68,8 @@ public class RefinementOperator {
         @Override
         public Stream<OWLClassExpression> visit(final OWLObjectUnionOf concept) {
             final var disjuncts = concept.getOperandsAsList();
-            if ((flags & FLAG_ALC_STRICT) != 0 && disjuncts.size() != 2) {
-                throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
+            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0 && disjuncts.size() != 2) {
+                throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             }
             return IntStream.range(0, disjuncts.size()).mapToObj(i -> i)
                     .flatMap(i -> refine(disjuncts.get(i))
@@ -133,10 +134,33 @@ public class RefinementOperator {
         }
 
         @Override
-        public <T> Stream<OWLClassExpression> doDefault(final T obj) throws IllegalArgumentException {
-            final var concept = (OWLClassExpression) obj;
+        public Stream<OWLClassExpression> visit(final OWLObjectExactCardinality concept) {
+            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
+                throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
+            }
+            final var number = concept.getCardinality();
+            final var filler = concept.getFiller();
+            final var property = concept.getProperty();
+            final var minCard = df.getOWLObjectMinCardinality(number, property, filler);
+            final var maxCard = df.getOWLObjectMaxCardinality(number, property, filler);
+            return Stream.concat(
+                    refine(minCard).map(minPart -> df.getOWLObjectIntersectionOf(minPart, maxCard)),
+                    refine(maxCard).map(maxPart -> df.getOWLObjectIntersectionOf(minCard, maxPart)));
+        }
+
+        @Override
+        public Stream<OWLClassExpression> visit(final OWLObjectOneOf concept) {
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
+            }
+            return Stream.of();
+        }
+
+        @Override
+        public <T> Stream<OWLClassExpression> doDefault(final T obj) throws IllegalArgumentException {
+            final var concept = (OWLClassExpression) obj;
+            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
+                throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             } else {
                 return Stream.of();
             }

@@ -370,4 +370,56 @@ public class SroiqRefinementOperatorTest {
     public void allSpecialize() {
         ontology.subConcepts().map(specialization::refine).forEach(Stream::count);
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
+            "../a-and-b.owl", "../Empty.owl", "../FishVehicle/Alignment.owl", "../owl-tests.owl",
+            "../FishVehicle/Disalignment.owl", "../FishVehicle/Fish.owl", "../FishVehicle/InitialOntology.owl",
+            "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
+            "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
+            "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
+    })
+    public void generalizationFromFile(final String resourceName) throws OWLOntologyCreationException {
+        final var df = Ontology.getDefaultDataFactory();
+        final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (final var ontology = Ontology.loadOntology(path)) {
+            try (final var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
+                final var upCover = covers.upCover().cached();
+                final var downCover = covers.downCover().cached();
+                generalization = new RefinementOperator(upCover, downCover);
+                ontology.subConcepts().forEach(special -> {
+                    for (final var general : generalization.refine(special).toList()) {
+                        assertTrue(ontology.isEntailed(df.getOWLSubClassOfAxiom(special, general)));
+                    }
+                });
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
+            "../a-and-b.owl", "../Empty.owl", "../FishVehicle/Alignment.owl", "../owl-tests.owl",
+            "../FishVehicle/Disalignment.owl", "../FishVehicle/Fish.owl", "../FishVehicle/InitialOntology.owl",
+            "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
+            "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
+            "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
+    })
+    public void specializationFromFile(final String resourceName) throws OWLOntologyCreationException {
+        final var df = Ontology.getDefaultDataFactory();
+        final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (final var ontology = Ontology.loadOntology(path)) {
+            try (final var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
+                final var upCover = covers.upCover().cached();
+                final var downCover = covers.downCover().cached();
+                specialization = new RefinementOperator(downCover, upCover);
+                ontology.subConcepts().forEach(general -> {
+                    for (final var special : specialization.refine(general).toList()) {
+                        assertTrue(ontology.isEntailed(df.getOWLSubClassOfAxiom(special, general)));
+                    }
+                });
+            }
+        }
+    }
 }
