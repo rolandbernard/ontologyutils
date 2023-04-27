@@ -354,7 +354,11 @@ public class Ontology implements AutoCloseable {
      * @return A new annotated axiom equivalent to {@code axiom}.
      */
     public static OWLAxiom getOriginAnnotatedAxiom(final OWLAxiom axiom, final OWLAxiom origin) {
-        return axiom.getAnnotatedAxiom(axiomOriginAnnotations(origin));
+        if (axiom.equals(origin)) {
+            return axiom;
+        } else {
+            return axiom.getAnnotatedAxiom(axiomOriginAnnotations(origin));
+        }
     }
 
     public void replaceAxiom(final OWLAxiom remove, final Stream<? extends OWLAxiom> replacement) {

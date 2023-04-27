@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.semanticweb.owlapi.model.*;
 
+import www.ontologyutils.normalization.SroiqNormalization;
 import www.ontologyutils.toolbox.*;
 
 import org.junit.jupiter.api.*;
@@ -65,6 +66,21 @@ public abstract class OntologyRepairTest {
         final var path = OntologyRepairTest.class.getResource(resourceName).getFile();
         try (final var ontology = Ontology.loadOntology(path)) {
             Utils.randomSeed(0);
+            final var repair = getRepairForConsistency();
+            assertFalse(ontology.isConsistent());
+            repair.apply(ontology);
+            assertTrue(ontology.isConsistent());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "../inconsistent-leftpolicies-small.owl", "../inconsistent-leftpolicies.owl" })
+    public void repairWithNormalizationInconsistentOntologyFromFile(final String resourceName) {
+        final var path = OntologyRepairTest.class.getResource(resourceName).getFile();
+        try (final var ontology = Ontology.loadOntology(path)) {
+            Utils.randomSeed(0);
+            final var normalization = new SroiqNormalization();
+            normalization.apply(ontology);
             final var repair = getRepairForConsistency();
             assertFalse(ontology.isConsistent());
             repair.apply(ontology);
