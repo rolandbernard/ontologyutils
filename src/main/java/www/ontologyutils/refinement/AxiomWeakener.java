@@ -1,8 +1,7 @@
 package www.ontologyutils.refinement;
 
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -27,6 +26,56 @@ public class AxiomWeakener extends AxiomRefinement {
         @Override
         protected OWLAxiom noopAxiom() {
             return df.getOWLSubClassOfAxiom(df.getOWLNothing(), df.getOWLThing());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLSameIndividualAxiom axiom) {
+            final var individuals = axiom.getIndividualsAsList();
+            if (individuals.size() <= 2) {
+                return super.visit(axiom);
+            } else {
+                return Stream.concat(Stream.of((OWLAxiom) axiom),
+                        IntStream.range(0, individuals.size()).mapToObj(i -> i)
+                                .map(i -> df.getOWLSameIndividualAxiom(Utils.removeFromList(individuals, i).toList())));
+            }
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLDifferentIndividualsAxiom axiom) {
+            final var individuals = axiom.getIndividualsAsList();
+            if (individuals.size() <= 2) {
+                return super.visit(axiom);
+            } else {
+                return Stream.concat(Stream.of((OWLAxiom) axiom),
+                        IntStream.range(0, individuals.size()).mapToObj(i -> i)
+                                .map(i -> df.getOWLDifferentIndividualsAxiom(
+                                        Utils.removeFromList(individuals, i).toList())));
+            }
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLEquivalentClassesAxiom axiom) {
+            final var concepts = axiom.classExpressions().toList();
+            if (concepts.size() <= 2) {
+                return super.visit(axiom);
+            } else {
+                return Stream.concat(Stream.of((OWLAxiom) axiom),
+                        IntStream.range(0, concepts.size()).mapToObj(i -> i)
+                                .map(i -> df.getOWLEquivalentClassesAxiom(Utils.removeFromList(concepts, i))));
+            }
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLEquivalentObjectPropertiesAxiom axiom) {
+            final var properties = axiom.properties().toList();
+            if (properties.size() <= 2) {
+                return super.visit(axiom);
+            } else {
+                return Stream.concat(Stream.of((OWLAxiom) axiom),
+                        IntStream.range(0, properties.size()).mapToObj(i -> i)
+                                .map(i -> df.getOWLEquivalentObjectPropertiesAxiom(
+                                        Utils.removeFromList(properties, i).toList())));
+            }
         }
     }
 

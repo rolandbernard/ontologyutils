@@ -160,11 +160,12 @@ public class SroiqAxiomStrengthenerTest {
         final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (final var ontology = Ontology.loadOntology(path)) {
             ontology.axioms(AxiomStrengthener.SUPPORTED_AXIOM_TYPES).forEach(weakAxiom -> {
-                try (final var copy = ontology.cloneWithJFact()) {
+                try (final var copy = ontology.clone()) {
                     copy.removeAxioms(weakAxiom);
                     try (final var axiomStrengthener = new AxiomStrengthener(copy)) {
                         axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
-                            try (final var copy2 = copy.clone()) {
+                            try (final var copy2 = resourceName.equals("../owl-tests.owl") ? copy.cloneWithJFact()
+                                    : copy.clone()) {
                                 copy2.addAxioms(strongAxiom);
                                 // Some reasoners don't like entailment on inconsistent ontologies.
                                 assertTrue(!copy2.isConsistent() || copy2.isEntailed(weakAxiom));

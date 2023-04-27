@@ -109,6 +109,17 @@ public final class Utils {
     }
 
     /**
+     * @param <T>
+     * @param list
+     * @param idx
+     * @return A stream that contains all elements in {@code list} except the one at
+     *         {@code idx}.
+     */
+    public static <T> Stream<T> removeFromList(final List<T> list, final int idx) {
+        return IntStream.range(0, list.size()).filter(j -> idx != j).mapToObj(list::get);
+    }
+
+    /**
      * Compute the power set of the given collection. The implementation here is
      * only able to handle up to 63 elements in {@code set}.
      *

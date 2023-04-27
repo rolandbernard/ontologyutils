@@ -24,6 +24,12 @@ public abstract class AxiomRefinement implements AutoCloseable {
     public static final Set<AxiomType<?>> SUPPORTED_AXIOM_TYPES = Set.of(
             AxiomType.SUBCLASS_OF, AxiomType.CLASS_ASSERTION, AxiomType.OBJECT_PROPERTY_ASSERTION,
             AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION, AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS,
+            AxiomType.EQUIVALENT_CLASSES, AxiomType.DISJOINT_CLASSES, AxiomType.DISJOINT_UNION,
+            AxiomType.EQUIVALENT_OBJECT_PROPERTIES, AxiomType.INVERSE_FUNCTIONAL_OBJECT_PROPERTY,
+            AxiomType.FUNCTIONAL_OBJECT_PROPERTY, AxiomType.INVERSE_OBJECT_PROPERTIES,
+            AxiomType.SYMMETRIC_OBJECT_PROPERTY, AxiomType.ASYMMETRIC_OBJECT_PROPERTY,
+            AxiomType.TRANSITIVE_OBJECT_PROPERTY, AxiomType.REFLEXIVE_OBJECT_PROPERTY,
+            AxiomType.IRREFLEXIVE_OBJECT_PROPERTY, AxiomType.OBJECT_PROPERTY_DOMAIN, AxiomType.OBJECT_PROPERTY_RANGE,
             AxiomType.SUB_OBJECT_PROPERTY, AxiomType.SUB_PROPERTY_CHAIN_OF, AxiomType.DISJOINT_OBJECT_PROPERTIES);
 
     protected static abstract class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
@@ -91,6 +97,85 @@ public abstract class AxiomRefinement implements AutoCloseable {
         @Override
         public Stream<OWLAxiom> visit(final OWLDifferentIndividualsAxiom axiom) {
             return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLEquivalentClassesAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLDisjointClassesAxiom axiom) {
+            final var concepts = axiom.classExpressions().toList();
+            return IntStream.range(0, concepts.size()).mapToObj(i -> i)
+                    .flatMap(i -> down.refine(concepts.get(i))
+                            .map(refined -> df.getOWLDisjointClassesAxiom(Utils.replaceInList(concepts, i, refined))));
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLDisjointUnionAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLEquivalentObjectPropertiesAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLInverseObjectPropertiesAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLFunctionalObjectPropertyAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLInverseFunctionalObjectPropertyAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLSymmetricObjectPropertyAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLAsymmetricObjectPropertyAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLTransitiveObjectPropertyAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLReflexiveObjectPropertyAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLIrreflexiveObjectPropertyAxiom axiom) {
+            return Stream.of(axiom, noopAxiom());
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLObjectPropertyDomainAxiom axiom) {
+            final var concept = axiom.getDomain();
+            final var property = axiom.getProperty();
+            return up.refine(concept)
+                    .map(newConcept -> df.getOWLObjectPropertyDomainAxiom(property, newConcept));
+        }
+
+        @Override
+        public Stream<OWLAxiom> visit(final OWLObjectPropertyRangeAxiom axiom) {
+            final var concept = axiom.getRange();
+            final var property = axiom.getProperty();
+            return up.refine(concept)
+                    .map(newConcept -> df.getOWLObjectPropertyRangeAxiom(property, newConcept));
         }
 
         @Override
