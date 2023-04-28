@@ -131,28 +131,16 @@ public class OntologyRepairWeakening extends OntologyRepair {
 
     @Override
     public void repair(final Ontology ontology) {
-        try (final var copy = ontology.clone()) {
-            // Make all non-reparable axioms static to ensure that they are in the reference
-            // ontology.
-            copy.addStaticAxioms(ontology.refutableAxioms()
-                    .filter(axiom -> !axiom.isOfType(getReparableAxiomTypes())));
-            final var refAxioms = getRefAxioms(copy);
-            try (final var refOntology = Ontology.withAxioms(refAxioms)) {
-                try (final var axiomWeakener = new AxiomWeakener(refOntology, copy)) {
-                    while (!isRepaired(copy)) {
-                        final var badAxioms = findBadAxioms(copy);
-                        final var badAxiom = Utils.randomChoice(badAxioms);
-                        final var weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
-                        ontology.replaceAxiom(badAxiom, weakerAxiom);
-                        copy.replaceAxiom(badAxiom, weakerAxiom);
-                    }
+        final var refAxioms = getRefAxioms(ontology);
+        try (final var refOntology = Ontology.withAxioms(refAxioms)) {
+            try (final var axiomWeakener = new AxiomWeakener(refOntology, ontology)) {
+                while (!isRepaired(ontology)) {
+                    final var badAxioms = findBadAxioms(ontology);
+                    final var badAxiom = Utils.randomChoice(badAxioms);
+                    final var weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
+                    ontology.replaceAxiom(badAxiom, weakerAxiom);
                 }
             }
         }
-    }
-
-    @Override
-    public Collection<AxiomType<?>> getReparableAxiomTypes() {
-        return AxiomWeakener.SUPPORTED_AXIOM_TYPES;
     }
 }

@@ -131,7 +131,7 @@ public class SroiqAxiomStrengthenerTest {
 
     @Test
     public void allStrongAxiomsEntailWeakerAxioms() {
-        ontology.axioms(AxiomStrengthener.SUPPORTED_AXIOM_TYPES).forEach(weakAxiom -> {
+        ontology.logicalAxioms().forEach(weakAxiom -> {
             try (final var copy = ontology.clone()) {
                 copy.removeAxioms(weakAxiom);
                 try (final var axiomStrengthener = new AxiomStrengthener(copy)) {
@@ -159,7 +159,7 @@ public class SroiqAxiomStrengthenerTest {
             throws OWLOntologyCreationException {
         final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (final var ontology = Ontology.loadOntology(path)) {
-            ontology.axioms(AxiomStrengthener.SUPPORTED_AXIOM_TYPES).forEach(weakAxiom -> {
+            ontology.logicalAxioms().forEach(weakAxiom -> {
                 try (final var copy = ontology.clone()) {
                     copy.removeAxioms(weakAxiom);
                     try (final var axiomStrengthener = new AxiomStrengthener(copy)) {

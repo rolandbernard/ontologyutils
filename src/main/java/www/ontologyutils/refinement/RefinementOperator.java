@@ -18,10 +18,10 @@ import www.ontologyutils.toolbox.Utils;
  * Conference on Artificial Intelligence. Vol. 32. No. 1. 2018. Table 1.
  */
 public class RefinementOperator {
-    public static final int FLAG_NON_STRICT = 0;
-    public static final int FLAG_NNF_STRICT = 1 << 0;
-    public static final int FLAG_ALC_STRICT = 1 << 1;
-    public static final int FLAG_SROIQ_STRICT = 1 << 2;
+    public static final int FLAG_NON_STRICT = AxiomRefinement.FLAG_NON_STRICT;
+    public static final int FLAG_NNF_STRICT = AxiomRefinement.FLAG_NNF_STRICT;
+    public static final int FLAG_ALC_STRICT = AxiomRefinement.FLAG_ALC_STRICT;
+    public static final int FLAG_SROIQ_STRICT = AxiomRefinement.FLAG_SROIQ_STRICT;
 
     private static class Visitor implements OWLClassExpressionVisitorEx<Stream<OWLClassExpression>> {
         protected final OWLDataFactory df;

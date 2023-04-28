@@ -19,8 +19,8 @@ import www.ontologyutils.toolbox.*;
 public class AxiomWeakener extends AxiomRefinement {
     private static class Visitor extends AxiomRefinement.Visitor {
         public Visitor(final RefinementOperator up, final RefinementOperator down,
-                final Set<OWLObjectProperty> simpleRoles) {
-            super(up, down, simpleRoles);
+                final Set<OWLObjectProperty> simpleRoles, final int flags) {
+            super(up, down, simpleRoles, flags);
         }
 
         @Override
@@ -34,6 +34,9 @@ public class AxiomWeakener extends AxiomRefinement {
             if (individuals.size() <= 2) {
                 return super.visit(axiom);
             } else {
+                if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
+                    throw new IllegalArgumentException("The axiom " + axiom + " is not a SROIQ axiom.");
+                }
                 return Stream.concat(Stream.of((OWLAxiom) axiom),
                         IntStream.range(0, individuals.size()).mapToObj(i -> i)
                                 .map(i -> df.getOWLSameIndividualAxiom(Utils.removeFromList(individuals, i).toList())));
@@ -46,6 +49,9 @@ public class AxiomWeakener extends AxiomRefinement {
             if (individuals.size() <= 2) {
                 return super.visit(axiom);
             } else {
+                if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
+                    throw new IllegalArgumentException("The axiom " + axiom + " is not a SROIQ axiom.");
+                }
                 return Stream.concat(Stream.of((OWLAxiom) axiom),
                         IntStream.range(0, individuals.size()).mapToObj(i -> i)
                                 .map(i -> df.getOWLDifferentIndividualsAxiom(
@@ -55,6 +61,9 @@ public class AxiomWeakener extends AxiomRefinement {
 
         @Override
         public Stream<OWLAxiom> visit(final OWLEquivalentClassesAxiom axiom) {
+            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
+                throw new IllegalArgumentException("The axiom " + axiom + " is not a SROIQ axiom.");
+            }
             final var concepts = axiom.classExpressions().toList();
             if (concepts.size() <= 2) {
                 return super.visit(axiom);
@@ -67,6 +76,9 @@ public class AxiomWeakener extends AxiomRefinement {
 
         @Override
         public Stream<OWLAxiom> visit(final OWLEquivalentObjectPropertiesAxiom axiom) {
+            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
+                throw new IllegalArgumentException("The axiom " + axiom + " is not a SROIQ axiom.");
+            }
             final var properties = axiom.properties().toList();
             if (properties.size() <= 2) {
                 return super.visit(axiom);
@@ -80,13 +92,13 @@ public class AxiomWeakener extends AxiomRefinement {
     }
 
     private AxiomWeakener(final Covers covers, final Cover upCover, final Cover downCover,
-            final Set<OWLObjectProperty> simpleRoles) {
-        super(new Visitor(new RefinementOperator(upCover, downCover), new RefinementOperator(downCover, upCover),
-                simpleRoles), covers);
+            final Set<OWLObjectProperty> simpleRoles, final int flags) {
+        super(new Visitor(new RefinementOperator(upCover, downCover, flags),
+                new RefinementOperator(downCover, upCover, flags), simpleRoles, flags), covers);
     }
 
-    private AxiomWeakener(final Covers covers, final Set<OWLObjectProperty> simpleRoles) {
-        this(covers, covers.upCover().cached(), covers.downCover().cached(), simpleRoles);
+    private AxiomWeakener(final Covers covers, final Set<OWLObjectProperty> simpleRoles, final int flags) {
+        this(covers, covers.upCover().cached(), covers.downCover().cached(), simpleRoles, flags);
     }
 
     /**
@@ -100,7 +112,7 @@ public class AxiomWeakener extends AxiomRefinement {
      *            The roles that are guaranteed to be simple.
      */
     public AxiomWeakener(final Ontology refOntology, final Set<OWLObjectProperty> simpleRoles) {
-        this(new Covers(refOntology, simpleRoles), simpleRoles);
+        this(new Covers(refOntology, simpleRoles), simpleRoles, FLAG_NON_STRICT);
     }
 
     /**

@@ -120,7 +120,7 @@ public class AxiomWeakenerTest {
 
     @Test
     public void allWeakerAxiomsAreEntailed() {
-        ontology.axioms(AxiomWeakener.SUPPORTED_AXIOM_TYPES).forEach(strongAxiom -> {
+        ontology.logicalAxioms().forEach(strongAxiom -> {
             axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
                 assertTrue(ontology.isEntailed(weakAxiom));
             });

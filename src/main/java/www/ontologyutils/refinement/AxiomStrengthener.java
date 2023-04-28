@@ -15,8 +15,8 @@ import www.ontologyutils.toolbox.Ontology;
 public class AxiomStrengthener extends AxiomRefinement {
     private static class Visitor extends AxiomRefinement.Visitor {
         public Visitor(final RefinementOperator up, final RefinementOperator down,
-                final Set<OWLObjectProperty> simpleRoles) {
-            super(up, down, simpleRoles);
+                final Set<OWLObjectProperty> simpleRoles, final int flags) {
+            super(up, down, simpleRoles, flags);
         }
 
         @Override
@@ -26,13 +26,13 @@ public class AxiomStrengthener extends AxiomRefinement {
     }
 
     private AxiomStrengthener(final Covers covers, final Cover upCover, final Cover downCover,
-            final Set<OWLObjectProperty> simpleRoles) {
-        super(new Visitor(new RefinementOperator(downCover, upCover), new RefinementOperator(upCover, downCover),
-                simpleRoles), covers);
+            final Set<OWLObjectProperty> simpleRoles, final int flags) {
+        super(new Visitor(new RefinementOperator(downCover, upCover, flags),
+                new RefinementOperator(upCover, downCover, flags), simpleRoles, flags), covers);
     }
 
-    private AxiomStrengthener(final Covers covers, final Set<OWLObjectProperty> simpleRoles) {
-        this(covers, covers.upCover().cached(), covers.downCover().cached(), simpleRoles);
+    private AxiomStrengthener(final Covers covers, final Set<OWLObjectProperty> simpleRoles, final int flags) {
+        this(covers, covers.upCover().cached(), covers.downCover().cached(), simpleRoles, flags);
     }
 
     /**
@@ -46,7 +46,7 @@ public class AxiomStrengthener extends AxiomRefinement {
      *            The roles that are guaranteed to be simple.
      */
     public AxiomStrengthener(final Ontology refOntology, final Set<OWLObjectProperty> simpleRoles) {
-        this(new Covers(refOntology, simpleRoles), simpleRoles);
+        this(new Covers(refOntology, simpleRoles), simpleRoles, FLAG_NON_STRICT);
     }
 
     /**

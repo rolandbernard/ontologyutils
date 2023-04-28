@@ -79,9 +79,4 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
         final var toRemove = Utils.randomChoice(computeMcs(ontology));
         ontology.removeAxioms(toRemove);
     }
-
-    @Override
-    public Collection<AxiomType<?>> getReparableAxiomTypes() {
-        return AxiomType.LOGICAL_AXIOM_TYPES;
-    }
 }

@@ -1,9 +1,6 @@
 package www.ontologyutils.repair;
 
-import java.util.Collection;
 import java.util.function.Predicate;
-
-import org.semanticweb.owlapi.model.AxiomType;
 
 import www.ontologyutils.toolbox.*;
 
@@ -25,8 +22,6 @@ public abstract class OntologyRepair implements OntologyModification {
 
     public abstract void repair(Ontology ontology);
 
-    public abstract Collection<AxiomType<?>> getReparableAxiomTypes();
-
     /**
      * Simple utility function applying the internal predicate.
      *
@@ -41,7 +36,7 @@ public abstract class OntologyRepair implements OntologyModification {
     @Override
     public void apply(final Ontology ontology) throws IllegalArgumentException {
         try (final var nonRefutable = ontology.clone()) {
-            nonRefutable.removeAxioms(ontology.refutableAxioms(getReparableAxiomTypes()));
+            nonRefutable.removeAxioms(ontology.refutableAxioms());
             if (!isRepaired(nonRefutable)) {
                 throw new IllegalArgumentException("The ontology is not reparable.");
             }
