@@ -7,6 +7,10 @@ import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
 
 public class AppAutomatedRepairRandomMCS {
+    private static String getTimeStamp() {
+        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new java.util.Date());
+    }
+
     /**
      * One argument must be given, corresponding to an OWL ontology file path. E.g.,
      * run with the parameter
@@ -23,6 +27,7 @@ public class AppAutomatedRepairRandomMCS {
         System.err.println("Loaded...");
         final var normalization = new SroiqNormalization();
         final var repair = OntologyRepairRandomMcs.forConsistency();
+        repair.setInfoCallback(msg -> System.out.println("[" + getTimeStamp() + "] " + msg));
         System.err.println("Normalizing...");
         normalization.apply(ontology);
         System.err.println("Repairing...");

@@ -7,6 +7,10 @@ import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
 
 public class AppAutomatedRepairWeakening {
+    private static String getTimeStamp() {
+        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new java.util.Date());
+    }
+
     /**
      * One argument must be given, corresponding to an OWL ontology file path. E.g.,
      * run with the parameter
@@ -23,6 +27,7 @@ public class AppAutomatedRepairWeakening {
         System.err.println("Loaded...");
         final var normalization = new SroiqNormalization();
         final var repair = OntologyRepairWeakening.forConsistency();
+        repair.setInfoCallback(msg -> System.out.println("[" + getTimeStamp() + "] " + msg));
         System.err.println("Normalizing...");
         normalization.apply(ontology);
         System.err.println("Repairing...");

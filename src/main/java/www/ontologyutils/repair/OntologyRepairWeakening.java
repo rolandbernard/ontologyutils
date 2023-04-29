@@ -20,7 +20,7 @@ import www.ontologyutils.toolbox.*;
  */
 public class OntologyRepairWeakening extends OntologyRepair {
     public static enum RefOntologyStrategy {
-        RANDOM_MCS, SOME_MCS, ONE_MCS, LARGEST_MCS, INTERSECTION_OF_MCS,
+        RANDOM_MCS, SOME_MCS, ONE_MCS, LARGEST_MCS, INTERSECTION_OF_MCS, INTERSECTION_OF_SOME_MCS,
     }
 
     public static enum BadAxiomStrategy {
@@ -73,17 +73,23 @@ public class OntologyRepairWeakening extends OntologyRepair {
     public Set<OWLAxiom> getRefAxioms(final Ontology ontology) {
         switch (refOntologySource) {
             case INTERSECTION_OF_MCS: {
-                return ontology.maximalConsistentSubsets(isRepaired).reduce((a, b) -> {
+                return mcsPeekInfo(ontology.maximalConsistentSubsets(isRepaired)).reduce((a, b) -> {
+                    a.removeIf(axiom -> !b.contains(axiom));
+                    return a;
+                }).get();
+            }
+            case INTERSECTION_OF_SOME_MCS: {
+                return mcsPeekInfo(ontology.someMaximalConsistentSubsets(isRepaired)).reduce((a, b) -> {
                     a.removeIf(axiom -> !b.contains(axiom));
                     return a;
                 }).get();
             }
             case LARGEST_MCS:
-                return Utils.randomChoice(ontology.largestMaximalConsistentSubsets(isRepaired));
+                return Utils.randomChoice(mcsPeekInfo(ontology.largestMaximalConsistentSubsets(isRepaired)));
             case RANDOM_MCS:
-                return Utils.randomChoice(ontology.maximalConsistentSubsets(isRepaired));
+                return Utils.randomChoice(mcsPeekInfo(ontology.maximalConsistentSubsets(isRepaired)));
             case SOME_MCS:
-                return Utils.randomChoice(ontology.someMaximalConsistentSubsets(isRepaired));
+                return Utils.randomChoice(mcsPeekInfo(ontology.someMaximalConsistentSubsets(isRepaired)));
             case ONE_MCS:
                 return ontology.maximalConsistentSubset(isRepaired);
             default:
@@ -132,12 +138,18 @@ public class OntologyRepairWeakening extends OntologyRepair {
     @Override
     public void repair(final Ontology ontology) {
         final var refAxioms = getRefAxioms(ontology);
+        infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
         try (final var refOntology = ontology.cloneWith(refAxioms)) {
             try (final var axiomWeakener = new AxiomWeakener(refOntology, ontology)) {
                 while (!isRepaired(ontology)) {
-                    final var badAxioms = findBadAxioms(ontology);
+                    final var badAxioms = findBadAxioms(ontology).toList();
+                    infoMessage("Found " + badAxioms.size() + " possible bad axioms.");
                     final var badAxiom = Utils.randomChoice(badAxioms);
-                    final var weakerAxiom = Utils.randomChoice(axiomWeakener.weakerAxioms(badAxiom));
+                    infoMessage("Selected the bad axiom " + Utils.prettyPrintAxiom(badAxiom) + ".");
+                    final var weakerAxioms = axiomWeakener.weakerAxioms(badAxiom).toList();
+                    infoMessage("Found  " + weakerAxioms.size() + " weaker axioms.");
+                    final var weakerAxiom = Utils.randomChoice(weakerAxioms);
+                    infoMessage("Selected the weaker axiom " + Utils.prettyPrintAxiom(weakerAxiom) + ".");
                     ontology.replaceAxiom(badAxiom, weakerAxiom);
                 }
             }
