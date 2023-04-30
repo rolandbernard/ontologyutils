@@ -430,6 +430,10 @@ public class Ontology implements AutoCloseable {
         return withReasonerDo(reasoner -> reasoner.isConsistent());
     }
 
+    public boolean isCoherent() {
+        return withReasonerDo(reasoner -> reasoner.getUnsatisfiableClasses().getEntitiesMinusBottom().isEmpty());
+    }
+
     public boolean isEntailed(final OWLAxiom... axioms) {
         return withReasonerDo(reasoner -> reasoner.isEntailed(axioms));
     }
