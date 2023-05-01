@@ -19,6 +19,9 @@ import java.util.stream.*;
  * Shchekotykhin, Kostyantyn, Dietmar Jannach, and Thomas Schmitz. "MergeXplain:
  * Fast computation of multiple conflicts for diagnosis." Twenty-Fourth
  * International Joint Conference on Artificial Intelligence. 2015.
+ * and
+ * Kalyanpur, A., Parsia, B., Horridge, M., & Sirin, E. (2007). Finding all
+ * justifications of OWL DL entailments. ISWC/ASWC, 4825, 267-280.
  */
 public final class MinimalSubsets {
     private static record MinimalSubsetsResult<T>(Set<T> invalid, Set<Set<T>>results)
@@ -181,5 +184,73 @@ public final class MinimalSubsets {
             final Predicate<Set<T>> isValid) {
         return IntStream.range(0, tries).mapToObj(i -> getMinimalSubsets(Utils.randomOrder(set), isValid))
                 .flatMap(sets -> sets.stream()).distinct();
+    }
+
+    private static <T extends Comparable<? super T>> void getAllMinimalSubsetsHelper(final Collection<T> contained,
+            final Collection<T> set, final Predicate<Set<T>> isValid, final Set<T> path, final SetOfSets<T> minimalSets,
+            final SetOfSets<T> hittingSets, final SetOfSets<T> prefixPaths) {
+        if (hittingSets.containsSubset(path) || prefixPaths.containsSubset(path)) {
+            return;
+        }
+        Set<T> minimalSet = minimalSets.getDisjoint(path);
+        if (minimalSet == null) {
+            if (isValid.test(getUnion(contained, set))) {
+                minimalSet = getMinimalSubset(contained, set, isValid);
+                minimalSets.add(minimalSet);
+            } else {
+                hittingSets.add(path);
+                return;
+            }
+        }
+        for (final var elem : minimalSet) {
+            set.remove(elem);
+            path.add(elem);
+            getAllMinimalSubsetsHelper(contained, set, isValid, path, minimalSets, hittingSets, prefixPaths);
+            set.add(elem);
+            path.remove(elem);
+        }
+        prefixPaths.add(path);
+    }
+
+    public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalSubsets(final Collection<T> contained,
+            final Collection<T> set, final Predicate<Set<T>> isValid) {
+        if (isValid.test(Set.copyOf(contained))) {
+            return Set.of(Set.of());
+        } else if (!isValid.test(getUnion(contained, set))) {
+            return Set.of();
+        } else {
+            final var minimalSets = new SetOfSets<T>();
+            final var hittingSets = new SetOfSets<T>();
+            final var prefixPaths = new SetOfSets<T>();
+            getAllMinimalSubsetsHelper(Set.copyOf(contained), new HashSet<>(set), isValid, new HashSet<>(), minimalSets,
+                    hittingSets, prefixPaths);
+            return minimalSets;
+        }
+    }
+
+    public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalSubsets(final Collection<T> set,
+            final Predicate<Set<T>> isValid) {
+        return getAllMinimalSubsets(Set.of(), set, isValid);
+    }
+
+    public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalHittingSets(final Collection<T> contained,
+            final Collection<T> set, final Predicate<Set<T>> isValid) {
+        if (isValid.test(Set.copyOf(contained))) {
+            return Set.of(Set.of());
+        } else if (!isValid.test(getUnion(contained, set))) {
+            return Set.of();
+        } else {
+            final var minimalSets = new SetOfSets<T>();
+            final var hittingSets = new SetOfSets<T>();
+            final var prefixPaths = new SetOfSets<T>();
+            getAllMinimalSubsetsHelper(Set.copyOf(contained), new HashSet<>(set), isValid, new HashSet<>(), minimalSets,
+                    hittingSets, prefixPaths);
+            return hittingSets;
+        }
+    }
+
+    public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalHittingSets(final Collection<T> set,
+            final Predicate<Set<T>> isValid) {
+        return getAllMinimalHittingSets(Set.of(), set, isValid);
     }
 }

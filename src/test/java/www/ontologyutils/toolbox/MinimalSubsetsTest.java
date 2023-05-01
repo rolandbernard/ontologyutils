@@ -3,6 +3,7 @@ package www.ontologyutils.toolbox;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
@@ -122,6 +123,23 @@ public class MinimalSubsetsTest {
         }
     }
 
+    @Test
+    public void maximalConsistentSubsets() {
+        final var agenda = Set.copyOf(axioms);
+        try (final var ontology = Ontology.withAxioms(agenda)) {
+            final var results = ontology.maximalConsistentSubsets().toList();
+            for (final var subset : results) {
+                assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
+                assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
+            }
+            for (final var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
+                assertTrue(
+                        !MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda)
+                                || results.contains(subset));
+            }
+        }
+    }
+
     private static Stream<Arguments> axiomPowerSet() {
         return Utils.powerSet(axioms).map(Arguments::of);
     }
@@ -146,6 +164,31 @@ public class MinimalSubsetsTest {
                 assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
                 assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
             }
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("axiomPowerSet")
+    public void allMaximalConsistentSubsetsOfSubsets(final Set<OWLAxiom> agenda) {
+        try (final var ontology = Ontology.withAxioms(agenda)) {
+            final var results = ontology.maximalConsistentSubsets().collect(Collectors.toSet());
+            final var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(agenda, Set.of())
+                    .collect(Collectors.toSet());
+            assertTrue(results.containsAll(resultsNaive));
+            assertTrue(resultsNaive.containsAll(results));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("axiomPowerSet")
+    public void maximalConsistentSubsetsContaining(final Set<OWLAxiom> contained) {
+        final var agenda = Set.copyOf(axioms);
+        try (final var ontology = Ontology.withAxioms(contained, agenda)) {
+            final var results = ontology.maximalConsistentSubsets().collect(Collectors.toSet());
+            final var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(axioms, contained)
+                    .collect(Collectors.toSet());
+            assertTrue(results.containsAll(resultsNaive));
+            assertTrue(resultsNaive.containsAll(results));
         }
     }
 }
