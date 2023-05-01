@@ -155,6 +155,36 @@ public class SetOfSetsTest {
     }
 
     @Test
+    public void containsDisjointNonDisjoint() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertFalse(set.containsDisjoint(Set.of(1, 2)));
+        assertFalse(set.containsDisjoint(Set.of(3, 2, 5)));
+        assertFalse(set.containsDisjoint(Set.of(1, 2, 5)));
+        assertFalse(set.containsDisjoint(Set.of(2, 4, 3)));
+        assertFalse(set.containsDisjoint(Set.of(2, 3, 6)));
+        assertFalse(set.containsDisjoint(Set.of(2, 3, 6)));
+    }
+
+    @Test
+    public void containsDisjointFindsDisjoint() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertTrue(set.containsDisjoint(Set.of(2, 5)));
+        assertTrue(set.containsDisjoint(Set.of(3, 2)));
+        assertTrue(set.containsDisjoint(Set.of(1, 5, 6, 4, 8, 9)));
+        assertTrue(set.containsDisjoint(Set.of(3, 5, 4, 7, 1)));
+        assertTrue(set.containsDisjoint(Set.of(1, 5, 4, 6, 3)));
+        assertTrue(set.containsDisjoint(Set.of(2, 4, 5, 6)));
+        assertTrue(set.containsDisjoint(Set.of(2, 3)));
+        assertTrue(set.containsDisjoint(Set.of(1, 3, 4, 5, 6)));
+    }
+
+    @Test
     public void containsSupersetFindsKeys() {
         final var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
@@ -225,5 +255,129 @@ public class SetOfSetsTest {
         assertEquals(
                 Set.of(Set.of(1, 4, 5, 6)),
                 set.supersets(Set.of(1, 4)).collect(Collectors.toSet()));
+    }
+
+    @Test
+    public void getSubsetFindsKeys() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertEquals(Set.of(2), set.getSubset(Set.of(2)));
+        assertEquals(Set.of(1, 3), set.getSubset(Set.of(1, 3)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSubset(Set.of(1, 4, 5, 6)));
+    }
+
+    @Test
+    public void getSubsetNonSubsets() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertNull(set.getSubset(Set.of(1)));
+        assertNull(set.getSubset(Set.of(3)));
+        assertNull(set.getSubset(Set.of(1, 4, 5)));
+        assertNull(set.getSubset(Set.of(1, 4, 6)));
+        assertNull(set.getSubset(Set.of(1, 5, 6)));
+        assertNull(set.getSubset(Set.of(4, 5, 6)));
+        assertNull(set.getSubset(Set.of(4, 5)));
+        assertNull(set.getSubset(Set.of(4, 6)));
+        assertNull(set.getSubset(Set.of(5, 6)));
+        assertNull(set.getSubset(Set.of(5)));
+        assertNull(set.getSubset(Set.of(6)));
+        assertNull(set.getSubset(Set.of(3, 4, 5, 6)));
+        assertNull(set.getSubset(Set.of(1, 4, 5, 7)));
+        assertNull(set.getSubset(Set.of(1, 4, 6, 7)));
+    }
+
+    @Test
+    public void getSubsetFindsSubsets() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertEquals(Set.of(2), set.getSubset(Set.of(2, 7)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSubset(Set.of(1, 5, 6, 4, 8, 9)));
+        assertEquals(Set.of(1, 3), set.getSubset(Set.of(3, 5, 4, 7, 1)));
+        assertNotNull(set.getSubset(Set.of(3, 2)));
+        assertNotNull(set.getSubset(Set.of(1, 5, 4, 6, 3)));
+    }
+
+    @Test
+    public void getDisjointNonDisjoint() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertNull(set.getDisjoint(Set.of(1, 2)));
+        assertNull(set.getDisjoint(Set.of(3, 2, 5)));
+        assertNull(set.getDisjoint(Set.of(1, 2, 5)));
+        assertNull(set.getDisjoint(Set.of(2, 4, 3)));
+        assertNull(set.getDisjoint(Set.of(2, 3, 6)));
+        assertNull(set.getDisjoint(Set.of(2, 3, 6)));
+    }
+
+    @Test
+    public void getDisjointFindsDisjoint() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertEquals(Set.of(1, 3), set.getDisjoint(Set.of(2, 5)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getDisjoint(Set.of(3, 2)));
+        assertEquals(Set.of(2), set.getDisjoint(Set.of(1, 5, 6, 4, 8, 9)));
+        assertEquals(Set.of(2), set.getDisjoint(Set.of(3, 5, 4, 7, 1)));
+        assertEquals(Set.of(2), set.getDisjoint(Set.of(1, 5, 4, 6, 3)));
+        assertEquals(Set.of(1, 3), set.getDisjoint(Set.of(2, 4, 5, 6)));
+        assertEquals(Set.of(2), set.getDisjoint(Set.of(1, 3, 4, 5, 6)));
+        assertNotNull(set.getDisjoint(Set.of(2)));
+        assertNotNull(set.getDisjoint(Set.of(3)));
+        assertNotNull(set.getDisjoint(Set.of(4, 5, 6)));
+    }
+
+    @Test
+    public void getSupersetFindsKeys() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertEquals(Set.of(2), set.getSuperset(Set.of(2)));
+        assertEquals(Set.of(1, 3), set.getSuperset(Set.of(1, 3)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(1, 4, 5, 6)));
+    }
+
+    @Test
+    public void getSupersetNonSupersets() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertNull(set.getSuperset(Set.of(3, 4, 5, 6)));
+        assertNull(set.getSuperset(Set.of(1, 4, 5, 7)));
+        assertNull(set.getSuperset(Set.of(1, 4, 6, 7)));
+        assertNull(set.getSuperset(Set.of(2, 7)));
+        assertNull(set.getSuperset(Set.of(3, 2)));
+        assertNull(set.getSuperset(Set.of(1, 5, 6, 4, 8, 9)));
+        assertNull(set.getSuperset(Set.of(3, 5, 4, 7, 1)));
+        assertNull(set.getSuperset(Set.of(1, 5, 4, 6, 3)));
+    }
+
+    @Test
+    public void getSupersetFindsSupersets() {
+        final var set = new SetOfSets<Integer>();
+        set.add(Set.of(2));
+        set.add(Set.of(1, 3));
+        set.add(Set.of(1, 4, 5, 6));
+        assertEquals(Set.of(1, 3), set.getSuperset(Set.of(3)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(1, 4, 5)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(1, 4, 6)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(1, 5, 6)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(4, 5, 6)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(4, 5)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(4, 6)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(5, 6)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(5)));
+        assertEquals(Set.of(1, 4, 5, 6), set.getSuperset(Set.of(6)));
+        assertNotNull(set.getSuperset(Set.of(1)));
     }
 }

@@ -206,6 +206,36 @@ public class MapOfSetsTest {
     }
 
     @Test
+    public void containsDisjointNonDisjoint() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertFalse(map.containsDisjoint(Set.of(1, 2)));
+        assertFalse(map.containsDisjoint(Set.of(3, 2, 5)));
+        assertFalse(map.containsDisjoint(Set.of(1, 2, 5)));
+        assertFalse(map.containsDisjoint(Set.of(2, 4, 3)));
+        assertFalse(map.containsDisjoint(Set.of(2, 3, 6)));
+        assertFalse(map.containsDisjoint(Set.of(2, 3, 6)));
+    }
+
+    @Test
+    public void containsDisjointFindsDisjoint() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertTrue(map.containsDisjoint(Set.of(2, 5)));
+        assertTrue(map.containsDisjoint(Set.of(3, 2)));
+        assertTrue(map.containsDisjoint(Set.of(1, 5, 6, 4, 8, 9)));
+        assertTrue(map.containsDisjoint(Set.of(3, 5, 4, 7, 1)));
+        assertTrue(map.containsDisjoint(Set.of(1, 5, 4, 6, 3)));
+        assertTrue(map.containsDisjoint(Set.of(2, 4, 5, 6)));
+        assertTrue(map.containsDisjoint(Set.of(2, 3)));
+        assertTrue(map.containsDisjoint(Set.of(1, 3, 4, 5, 6)));
+    }
+
+    @Test
     public void containsSupersetFindsKeys() {
         final var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
@@ -278,5 +308,129 @@ public class MapOfSetsTest {
         assertEquals(
                 Set.of(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3)),
                 map.entrySetForSupersets(Set.of(1, 4)));
+    }
+
+    @Test
+    public void getSubsetFindsKeys() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertEquals(new SimpleEntry<>(Set.of(2), 1), map.getSubset(Set.of(2)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 3), 2), map.getSubset(Set.of(1, 3)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSubset(Set.of(1, 4, 5, 6)));
+    }
+
+    @Test
+    public void getSubsetNonSubsets() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertNull(map.getSubset(Set.of(1)));
+        assertNull(map.getSubset(Set.of(3)));
+        assertNull(map.getSubset(Set.of(1, 4, 5)));
+        assertNull(map.getSubset(Set.of(1, 4, 6)));
+        assertNull(map.getSubset(Set.of(1, 5, 6)));
+        assertNull(map.getSubset(Set.of(4, 5, 6)));
+        assertNull(map.getSubset(Set.of(4, 5)));
+        assertNull(map.getSubset(Set.of(4, 6)));
+        assertNull(map.getSubset(Set.of(5, 6)));
+        assertNull(map.getSubset(Set.of(5)));
+        assertNull(map.getSubset(Set.of(6)));
+        assertNull(map.getSubset(Set.of(3, 4, 5, 6)));
+        assertNull(map.getSubset(Set.of(1, 4, 5, 7)));
+        assertNull(map.getSubset(Set.of(1, 4, 6, 7)));
+    }
+
+    @Test
+    public void getSubsetFindsSubsets() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertEquals(new SimpleEntry<>(Set.of(2), 1), map.getSubset(Set.of(2, 7)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSubset(Set.of(1, 5, 6, 4, 8, 9)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 3), 2), map.getSubset(Set.of(3, 5, 4, 7, 1)));
+        assertNotNull(map.getSubset(Set.of(3, 2)));
+        assertNotNull(map.getSubset(Set.of(1, 5, 4, 6, 3)));
+    }
+
+    @Test
+    public void getDisjointNonDisjoint() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertNull(map.getDisjoint(Set.of(1, 2)));
+        assertNull(map.getDisjoint(Set.of(3, 2, 5)));
+        assertNull(map.getDisjoint(Set.of(1, 2, 5)));
+        assertNull(map.getDisjoint(Set.of(2, 4, 3)));
+        assertNull(map.getDisjoint(Set.of(2, 3, 6)));
+        assertNull(map.getDisjoint(Set.of(2, 3, 6)));
+    }
+
+    @Test
+    public void getDisjointFindsDisjoint() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertEquals(new SimpleEntry<>(Set.of(1, 3), 2), map.getDisjoint(Set.of(2, 5)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getDisjoint(Set.of(3, 2)));
+        assertEquals(new SimpleEntry<>(Set.of(2), 1), map.getDisjoint(Set.of(1, 5, 6, 4, 8, 9)));
+        assertEquals(new SimpleEntry<>(Set.of(2), 1), map.getDisjoint(Set.of(3, 5, 4, 7, 1)));
+        assertEquals(new SimpleEntry<>(Set.of(2), 1), map.getDisjoint(Set.of(1, 5, 4, 6, 3)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 3), 2), map.getDisjoint(Set.of(2, 4, 5, 6)));
+        assertEquals(new SimpleEntry<>(Set.of(2), 1), map.getDisjoint(Set.of(1, 3, 4, 5, 6)));
+        assertNotNull(map.getDisjoint(Set.of(2)));
+        assertNotNull(map.getDisjoint(Set.of(3)));
+        assertNotNull(map.getDisjoint(Set.of(4, 5, 6)));
+    }
+
+    @Test
+    public void getSupersetFindsKeys() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertEquals(new SimpleEntry<>(Set.of(2), 1), map.getSuperset(Set.of(2)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 3), 2), map.getSuperset(Set.of(1, 3)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(1, 4, 5, 6)));
+    }
+
+    @Test
+    public void getSupersetNonSupersets() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertNull(map.getSuperset(Set.of(3, 4, 5, 6)));
+        assertNull(map.getSuperset(Set.of(1, 4, 5, 7)));
+        assertNull(map.getSuperset(Set.of(1, 4, 6, 7)));
+        assertNull(map.getSuperset(Set.of(2, 7)));
+        assertNull(map.getSuperset(Set.of(3, 2)));
+        assertNull(map.getSuperset(Set.of(1, 5, 6, 4, 8, 9)));
+        assertNull(map.getSuperset(Set.of(3, 5, 4, 7, 1)));
+        assertNull(map.getSuperset(Set.of(1, 5, 4, 6, 3)));
+    }
+
+    @Test
+    public void getSupersetFindsSupersets() {
+        final var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        assertEquals(new SimpleEntry<>(Set.of(1, 3), 2), map.getSuperset(Set.of(3)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(1, 4, 5)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(1, 4, 6)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(1, 5, 6)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(4, 5, 6)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(4, 5)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(4, 6)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(5, 6)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(5)));
+        assertEquals(new SimpleEntry<>(Set.of(1, 4, 5, 6), 3), map.getSuperset(Set.of(6)));
+        assertNotNull(map.getSuperset(Set.of(1)));
     }
 }
