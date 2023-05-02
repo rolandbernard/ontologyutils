@@ -473,7 +473,7 @@ public class Ontology implements AutoCloseable {
      *         yield an optimal classical repair for consistency of the ontology.
      */
     public Stream<Set<OWLAxiom>> minimalCorrectionSubsets() {
-        return (new MaximalConsistentSubsets(this)).correctionStream();
+        return minimalCorrectionSubsets(Ontology::isConsistent);
     }
 
     public Stream<Set<OWLAxiom>> minimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {
@@ -525,7 +525,7 @@ public class Ontology implements AutoCloseable {
      * @return A single minimal correction subset.
      */
     public Stream<Set<OWLAxiom>> someMinimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.randomizedMinimalSubsets(refutableAxioms, 8,
+        return MinimalSubsets.randomizedMinimalSubsets(refutableAxioms, 1,
                 axioms -> isRepaired.test(new Ontology(staticAxioms, complement(axioms), reasonerCache)));
     }
 
@@ -534,7 +534,7 @@ public class Ontology implements AutoCloseable {
      *         subset.
      */
     public Stream<Set<OWLAxiom>> someMinimalUnsatisfiableSubsets(final Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.randomizedMinimalSubsets(refutableAxioms, 8,
+        return MinimalSubsets.randomizedMinimalSubsets(refutableAxioms, 1,
                 axioms -> !isRepaired.test(new Ontology(staticAxioms, axioms, reasonerCache)));
     }
 

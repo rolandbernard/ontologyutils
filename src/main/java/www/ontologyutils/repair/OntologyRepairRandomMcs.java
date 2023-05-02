@@ -26,7 +26,7 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
     }
 
     public OntologyRepairRandomMcs(final Predicate<Ontology> isRepaired) {
-        this(isRepaired, McsComputationStrategy.SOME_MCS);
+        this(isRepaired, McsComputationStrategy.ALL_MCS);
     }
 
     /**
@@ -84,7 +84,8 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
 
     @Override
     public void repair(final Ontology ontology) {
-        final var toRemove = Utils.randomChoice(mcsPeekInfo(computeMcs(ontology)));
+        final var toRemove = Utils.randomChoice(mcsPeekInfo(true, computeMcs(ontology)));
         ontology.removeAxioms(toRemove);
+        infoMessage("Selected a repair with " + ontology.axioms().count() + " axioms.");
     }
 }
