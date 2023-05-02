@@ -377,8 +377,14 @@ public class Ontology implements AutoCloseable {
     }
 
     public void replaceAxiom(final OWLAxiom remove, final Stream<? extends OWLAxiom> replacement) {
+        final var annotated = replacement.map(a -> getOriginAnnotatedAxiom(a, remove));
+        final boolean isStatic = staticAxioms.contains(remove);
         removeAxioms(remove);
-        addAxioms(replacement.map(a -> getOriginAnnotatedAxiom(a, remove)));
+        if (isStatic) {
+            addStaticAxioms(annotated);
+        } else {
+            addAxioms(annotated);
+        }
     }
 
     public void replaceAxiom(final OWLAxiom remove, final Collection<? extends OWLAxiom> replacement) {

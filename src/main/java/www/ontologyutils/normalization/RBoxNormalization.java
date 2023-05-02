@@ -165,8 +165,8 @@ public class RBoxNormalization implements OntologyModification {
 
     @Override
     public void apply(final Ontology ontology) throws IllegalArgumentException {
-        final var tBox = ontology.rboxAxioms().toList();
-        for (final var axiom : tBox) {
+        final var rBox = ontology.rboxAxioms().toList();
+        for (final var axiom : rBox) {
             ontology.replaceAxiom(axiom, asSroiqAxioms(axiom));
         }
     }

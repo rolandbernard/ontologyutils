@@ -112,8 +112,8 @@ public class ABoxNormalization implements OntologyModification {
 
     @Override
     public void apply(final Ontology ontology) throws IllegalArgumentException {
-        final var tBox = ontology.aboxAxioms().toList();
-        for (final var axiom : tBox) {
+        final var aBox = ontology.aboxAxioms().toList();
+        for (final var axiom : aBox) {
             ontology.replaceAxiom(axiom, asSroiqAxioms(axiom));
         }
     }
