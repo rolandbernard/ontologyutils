@@ -483,9 +483,9 @@ public class Ontology implements AutoCloseable {
     }
 
     public Stream<Set<OWLAxiom>> minimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.getAllMinimalHittingSets(refutableAxioms, axioms -> {
-            try (final var ontology = new Ontology(staticAxioms, axioms, reasonerCache)) {
-                return !isRepaired.test(ontology);
+        return MinimalSubsets.getAllMinimalSubsets(refutableAxioms, axioms -> {
+            try (final var ontology = new Ontology(staticAxioms, complement(axioms), reasonerCache)) {
+                return isRepaired.test(ontology);
             }
         }).stream();
     }

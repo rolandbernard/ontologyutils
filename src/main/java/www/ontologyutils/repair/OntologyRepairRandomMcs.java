@@ -26,7 +26,7 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
     }
 
     public OntologyRepairRandomMcs(final Predicate<Ontology> isRepaired) {
-        this(isRepaired, McsComputationStrategy.ALL_MCS);
+        this(isRepaired, McsComputationStrategy.SOME_MCS);
     }
 
     /**
