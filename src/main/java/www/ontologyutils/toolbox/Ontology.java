@@ -437,7 +437,8 @@ public class Ontology implements AutoCloseable {
     }
 
     public boolean isCoherent() {
-        return withReasonerDo(reasoner -> reasoner.getUnsatisfiableClasses().getEntitiesMinusBottom().isEmpty());
+        return withReasonerDo(reasoner -> reasoner.isConsistent()
+                && reasoner.getUnsatisfiableClasses().getEntitiesMinusBottom().isEmpty());
     }
 
     public boolean isEntailed(final OWLAxiom... axioms) {
@@ -483,19 +484,19 @@ public class Ontology implements AutoCloseable {
     }
 
     public Stream<Set<OWLAxiom>> minimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.getAllMinimalSubsets(refutableAxioms, axioms -> {
+        return MinimalSubsets.allMinimalSubsets(refutableAxioms, axioms -> {
             try (final var ontology = new Ontology(staticAxioms, complement(axioms), reasonerCache)) {
                 return isRepaired.test(ontology);
             }
-        }).stream();
+        });
     }
 
     public Stream<Set<OWLAxiom>> minimalUnsatisfiableSubsets(final Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.getAllMinimalSubsets(refutableAxioms, axioms -> {
+        return MinimalSubsets.allMinimalSubsets(refutableAxioms, axioms -> {
             try (final var ontology = new Ontology(staticAxioms, axioms, reasonerCache)) {
                 return !isRepaired.test(ontology);
             }
-        }).stream();
+        });
     }
 
     public Stream<Set<OWLAxiom>> smallestMinimalCorrectionSubsets(final Predicate<Ontology> isRepaired) {

@@ -202,7 +202,7 @@ public final class MinimalSubsets {
         sets.add(set);
     }
 
-    private static <T extends Comparable<? super T>> void getAllMinimalSubsetsHelper(final Set<T> contained,
+    private static <T extends Comparable<? super T>> void getAllMinimalSubsetsHelper(final Collection<T> contained,
             final Collection<T> set, final Predicate<Set<T>> isValid, final Set<T> path, final SetOfSets<T> minimalSets,
             final Set<Set<T>> hittingSets, final SetOfSets<T> prefixPaths, final Map<T, Integer> frequency) {
         if (prefixPaths.containsSubset(path)) {
@@ -210,9 +210,9 @@ public final class MinimalSubsets {
         }
         Set<T> minimalSet = minimalSets.getDisjoint(path);
         if (minimalSet == null) {
-            minimalSet = getMinimalSubset(contained, List.copyOf(set), isValid);
+            minimalSet = getMinimalSubset(contained, set, isValid);
             if (minimalSet == null) {
-                final var minimalHitting = getMinimalSubset(Set.of(), List.copyOf(path),
+                final var minimalHitting = getMinimalSubset(Set.of(), path,
                         s -> !isValid.test(getUnion(contained, set, getDifference(path, s))));
                 addToSetOfSets(prefixPaths, minimalHitting);
                 if (hittingSets != null) {
@@ -237,6 +237,14 @@ public final class MinimalSubsets {
         addToSetOfSets(prefixPaths, path);
     }
 
+    /**
+     * @param <T>
+     * @param contained
+     * @param set
+     * @param isValid
+     * @return All minimal subsets that together with {@code contained} satisfy the
+     *         monotone predicate {@code isValid}.
+     */
     public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalSubsets(final Collection<T> contained,
             final Collection<T> set, final Predicate<Set<T>> isValid) {
         if (isValid.test(Set.copyOf(contained))) {
@@ -251,11 +259,25 @@ public final class MinimalSubsets {
         }
     }
 
+    /**
+     * @param <T>
+     * @param set
+     * @param isValid
+     * @return All minimal subsets that satisfy the monotone predicate
+     *         {@code isValid}.
+     */
     public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalSubsets(final Collection<T> set,
             final Predicate<Set<T>> isValid) {
         return getAllMinimalSubsets(Set.of(), set, isValid);
     }
 
+    /**
+     * @param <T>
+     * @param contained
+     * @param set
+     * @param isValid
+     * @return All minimal hitting sets for the justifications of {@code isValid}.
+     */
     public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalHittingSets(final Collection<T> contained,
             final Collection<T> set, final Predicate<Set<T>> isValid) {
         if (isValid.test(Set.copyOf(contained))) {
@@ -271,8 +293,99 @@ public final class MinimalSubsets {
         }
     }
 
+    /**
+     * @param <T>
+     * @param set
+     * @param isValid
+     * @return All minimal hitting sets for the justifications of {@code isValid}.
+     */
     public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalHittingSets(final Collection<T> set,
             final Predicate<Set<T>> isValid) {
         return getAllMinimalHittingSets(Set.of(), set, isValid);
+    }
+
+    private static <T extends Comparable<? super T>> Set<T> allMinimalSubsetsHelper(final Collection<T> contained,
+            final Collection<T> set, final Predicate<Set<T>> isValid, final ArrayDeque<Set<T>> queue,
+            final SetOfSets<T> minimalSets, final SetOfSets<T> hittingSets, final Map<T, Integer> frequency) {
+        Set<T> result = null;
+        while (result == null && !queue.isEmpty()) {
+            final var path = queue.pop();
+            if (hittingSets.containsSubset(path)) {
+                continue;
+            }
+            Set<T> minimalSet = minimalSets.getDisjoint(path);
+            if (minimalSet == null) {
+                minimalSet = getMinimalSubset(contained, getDifference(set, path), isValid);
+                if (minimalSet == null) {
+                    final var minimalHitting = getMinimalSubset(Set.of(), path,
+                            s -> !isValid.test(getUnion(contained, getDifference(set, s))));
+                    hittingSets.add(minimalHitting);
+                    continue;
+                }
+                minimalSets.add(minimalSet);
+                for (final var elem : minimalSet) {
+                    frequency.put(elem, frequency.getOrDefault(elem, 0) + 1);
+                }
+                result = minimalSet;
+            }
+            final var sorted = minimalSet.stream()
+                    .sorted((a, b) -> frequency.get(b).compareTo(frequency.get(a)));
+            for (final var elem : (Iterable<T>) sorted::iterator) {
+                queue.push(getUnion(path, Set.of(elem)));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @param <T>
+     * @param contained
+     * @param set
+     * @param isValid
+     * @return All minimal subsets that together with {@code contained} satisfy the
+     *         monotone predicate {@code isValid}.
+     */
+    public static <T extends Comparable<? super T>> Stream<Set<T>> allMinimalSubsets(final Collection<T> contained,
+            final Collection<T> set, final Predicate<Set<T>> isValid) {
+        if (isValid.test(Set.copyOf(contained))) {
+            return Stream.of(Set.of());
+        } else {
+            final var minimalSets = new SetOfSets<T>();
+            final var hittingSets = new SetOfSets<T>();
+            final var frequency = new HashMap<T, Integer>();
+            final var queue = new ArrayDeque<Set<T>>();
+            queue.add(Set.of());
+            return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<Set<T>>() {
+                private Set<T> result;
+
+                public boolean hasNext() {
+                    if (result == null) {
+                        result = allMinimalSubsetsHelper(contained, set, isValid, queue, minimalSets, hittingSets,
+                                frequency);
+                    }
+                    return result != null;
+                }
+
+                @Override
+                public Set<T> next() {
+                    hasNext();
+                    final var next = result;
+                    result = null;
+                    return next;
+                }
+            }, Spliterator.NONNULL), false);
+        }
+    }
+
+    /**
+     * @param <T>
+     * @param set
+     * @param isValid
+     * @return All minimal subsets that satisfy the monotone predicate
+     *         {@code isValid}.
+     */
+    public static <T extends Comparable<? super T>> Stream<Set<T>> allMinimalSubsets(final Collection<T> set,
+            final Predicate<Set<T>> isValid) {
+        return allMinimalSubsets(Set.of(), set, isValid);
     }
 }
