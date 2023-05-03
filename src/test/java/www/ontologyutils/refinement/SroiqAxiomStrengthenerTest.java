@@ -15,17 +15,17 @@ import www.ontologyutils.toolbox.Ontology;
 public class SroiqAxiomStrengthenerTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/roland/ontologies/2023/3/untitled/";
 
-    private final Ontology ontology;
-    private final AxiomStrengthener axiomStrengthener;
+    private Ontology ontology;
+    private AxiomStrengthener axiomStrengthener;
 
     public SroiqAxiomStrengthenerTest() {
-        final var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
+        var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomStrengthener = new AxiomStrengthener(ontology);
     }
 
     private static Stream<Arguments> expectedStrengthening() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -125,18 +125,18 @@ public class SroiqAxiomStrengthenerTest {
 
     @ParameterizedTest
     @MethodSource("expectedStrengthening")
-    public void strengthenAxiom(final Set<OWLAxiom> expected, final OWLAxiom axiom) {
+    public void strengthenAxiom(Set<OWLAxiom> expected, OWLAxiom axiom) {
         assertEquals(expected, axiomStrengthener.strongerAxioms(axiom).collect(Collectors.toSet()));
     }
 
     @Test
     public void allStrongAxiomsEntailWeakerAxioms() {
         ontology.logicalAxioms().forEach(weakAxiom -> {
-            try (final var copy = ontology.clone()) {
+            try (var copy = ontology.clone()) {
                 copy.removeAxioms(weakAxiom);
-                try (final var axiomStrengthener = new AxiomStrengthener(copy)) {
+                try (var axiomStrengthener = new AxiomStrengthener(copy)) {
                     axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
-                        try (final var copy2 = copy.cloneWithJFact()) {
+                        try (var copy2 = copy.cloneWithJFact()) {
                             copy2.addAxioms(strongAxiom);
                             // Some reasoners don't like entailment on inconsistent ontologies.
                             assertTrue(!copy2.isConsistent() || copy2.isEntailed(weakAxiom));
@@ -155,16 +155,16 @@ public class SroiqAxiomStrengthenerTest {
             "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
             "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Vehicle.owl",
     })
-    public void allStrongAxiomsEntailWeakerAxiomsFromFile(final String resourceName)
+    public void allStrongAxiomsEntailWeakerAxiomsFromFile(String resourceName)
             throws OWLOntologyCreationException {
-        final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
+        var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
             ontology.logicalAxioms().forEach(weakAxiom -> {
-                try (final var copy = ontology.clone()) {
+                try (var copy = ontology.clone()) {
                     copy.removeAxioms(weakAxiom);
-                    try (final var axiomStrengthener = new AxiomStrengthener(copy)) {
+                    try (var axiomStrengthener = new AxiomStrengthener(copy)) {
                         axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
-                            try (final var copy2 = resourceName.equals("../owl-tests.owl") ? copy.cloneWithJFact()
+                            try (var copy2 = resourceName.equals("../owl-tests.owl") ? copy.cloneWithJFact()
                                     : copy.clone()) {
                                 copy2.addAxioms(strongAxiom);
                                 // Some reasoners don't like entailment on inconsistent ontologies.

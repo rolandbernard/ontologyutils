@@ -15,17 +15,17 @@ import www.ontologyutils.toolbox.Ontology;
 public class AxiomWeakenerTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/ontologies/dl2017_example#";
 
-    private final Ontology ontology;
-    private final AxiomWeakener axiomWeakener;
+    private Ontology ontology;
+    private AxiomWeakener axiomWeakener;
 
     public AxiomWeakenerTest() {
-        final var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomWeakener = new AxiomWeakener(ontology, ontology);
     }
 
     private static Stream<Arguments> expectedWeakening() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -114,7 +114,7 @@ public class AxiomWeakenerTest {
 
     @ParameterizedTest
     @MethodSource("expectedWeakening")
-    public void weakenAxiom(final Set<OWLAxiom> expected, final OWLAxiom axiom) {
+    public void weakenAxiom(Set<OWLAxiom> expected, OWLAxiom axiom) {
         assertEquals(expected, axiomWeakener.weakerAxioms(axiom).collect(Collectors.toSet()));
     }
 

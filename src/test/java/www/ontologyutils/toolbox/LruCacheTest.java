@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class LruCacheTest {
     @Test
     public void keepAllEntriesUntilLimit() {
-        final var cache = new LruCache<Integer, Integer>(3);
+        var cache = new LruCache<Integer, Integer>(3);
         cache.put(1, 1);
         cache.put(2, 2);
         cache.put(3, 3);
@@ -23,7 +23,7 @@ public class LruCacheTest {
 
     @Test
     public void removeOldestEntry() {
-        final var cache = new LruCache<Integer, Integer>(3);
+        var cache = new LruCache<Integer, Integer>(3);
         cache.put(1, 1);
         cache.put(2, 2);
         cache.put(3, 3);
@@ -36,7 +36,7 @@ public class LruCacheTest {
 
     @Test
     public void removeLastAccessedEntry() {
-        final var cache = new LruCache<Integer, Integer>(3);
+        var cache = new LruCache<Integer, Integer>(3);
         cache.put(1, 1);
         cache.put(2, 2);
         cache.put(3, 3);
@@ -51,7 +51,7 @@ public class LruCacheTest {
 
     @Test
     public void canOverwriteEntries() {
-        final var cache = new LruCache<Integer, Integer>(3);
+        var cache = new LruCache<Integer, Integer>(3);
         cache.put(1, 1);
         cache.put(2, 2);
         cache.put(3, 3);
@@ -67,7 +67,7 @@ public class LruCacheTest {
 
     @Test
     public void computeIfAbsent() {
-        final var cache = new LruCache<Integer, Integer>(3);
+        var cache = new LruCache<Integer, Integer>(3);
         cache.put(1, 1);
         cache.put(2, 2);
         cache.put(3, 3);
@@ -87,11 +87,11 @@ public class LruCacheTest {
 
     @Test
     public void wrappedFunction() {
-        final var func = LruCache.wrapFunction(new Function<Integer, Integer>() {
+        var func = LruCache.wrapFunction(new Function<Integer, Integer>() {
             private int call = 0;
 
             @Override
-            public Integer apply(final Integer argument) {
+            public Integer apply(Integer argument) {
                 call += 1;
                 return call;
             }

@@ -13,10 +13,10 @@ public class TBoxNormalizationTest {
     @ValueSource(strings = {
             "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
     })
-    public void allTBoxAxiomsAreSubclassOf(final String resourceName) throws OWLOntologyCreationException {
-        final var path = TBoxNormalizationTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
-            final var normalization = new TBoxNormalization();
+    public void allTBoxAxiomsAreSubclassOf(String resourceName) throws OWLOntologyCreationException {
+        var path = TBoxNormalizationTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
+            var normalization = new TBoxNormalization();
             normalization.apply(ontology);
             ontology.tboxAxioms()
                     .forEach(axiom -> assertEquals(AxiomType.SUBCLASS_OF, axiom.getAxiomType()));
@@ -27,11 +27,11 @@ public class TBoxNormalizationTest {
     @ValueSource(strings = {
             "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
     })
-    public void normalizedOntologyIsEquivalent(final String resourceName) throws OWLOntologyCreationException {
-        final var path = TBoxNormalizationTest.class.getResource(resourceName).getFile();
-        try (final var originalOntology = Ontology.loadOntology(path)) {
-            try (final var normalizedOntology = Ontology.loadOntology(path)) {
-                final var normalization = new TBoxNormalization();
+    public void normalizedOntologyIsEquivalent(String resourceName) throws OWLOntologyCreationException {
+        var path = TBoxNormalizationTest.class.getResource(resourceName).getFile();
+        try (var originalOntology = Ontology.loadOntology(path)) {
+            try (var normalizedOntology = Ontology.loadOntology(path)) {
+                var normalization = new TBoxNormalization();
                 normalization.apply(normalizedOntology);
                 assertTrue(originalOntology.isEntailed(normalizedOntology));
                 assertTrue(normalizedOntology.isEntailed(originalOntology));

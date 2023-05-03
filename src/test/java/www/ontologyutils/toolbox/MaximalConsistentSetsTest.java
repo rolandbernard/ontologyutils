@@ -13,10 +13,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
 public class MaximalConsistentSetsTest {
-    private static final OWLDataFactory df;
-    private static final List<OWLClassExpression> concepts;
-    private static final List<OWLIndividual> individuals;
-    private static final List<OWLAxiom> axioms;
+    private static OWLDataFactory df;
+    private static List<OWLClassExpression> concepts;
+    private static List<OWLIndividual> individuals;
+    private static List<OWLAxiom> axioms;
 
     static {
         df = Ontology.getDefaultDataFactory();
@@ -42,13 +42,13 @@ public class MaximalConsistentSetsTest {
 
     @Test
     public void maximalConsistentSubsetsNaive() {
-        final var agenda = Set.copyOf(axioms);
-        final var results = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(agenda, Set.of()).toList();
-        for (final var subset : results) {
+        var agenda = Set.copyOf(axioms);
+        var results = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(agenda, Set.of()).toList();
+        for (var subset : results) {
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
             assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
         }
-        for (final var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
+        for (var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
             assertTrue(
                     !MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda) || results.contains(subset));
         }
@@ -56,13 +56,13 @@ public class MaximalConsistentSetsTest {
 
     @Test
     public void maximalConsistentSubsets() {
-        final var agenda = Set.copyOf(axioms);
-        final var results = MaximalConsistentSubsets.maximalConsistentSubsets(agenda, Set.of());
-        for (final var subset : results) {
+        var agenda = Set.copyOf(axioms);
+        var results = MaximalConsistentSubsets.maximalConsistentSubsets(agenda, Set.of());
+        for (var subset : results) {
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
             assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
         }
-        for (final var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
+        for (var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
             assertTrue(
                     !MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda) || results.contains(subset));
         }
@@ -74,9 +74,9 @@ public class MaximalConsistentSetsTest {
 
     @ParameterizedTest
     @MethodSource("axiomPowerSet")
-    public void maximalConsistentSubsetsContaining(final Set<OWLAxiom> contained) {
-        final var results = MaximalConsistentSubsets.maximalConsistentSubsets(axioms, contained);
-        final var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(axioms, contained)
+    public void maximalConsistentSubsetsContaining(Set<OWLAxiom> contained) {
+        var results = MaximalConsistentSubsets.maximalConsistentSubsets(axioms, contained);
+        var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(axioms, contained)
                 .collect(Collectors.toSet());
         assertTrue(results.containsAll(resultsNaive));
         assertTrue(resultsNaive.containsAll(results));

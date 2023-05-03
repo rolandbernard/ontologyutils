@@ -29,8 +29,8 @@ public class AppCondorRules {
             copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));
         });
 
-        // final var condor = Normalization.normalizeCondor(copy);
-        final var condor = superNormalize(Normalization.normalizeCondor(copy));
+        // var condor = Normalization.normalizeCondor(copy);
+        var condor = superNormalize(Normalization.normalizeCondor(copy));
 
         // check every axiom of the original ontology is entailed in condor
         assert (this.ontology.axioms().allMatch(ax -> condor.isEntailed(ax)));

@@ -9,8 +9,8 @@ import org.semanticweb.owlapi.model.*;
 import org.junit.jupiter.api.Test;
 
 public class OntologyTest {
-    private final OWLDataFactory df;
-    private final List<OWLClassExpression> concepts;
+    private OWLDataFactory df;
+    private List<OWLClassExpression> concepts;
 
     public OntologyTest() {
         df = Ontology.getDefaultDataFactory();
@@ -24,20 +24,20 @@ public class OntologyTest {
 
     @Test
     public void inferredTaxonomyAxioms() {
-        final var df = Ontology.getDefaultDataFactory();
-        final var ax1 = df.getOWLSubClassOfAxiom(concepts.get(0), concepts.get(1));
-        final var ax2 = df.getOWLSubClassOfAxiom(concepts.get(1), concepts.get(2));
-        final var ax3 = df.getOWLSubClassOfAxiom(concepts.get(1), concepts.get(0));
-        final var axioms = new HashSet<OWLAxiom>();
+        var df = Ontology.getDefaultDataFactory();
+        var ax1 = df.getOWLSubClassOfAxiom(concepts.get(0), concepts.get(1));
+        var ax2 = df.getOWLSubClassOfAxiom(concepts.get(1), concepts.get(2));
+        var ax3 = df.getOWLSubClassOfAxiom(concepts.get(1), concepts.get(0));
+        var axioms = new HashSet<OWLAxiom>();
         axioms.add(ax1);
         axioms.add(ax2);
-        try (final var ontology = Ontology.withAxioms(axioms)) {
-            final long infSize = ontology.inferredTaxonomyAxioms().count();
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            long infSize = ontology.inferredTaxonomyAxioms().count();
             assertEquals(6, infSize);
         }
         axioms.add(ax3);
-        try (final var ontology = Ontology.withAxioms(axioms)) {
-            final long infSize = ontology.inferredTaxonomyAxioms().count();
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            long infSize = ontology.inferredTaxonomyAxioms().count();
             assertEquals(7, infSize);
         }
     }

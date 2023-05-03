@@ -13,10 +13,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
 public class MinimalSubsetsTest {
-    private static final OWLDataFactory df;
-    private static final List<OWLClassExpression> concepts;
-    private static final List<OWLIndividual> individuals;
-    private static final List<OWLAxiom> axioms;
+    private static OWLDataFactory df;
+    private static List<OWLClassExpression> concepts;
+    private static List<OWLIndividual> individuals;
+    private static List<OWLAxiom> axioms;
 
     static {
         df = Ontology.getDefaultDataFactory();
@@ -42,9 +42,9 @@ public class MinimalSubsetsTest {
 
     @Test
     public void maximalConsistentSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var subset = ontology.maximalConsistentSubset(o -> o.isConsistent());
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var subset = ontology.maximalConsistentSubset(o -> o.isConsistent());
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
             assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
         }
@@ -52,9 +52,9 @@ public class MinimalSubsetsTest {
 
     @Test
     public void minimalCorrectionSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var subset = ontology.minimalCorrectionSubset(o -> o.isConsistent());
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var subset = ontology.minimalCorrectionSubset(o -> o.isConsistent());
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
             assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(ontology.complement(subset), agenda));
         }
@@ -62,14 +62,14 @@ public class MinimalSubsetsTest {
 
     @Test
     public void minimalUnsatisfiableSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var subset = ontology.minimalUnsatisfiableSubset(o -> o.isConsistent());
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var subset = ontology.minimalUnsatisfiableSubset(o -> o.isConsistent());
             ontology.removeAxioms(ontology.axioms().toList());
             ontology.addAxioms(subset);
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
             assertFalse(ontology.isConsistent());
-            for (final var axiom : subset) {
+            for (var axiom : subset) {
                 ontology.removeAxioms(axiom);
                 assertTrue(ontology.isConsistent());
                 ontology.addAxioms(axiom);
@@ -79,11 +79,11 @@ public class MinimalSubsetsTest {
 
     @Test
     public void someMaximalConsistentSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var results = ontology.someMaximalConsistentSubsets(o -> o.isConsistent()).toList();
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var results = ontology.someMaximalConsistentSubsets(o -> o.isConsistent()).toList();
             assertFalse(results.isEmpty());
-            for (final var subset : results) {
+            for (var subset : results) {
                 assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
                 assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
             }
@@ -92,11 +92,11 @@ public class MinimalSubsetsTest {
 
     @Test
     public void someMinimalCorrectionSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var results = ontology.someMinimalCorrectionSubsets(o -> o.isConsistent()).toList();
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var results = ontology.someMinimalCorrectionSubsets(o -> o.isConsistent()).toList();
             assertFalse(results.isEmpty());
-            for (final var subset : results) {
+            for (var subset : results) {
                 assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
                 assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(ontology.complement(subset), agenda));
             }
@@ -105,16 +105,16 @@ public class MinimalSubsetsTest {
 
     @Test
     public void someMinimalUnsatisfiableSubset() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var results = ontology.someMinimalUnsatisfiableSubsets(o -> o.isConsistent()).toList();
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var results = ontology.someMinimalUnsatisfiableSubsets(o -> o.isConsistent()).toList();
             assertFalse(results.isEmpty());
-            for (final var subset : results) {
+            for (var subset : results) {
                 ontology.removeAxioms(ontology.axioms().toList());
                 ontology.addAxioms(subset);
                 assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
                 assertFalse(ontology.isConsistent());
-                for (final var axiom : subset) {
+                for (var axiom : subset) {
                     ontology.removeAxioms(axiom);
                     assertTrue(ontology.isConsistent());
                     ontology.addAxioms(axiom);
@@ -125,14 +125,14 @@ public class MinimalSubsetsTest {
 
     @Test
     public void maximalConsistentSubsets() {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var results = ontology.maximalConsistentSubsets().toList();
-            for (final var subset : results) {
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var results = ontology.maximalConsistentSubsets().toList();
+            for (var subset : results) {
                 assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
                 assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
             }
-            for (final var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
+            for (var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
                 assertTrue(
                         !MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda)
                                 || results.contains(subset));
@@ -146,9 +146,9 @@ public class MinimalSubsetsTest {
 
     @ParameterizedTest
     @MethodSource("axiomPowerSet")
-    public void maximalConsistentSubsetsOfSubsets(final Set<OWLAxiom> agenda) {
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var subset = ontology.maximalConsistentSubset(o -> o.isConsistent());
+    public void maximalConsistentSubsetsOfSubsets(Set<OWLAxiom> agenda) {
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var subset = ontology.maximalConsistentSubset(o -> o.isConsistent());
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
             assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
         }
@@ -156,11 +156,11 @@ public class MinimalSubsetsTest {
 
     @ParameterizedTest
     @MethodSource("axiomPowerSet")
-    public void someMaximalConsistentSubsetsOfSubsets(final Set<OWLAxiom> agenda) {
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var results = ontology.someMaximalConsistentSubsets(o -> o.isConsistent()).toList();
+    public void someMaximalConsistentSubsetsOfSubsets(Set<OWLAxiom> agenda) {
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var results = ontology.someMaximalConsistentSubsets(o -> o.isConsistent()).toList();
             assertFalse(results.isEmpty());
-            for (final var subset : results) {
+            for (var subset : results) {
                 assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
                 assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
             }
@@ -169,10 +169,10 @@ public class MinimalSubsetsTest {
 
     @ParameterizedTest
     @MethodSource("axiomPowerSet")
-    public void allMaximalConsistentSubsetsOfSubsets(final Set<OWLAxiom> agenda) {
-        try (final var ontology = Ontology.withAxioms(agenda)) {
-            final var results = ontology.maximalConsistentSubsets().collect(Collectors.toSet());
-            final var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(agenda, Set.of())
+    public void allMaximalConsistentSubsetsOfSubsets(Set<OWLAxiom> agenda) {
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var results = ontology.maximalConsistentSubsets().collect(Collectors.toSet());
+            var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(agenda, Set.of())
                     .collect(Collectors.toSet());
             assertTrue(results.containsAll(resultsNaive));
             assertTrue(resultsNaive.containsAll(results));
@@ -181,11 +181,11 @@ public class MinimalSubsetsTest {
 
     @ParameterizedTest
     @MethodSource("axiomPowerSet")
-    public void maximalConsistentSubsetsContaining(final Set<OWLAxiom> contained) {
-        final var agenda = Set.copyOf(axioms);
-        try (final var ontology = Ontology.withAxioms(contained, agenda)) {
-            final var results = ontology.maximalConsistentSubsets().collect(Collectors.toSet());
-            final var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(axioms, contained)
+    public void maximalConsistentSubsetsContaining(Set<OWLAxiom> contained) {
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(contained, agenda)) {
+            var results = ontology.maximalConsistentSubsets().collect(Collectors.toSet());
+            var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(axioms, contained)
                     .collect(Collectors.toSet());
             assertTrue(results.containsAll(resultsNaive));
             assertTrue(resultsNaive.containsAll(results));

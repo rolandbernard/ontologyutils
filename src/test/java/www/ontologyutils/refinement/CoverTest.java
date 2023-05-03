@@ -15,17 +15,17 @@ import www.ontologyutils.toolbox.Ontology;
 public class CoverTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/ontologies/dl2017_example#";
 
-    private final Ontology ontology;
-    private final Covers covers;
+    private Ontology ontology;
+    private Covers covers;
 
     public CoverTest() {
-        final var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
     }
 
     private static Stream<Arguments> expectedUpCover() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -111,12 +111,12 @@ public class CoverTest {
 
     @ParameterizedTest
     @MethodSource("expectedUpCover")
-    public void upCover(final Set<OWLClassExpression> expected, final OWLClassExpression concept) {
+    public void upCover(Set<OWLClassExpression> expected, OWLClassExpression concept) {
         assertEquals(expected, covers.upCover(concept).collect(Collectors.toSet()));
     }
 
     private static Stream<Arguments> expectedDownCover() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -221,7 +221,7 @@ public class CoverTest {
 
     @ParameterizedTest
     @MethodSource("expectedDownCover")
-    public void downCover(final Set<OWLClassExpression> expected, final OWLClassExpression concept) {
+    public void downCover(Set<OWLClassExpression> expected, OWLClassExpression concept) {
         assertEquals(expected, covers.downCover(concept).collect(Collectors.toSet()));
     }
 

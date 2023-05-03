@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 public class SetOfSetsTest {
     @Test
     public void emptySetHasEmpty() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         assertEquals(List.of(), set.stream().toList());
     }
 
     @Test
     public void emptySetContainsNoKey() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         assertFalse(set.contains(Set.of()));
         assertFalse(set.contains(Set.of(1)));
         assertFalse(set.contains(Set.of(2, 3)));
@@ -25,7 +25,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsAfterAdd() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of());
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
@@ -38,7 +38,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsNoKeyNotAdded() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of());
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
@@ -50,7 +50,7 @@ public class SetOfSetsTest {
 
     @Test
     public void streamAfterAdd() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of());
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
@@ -62,7 +62,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsNoKeyAfterRemove() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of());
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
@@ -76,7 +76,7 @@ public class SetOfSetsTest {
 
     @Test
     public void sizeReturnsSize() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         assertEquals(0, set.size());
         set.add(Set.of());
         assertEquals(1, set.size());
@@ -94,7 +94,7 @@ public class SetOfSetsTest {
 
     @Test
     public void clearRemovesAllEntries() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of());
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
@@ -110,7 +110,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsSubsetFindsKeys() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -121,7 +121,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsSubsetNonSubsets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -143,7 +143,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsSubsetFindsSubsets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -156,7 +156,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsDisjointNonDisjoint() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -170,7 +170,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsDisjointFindsDisjoint() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -186,7 +186,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsSupersetFindsKeys() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -197,7 +197,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsSupersetNonSupersets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -213,7 +213,7 @@ public class SetOfSetsTest {
 
     @Test
     public void containsSupersetFindsSupersets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -232,7 +232,7 @@ public class SetOfSetsTest {
 
     @Test
     public void subsets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of());
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
@@ -244,7 +244,7 @@ public class SetOfSetsTest {
 
     @Test
     public void entrySetForSupersets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of());
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
@@ -259,7 +259,7 @@ public class SetOfSetsTest {
 
     @Test
     public void getSubsetFindsKeys() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -270,7 +270,7 @@ public class SetOfSetsTest {
 
     @Test
     public void getSubsetNonSubsets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -292,7 +292,7 @@ public class SetOfSetsTest {
 
     @Test
     public void getSubsetFindsSubsets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -305,7 +305,7 @@ public class SetOfSetsTest {
 
     @Test
     public void getDisjointNonDisjoint() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -319,7 +319,7 @@ public class SetOfSetsTest {
 
     @Test
     public void getDisjointFindsDisjoint() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -337,7 +337,7 @@ public class SetOfSetsTest {
 
     @Test
     public void getSupersetFindsKeys() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -348,7 +348,7 @@ public class SetOfSetsTest {
 
     @Test
     public void getSupersetNonSupersets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));
@@ -364,7 +364,7 @@ public class SetOfSetsTest {
 
     @Test
     public void getSupersetFindsSupersets() {
-        final var set = new SetOfSets<Integer>();
+        var set = new SetOfSets<Integer>();
         set.add(Set.of(2));
         set.add(Set.of(1, 3));
         set.add(Set.of(1, 4, 5, 6));

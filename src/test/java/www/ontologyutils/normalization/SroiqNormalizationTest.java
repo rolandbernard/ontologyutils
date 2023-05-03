@@ -19,12 +19,12 @@ public class SroiqNormalizationTest {
             "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
             "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
     })
-    public void normalizedOntologyIsEquivalent(final String resourceName) throws OWLOntologyCreationException {
-        final var path = SroiqNormalizationTest.class.getResource(resourceName).getFile();
+    public void normalizedOntologyIsEquivalent(String resourceName) throws OWLOntologyCreationException {
+        var path = SroiqNormalizationTest.class.getResource(resourceName).getFile();
         // Using JFact, because Openllet does not support some axioms in entailments.
-        try (final var originalOntology = Ontology.loadOntology(path, new JFactFactory())) {
-            try (final var normalizedOntology = originalOntology.clone()) {
-                final var normalization = new SroiqNormalization();
+        try (var originalOntology = Ontology.loadOntology(path, new JFactFactory())) {
+            try (var normalizedOntology = originalOntology.clone()) {
+                var normalization = new SroiqNormalization();
                 normalization.apply(normalizedOntology);
                 assertTrue(originalOntology.isEntailed(normalizedOntology));
                 assertTrue(normalizedOntology.isEntailed(originalOntology));

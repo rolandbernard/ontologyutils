@@ -15,23 +15,23 @@ import www.ontologyutils.toolbox.Ontology;
 public class SroiqRefinementOperatorTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/roland/ontologies/2023/3/untitled/";
 
-    private final Ontology ontology;
-    private final Covers covers;
+    private Ontology ontology;
+    private Covers covers;
     static RefinementOperator generalization;
     static RefinementOperator specialization;
 
     public SroiqRefinementOperatorTest() {
-        final var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
+        var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
-        final var upCover = covers.upCover().cached();
-        final var downCover = covers.downCover().cached();
+        var upCover = covers.upCover().cached();
+        var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);
         specialization = new RefinementOperator(downCover, upCover);
     }
 
     private static Stream<Arguments> expectedGeneralization() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -178,12 +178,12 @@ public class SroiqRefinementOperatorTest {
 
     @ParameterizedTest
     @MethodSource("expectedGeneralization")
-    public void generalize(final Set<OWLClassExpression> expected, final OWLClassExpression concept) {
+    public void generalize(Set<OWLClassExpression> expected, OWLClassExpression concept) {
         assertEquals(expected, generalization.refine(concept).collect(Collectors.toSet()));
     }
 
     private static Stream<Arguments> expectedSpecialization() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -357,7 +357,7 @@ public class SroiqRefinementOperatorTest {
 
     @ParameterizedTest
     @MethodSource("expectedSpecialization")
-    public void specialize(final Set<OWLClassExpression> expected, final OWLClassExpression concept) {
+    public void specialize(Set<OWLClassExpression> expected, OWLClassExpression concept) {
         assertEquals(expected, specialization.refine(concept).collect(Collectors.toSet()));
     }
 
@@ -380,16 +380,16 @@ public class SroiqRefinementOperatorTest {
             "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
             "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
     })
-    public void generalizationFromFile(final String resourceName) throws OWLOntologyCreationException {
-        final var df = Ontology.getDefaultDataFactory();
-        final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
-            try (final var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
-                final var upCover = covers.upCover().cached();
-                final var downCover = covers.downCover().cached();
+    public void generalizationFromFile(String resourceName) throws OWLOntologyCreationException {
+        var df = Ontology.getDefaultDataFactory();
+        var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
+            try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
+                var upCover = covers.upCover().cached();
+                var downCover = covers.downCover().cached();
                 generalization = new RefinementOperator(upCover, downCover);
                 ontology.subConcepts().forEach(special -> {
-                    for (final var general : generalization.refine(special).toList()) {
+                    for (var general : generalization.refine(special).toList()) {
                         assertTrue(ontology.isEntailed(df.getOWLSubClassOfAxiom(special, general)));
                     }
                 });
@@ -406,16 +406,16 @@ public class SroiqRefinementOperatorTest {
             "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
             "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
     })
-    public void specializationFromFile(final String resourceName) throws OWLOntologyCreationException {
-        final var df = Ontology.getDefaultDataFactory();
-        final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
-            try (final var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
-                final var upCover = covers.upCover().cached();
-                final var downCover = covers.downCover().cached();
+    public void specializationFromFile(String resourceName) throws OWLOntologyCreationException {
+        var df = Ontology.getDefaultDataFactory();
+        var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
+            try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
+                var upCover = covers.upCover().cached();
+                var downCover = covers.downCover().cached();
                 specialization = new RefinementOperator(downCover, upCover);
                 ontology.subConcepts().forEach(general -> {
-                    for (final var special : specialization.refine(general).toList()) {
+                    for (var special : specialization.refine(general).toList()) {
                         assertTrue(ontology.isEntailed(df.getOWLSubClassOfAxiom(special, general)));
                     }
                 });

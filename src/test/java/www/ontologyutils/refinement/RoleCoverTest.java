@@ -15,17 +15,17 @@ import www.ontologyutils.toolbox.Ontology;
 public class RoleCoverTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/roland/ontologies/2023/3/untitled/";
 
-    private final Ontology ontology;
-    private final Covers covers;
+    private Ontology ontology;
+    private Covers covers;
 
     public RoleCoverTest() {
-        final var path = CoverTest.class.getResource("../sroiq-tests.owl").getFile();
+        var path = CoverTest.class.getResource("../sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
     }
 
     private static Stream<Arguments> expectedUpCover() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -85,13 +85,13 @@ public class RoleCoverTest {
 
     @ParameterizedTest
     @MethodSource("expectedUpCover")
-    public void upCover(final Set<OWLObjectPropertyExpression> expected,
-            final OWLObjectPropertyExpression concept) {
+    public void upCover(Set<OWLObjectPropertyExpression> expected,
+            OWLObjectPropertyExpression concept) {
         assertEquals(expected, covers.upCover(concept).collect(Collectors.toSet()));
     }
 
     private static Stream<Arguments> expectedDownCover() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -141,8 +141,8 @@ public class RoleCoverTest {
 
     @ParameterizedTest
     @MethodSource("expectedDownCover")
-    public void downCover(final Set<OWLObjectPropertyExpression> expected,
-            final OWLObjectPropertyExpression concept) {
+    public void downCover(Set<OWLObjectPropertyExpression> expected,
+            OWLObjectPropertyExpression concept) {
         assertEquals(expected, covers.downCover(concept).collect(Collectors.toSet()));
     }
 

@@ -18,10 +18,10 @@ public class NormalizationsTest {
     @ValueSource(strings = {
             "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
     })
-    public void testNormalizeCondor(final String resourceName) throws OWLOntologyCreationException {
+    public void testNormalizeCondor(String resourceName) throws OWLOntologyCreationException {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms();
-        final var path = NormalizationsTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
+        var path = NormalizationsTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
             Ontology copy = Ontology.emptyOntology();
             copy.addAxioms(ontology.axioms());
             List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
@@ -39,10 +39,10 @@ public class NormalizationsTest {
     @ValueSource(strings = {
             "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
     })
-    public void testNormalizeNaive(final String resourceName) throws OWLOntologyCreationException {
+    public void testNormalizeNaive(String resourceName) throws OWLOntologyCreationException {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms();
-        final var path = NormalizationsTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
+        var path = NormalizationsTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
             Ontology copy = Ontology.emptyOntology();
             copy.addAxioms(ontology.axioms());
             List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();

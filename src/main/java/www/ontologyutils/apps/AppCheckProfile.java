@@ -9,12 +9,12 @@ public class AppCheckProfile {
      *
      * @param args
      */
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: java " + AppCheckProfile.class.getCanonicalName() + " FILENAME");
             System.exit(1);
         }
-        final var ontology = Ontology.loadOntology(args[0]);
+        var ontology = Ontology.loadOntology(args[0]);
         ontology.checkOwlProfiles().forEach(System.out::println);
         ontology.close();
     }

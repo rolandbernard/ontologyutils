@@ -18,19 +18,21 @@ import www.ontologyutils.toolbox.Utils;
  * Conference on Artificial Intelligence. Vol. 32. No. 1. 2018. Table 1.
  */
 public class RefinementOperator {
+    // These are set to be equal to those in AxiomRefinement so they can be passed
+    // through.
     public static final int FLAG_NON_STRICT = AxiomRefinement.FLAG_NON_STRICT;
     public static final int FLAG_NNF_STRICT = AxiomRefinement.FLAG_NNF_STRICT;
     public static final int FLAG_ALC_STRICT = AxiomRefinement.FLAG_ALC_STRICT;
     public static final int FLAG_SROIQ_STRICT = AxiomRefinement.FLAG_SROIQ_STRICT;
 
     private static class Visitor implements OWLClassExpressionVisitorEx<Stream<OWLClassExpression>> {
-        protected final OWLDataFactory df;
-        private final Cover way;
-        private final Cover back;
-        private final int flags;
+        protected OWLDataFactory df;
+        private Cover way;
+        private Cover back;
+        private int flags;
         private Visitor reverse;
 
-        public Visitor(final Cover way, final Cover back, final int flags) {
+        public Visitor(Cover way, Cover back, int flags) {
             df = Ontology.getDefaultDataFactory();
             this.way = way;
             this.back = back;
@@ -38,13 +40,13 @@ public class RefinementOperator {
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLClass concept) {
+        public Stream<OWLClassExpression> visit(OWLClass concept) {
             return Stream.of();
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectComplementOf concept) {
-            final var operand = concept.getOperand();
+        public Stream<OWLClassExpression> visit(OWLObjectComplementOf concept) {
+            var operand = concept.getOperand();
             if ((flags & FLAG_NNF_STRICT) != 0 && operand.getClassExpressionType() != ClassExpressionType.OWL_CLASS) {
                 throw new IllegalArgumentException("The concept " + concept + " is not in NNF.");
             }
@@ -55,8 +57,8 @@ public class RefinementOperator {
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectIntersectionOf concept) {
-            final var conjuncts = concept.getOperandsAsList();
+        public Stream<OWLClassExpression> visit(OWLObjectIntersectionOf concept) {
+            var conjuncts = concept.getOperandsAsList();
             if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0 && conjuncts.size() != 2) {
                 throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             }
@@ -66,8 +68,8 @@ public class RefinementOperator {
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectUnionOf concept) {
-            final var disjuncts = concept.getOperandsAsList();
+        public Stream<OWLClassExpression> visit(OWLObjectUnionOf concept) {
+            var disjuncts = concept.getOperandsAsList();
             if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0 && disjuncts.size() != 2) {
                 throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             }
@@ -77,40 +79,40 @@ public class RefinementOperator {
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectAllValuesFrom concept) {
-            final var filler = concept.getFiller();
-            final var property = concept.getProperty();
+        public Stream<OWLClassExpression> visit(OWLObjectAllValuesFrom concept) {
+            var filler = concept.getFiller();
+            var property = concept.getProperty();
             return Stream.concat(
                     refine(filler).map(c -> df.getOWLObjectAllValuesFrom(property, c)),
                     reverse.refine(property).map(r -> df.getOWLObjectAllValuesFrom(r, filler)));
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectSomeValuesFrom concept) {
-            final var filler = concept.getFiller();
-            final var property = concept.getProperty();
+        public Stream<OWLClassExpression> visit(OWLObjectSomeValuesFrom concept) {
+            var filler = concept.getFiller();
+            var property = concept.getProperty();
             return Stream.concat(
                     refine(filler).map(c -> df.getOWLObjectSomeValuesFrom(property, c)),
                     refine(property).map(r -> df.getOWLObjectSomeValuesFrom(r, filler)));
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectHasSelf concept) {
+        public Stream<OWLClassExpression> visit(OWLObjectHasSelf concept) {
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
             }
-            final var property = concept.getProperty();
+            var property = concept.getProperty();
             return refine(property).map(r -> df.getOWLObjectHasSelf(r));
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectMaxCardinality concept) {
+        public Stream<OWLClassExpression> visit(OWLObjectMaxCardinality concept) {
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
             }
-            final var number = concept.getCardinality();
-            final var filler = concept.getFiller();
-            final var property = concept.getProperty();
+            var number = concept.getCardinality();
+            var filler = concept.getFiller();
+            var property = concept.getProperty();
             return Stream.concat(
                     reverse.refine(filler).map(c -> df.getOWLObjectMaxCardinality(number, property, c)),
                     Stream.concat(
@@ -119,13 +121,13 @@ public class RefinementOperator {
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectMinCardinality concept) {
+        public Stream<OWLClassExpression> visit(OWLObjectMinCardinality concept) {
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
             }
-            final var number = concept.getCardinality();
-            final var filler = concept.getFiller();
-            final var property = concept.getProperty();
+            var number = concept.getCardinality();
+            var filler = concept.getFiller();
+            var property = concept.getProperty();
             return Stream.concat(
                     refine(filler).map(c -> df.getOWLObjectMinCardinality(number, property, c)),
                     Stream.concat(
@@ -134,22 +136,22 @@ public class RefinementOperator {
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectExactCardinality concept) {
+        public Stream<OWLClassExpression> visit(OWLObjectExactCardinality concept) {
             if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             }
-            final var number = concept.getCardinality();
-            final var filler = concept.getFiller();
-            final var property = concept.getProperty();
-            final var minCard = df.getOWLObjectMinCardinality(number, property, filler);
-            final var maxCard = df.getOWLObjectMaxCardinality(number, property, filler);
+            var number = concept.getCardinality();
+            var filler = concept.getFiller();
+            var property = concept.getProperty();
+            var minCard = df.getOWLObjectMinCardinality(number, property, filler);
+            var maxCard = df.getOWLObjectMaxCardinality(number, property, filler);
             return Stream.concat(
                     refine(minCard).map(minPart -> df.getOWLObjectIntersectionOf(minPart, maxCard)),
                     refine(maxCard).map(maxPart -> df.getOWLObjectIntersectionOf(minCard, maxPart)));
         }
 
         @Override
-        public Stream<OWLClassExpression> visit(final OWLObjectOneOf concept) {
+        public Stream<OWLClassExpression> visit(OWLObjectOneOf concept) {
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not an ALC concept.");
             }
@@ -157,8 +159,8 @@ public class RefinementOperator {
         }
 
         @Override
-        public <T> Stream<OWLClassExpression> doDefault(final T obj) throws IllegalArgumentException {
-            final var concept = (OWLClassExpression) obj;
+        public <T> Stream<OWLClassExpression> doDefault(T obj) throws IllegalArgumentException {
+            var concept = (OWLClassExpression) obj;
             if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             } else {
@@ -166,13 +168,13 @@ public class RefinementOperator {
             }
         }
 
-        public Stream<OWLClassExpression> refine(final OWLClassExpression concept) throws IllegalArgumentException {
+        public Stream<OWLClassExpression> refine(OWLClassExpression concept) throws IllegalArgumentException {
             // Since all rules include {@code way.apply(concept)} we perform this operation
             // here.
             return Stream.concat(way.apply(concept), concept.accept(this)).distinct();
         }
 
-        public Stream<OWLObjectPropertyExpression> refine(final OWLObjectPropertyExpression role) {
+        public Stream<OWLObjectPropertyExpression> refine(OWLObjectPropertyExpression role) {
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 return Stream.of(role);
             } else {
@@ -181,7 +183,7 @@ public class RefinementOperator {
         }
     }
 
-    private final Visitor visitor;
+    private Visitor visitor;
 
     /**
      * Create a new refinement operator.
@@ -194,13 +196,13 @@ public class RefinementOperator {
      *            is not valid in ALC. If FLAG_NNF_STRICT is set, the input must
      *            be in NNF and the output will also be in NNF.
      */
-    public RefinementOperator(final Cover way, final Cover back, final int flags) {
+    public RefinementOperator(Cover way, Cover back, int flags) {
         visitor = new Visitor(way, back, flags);
         visitor.reverse = new Visitor(back, way, flags);
         visitor.reverse.reverse = visitor;
     }
 
-    public RefinementOperator(final Cover way, final Cover back) {
+    public RefinementOperator(Cover way, Cover back) {
         this(way, back, FLAG_NON_STRICT);
     }
 
@@ -218,7 +220,7 @@ public class RefinementOperator {
      *             If the axioms in this ontology are not
      *             supported by the current flags.
      */
-    public Stream<OWLClassExpression> refine(final OWLClassExpression concept) throws IllegalArgumentException {
+    public Stream<OWLClassExpression> refine(OWLClassExpression concept) throws IllegalArgumentException {
         return visitor.refine(concept);
     }
 
@@ -230,7 +232,7 @@ public class RefinementOperator {
      *            The role that should be refined.
      * @return A stream of all refinements of {@code role} using the covers.
      */
-    public Stream<OWLObjectPropertyExpression> refine(final OWLObjectPropertyExpression role) {
+    public Stream<OWLObjectPropertyExpression> refine(OWLObjectPropertyExpression role) {
         return visitor.refine(role);
     }
 
@@ -249,7 +251,7 @@ public class RefinementOperator {
      *             If the axioms in this ontology are not
      *             supported by the current flags.
      */
-    public Stream<OWLClassExpression> refineReverse(final OWLClassExpression concept) throws IllegalArgumentException {
+    public Stream<OWLClassExpression> refineReverse(OWLClassExpression concept) throws IllegalArgumentException {
         return visitor.reverse.refine(concept);
     }
 
@@ -261,7 +263,7 @@ public class RefinementOperator {
      *            The role that should be refined.
      * @return A stream of all refinements of {@code role} using the covers.
      */
-    public Stream<OWLObjectPropertyExpression> refineReverse(final OWLObjectPropertyExpression role) {
+    public Stream<OWLObjectPropertyExpression> refineReverse(OWLObjectPropertyExpression role) {
         return visitor.reverse.refine(role);
     }
 }

@@ -13,7 +13,7 @@ import www.ontologyutils.toolbox.Ontology;
 
 public class ConceptNormalizationTest {
     private static Stream<Arguments> testAxioms() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -79,12 +79,12 @@ public class ConceptNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void allConceptsAxiomsAreInSroiq(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        try (final var ontology = Ontology.withAxioms(axioms)) {
-            final var normalization = new ConceptNormalization();
+    public void allConceptsAxiomsAreInSroiq(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            var normalization = new ConceptNormalization();
             normalization.apply(ontology);
             ontology.subConcepts().forEach(ce -> {
-                final var type = ce.getClassExpressionType();
+                var type = ce.getClassExpressionType();
                 assertTrue(
                         type == ClassExpressionType.OWL_CLASS
                                 || type == ClassExpressionType.OBJECT_COMPLEMENT_OF
@@ -102,10 +102,10 @@ public class ConceptNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void unionAndIntersectionAreInBinaryOperations(final Set<OWLAxiom> axioms)
+    public void unionAndIntersectionAreInBinaryOperations(Set<OWLAxiom> axioms)
             throws OWLOntologyCreationException {
-        try (final var ontology = Ontology.withAxioms(axioms)) {
-            final var normalization = new ConceptNormalization(true);
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            var normalization = new ConceptNormalization(true);
             normalization.apply(ontology);
             ontology.subConcepts()
                     .filter(ce -> ce.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF
@@ -116,10 +116,10 @@ public class ConceptNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void normalizedOntologyIsEquivalent(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        try (final var originalOntology = Ontology.withAxioms(axioms)) {
-            try (final var normalizedOntology = Ontology.withAxioms(axioms)) {
-                final var normalization = new ConceptNormalization();
+    public void normalizedOntologyIsEquivalent(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+        try (var originalOntology = Ontology.withAxioms(axioms)) {
+            try (var normalizedOntology = Ontology.withAxioms(axioms)) {
+                var normalization = new ConceptNormalization();
                 normalization.apply(normalizedOntology);
                 assertTrue(originalOntology.isEntailed(normalizedOntology));
                 assertTrue(normalizedOntology.isEntailed(originalOntology));
@@ -129,10 +129,10 @@ public class ConceptNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void normalizedOntologyIsEquivalentBinary(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        try (final var originalOntology = Ontology.withAxioms(axioms)) {
-            try (final var normalizedOntology = Ontology.withAxioms(axioms)) {
-                final var normalization = new ConceptNormalization(true);
+    public void normalizedOntologyIsEquivalentBinary(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+        try (var originalOntology = Ontology.withAxioms(axioms)) {
+            try (var normalizedOntology = Ontology.withAxioms(axioms)) {
+                var normalization = new ConceptNormalization(true);
                 normalization.apply(normalizedOntology);
                 assertTrue(originalOntology.isEntailed(normalizedOntology));
                 assertTrue(normalizedOntology.isEntailed(originalOntology));

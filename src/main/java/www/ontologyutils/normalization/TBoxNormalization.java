@@ -20,19 +20,19 @@ public class TBoxNormalization implements OntologyModification {
      */
     private static class Visitor implements OWLAxiomVisitorEx<Collection<OWLSubClassOfAxiom>> {
         @Override
-        public Collection<OWLSubClassOfAxiom> visit(final OWLDisjointUnionAxiom axiom) {
+        public Collection<OWLSubClassOfAxiom> visit(OWLDisjointUnionAxiom axiom) {
             // Since OWLDisjointUnionAxiom does not implement OWLSubClassOfAxiomSetShortCut
             // directly, we must first split the axiom into a disjoint class and equivalent
             // class axioms. Then we split the result axioms into subclass axioms.
-            final var disjointClasses = axiom.getOWLDisjointClassesAxiom();
-            final var equivalentClasses = axiom.getOWLEquivalentClassesAxiom();
-            final var axioms = disjointClasses.asOWLSubClassOfAxioms();
+            var disjointClasses = axiom.getOWLDisjointClassesAxiom();
+            var equivalentClasses = axiom.getOWLEquivalentClassesAxiom();
+            var axioms = disjointClasses.asOWLSubClassOfAxioms();
             axioms.addAll(equivalentClasses.asOWLSubClassOfAxioms());
             return axioms;
         }
 
         @Override
-        public <T> Collection<OWLSubClassOfAxiom> doDefault(final T axiom) throws IllegalArgumentException {
+        public <T> Collection<OWLSubClassOfAxiom> doDefault(T axiom) throws IllegalArgumentException {
             if (axiom instanceof OWLSubClassOfAxiomSetShortCut ax) {
                 return ax.asOWLSubClassOfAxioms();
             } else if (axiom instanceof OWLSubClassOfAxiomShortCut ax) {
@@ -43,7 +43,7 @@ public class TBoxNormalization implements OntologyModification {
         }
     }
 
-    private final Visitor visitor;
+    private Visitor visitor;
 
     public TBoxNormalization() {
         visitor = new Visitor();
@@ -55,15 +55,15 @@ public class TBoxNormalization implements OntologyModification {
      * @return A number of subclass axioms that together are equivalent to
      *         {@code axiom} in every ontology.
      */
-    public Stream<OWLSubClassOfAxiom> asSubclassOfAxioms(final OWLAxiom axiom) {
+    public Stream<OWLSubClassOfAxiom> asSubclassOfAxioms(OWLAxiom axiom) {
         return axiom.accept(visitor).stream();
     }
 
     @Override
-    public void apply(final Ontology ontology) throws IllegalArgumentException {
-        final var tBox = ontology.tboxAxioms()
+    public void apply(Ontology ontology) throws IllegalArgumentException {
+        var tBox = ontology.tboxAxioms()
                 .filter(axiom -> !axiom.isOfType(AxiomType.SUBCLASS_OF)).toList();
-        for (final var axiom : tBox) {
+        for (var axiom : tBox) {
             ontology.replaceAxiom(axiom, asSubclassOfAxioms(axiom));
         }
     }

@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 public class MapOfSetsTest {
     @Test
     public void emptyMapHasEmptyEntrySet() {
-        final var map = new MapOfSets<Integer, Void>();
+        var map = new MapOfSets<Integer, Void>();
         assertEquals(Set.of(), map.entrySet());
     }
 
     @Test
     public void emptyMapContainsNoKey() {
-        final var map = new MapOfSets<Integer, Void>();
+        var map = new MapOfSets<Integer, Void>();
         assertFalse(map.containsKey(Set.of()));
         assertFalse(map.containsKey(Set.of(1)));
         assertFalse(map.containsKey(Set.of(2, 3)));
@@ -25,7 +25,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getForNonContainIsNull() {
-        final var map = new MapOfSets<Integer, Void>();
+        var map = new MapOfSets<Integer, Void>();
         assertNull(map.get(Set.of()));
         assertNull(map.get(Set.of(1)));
         assertNull(map.get(Set.of(2, 3)));
@@ -34,7 +34,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsKeyAfterPut() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -47,7 +47,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsNoKeyNotPut() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -59,7 +59,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getReturnsValuesPut() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -72,7 +72,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getReturnsNullForNotPut() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -84,7 +84,7 @@ public class MapOfSetsTest {
 
     @Test
     public void entrySetAfterPut() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -97,7 +97,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsNoKeyAfterRemove() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -111,7 +111,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getReturnsNullAfterRemove() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -127,7 +127,7 @@ public class MapOfSetsTest {
 
     @Test
     public void sizeReturnsSize() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         assertEquals(0, map.size());
         map.put(Set.of(), 0);
         assertEquals(1, map.size());
@@ -145,7 +145,7 @@ public class MapOfSetsTest {
 
     @Test
     public void clearRemovesAllEntries() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -161,7 +161,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsSubsetFindsKeys() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -172,7 +172,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsSubsetNonSubsets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -194,7 +194,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsSubsetFindsSubsets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -207,7 +207,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsDisjointNonDisjoint() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -221,7 +221,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsDisjointFindsDisjoint() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -237,7 +237,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsSupersetFindsKeys() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -248,7 +248,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsSupersetNonSupersets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -264,7 +264,7 @@ public class MapOfSetsTest {
 
     @Test
     public void containsSupersetFindsSupersets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -283,7 +283,7 @@ public class MapOfSetsTest {
 
     @Test
     public void entrySetForSubsets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -296,7 +296,7 @@ public class MapOfSetsTest {
 
     @Test
     public void entrySetForSupersets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
@@ -312,7 +312,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getSubsetFindsKeys() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -323,7 +323,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getSubsetNonSubsets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -345,7 +345,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getSubsetFindsSubsets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -358,7 +358,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getDisjointNonDisjoint() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -372,7 +372,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getDisjointFindsDisjoint() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -390,7 +390,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getSupersetFindsKeys() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -401,7 +401,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getSupersetNonSupersets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);
@@ -417,7 +417,7 @@ public class MapOfSetsTest {
 
     @Test
     public void getSupersetFindsSupersets() {
-        final var map = new MapOfSets<Integer, Integer>();
+        var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(2), 1);
         map.put(Set.of(1, 3), 2);
         map.put(Set.of(1, 4, 5, 6), 3);

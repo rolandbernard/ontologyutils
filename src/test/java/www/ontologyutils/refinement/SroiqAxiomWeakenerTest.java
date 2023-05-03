@@ -15,17 +15,17 @@ import www.ontologyutils.toolbox.Ontology;
 public class SroiqAxiomWeakenerTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/roland/ontologies/2023/3/untitled/";
 
-    private final Ontology ontology;
-    private final AxiomWeakener axiomWeakener;
+    private Ontology ontology;
+    private AxiomWeakener axiomWeakener;
 
     public SroiqAxiomWeakenerTest() {
-        final var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
+        var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomWeakener = new AxiomWeakener(ontology, ontology);
     }
 
     private static Stream<Arguments> expectedWeakening() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -241,13 +241,13 @@ public class SroiqAxiomWeakenerTest {
 
     @ParameterizedTest
     @MethodSource("expectedWeakening")
-    public void weakenAxiom(final Set<OWLAxiom> expected, final OWLAxiom axiom) {
+    public void weakenAxiom(Set<OWLAxiom> expected, OWLAxiom axiom) {
         assertEquals(expected, axiomWeakener.weakerAxioms(axiom).collect(Collectors.toSet()));
     }
 
     @Test
     public void allWeakerAxiomsAreEntailed() {
-        try (final var copy = ontology.cloneWithJFact()) {
+        try (var copy = ontology.cloneWithJFact()) {
             ontology.logicalAxioms().forEach(strongAxiom -> {
                 axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
                     assertTrue(copy.isEntailed(weakAxiom));
@@ -265,11 +265,11 @@ public class SroiqAxiomWeakenerTest {
             "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
             "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
     })
-    public void allWeakerAxiomsAreEntailedFromFile(final String resourceName) throws OWLOntologyCreationException {
-        final var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
-            try (final var jfact = ontology.cloneWithJFact()) {
-                try (final var axiomWeakener = new AxiomWeakener(ontology)) {
+    public void allWeakerAxiomsAreEntailedFromFile(String resourceName) throws OWLOntologyCreationException {
+        var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
+            try (var jfact = ontology.cloneWithJFact()) {
+                try (var axiomWeakener = new AxiomWeakener(ontology)) {
                     ontology.logicalAxioms().forEach(strongAxiom -> {
                         axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
                             if (weakAxiom.isOfType(AxiomType.SUB_PROPERTY_CHAIN_OF, AxiomType.DISJOINT_UNION)) {

@@ -7,9 +7,9 @@ import www.ontologyutils.toolbox.*;
  */
 public class NnfNormalization implements OntologyModification {
     @Override
-    public void apply(final Ontology ontology) {
-        final var axioms = ontology.axioms().toList();
-        for (final var axiom : axioms) {
+    public void apply(Ontology ontology) {
+        var axioms = ontology.axioms().toList();
+        for (var axiom : axioms) {
             ontology.replaceAxiom(axiom, axiom.getNNF());
         }
     }

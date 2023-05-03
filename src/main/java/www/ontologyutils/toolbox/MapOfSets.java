@@ -38,7 +38,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
          *
          * @param key
          */
-        public void removeChild(final Object key) {
+        public void removeChild(Object key) {
             if (children != null) {
                 if (children.size() == 1) {
                     children = null;
@@ -52,7 +52,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
          * @param key
          * @return The child at {@code key} in this node.
          */
-        public TrieNode<K, V> getChild(final Object key) {
+        public TrieNode<K, V> getChild(Object key) {
             if (children != null) {
                 return children.get(key);
             } else {
@@ -67,7 +67,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
          * @param key
          * @return The child at {@code key}.
          */
-        public TrieNode<K, V> getOrCreateChild(final K key) {
+        public TrieNode<K, V> getOrCreateChild(K key) {
             if (children == null) {
                 children = new HashMap<>(1);
             }
@@ -78,7 +78,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
         }
     }
 
-    private final TrieNode<K, V> root;
+    private TrieNode<K, V> root;
 
     /**
      * Create a new empty map.
@@ -93,9 +93,9 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
     }
 
     @Override
-    public V get(final Object key) {
+    public V get(Object key) {
         if (key instanceof Set<?> set) {
-            final var sorted = set.stream().sorted().iterator();
+            var sorted = set.stream().sorted().iterator();
             var current = root;
             while (current != null && sorted.hasNext()) {
                 current = current.getChild(sorted.next());
@@ -107,19 +107,19 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
     }
 
     @Override
-    public V put(final Set<K> key, final V value) {
-        final var sorted = key.stream().sorted().iterator();
-        final var path = new ArrayList<TrieNode<K, V>>();
+    public V put(Set<K> key, V value) {
+        var sorted = key.stream().sorted().iterator();
+        var path = new ArrayList<TrieNode<K, V>>();
         var current = root;
         while (sorted.hasNext()) {
             path.add(current);
             current = current.getOrCreateChild(sorted.next());
         }
-        final V oldData = current.data;
+        V oldData = current.data;
         current.data = value;
         if (oldData == null) {
             current.size += 1;
-            for (final var node : path) {
+            for (var node : path) {
                 node.size += 1;
             }
         }
@@ -127,21 +127,21 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
     }
 
     @Override
-    public V remove(final Object key) {
+    public V remove(Object key) {
         if (key instanceof Set<?> set) {
-            final var sorted = set.stream().sorted().iterator();
-            final var path = new ArrayList<TrieNode<K, V>>();
+            var sorted = set.stream().sorted().iterator();
+            var path = new ArrayList<TrieNode<K, V>>();
             var current = root;
             while (current != null && sorted.hasNext()) {
                 path.add(current);
                 current = current.getChild(sorted.next());
             }
             if (current != null && current.data != null) {
-                final V data = current.data;
+                V data = current.data;
                 current.size -= 1;
                 current.data = null;
                 Collections.reverse(path);
-                for (final var node : path) {
+                for (var node : path) {
                     if (current.size == 0) {
                         node.removeChild(key);
                     }
@@ -162,11 +162,11 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
         return root.size;
     }
 
-    private void entrySetHelper(final TrieNode<K, V> node, final List<K> path, final Set<Entry<Set<K>, V>> into) {
+    private void entrySetHelper(TrieNode<K, V> node, List<K> path, Set<Entry<Set<K>, V>> into) {
         if (node.data != null) {
             into.add(new SimpleEntry<>(Set.copyOf(path), node.data));
         }
-        for (final var entry : node.children()) {
+        for (var entry : node.children()) {
             path.add(entry.getKey());
             entrySetHelper(entry.getValue(), path, into);
             path.remove(path.size() - 1);
@@ -175,7 +175,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     @Override
     public Set<Entry<Set<K>, V>> entrySet() {
-        final var result = new HashSet<Entry<Set<K>, V>>();
+        var result = new HashSet<Entry<Set<K>, V>>();
         entrySetHelper(root, new ArrayList<>(), result);
         return result;
     }
@@ -184,7 +184,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @param key
      * @return True iff any key in the map is a subset of {@code key}:
      */
-    public boolean containsSubset(final Set<K> key) {
+    public boolean containsSubset(Set<K> key) {
         return getSubset(key) != null;
     }
 
@@ -192,7 +192,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @param key
      * @return True iff any key in the map is disjoint with {@code key}:
      */
-    public boolean containsDisjoint(final Set<K> key) {
+    public boolean containsDisjoint(Set<K> key) {
         return getDisjoint(key) != null;
     }
 
@@ -200,16 +200,16 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @param key
      * @return True iff any key in the map is a superset of {@code key}:
      */
-    public boolean containsSuperset(final Set<K> key) {
+    public boolean containsSuperset(Set<K> key) {
         return getSuperset(key) != null;
     }
 
-    private void entrySetForSubsetHelper(final TrieNode<K, V> node, final Set<K> key, final List<K> path,
-            final Set<Entry<Set<K>, V>> into) {
+    private void entrySetForSubsetHelper(TrieNode<K, V> node, Set<K> key, List<K> path,
+            Set<Entry<Set<K>, V>> into) {
         if (node.data != null) {
             into.add(new SimpleEntry<>(Set.copyOf(path), node.data));
         }
-        for (final var entry : node.children()) {
+        for (var entry : node.children()) {
             if (key.contains(entry.getKey())) {
                 path.add(entry.getKey());
                 entrySetForSubsetHelper(entry.getValue(), key, path, into);
@@ -222,19 +222,19 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @param key
      * @return All entries for which the key is a subset of {@code key}.
      */
-    public Set<Entry<Set<K>, V>> entrySetForSubsets(final Set<K> key) {
-        final var result = new HashSet<Entry<Set<K>, V>>();
+    public Set<Entry<Set<K>, V>> entrySetForSubsets(Set<K> key) {
+        var result = new HashSet<Entry<Set<K>, V>>();
         entrySetForSubsetHelper(root, key, new ArrayList<>(), result);
         return result;
     }
 
-    private void entrySetForSupersetHelper(final TrieNode<K, V> node, final List<K> key, final int depth,
-            final List<K> path, final Set<Entry<Set<K>, V>> into) {
+    private void entrySetForSupersetHelper(TrieNode<K, V> node, List<K> key, int depth,
+            List<K> path, Set<Entry<Set<K>, V>> into) {
         if (depth == key.size() && node.data != null) {
             into.add(new SimpleEntry<>(Set.copyOf(path), node.data));
         }
-        for (final var entry : node.children()) {
-            final int cmp = depth < key.size() ? entry.getKey().compareTo(key.get(depth)) : -1;
+        for (var entry : node.children()) {
+            int cmp = depth < key.size() ? entry.getKey().compareTo(key.get(depth)) : -1;
             if (cmp <= 0) {
                 path.add(entry.getKey());
                 entrySetForSupersetHelper(entry.getValue(), key, cmp == 0 ? depth + 1 : depth, path, into);
@@ -247,21 +247,21 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @param key
      * @return All entries for which the key is a superset of {@code key}.
      */
-    public Set<Entry<Set<K>, V>> entrySetForSupersets(final Set<K> key) {
-        final var sorted = key.stream().sorted().toList();
-        final var result = new HashSet<Entry<Set<K>, V>>();
+    public Set<Entry<Set<K>, V>> entrySetForSupersets(Set<K> key) {
+        var sorted = key.stream().sorted().toList();
+        var result = new HashSet<Entry<Set<K>, V>>();
         entrySetForSupersetHelper(root, sorted, 0, new ArrayList<>(), result);
         return result;
     }
 
-    private Entry<Set<K>, V> getSubsetHelper(final TrieNode<K, V> node, final Set<K> key, final List<K> path) {
+    private Entry<Set<K>, V> getSubsetHelper(TrieNode<K, V> node, Set<K> key, List<K> path) {
         if (node.data != null) {
             return new SimpleEntry<>(Set.copyOf(path), node.data);
         }
-        for (final var entry : node.children()) {
+        for (var entry : node.children()) {
             if (key.contains(entry.getKey())) {
                 path.add(entry.getKey());
-                final var result = getSubsetHelper(entry.getValue(), key, path);
+                var result = getSubsetHelper(entry.getValue(), key, path);
                 if (result != null) {
                     return result;
                 }
@@ -276,18 +276,18 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @return Some entry for which the key is a subset of {@code key} or null if no
      *         such entry exists.
      */
-    public Entry<Set<K>, V> getSubset(final Set<K> key) {
+    public Entry<Set<K>, V> getSubset(Set<K> key) {
         return getSubsetHelper(root, key, new ArrayList<>());
     }
 
-    private Entry<Set<K>, V> getDisjointHelper(final TrieNode<K, V> node, final Set<K> key, final List<K> path) {
+    private Entry<Set<K>, V> getDisjointHelper(TrieNode<K, V> node, Set<K> key, List<K> path) {
         if (node.data != null) {
             return new SimpleEntry<>(Set.copyOf(path), node.data);
         }
-        for (final var entry : node.children()) {
+        for (var entry : node.children()) {
             if (!key.contains(entry.getKey())) {
                 path.add(entry.getKey());
-                final var result = getDisjointHelper(entry.getValue(), key, path);
+                var result = getDisjointHelper(entry.getValue(), key, path);
                 if (result != null) {
                     return result;
                 }
@@ -302,20 +302,20 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @return Some entry for which the key is disjoint with {@code key} or null if
      *         no such entry exists.
      */
-    public Entry<Set<K>, V> getDisjoint(final Set<K> key) {
+    public Entry<Set<K>, V> getDisjoint(Set<K> key) {
         return getDisjointHelper(root, key, new ArrayList<>());
     }
 
-    private Entry<Set<K>, V> getSupersetHelper(final TrieNode<K, V> node, final List<K> key, final int depth,
-            final List<K> path) {
+    private Entry<Set<K>, V> getSupersetHelper(TrieNode<K, V> node, List<K> key, int depth,
+            List<K> path) {
         if (depth == key.size() && node.data != null) {
             return new SimpleEntry<>(Set.copyOf(path), node.data);
         }
-        for (final var entry : node.children()) {
-            final int cmp = depth < key.size() ? entry.getKey().compareTo(key.get(depth)) : -1;
+        for (var entry : node.children()) {
+            int cmp = depth < key.size() ? entry.getKey().compareTo(key.get(depth)) : -1;
             if (cmp <= 0) {
                 path.add(entry.getKey());
-                final var result = getSupersetHelper(entry.getValue(), key, cmp == 0 ? depth + 1 : depth, path);
+                var result = getSupersetHelper(entry.getValue(), key, cmp == 0 ? depth + 1 : depth, path);
                 if (result != null) {
                     return result;
                 }
@@ -330,8 +330,8 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @return Some entry for which the key is a superset of {@code key} or null if
      *         no such entry exists.
      */
-    public Entry<Set<K>, V> getSuperset(final Set<K> key) {
-        final var sorted = key.stream().sorted().toList();
+    public Entry<Set<K>, V> getSuperset(Set<K> key) {
+        var sorted = key.stream().sorted().toList();
         return getSupersetHelper(root, sorted, 0, new ArrayList<>());
     }
 }

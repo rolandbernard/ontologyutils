@@ -18,15 +18,15 @@ public class AppAutomatedRepairWeakening {
      *
      * @param args
      */
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Usage: java " + AppAutomatedRepairWeakening.class.getCanonicalName() + " FILENAME");
             System.exit(1);
         }
-        final var ontology = Ontology.loadOntology(args[0]);
+        var ontology = Ontology.loadOntology(args[0]);
         System.err.println("Loaded...");
-        final var normalization = new SroiqNormalization();
-        final var repair = OntologyRepairWeakening.forConsistency();
+        var normalization = new SroiqNormalization();
+        var repair = OntologyRepairWeakening.forConsistency();
         repair.setInfoCallback(msg -> System.out.println("[" + getTimeStamp() + "] " + msg));
         System.err.println("Normalizing...");
         normalization.apply(ontology);

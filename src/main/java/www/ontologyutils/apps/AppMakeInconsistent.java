@@ -20,8 +20,8 @@ public class AppMakeInconsistent {
      * @param args
      */
     public static void main(String[] args) {
-        final var ontology = Ontology.loadOntology(args[0]);
-        final var normalization = new SroiqNormalization();
+        var ontology = Ontology.loadOntology(args[0]);
+        var normalization = new SroiqNormalization();
         normalization.apply(ontology);
         System.err.println("Loaded...");
         if (!ontology.isConsistent()) {
@@ -43,21 +43,21 @@ public class AppMakeInconsistent {
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
             System.err.println("No minimal number of iterations after reaching inconsistency specified.");
         }
-        final var emptyOntology = Ontology.emptyOntology();
-        final var axiomStrengthener = new AxiomStrengthener(ontology);
+        var emptyOntology = Ontology.emptyOntology();
+        var axiomStrengthener = new AxiomStrengthener(ontology);
         int iter = 0;
         int iterSinceInconsistency = 0;
         boolean isConsistent = ontology.isConsistent();
         System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         while (isConsistent || iter < minNumIter || iterSinceInconsistency < minNumIterAfterInconsistency) {
-            final OWLAxiom axiom = Utils.randomChoice(ontology.logicalAxioms());
-            final var strongerAxioms = axiomStrengthener.strongerAxioms(axiom).collect(Collectors.toSet());
+            OWLAxiom axiom = Utils.randomChoice(ontology.logicalAxioms());
+            var strongerAxioms = axiomStrengthener.strongerAxioms(axiom).collect(Collectors.toSet());
             // We do not consider the axioms already in the ontology.
             strongerAxioms.removeAll(ontology.axioms().toList());
             // We do not consider axioms that are inconsistent on their own, could be made
             // optional.
-            final var tooStrong = new HashSet<OWLAxiom>();
-            for (final var strongerAxiom : strongerAxioms) {
+            var tooStrong = new HashSet<OWLAxiom>();
+            for (var strongerAxiom : strongerAxioms) {
                 emptyOntology.addAxioms(strongerAxiom);
                 if (!ontology.isConsistent()) {
                     tooStrong.add(strongerAxiom);
@@ -66,8 +66,8 @@ public class AppMakeInconsistent {
             }
             strongerAxioms.removeAll(tooStrong);
             // We do not consider axioms that are tautologies, could be made optional.
-            final var tautologies = new HashSet<OWLAxiom>();
-            for (final var strongerAxiom : strongerAxioms) {
+            var tautologies = new HashSet<OWLAxiom>();
+            for (var strongerAxiom : strongerAxioms) {
                 if (emptyOntology.isEntailed(strongerAxiom)) {
                     tautologies.add(strongerAxiom);
                 }

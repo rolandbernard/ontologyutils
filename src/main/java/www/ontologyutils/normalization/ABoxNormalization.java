@@ -27,32 +27,32 @@ public class ABoxNormalization implements OntologyModification {
      * Visitor class used for converting the axioms.
      */
     private static class Visitor implements OWLAxiomVisitorEx<Collection<OWLAxiom>> {
-        protected final OWLDataFactory df;
-        private final boolean fullEquality;
+        protected OWLDataFactory df;
+        private boolean fullEquality;
 
-        private Visitor(final boolean fullEquality) {
+        private Visitor(boolean fullEquality) {
             df = Ontology.getDefaultDataFactory();
             this.fullEquality = fullEquality;
         }
 
         @Override
-        public Collection<OWLAxiom> visit(final OWLClassAssertionAxiom axiom) {
+        public Collection<OWLAxiom> visit(OWLClassAssertionAxiom axiom) {
             return List.of(axiom);
         }
 
         @Override
-        public Collection<OWLAxiom> visit(final OWLObjectPropertyAssertionAxiom axiom) {
+        public Collection<OWLAxiom> visit(OWLObjectPropertyAssertionAxiom axiom) {
             return List.of(axiom);
         }
 
         @Override
-        public Collection<OWLAxiom> visit(final OWLNegativeObjectPropertyAssertionAxiom axiom) {
+        public Collection<OWLAxiom> visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
             return List.of(axiom);
         }
 
         @Override
-        public Collection<OWLAxiom> visit(final OWLDifferentIndividualsAxiom axiom) {
-            final var individuals = axiom.getIndividualsAsList();
+        public Collection<OWLAxiom> visit(OWLDifferentIndividualsAxiom axiom) {
+            var individuals = axiom.getIndividualsAsList();
             return individuals.stream()
                     .flatMap(first -> individuals.stream()
                             .filter(second -> !first.equals(second))
@@ -61,8 +61,8 @@ public class ABoxNormalization implements OntologyModification {
         }
 
         @Override
-        public Collection<OWLAxiom> visit(final OWLSameIndividualAxiom axiom) {
-            final var individuals = axiom.getIndividualsAsList();
+        public Collection<OWLAxiom> visit(OWLSameIndividualAxiom axiom) {
+            var individuals = axiom.getIndividualsAsList();
             if (fullEquality) {
                 return individuals.stream()
                         .flatMap(first -> individuals.stream()
@@ -70,7 +70,7 @@ public class ABoxNormalization implements OntologyModification {
                                 .map(second -> (OWLAxiom) df.getOWLSameIndividualAxiom(first, second)))
                         .toList();
             } else {
-                final var first = individuals.get(0);
+                var first = individuals.get(0);
                 return individuals.stream()
                         .filter(second -> !first.equals(second))
                         .map(second -> (OWLAxiom) df.getOWLSameIndividualAxiom(first, second))
@@ -79,12 +79,12 @@ public class ABoxNormalization implements OntologyModification {
         }
 
         @Override
-        public <T> Collection<OWLAxiom> doDefault(final T axiom) {
+        public <T> Collection<OWLAxiom> doDefault(T axiom) {
             throw new IllegalArgumentException("ABox normalization does not support axiom " + axiom);
         }
     }
 
-    private final Visitor visitor;
+    private Visitor visitor;
 
     /**
      * @param fullEquality
@@ -92,7 +92,7 @@ public class ABoxNormalization implements OntologyModification {
      *            pairs of
      *            individuals.
      */
-    public ABoxNormalization(final boolean fullEquality) {
+    public ABoxNormalization(boolean fullEquality) {
         visitor = new Visitor(fullEquality);
     }
 
@@ -106,14 +106,14 @@ public class ABoxNormalization implements OntologyModification {
      * @return A number of sroiq axioms that together are equivalent to
      *         {@code axiom} in every ontology.
      */
-    public Stream<OWLAxiom> asSroiqAxioms(final OWLAxiom axiom) {
+    public Stream<OWLAxiom> asSroiqAxioms(OWLAxiom axiom) {
         return axiom.accept(visitor).stream();
     }
 
     @Override
-    public void apply(final Ontology ontology) throws IllegalArgumentException {
-        final var aBox = ontology.aboxAxioms().toList();
-        for (final var axiom : aBox) {
+    public void apply(Ontology ontology) throws IllegalArgumentException {
+        var aBox = ontology.aboxAxioms().toList();
+        for (var axiom : aBox) {
             ontology.replaceAxiom(axiom, asSroiqAxioms(axiom));
         }
     }

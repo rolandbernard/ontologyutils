@@ -14,7 +14,7 @@ import www.ontologyutils.toolbox.Ontology;
 
 public class RBoxNormalizationTest {
     private static Stream<Arguments> testAxioms() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -68,9 +68,9 @@ public class RBoxNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void allRBoxAxiomsAreInSroiq(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        try (final var ontology = Ontology.withAxioms(axioms)) {
-            final var normalization = new RBoxNormalization();
+    public void allRBoxAxiomsAreInSroiq(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            var normalization = new RBoxNormalization();
             normalization.apply(ontology);
             ontology.rboxAxioms().forEach(axiom -> {
                 assertTrue(axiom.isOfType(AxiomType.SUB_OBJECT_PROPERTY, AxiomType.SUB_PROPERTY_CHAIN_OF,
@@ -84,9 +84,9 @@ public class RBoxNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void allRBoxAxiomsAreInSroiqFull(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        try (final var ontology = Ontology.withAxioms(axioms)) {
-            final var normalization = new RBoxNormalization(true);
+    public void allRBoxAxiomsAreInSroiqFull(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            var normalization = new RBoxNormalization(true);
             normalization.apply(ontology);
             ontology.axioms(AxiomType.SAME_INDIVIDUAL)
                     .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).getIndividuals().size()));
@@ -97,12 +97,12 @@ public class RBoxNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void normalizedOntologyIsEquivalent(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+    public void normalizedOntologyIsEquivalent(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
         // Using HermiT, because Openllet can not handle entailment of complex role
         // inclusion axioms. Also, JFact crashes with an index-out-of-bounds exception.
-        try (final var originalOntology = Ontology.withAxioms(axioms, new ReasonerFactory())) {
-            try (final var normalizedOntology = originalOntology.clone()) {
-                final var normalization = new RBoxNormalization();
+        try (var originalOntology = Ontology.withAxioms(axioms, new ReasonerFactory())) {
+            try (var normalizedOntology = originalOntology.clone()) {
+                var normalization = new RBoxNormalization();
                 normalization.apply(normalizedOntology);
                 RBoxNormalization.addSimpleReflexiveRole(originalOntology);
                 RBoxNormalization.addSimpleReflexiveRole(normalizedOntology);
@@ -114,12 +114,12 @@ public class RBoxNormalizationTest {
 
     @ParameterizedTest
     @MethodSource("testAxioms")
-    public void normalizedOntologyIsEquivalentFull(final Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
+    public void normalizedOntologyIsEquivalentFull(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
         // Using HermiT, because Openllet can not handle entailment of complex role
         // inclusion axioms. Also, JFact crashes with an index-out-of-bounds exception.
-        try (final var originalOntology = Ontology.withAxioms(axioms, new ReasonerFactory())) {
-            try (final var normalizedOntology = originalOntology.clone()) {
-                final var normalization = new RBoxNormalization(true);
+        try (var originalOntology = Ontology.withAxioms(axioms, new ReasonerFactory())) {
+            try (var normalizedOntology = originalOntology.clone()) {
+                var normalization = new RBoxNormalization(true);
                 normalization.apply(normalizedOntology);
                 RBoxNormalization.addSimpleReflexiveRole(originalOntology);
                 RBoxNormalization.addSimpleReflexiveRole(normalizedOntology);

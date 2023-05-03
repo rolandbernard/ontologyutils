@@ -15,23 +15,23 @@ import www.ontologyutils.toolbox.Ontology;
 public class RefinementOperatorTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/ontologies/dl2017_example#";
 
-    private final Ontology ontology;
-    private final Covers covers;
+    private Ontology ontology;
+    private Covers covers;
     static RefinementOperator generalization;
     static RefinementOperator specialization;
 
     public RefinementOperatorTest() {
-        final var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
-        final var upCover = covers.upCover().cached();
-        final var downCover = covers.downCover().cached();
+        var upCover = covers.upCover().cached();
+        var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);
         specialization = new RefinementOperator(downCover, upCover);
     }
 
     private static Stream<Arguments> expectedGeneralization() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(df.getOWLThing()),
@@ -110,12 +110,12 @@ public class RefinementOperatorTest {
 
     @ParameterizedTest
     @MethodSource("expectedGeneralization")
-    public void generalize(final Set<OWLClassExpression> expected, final OWLClassExpression concept) {
+    public void generalize(Set<OWLClassExpression> expected, OWLClassExpression concept) {
         assertEquals(expected, generalization.refine(concept).collect(Collectors.toSet()));
     }
 
     private static Stream<Arguments> expectedSpecialization() {
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         return Stream.of(
                 Arguments.of(
                         Set.of(
@@ -207,7 +207,7 @@ public class RefinementOperatorTest {
 
     @ParameterizedTest
     @MethodSource("expectedSpecialization")
-    public void specialize(final Set<OWLClassExpression> expected, final OWLClassExpression concept) {
+    public void specialize(Set<OWLClassExpression> expected, OWLClassExpression concept) {
         assertEquals(expected, specialization.refine(concept).collect(Collectors.toSet()));
     }
 

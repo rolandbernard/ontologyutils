@@ -14,23 +14,23 @@ import www.ontologyutils.toolbox.Utils;
  * iterated generalization from BOT.
  */
 public class TerminationTest {
-    private final Ontology ontology;
-    private final Covers covers;
+    private Ontology ontology;
+    private Covers covers;
     static RefinementOperator generalization;
 
     public TerminationTest() {
-        final var path = RoleCoverTest.class.getResource("../a-and-b.owl").getFile();
+        var path = RoleCoverTest.class.getResource("../a-and-b.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
-        final var upCover = covers.upCover().cached();
-        final var downCover = covers.downCover().cached();
+        var upCover = covers.upCover().cached();
+        var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);
     }
 
-    public boolean areEquivalent(final OWLClassExpression c1, final OWLClassExpression c2) {
-        final var df = Ontology.getDefaultDataFactory();
-        final var lr = df.getOWLSubClassOfAxiom(c1, c2);
-        final var rl = df.getOWLSubClassOfAxiom(c2, c1);
+    public boolean areEquivalent(OWLClassExpression c1, OWLClassExpression c2) {
+        var df = Ontology.getDefaultDataFactory();
+        var lr = df.getOWLSubClassOfAxiom(c1, c2);
+        var rl = df.getOWLSubClassOfAxiom(c2, c1);
         return ontology.isEntailed(lr) && ontology.isEntailed(rl);
     }
 
@@ -40,9 +40,9 @@ public class TerminationTest {
 
     @ParameterizedTest
     @MethodSource("terminationRuns")
-    public void testTermination(final int seed) {
+    public void testTermination(int seed) {
         Utils.randomSeed(seed);
-        final var df = Ontology.getDefaultDataFactory();
+        var df = Ontology.getDefaultDataFactory();
         OWLClassExpression current = df.getOWLNothing();
         while (!current.isOWLThing()) {
             current = Utils.randomChoice(generalization.refine(current));

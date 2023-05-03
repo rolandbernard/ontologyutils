@@ -14,10 +14,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public abstract class OntologyRepairTest {
-    private final OWLDataFactory df;
-    private final List<OWLClassExpression> concepts;
-    private final List<OWLIndividual> individuals;
-    private final List<OWLAxiom> axioms;
+    private OWLDataFactory df;
+    private List<OWLClassExpression> concepts;
+    private List<OWLIndividual> individuals;
+    private List<OWLAxiom> axioms;
 
     public OntologyRepairTest() {
         df = Ontology.getDefaultDataFactory();
@@ -43,17 +43,17 @@ public abstract class OntologyRepairTest {
 
     @Test
     public void completeOntologyIsInconsistent() {
-        try (final var ontology = Ontology.withAxioms(axioms)) {
+        try (var ontology = Ontology.withAxioms(axioms)) {
             assertFalse(ontology.isConsistent());
         }
     }
 
     @ParameterizedTest
     @ValueSource(ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })
-    public void repairInconsistentOntology(final int seed) {
+    public void repairInconsistentOntology(int seed) {
         Utils.randomSeed(seed);
-        try (final var ontology = Ontology.withAxioms(axioms)) {
-            final var repair = getRepairForConsistency();
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            var repair = getRepairForConsistency();
             assertFalse(ontology.isConsistent());
             repair.apply(ontology);
             assertTrue(ontology.isConsistent());
@@ -62,11 +62,11 @@ public abstract class OntologyRepairTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "../inconsistent-leftpolicies-small.owl", "../inconsistent-leftpolicies.owl" })
-    public void repairInconsistentOntologyFromFile(final String resourceName) {
-        final var path = OntologyRepairTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
+    public void repairInconsistentOntologyFromFile(String resourceName) {
+        var path = OntologyRepairTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
             Utils.randomSeed(0);
-            final var repair = getRepairForConsistency();
+            var repair = getRepairForConsistency();
             assertFalse(ontology.isConsistent());
             repair.apply(ontology);
             assertTrue(ontology.isConsistent());
@@ -75,13 +75,13 @@ public abstract class OntologyRepairTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "../inconsistent-leftpolicies-small.owl", "../inconsistent-leftpolicies.owl" })
-    public void repairWithNormalizationInconsistentOntologyFromFile(final String resourceName) {
-        final var path = OntologyRepairTest.class.getResource(resourceName).getFile();
-        try (final var ontology = Ontology.loadOntology(path)) {
+    public void repairWithNormalizationInconsistentOntologyFromFile(String resourceName) {
+        var path = OntologyRepairTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
             Utils.randomSeed(0);
-            final var normalization = new SroiqNormalization();
+            var normalization = new SroiqNormalization();
             normalization.apply(ontology);
-            final var repair = getRepairForConsistency();
+            var repair = getRepairForConsistency();
             assertFalse(ontology.isConsistent());
             repair.apply(ontology);
             assertTrue(ontology.isConsistent());
