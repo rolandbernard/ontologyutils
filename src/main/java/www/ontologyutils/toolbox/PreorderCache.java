@@ -8,6 +8,9 @@ import java.util.function.BiPredicate;
  * relation.
  */
 public class PreorderCache<T> {
+    private static record Tuple<T>(T first, T second) {
+    }
+
     private Map<T, Map<T, Boolean>> successors;
     private Map<T, Map<T, Boolean>> predecessors;
 
@@ -34,32 +37,48 @@ public class PreorderCache<T> {
 
     private void cachePositiveObservation(T pred, T succ) {
         cacheImmediateObservation(pred, succ, true);
-        for (var entry1 : Set.copyOf(getPredecessorMap(pred).entrySet())) {
-            if (entry1.getValue()) {
-                for (var entry2 : Set.copyOf(getSuccessorMap(succ).entrySet())) {
-                    if (entry2.getValue()) {
-                        cacheImmediateObservation(entry1.getKey(), entry2.getKey(), true);
+        var newPositive = new ArrayList<Tuple<T>>();
+        getPredecessorMap(pred).forEach((key1, value1) -> {
+            if (value1) {
+                getSuccessorMap(succ).forEach((key2, value2) -> {
+                    if (value2) {
+                        newPositive.add(new Tuple<>(key1, key2));
                     }
-                }
+                });
             }
+        });
+        for (var tuple : newPositive) {
+            cacheImmediateObservation(tuple.first, tuple.second, true);
         }
-        for (var entry : Set.copyOf(getSuccessorMap(pred).entrySet())) {
-            if (!entry.getValue()) {
-                cacheImmediateObservation(succ, entry.getKey(), false);
+        var newNegative = new ArrayList<Tuple<T>>();
+        getSuccessorMap(pred).forEach((key1, value1) -> {
+            if (!value1) {
+                getSuccessorMap(succ).forEach((key2, value2) -> {
+                    if (value2) {
+                        newNegative.add(new Tuple<>(key2, key1));
+                    }
+                });
             }
+        });
+        for (var tuple : newNegative) {
+            cacheImmediateObservation(tuple.first, tuple.second, false);
         }
     }
 
     private void cacheNegativeObservation(T pred, T succ) {
         cacheImmediateObservation(pred, succ, false);
-        for (var entry1 : Set.copyOf(getSuccessorMap(pred).entrySet())) {
-            if (entry1.getValue()) {
-                for (var entry2 : Set.copyOf(getPredecessorMap(succ).entrySet())) {
-                    if (entry2.getValue()) {
-                        cacheImmediateObservation(entry1.getKey(), entry2.getKey(), false);
+        var newNegative = new ArrayList<Tuple<T>>();
+        getSuccessorMap(pred).forEach((key1, value1) -> {
+            if (value1) {
+                getPredecessorMap(succ).forEach((key2, value2) -> {
+                    if (value2) {
+                        newNegative.add(new Tuple<>(key1, key2));
                     }
-                }
+                });
             }
+        });
+        for (var tuple : newNegative) {
+            cacheImmediateObservation(tuple.first, tuple.second, false);
         }
     }
 
