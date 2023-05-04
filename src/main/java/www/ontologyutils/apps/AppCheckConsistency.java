@@ -40,6 +40,13 @@ public class AppCheckConsistency {
         } catch (Exception e) {
             System.err.println("ERROR... " + e);
         }
+        System.err.println("** Consistency check: FaCT++");
+        try (var withFactPP = ontology.cloneWithFactPP()) {
+            cons = withFactPP.isConsistent();
+            printResult(cons);
+        } catch (Exception e) {
+            System.err.println("ERROR... " + e);
+        }
         ontology.close();
     }
 }

@@ -14,6 +14,7 @@ import org.semanticweb.owlapi.reasoner.*;
 import org.semanticweb.owlapi.util.OWLObjectPropertyManager;
 
 import openllet.owlapi.OpenlletReasonerFactory;
+import uk.ac.manchester.cs.factplusplus.owlapi.FaCTPlusPlusReasonerFactory;
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
 /**
@@ -27,7 +28,7 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
  */
 public class Ontology implements AutoCloseable {
     private static final OWLOntologyManager defaultManager = OWLManager.createOWLOntologyManager();
-    private static final OWLReasonerFactory defaultFactory = OpenlletReasonerFactory.getInstance();
+    private static final OWLReasonerFactory defaultFactory = new FaCTPlusPlusReasonerFactory();
 
     private static class CachedReasoner {
         private OWLReasonerFactory reasonerFactory;
@@ -661,6 +662,16 @@ public class Ontology implements AutoCloseable {
      */
     public Ontology cloneWithJFact() {
         var newReasonerCache = new CachedReasoner(new JFactFactory());
+        return new Ontology(staticAxioms, refutableAxioms, newReasonerCache);
+    }
+
+    /**
+     * Clone this ontology, but give it a cache using the FaCT++ reasoner.
+     *
+     * @return The new ontology.
+     */
+    public Ontology cloneWithFactPP() {
+        var newReasonerCache = new CachedReasoner(new FaCTPlusPlusReasonerFactory());
         return new Ontology(staticAxioms, refutableAxioms, newReasonerCache);
     }
 

@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.semanticweb.owlapi.model.*;
 
-import uk.ac.manchester.cs.jfact.JFactFactory;
 import www.ontologyutils.toolbox.Ontology;
 
 public class SroiqNormalizationTest {
@@ -21,8 +20,7 @@ public class SroiqNormalizationTest {
     })
     public void normalizedOntologyIsEquivalent(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqNormalizationTest.class.getResource(resourceName).getFile();
-        // Using JFact, because Openllet does not support some axioms in entailments.
-        try (var originalOntology = Ontology.loadOntology(path, new JFactFactory())) {
+        try (var originalOntology = Ontology.loadOntology(path)) {
             try (var normalizedOntology = originalOntology.clone()) {
                 var normalization = new SroiqNormalization();
                 normalization.apply(normalizedOntology);

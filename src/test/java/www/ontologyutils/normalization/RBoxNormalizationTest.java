@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
-import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.toolbox.Ontology;
@@ -98,9 +97,7 @@ public class RBoxNormalizationTest {
     @ParameterizedTest
     @MethodSource("testAxioms")
     public void normalizedOntologyIsEquivalent(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        // Using HermiT, because Openllet can not handle entailment of complex role
-        // inclusion axioms. Also, JFact crashes with an index-out-of-bounds exception.
-        try (var originalOntology = Ontology.withAxioms(axioms, new ReasonerFactory())) {
+        try (var originalOntology = Ontology.withAxioms(axioms)) {
             try (var normalizedOntology = originalOntology.clone()) {
                 var normalization = new RBoxNormalization();
                 normalization.apply(normalizedOntology);
@@ -115,9 +112,7 @@ public class RBoxNormalizationTest {
     @ParameterizedTest
     @MethodSource("testAxioms")
     public void normalizedOntologyIsEquivalentFull(Set<OWLAxiom> axioms) throws OWLOntologyCreationException {
-        // Using HermiT, because Openllet can not handle entailment of complex role
-        // inclusion axioms. Also, JFact crashes with an index-out-of-bounds exception.
-        try (var originalOntology = Ontology.withAxioms(axioms, new ReasonerFactory())) {
+        try (var originalOntology = Ontology.withAxioms(axioms)) {
             try (var normalizedOntology = originalOntology.clone()) {
                 var normalization = new RBoxNormalization(true);
                 normalization.apply(normalizedOntology);

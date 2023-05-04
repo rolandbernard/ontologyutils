@@ -247,7 +247,7 @@ public class SroiqAxiomWeakenerTest {
 
     @Test
     public void allWeakerAxiomsAreEntailed() {
-        try (var copy = ontology.cloneWithJFact()) {
+        try (var copy = ontology.clone()) {
             ontology.logicalAxioms().forEach(strongAxiom -> {
                 axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
                     assertTrue(copy.isEntailed(weakAxiom));
@@ -268,19 +268,12 @@ public class SroiqAxiomWeakenerTest {
     public void allWeakerAxiomsAreEntailedFromFile(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            try (var jfact = ontology.cloneWithJFact()) {
-                try (var axiomWeakener = new AxiomWeakener(ontology)) {
-                    ontology.logicalAxioms().forEach(strongAxiom -> {
-                        axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
-                            if (weakAxiom.isOfType(AxiomType.SUB_PROPERTY_CHAIN_OF, AxiomType.DISJOINT_UNION)) {
-                                // Using JFact, because Openllet does not support some axioms in entailments.
-                                assertTrue(jfact.isEntailed(weakAxiom));
-                            } else {
-                                assertTrue(ontology.isEntailed(weakAxiom));
-                            }
-                        });
+            try (var axiomWeakener = new AxiomWeakener(ontology)) {
+                ontology.logicalAxioms().forEach(strongAxiom -> {
+                    axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
+                        assertTrue(ontology.isEntailed(weakAxiom));
                     });
-                }
+                });
             }
         }
     }
