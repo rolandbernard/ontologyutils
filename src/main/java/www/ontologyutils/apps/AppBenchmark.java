@@ -8,7 +8,7 @@ import www.ontologyutils.toolbox.*;
 public class AppBenchmark {
     private static void benchRun(Ontology ontology) {
         try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
-            var refinement = new RefinementOperator(covers.upCover(), covers.downCover());
+            var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
             ontology.subConcepts().forEach(concept -> {
                 refinement.refine(concept).count();
                 refinement.refineReverse(concept).count();

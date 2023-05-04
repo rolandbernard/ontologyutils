@@ -1,6 +1,7 @@
 package www.ontologyutils.refinement;
 
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.*;
 
@@ -41,9 +42,9 @@ public class Covers implements AutoCloseable {
          */
         public Cover cached() {
             return new Cover(
-                    LruCache.wrapStreamFunction(conceptCover),
-                    LruCache.wrapStreamFunction(roleCover),
-                    LruCache.wrapStreamFunction(intCover));
+                    LruCache.wrapStreamFunction(conceptCover, Integer.MAX_VALUE),
+                    LruCache.wrapStreamFunction(roleCover, Integer.MAX_VALUE),
+                    LruCache.wrapStreamFunction(intCover, Integer.MAX_VALUE));
         }
 
         public Stream<OWLClassExpression> apply(OWLClassExpression concept) {
@@ -64,6 +65,8 @@ public class Covers implements AutoCloseable {
     public Set<OWLClassExpression> subConcepts;
     public Set<OWLObjectProperty> simpleRoles;
     public OWLReasoner reasoner;
+    public BiPredicate<OWLClassExpression, OWLClassExpression> isSubClass;
+    public BiPredicate<OWLObjectPropertyExpression, OWLObjectPropertyExpression> isSubRole;
 
     /**
      * Creates a new {@code Cover} object for the given reference object.
@@ -81,6 +84,8 @@ public class Covers implements AutoCloseable {
         this.subConcepts.add(df.getOWLThing());
         this.subConcepts.add(df.getOWLNothing());
         this.simpleRoles = simpleRoles;
+        this.isSubClass = PreorderCache.wrapPreorder(this::isSubClass);
+        this.isSubRole = PreorderCache.wrapPreorder(this::isSubRole);
     }
 
     /**
@@ -89,7 +94,7 @@ public class Covers implements AutoCloseable {
      * @return True iff the reference ontology of this cover entails that
      *         {@code subclass} is a subclass of {@code superclass}.
      */
-    private boolean isSubclass(OWLClassExpression subclass, OWLClassExpression superclass) {
+    private boolean isSubClass(OWLClassExpression subclass, OWLClassExpression superclass) {
         if (Thread.interrupted()) {
             throw new CanceledException();
         }
@@ -106,8 +111,8 @@ public class Covers implements AutoCloseable {
      * @return True iff the reference ontology of this cover entails that
      *         {@code subclass} is a strict subclass of {@code superclass}.
      */
-    private boolean isStrictSubclass(OWLClassExpression subclass, OWLClassExpression superclass) {
-        return isSubclass(subclass, superclass) && !isSubclass(superclass, subclass);
+    private boolean isStrictSubClass(OWLClassExpression subclass, OWLClassExpression superclass) {
+        return isSubClass.test(subclass, superclass) && !isSubClass.test(superclass, subclass);
     }
 
     /**
@@ -116,11 +121,11 @@ public class Covers implements AutoCloseable {
      * @return True iff {@code candidate} is in the upward cover of {@code concept}.
      */
     private boolean isInUpCover(OWLClassExpression concept, OWLClassExpression candidate) {
-        if (!subConcepts.contains(candidate) || !isSubclass(concept, candidate)) {
+        if (!subConcepts.contains(candidate) || !isSubClass.test(concept, candidate)) {
             return false;
         } else {
             return !subConcepts.stream()
-                    .anyMatch(other -> isStrictSubclass(concept, other) && isStrictSubclass(other, candidate));
+                    .anyMatch(other -> isStrictSubClass(concept, other) && isStrictSubClass(other, candidate));
         }
     }
 
@@ -140,11 +145,11 @@ public class Covers implements AutoCloseable {
      *         {@code concept}.
      */
     private boolean isInDownCover(OWLClassExpression concept, OWLClassExpression candidate) {
-        if (!subConcepts.contains(candidate) || !isSubclass(candidate, concept)) {
+        if (!subConcepts.contains(candidate) || !isSubClass.test(candidate, concept)) {
             return false;
         } else {
             return !subConcepts.stream()
-                    .anyMatch(other -> isStrictSubclass(candidate, other) && isStrictSubclass(other, concept));
+                    .anyMatch(other -> isStrictSubClass(candidate, other) && isStrictSubClass(other, concept));
         }
     }
 
@@ -188,7 +193,7 @@ public class Covers implements AutoCloseable {
      *         {@code subRole} is strictly subsumed by {@code superRole}.
      */
     private boolean isStrictSubRole(OWLObjectPropertyExpression subRole, OWLObjectPropertyExpression superRole) {
-        return isSubRole(subRole, superRole) && !isSubRole(superRole, subRole);
+        return isSubRole.test(subRole, superRole) && !isSubRole.test(superRole, subRole);
     }
 
     /**
@@ -197,7 +202,7 @@ public class Covers implements AutoCloseable {
      * @return True iff {@code candidate} is in the upward cover of {@code role}.
      */
     private boolean isInUpCover(OWLObjectPropertyExpression role, OWLObjectPropertyExpression candidate) {
-        if (!simpleRoles.contains(candidate.getNamedProperty()) || !isSubRole(role, candidate)) {
+        if (!simpleRoles.contains(candidate.getNamedProperty()) || !isSubRole.test(role, candidate)) {
             return false;
         } else {
             return !allSimpleRoles()
@@ -220,7 +225,7 @@ public class Covers implements AutoCloseable {
      *         {@code role}.
      */
     private boolean isInDownCover(OWLObjectPropertyExpression role, OWLObjectPropertyExpression candidate) {
-        if (!simpleRoles.contains(candidate.getNamedProperty()) || !isSubRole(candidate, role)) {
+        if (!simpleRoles.contains(candidate.getNamedProperty()) || !isSubRole.test(candidate, role)) {
             return false;
         } else {
             return !allSimpleRoles()
