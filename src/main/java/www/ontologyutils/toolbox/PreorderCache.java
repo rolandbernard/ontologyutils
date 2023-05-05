@@ -6,79 +6,80 @@ import java.util.function.BiPredicate;
 /**
  * Implements a simple cache for a preorder, i.e., a reflexive and transitive
  * relation.
+ *
+ * Loosely inspired by the approach presented in Shearer, R., & Horrocks, I.
+ * (2009). Exploiting partial information in taxonomy construction. In The
+ * Semantic Web-ISWC 2009: 8th International Semantic Web Conference, ISWC 2009,
+ * Chantilly, VA, USA, October 25-29, 2009. Proceedings 8 (pp. 569-584).
+ * Springer Berlin Heidelberg.
  */
 public class PreorderCache<T> {
-    private static record Tuple<T>(T first, T second) {
-    }
-
-    private Map<T, Map<T, Boolean>> successors;
-    private Map<T, Map<T, Boolean>> predecessors;
+    private Map<T, Set<T>> knownSuccessors;
+    private Map<T, Set<T>> knownPredecessors;
+    private Map<T, Set<T>> possibleSuccessors;
+    private Map<T, Set<T>> possiblePredecessors;
 
     /**
      * Create a new empty cache.
      */
     public PreorderCache() {
-        successors = new HashMap<>();
-        predecessors = new HashMap<>();
+        knownSuccessors = new HashMap<>();
+        knownPredecessors = new HashMap<>();
+        possibleSuccessors = new HashMap<>();
+        possiblePredecessors = new HashMap<>();
     }
 
-    private Map<T, Boolean> getSuccessorMap(T pred) {
-        return successors.computeIfAbsent(pred, arg -> new HashMap<>(Map.of(arg, true)));
-    }
-
-    private Map<T, Boolean> getPredecessorMap(T succ) {
-        return predecessors.computeIfAbsent(succ, arg -> new HashMap<>(Map.of(arg, true)));
-    }
-
-    private void cacheImmediateObservation(T pred, T succ, boolean connected) {
-        getSuccessorMap(pred).put(succ, connected);
-        getPredecessorMap(succ).put(pred, connected);
-    }
-
-    private void cachePositiveObservation(T pred, T succ) {
-        cacheImmediateObservation(pred, succ, true);
-        var newPositive = new ArrayList<Tuple<T>>();
-        getPredecessorMap(pred).forEach((key1, value1) -> {
-            if (value1) {
-                getSuccessorMap(succ).forEach((key2, value2) -> {
-                    if (value2) {
-                        newPositive.add(new Tuple<>(key1, key2));
-                    }
-                });
+    private void assureExistence(T elem) {
+        if (!knownSuccessors.containsKey(elem)) {
+            var existing = new HashSet<>(knownSuccessors.keySet());
+            knownSuccessors.put(elem, new HashSet<>(Set.of(elem)));
+            knownPredecessors.put(elem, new HashSet<>(Set.of(elem)));
+            for (var other : existing) {
+                possiblePredecessors.get(other).add(elem);
+                possibleSuccessors.get(other).add(elem);
             }
-        });
-        for (var tuple : newPositive) {
-            cacheImmediateObservation(tuple.first, tuple.second, true);
-        }
-        var newNegative = new ArrayList<Tuple<T>>();
-        getSuccessorMap(pred).forEach((key1, value1) -> {
-            if (!value1) {
-                getSuccessorMap(succ).forEach((key2, value2) -> {
-                    if (value2) {
-                        newNegative.add(new Tuple<>(key2, key1));
-                    }
-                });
-            }
-        });
-        for (var tuple : newNegative) {
-            cacheImmediateObservation(tuple.first, tuple.second, false);
+            possibleSuccessors.put(elem, new HashSet<>(existing));
+            possiblePredecessors.put(elem, existing);
         }
     }
 
-    private void cacheNegativeObservation(T pred, T succ) {
-        cacheImmediateObservation(pred, succ, false);
-        var newNegative = new ArrayList<Tuple<T>>();
-        getSuccessorMap(pred).forEach((key1, value1) -> {
-            if (value1) {
-                getPredecessorMap(succ).forEach((key2, value2) -> {
-                    if (value2) {
-                        newNegative.add(new Tuple<>(key1, key2));
-                    }
-                });
+    private void removePossibleSuccessors(T pred, T succ) {
+        if (possibleSuccessors.get(pred).remove(succ)) {
+            possiblePredecessors.get(succ).remove(pred);
+            for (var pred2 : Utils.toArray(knownSuccessors.get(pred))) {
+                for (var succ2 : Utils.toArray(knownPredecessors.get(succ))) {
+                    removePossibleSuccessors(pred2, succ2);
+                }
             }
-        });
-        for (var tuple : newNegative) {
-            cacheImmediateObservation(tuple.first, tuple.second, false);
+        }
+    }
+
+    private void addKnownSuccessors(T pred, T succ) {
+        if (knownSuccessors.get(pred).add(succ)) {
+            knownPredecessors.get(succ).add(pred);
+            possibleSuccessors.get(pred).remove(succ);
+            possiblePredecessors.get(succ).remove(pred);
+            for (var pred2 : Utils.toArray(knownPredecessors.get(pred))) {
+                for (var succ2 : Utils.toArray(knownSuccessors.get(succ))) {
+                    addKnownSuccessors(pred2, succ2);
+                }
+            }
+            for (var succ2 : Utils.toArray(possibleSuccessors.get(succ))) {
+                for (var succ3 : Utils.toArray(knownSuccessors.get(succ2))) {
+                    if (!possibleSuccessors.get(pred).contains(succ3) && !knownSuccessors.get(pred).contains(succ3)) {
+                        removePossibleSuccessors(succ, succ2);
+                        break;
+                    }
+                }
+            }
+            for (var pred2 : Utils.toArray(possiblePredecessors.get(pred))) {
+                for (var pred3 : Utils.toArray(knownPredecessors.get(pred2))) {
+                    if (!possibleSuccessors.get(pred3).contains(succ) && !knownSuccessors.get(pred3).contains(succ)) {
+                        removePossibleSuccessors(pred2, pred);
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -95,14 +96,17 @@ public class PreorderCache<T> {
      *         {@code succ}.
      */
     public boolean computeIfAbsent(T pred, T succ, BiPredicate<T, T> order) {
-        var predSucc = getSuccessorMap(pred);
-        if (predSucc.containsKey(succ)) {
-            return predSucc.get(succ);
+        assureExistence(pred);
+        assureExistence(succ);
+        if (knownSuccessors.get(pred).contains(succ)) {
+            return true;
+        } else if (!possibleSuccessors.get(pred).contains(succ)) {
+            return false;
         } else if (order.test(pred, succ)) {
-            cachePositiveObservation(pred, succ);
+            addKnownSuccessors(pred, succ);
             return true;
         } else {
-            cacheNegativeObservation(pred, succ);
+            removePossibleSuccessors(pred, succ);
             return false;
         }
     }
