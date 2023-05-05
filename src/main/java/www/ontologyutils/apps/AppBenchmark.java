@@ -1,30 +1,40 @@
 package www.ontologyutils.apps;
 
+import java.util.*;
 import java.util.stream.Collectors;
+
+import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.refinement.*;
 import www.ontologyutils.toolbox.*;
 
 public class AppBenchmark {
     private static void benchRun(Ontology ontology) {
+        Utils.randomSeed(42);
+        var refined = new HashSet<OWLClassExpression>();
         try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
             var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
-            ontology.subConcepts().forEach(concept -> {
-                refinement.refine(concept).count();
-                refinement.refineReverse(concept).count();
-            });
-            ontology.rolesInSignature().forEach(role -> {
-                refinement.refine(role).count();
-                refinement.refineReverse(role).count();
-            });
-            System.out.println("sub queries: " + covers.reasonerCalls);
-        }
-        try (var axiomWeakener = new AxiomWeakener(ontology)) {
-            ontology.logicalAxioms().forEach(strongAxiom -> {
-                axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
-                    ontology.isEntailed(weakAxiom);
+            refined.addAll(ontology.subConcepts().toList());
+            for (int i = 0; i < 100; i++) {
+                var newRefined = new HashSet<OWLClassExpression>();
+                refined.stream().forEach(concept -> {
+                    newRefined.add(Utils.randomChoice(refinement.refine(concept)));
+                    newRefined.add(Utils.randomChoice(refinement.refineReverse(concept)));
                 });
-            });
+                refined = newRefined;
+            }
+            System.out.println("reasoner calls: " + covers.reasonerCalls);
+        }
+        var weaker = new HashSet<OWLAxiom>();
+        try (var axiomWeakener = new AxiomWeakener(ontology)) {
+            weaker.addAll(ontology.logicalAxioms().toList());
+            for (int i = 0; i < 1000; i++) {
+                var newWeaker = new HashSet<OWLAxiom>();
+                weaker.stream().forEach(strongAxiom -> {
+                    newWeaker.add(Utils.randomChoice(axiomWeakener.weakerAxioms(strongAxiom)));
+                });
+                weaker = newWeaker;
+            }
         }
     }
 

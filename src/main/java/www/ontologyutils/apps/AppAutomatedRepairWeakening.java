@@ -4,6 +4,8 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 
 import www.ontologyutils.normalization.SroiqNormalization;
 import www.ontologyutils.repair.*;
+import www.ontologyutils.repair.OntologyRepairWeakening.BadAxiomStrategy;
+import www.ontologyutils.repair.OntologyRepairWeakening.RefOntologyStrategy;
 import www.ontologyutils.toolbox.*;
 
 public class AppAutomatedRepairWeakening {
@@ -19,14 +21,19 @@ public class AppAutomatedRepairWeakening {
      * @param args
      */
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java " + AppAutomatedRepairWeakening.class.getCanonicalName() + " FILENAME");
+        if (args.length < 1 || args.length > 2 || args.length == 2 && !args[0].equals("fast")) {
+            System.err
+                    .println("Usage: java " + AppAutomatedRepairWeakening.class.getCanonicalName() + "[fast] FILENAME");
             System.exit(1);
         }
-        var ontology = Ontology.loadOntology(args[0]);
+        boolean fast = args[0].equals("fast");
+        var ontology = Ontology.loadOntology(fast ? args[1] : args[0]);
         System.err.println("Loaded...");
         var normalization = new SroiqNormalization();
-        var repair = OntologyRepairWeakening.forConsistency();
+        var repair = fast
+                ? new OntologyRepairWeakening(Ontology::isConsistent, RefOntologyStrategy.ONE_MCS,
+                        BadAxiomStrategy.IN_ONE_MUS)
+                : OntologyRepairWeakening.forConsistency();
         repair.setInfoCallback(msg -> System.out.println("[" + getTimeStamp() + "] " + msg));
         System.err.println("Normalizing...");
         normalization.apply(ontology);

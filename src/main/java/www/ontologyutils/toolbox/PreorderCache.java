@@ -49,8 +49,9 @@ public class PreorderCache<T> {
             possiblePredecessors.get(succ).remove(pred);
             for (var pred2 : Utils.toArray(knownSuccessors.get(pred))) {
                 for (var succ2 : Utils.toArray(knownPredecessors.get(succ))) {
-                    possibleSuccessors.get(pred2).remove(succ2);
-                    possiblePredecessors.get(succ2).remove(pred2);
+                    if (possibleSuccessors.get(pred2).remove(succ2)) {
+                        possiblePredecessors.get(succ2).remove(pred2);
+                    }
                 }
             }
         }
@@ -63,27 +64,34 @@ public class PreorderCache<T> {
             possiblePredecessors.get(succ).remove(pred);
             for (var pred2 : Utils.toArray(knownPredecessors.get(pred))) {
                 for (var succ2 : Utils.toArray(knownSuccessors.get(succ))) {
-                    knownSuccessors.get(pred2).add(succ2);
-                    knownPredecessors.get(succ2).add(pred2);
-                    possibleSuccessors.get(pred2).remove(succ2);
-                    possiblePredecessors.get(succ2).remove(pred2);
+                    if (knownSuccessors.get(pred2).add(succ2)) {
+                        knownPredecessors.get(succ2).add(pred2);
+                        possibleSuccessors.get(pred2).remove(succ2);
+                        possiblePredecessors.get(succ2).remove(pred2);
+                    }
                 }
             }
             for (var succ2 : Utils.toArray(possibleSuccessors.get(succ))) {
-                for (var succ3 : Utils.toArray(knownSuccessors.get(succ2))) {
-                    if (!possibleSuccessors.get(pred).contains(succ3) && !knownSuccessors.get(pred).contains(succ3)) {
-                        possibleSuccessors.get(succ).remove(succ2);
-                        possiblePredecessors.get(succ2).remove(succ);
-                        break;
+                if (possibleSuccessors.get(succ).contains(succ2)) {
+                    for (var succ3 : Utils.toArray(knownSuccessors.get(succ2))) {
+                        if (!possibleSuccessors.get(pred).contains(succ3)
+                                && !knownSuccessors.get(pred).contains(succ3)) {
+                            possibleSuccessors.get(succ).remove(succ2);
+                            possiblePredecessors.get(succ2).remove(succ);
+                            break;
+                        }
                     }
                 }
             }
             for (var pred2 : Utils.toArray(possiblePredecessors.get(pred))) {
-                for (var pred3 : Utils.toArray(knownPredecessors.get(pred2))) {
-                    if (!possibleSuccessors.get(pred3).contains(succ) && !knownSuccessors.get(pred3).contains(succ)) {
-                        possibleSuccessors.get(pred2).remove(pred);
-                        possiblePredecessors.get(pred).remove(pred2);
-                        break;
+                if (possibleSuccessors.get(pred2).contains(pred)) {
+                    for (var pred3 : Utils.toArray(knownPredecessors.get(pred2))) {
+                        if (!possibleSuccessors.get(pred3).contains(succ)
+                                && !knownSuccessors.get(pred3).contains(succ)) {
+                            possibleSuccessors.get(pred2).remove(pred);
+                            possiblePredecessors.get(pred).remove(pred2);
+                            break;
+                        }
                     }
                 }
             }
@@ -113,13 +121,12 @@ public class PreorderCache<T> {
      */
     public void precomputeFor(Collection<T> domain, BiPredicate<T, T> order) {
         setupDomain(domain);
-        for (;;) {
-            var some = possibleSuccessors.entrySet().stream().filter(entry -> !entry.getValue().isEmpty()).findAny();
-            if (some.isEmpty()) {
-                return;
-            } else {
-                computeIfAbsent(some.get().getKey(), some.get().getValue().stream().findAny().get(), order);
-            }
+        for (var element : domain) {
+            possibleSuccessors.get(element).stream()
+                    .sorted((a, b) -> Integer.compare(knownPredecessors.get(b).size(), knownPredecessors.get(a).size()))
+                    .forEach(elem -> {
+                        computeIfAbsent(element, elem, order);
+                    });
         }
     }
 
@@ -177,8 +184,12 @@ public class PreorderCache<T> {
      */
     public Stream<T> possibleStrictSuccessors(T pred) {
         assureExistence(pred);
-        return Stream.concat(knownSuccessors.get(pred).stream(), possibleSuccessors.get(pred).stream())
-                .filter(succ -> !knownSuccessors.get(succ).contains(pred));
+        return Stream.concat(
+                knownSuccessors.get(pred).stream()
+                        .filter(succ -> !knownSuccessors.get(succ).contains(pred)
+                                && possibleSuccessors.get(succ).contains(pred)),
+                possibleSuccessors.get(pred).stream()
+                        .filter(succ -> !knownSuccessors.get(succ).contains(pred)));
     }
 
     /**
@@ -199,8 +210,12 @@ public class PreorderCache<T> {
      */
     public Stream<T> possibleStrictPredecessors(T succ) {
         assureExistence(succ);
-        return Stream.concat(knownPredecessors.get(succ).stream(), possiblePredecessors.get(succ).stream())
-                .filter(pred -> !knownPredecessors.get(pred).contains(succ));
+        return Stream.concat(
+                knownPredecessors.get(succ).stream()
+                        .filter(pred -> !knownPredecessors.get(pred).contains(succ)
+                                && possiblePredecessors.get(pred).contains(succ)),
+                possiblePredecessors.get(succ).stream()
+                        .filter(pred -> !knownPredecessors.get(pred).contains(succ)));
     }
 
     /**
