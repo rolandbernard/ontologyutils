@@ -2,6 +2,7 @@ package www.ontologyutils.toolbox;
 
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.stream.Stream;
 
 /**
  * Implements a simple cache for a preorder, i.e., a reflexive and transitive
@@ -48,7 +49,8 @@ public class PreorderCache<T> {
             possiblePredecessors.get(succ).remove(pred);
             for (var pred2 : Utils.toArray(knownSuccessors.get(pred))) {
                 for (var succ2 : Utils.toArray(knownPredecessors.get(succ))) {
-                    removePossibleSuccessors(pred2, succ2);
+                    possibleSuccessors.get(pred2).remove(succ2);
+                    possiblePredecessors.get(succ2).remove(pred2);
                 }
             }
         }
@@ -61,13 +63,17 @@ public class PreorderCache<T> {
             possiblePredecessors.get(succ).remove(pred);
             for (var pred2 : Utils.toArray(knownPredecessors.get(pred))) {
                 for (var succ2 : Utils.toArray(knownSuccessors.get(succ))) {
-                    addKnownSuccessors(pred2, succ2);
+                    knownSuccessors.get(pred2).add(succ2);
+                    knownPredecessors.get(succ2).add(pred2);
+                    possibleSuccessors.get(pred2).remove(succ2);
+                    possiblePredecessors.get(succ2).remove(pred2);
                 }
             }
             for (var succ2 : Utils.toArray(possibleSuccessors.get(succ))) {
                 for (var succ3 : Utils.toArray(knownSuccessors.get(succ2))) {
                     if (!possibleSuccessors.get(pred).contains(succ3) && !knownSuccessors.get(pred).contains(succ3)) {
-                        removePossibleSuccessors(succ, succ2);
+                        possibleSuccessors.get(succ).remove(succ2);
+                        possiblePredecessors.get(succ2).remove(succ);
                         break;
                     }
                 }
@@ -75,12 +81,126 @@ public class PreorderCache<T> {
             for (var pred2 : Utils.toArray(possiblePredecessors.get(pred))) {
                 for (var pred3 : Utils.toArray(knownPredecessors.get(pred2))) {
                     if (!possibleSuccessors.get(pred3).contains(succ) && !knownSuccessors.get(pred3).contains(succ)) {
-                        removePossibleSuccessors(pred2, pred);
+                        possibleSuccessors.get(pred2).remove(pred);
+                        possiblePredecessors.get(pred).remove(pred2);
                         break;
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Create all entries for the elements in the given collection. It is valid to
+     * not call this method beforehand, but then the possible successors and
+     * possible predecessors will not contain these unseen elements.
+     *
+     * @param domain
+     */
+    public void setupDomain(Collection<T> domain) {
+        for (var elem : domain) {
+            assureExistence(elem);
+        }
+    }
+
+    /**
+     * Precompute the complete preorder for the given domain and relation.
+     *
+     * @param domain
+     *            The domain for which to compute the order.
+     * @param order
+     *            The relation to be computed.
+     */
+    public void precomputeFor(Collection<T> domain, BiPredicate<T, T> order) {
+        setupDomain(domain);
+        for (;;) {
+            var some = possibleSuccessors.entrySet().stream().filter(entry -> !entry.getValue().isEmpty()).findAny();
+            if (some.isEmpty()) {
+                return;
+            } else {
+                computeIfAbsent(some.get().getKey(), some.get().getValue().stream().findAny().get(), order);
+            }
+        }
+    }
+
+    /**
+     * @param pred
+     * @return A stream of all known successors of {@code pred}.
+     */
+    public Set<T> getKnownSuccessors(T pred) {
+        assureExistence(pred);
+        return knownSuccessors.get(pred);
+    }
+
+    /**
+     * @param pred
+     * @return A stream of all possible, but not known, successors of {@code pred}.
+     */
+    public Set<T> getPossibleSuccessors(T pred) {
+        assureExistence(pred);
+        return possibleSuccessors.get(pred);
+    }
+
+    /**
+     * @param succ
+     * @return A stream of all known predecessors of {@code succ}.
+     */
+    public Set<T> getKnownPredecessors(T succ) {
+        assureExistence(succ);
+        return knownPredecessors.get(succ);
+    }
+
+    /**
+     * @param succ
+     * @return A stream of all possible, but not known, predecessors of
+     *         {@code succ}.
+     */
+    public Set<T> getPossiblePredecessors(T succ) {
+        assureExistence(succ);
+        return possiblePredecessors.get(succ);
+    }
+
+    /**
+     * @param pred
+     * @return A stream of all known successors of {@code pred}.
+     */
+    public Stream<T> knownStrictSuccessors(T pred) {
+        assureExistence(pred);
+        return knownSuccessors.get(pred).stream()
+                .filter(succ -> !knownSuccessors.get(succ).contains(pred)
+                        && !possibleSuccessors.get(succ).contains(pred));
+    }
+
+    /**
+     * @param pred
+     * @return A stream of all possible, but not known, successors of {@code pred}.
+     */
+    public Stream<T> possibleStrictSuccessors(T pred) {
+        assureExistence(pred);
+        return Stream.concat(knownSuccessors.get(pred).stream(), possibleSuccessors.get(pred).stream())
+                .filter(succ -> !knownSuccessors.get(succ).contains(pred));
+    }
+
+    /**
+     * @param succ
+     * @return A stream of all known predecessors of {@code succ}.
+     */
+    public Stream<T> knownStrictPredecessors(T succ) {
+        assureExistence(succ);
+        return knownPredecessors.get(succ).stream()
+                .filter(pred -> !knownPredecessors.get(pred).contains(succ)
+                        && !possiblePredecessors.get(pred).contains(succ));
+    }
+
+    /**
+     * @param succ
+     * @return A stream of all possible, but not known, predecessors of
+     *         {@code succ}.
+     */
+    public Stream<T> possibleStrictPredecessors(T succ) {
+        assureExistence(succ);
+        return Stream.concat(knownPredecessors.get(succ).stream(), possiblePredecessors.get(succ).stream())
+                .filter(pred -> !knownPredecessors.get(pred).contains(succ));
     }
 
     /**
@@ -108,6 +228,30 @@ public class PreorderCache<T> {
         } else {
             removePossibleSuccessors(pred, succ);
             return false;
+        }
+    }
+
+    /**
+     * Get whether the relation contains the pair ({@code pred}, {@code succ}). If
+     * the result is already known form the cached values it is returned
+     * immediately, other wise {@code order} is called to find the result. Unlike
+     * {@code computeIfAbsent}, this method will not cache the result of the
+     * computation.
+     *
+     * @param pred
+     * @param succ
+     * @param order
+     *            A function defining the relation to cache.
+     * @return True iff the relation contains a connection from {@code pred} to
+     *         {@code succ}.
+     */
+    public boolean computeIfAbsentNoCache(T pred, T succ, BiPredicate<T, T> order) {
+        if (knownSuccessors.containsKey(pred) && knownSuccessors.get(pred).contains(succ)) {
+            return true;
+        } else if (possibleSuccessors.containsKey(pred) && !possibleSuccessors.get(pred).contains(succ)) {
+            return false;
+        } else {
+            return order.test(pred, succ);
         }
     }
 

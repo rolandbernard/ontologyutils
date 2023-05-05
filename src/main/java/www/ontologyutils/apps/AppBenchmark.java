@@ -17,6 +17,7 @@ public class AppBenchmark {
                 refinement.refine(role).count();
                 refinement.refineReverse(role).count();
             });
+            System.out.println("sub queries: " + covers.reasonerCalls);
         }
         try (var axiomWeakener = new AxiomWeakener(ontology)) {
             ontology.logicalAxioms().forEach(strongAxiom -> {
@@ -43,7 +44,7 @@ public class AppBenchmark {
      */
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Usage: java " + AppAutomatedRepairRandomMCS.class.getCanonicalName() + " FILENAME");
+            System.err.println("Usage: java " + AppBenchmark.class.getCanonicalName() + " FILENAME");
             System.exit(1);
         }
         var ontology = Ontology.loadOntology(args[0]);
