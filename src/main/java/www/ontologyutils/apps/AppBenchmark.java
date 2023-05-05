@@ -1,9 +1,8 @@
 package www.ontologyutils.apps;
 
-import java.util.*;
 import java.util.stream.Collectors;
 
-import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 
 import www.ontologyutils.refinement.*;
 import www.ontologyutils.toolbox.*;
@@ -11,38 +10,26 @@ import www.ontologyutils.toolbox.*;
 public class AppBenchmark {
     private static void benchRun(Ontology ontology) {
         Utils.randomSeed(42);
-        var refined = new HashSet<OWLClassExpression>();
-        try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
-            var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
-            refined.addAll(ontology.subConcepts().toList());
-            for (int i = 0; i < 100; i++) {
-                var newRefined = new HashSet<OWLClassExpression>();
-                refined.stream().forEach(concept -> {
-                    newRefined.add(Utils.randomChoice(refinement.refine(concept)));
-                    newRefined.add(Utils.randomChoice(refinement.refineReverse(concept)));
-                });
-                refined = newRefined;
-            }
-            System.out.println("reasoner calls: " + covers.reasonerCalls);
-        }
-        var weaker = new HashSet<OWLAxiom>();
-        try (var axiomWeakener = new AxiomWeakener(ontology)) {
-            weaker.addAll(ontology.logicalAxioms().toList());
-            for (int i = 0; i < 1000; i++) {
-                var newWeaker = new HashSet<OWLAxiom>();
-                weaker.stream().forEach(strongAxiom -> {
-                    newWeaker.add(Utils.randomChoice(axiomWeakener.weakerAxioms(strongAxiom)));
-                });
-                weaker = newWeaker;
+        for (int i = 0; i < 10; i++) {
+            try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
+                var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
+                OWLClassExpression toRefine = Ontology.getDefaultDataFactory().getOWLNothing();
+                for (int j = 0; j < 1_000; j++) {
+                    if (toRefine.isOWLThing()) {
+                        toRefine = Ontology.getDefaultDataFactory().getOWLNothing();
+                    }
+                    toRefine = Utils.randomChoice(refinement.refine(toRefine));
+                }
             }
         }
     }
 
     private static void benchOntology(Ontology ontology) {
         var startTime = System.nanoTime();
+        Ontology.reasonerCalls = 0;
         benchRun(ontology);
         var endTime = System.nanoTime();
-        System.out.println("time to run: " + (endTime - startTime) / 1_000_000 + " ms");
+        System.out.println((endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls");
     }
 
     /**

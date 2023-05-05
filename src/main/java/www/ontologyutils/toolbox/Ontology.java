@@ -29,6 +29,8 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
 public class Ontology implements AutoCloseable {
     private static final OWLOntologyManager defaultManager = OWLManager.createOWLOntologyManager();
     private static final OWLReasonerFactory defaultFactory = new FaCTPlusPlusReasonerFactory();
+    // This is only here for statistics
+    public static int reasonerCalls;
 
     private static class CachedReasoner {
         private OWLReasonerFactory reasonerFactory;
@@ -103,6 +105,7 @@ public class Ontology implements AutoCloseable {
                     reasoner.flush();
                 }
             }
+            reasonerCalls += 1;
             return action.apply(reasoner);
         }
     }
