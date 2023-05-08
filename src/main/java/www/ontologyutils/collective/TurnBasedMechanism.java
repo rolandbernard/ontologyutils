@@ -23,7 +23,6 @@ import www.ontologyutils.toolbox.*;
  * @author nico
  */
 public class TurnBasedMechanism {
-
     private List<OWLAxiom> agenda;
     private List<Preference> preferences;
     private List<BinaryVote> approvals;
@@ -77,7 +76,6 @@ public class TurnBasedMechanism {
             throw new IllegalArgumentException("The reference ontology must be consistent.");
         }
         this.referenceOntology = referenceOntology;
-
         for (int i = 0; i < numVoters; i++) {
             for (int rank = 1; rank < agenda.size(); rank++) {
                 int approvalRank = approvals.get(i).getVote(preferences.get(i).get(rank));
@@ -148,7 +146,6 @@ public class TurnBasedMechanism {
      */
     private Ontology init(Initialization initialization) {
         Ontology result = null;
-
         switch (initialization) {
             case EMPTY:
                 result = Ontology.emptyOntology();
@@ -165,7 +162,6 @@ public class TurnBasedMechanism {
                 }
                 break;
         }
-
         return result;
     }
 
@@ -183,22 +179,17 @@ public class TurnBasedMechanism {
      */
     public Ontology get(Initialization initialization) {
         Ontology result = init(initialization);
-
         List<OWLAxiom> currentAgenda = new ArrayList<>();
         currentAgenda.addAll(agenda.stream().collect(Collectors.toList()));
-
         // trim the current agenda from the axioms already in the reference ontology
         result.axioms().forEach(a -> currentAgenda.remove(a));
-
         // init turn
         int currentVoter = 0;
         Set<Integer> haveGivenUp = new HashSet<>();
-
         while (!currentAgenda.isEmpty() && haveGivenUp.size() < numVoters) {
             log("\nCurrent voter: " + (currentVoter + 1));
             // currentVoter's favorite axiom still in the current agenda
             OWLAxiom favorite = favorite(currentAgenda, preferences.get(currentVoter), approvals.get(currentVoter));
-
             if (favorite == null) {
                 // currentVoter does not approve of any axioms remaining in currentAgenda
                 haveGivenUp.add(currentVoter);
@@ -206,11 +197,9 @@ public class TurnBasedMechanism {
                 currentVoter = (currentVoter + 1) % numVoters;
                 continue;
             }
-
             log("\nNext accepted favorite axiom: " + favorite);
             // discard axiom favorite from the agenda
             currentAgenda.remove(favorite);
-
             try (var currentAxioms = result.clone()) {
                 currentAxioms.addAxioms(favorite);
                 while (!currentAxioms.isConsistent()) {
@@ -227,19 +216,15 @@ public class TurnBasedMechanism {
             }
             log("\nAdding axiom: " + favorite);
             result.addAxioms(favorite);
-
             // next turn
             currentVoter = (currentVoter + 1) % numVoters;
         }
-
         if (currentAgenda.isEmpty()) {
             log("\n-- End of procedure: all axioms of the agenda have been considered.\n");
         }
         if (haveGivenUp.size() >= numVoters) {
             log("\n-- End of procedure: all voters have given up.\n");
         }
-
         return result;
     }
-
 }

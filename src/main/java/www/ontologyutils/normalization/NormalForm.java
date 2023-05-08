@@ -17,20 +17,16 @@ import org.semanticweb.owlapi.model.*;
  * @author nico
  */
 public class NormalForm {
-
     public static boolean isNormalFormTBoxAxiom(OWLAxiom ax) {
         if (!ax.isOfType(AxiomType.SUBCLASS_OF)) {
             return false;
         }
-
         OWLClassExpression left = ((OWLSubClassOfAxiom) ax).getSubClass();
         OWLClassExpression right = ((OWLSubClassOfAxiom) ax).getSuperClass();
-
         if (typeOneSubClassAxiom(left, right) || typeTwoSubClassAxiom(left, right)
                 || typeThreeSubClassAxiom(left, right) || typeFourSubClassAxiom(left, right)) {
             return true;
         }
-
         return false;
     }
 
@@ -93,9 +89,7 @@ public class NormalForm {
         if (!(e.getClassExpressionType() == ClassExpressionType.OBJECT_SOME_VALUES_FROM)) {
             return false;
         }
-
         OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) e).getFiller();
-
         if (!isAtom(filler)) {
             return false;
         }
@@ -107,13 +101,10 @@ public class NormalForm {
         if (!(e.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM)) {
             return false;
         }
-
         OWLClassExpression filler = ((OWLQuantifiedRestriction<OWLClassExpression>) e).getFiller();
-
         if (!isAtom(filler)) {
             return false;
         }
         return true;
     }
-
 }

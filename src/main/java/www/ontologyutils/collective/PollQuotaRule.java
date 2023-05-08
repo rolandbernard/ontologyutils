@@ -22,7 +22,6 @@ import www.ontologyutils.collective.BinaryVoteFactory.BinaryVote;
  * @author nico
  */
 public class PollQuotaRule {
-
     List<OWLAxiom> agenda;
     List<Integer> quotas;
     List<BinaryVote> votes;
@@ -47,7 +46,6 @@ public class PollQuotaRule {
         if (votes.stream().anyMatch(bv -> !bv.getAgenda().equals(agenda))) {
             throw new IllegalArgumentException("The ballots must be built from the agenda in parameter.");
         }
-
         this.agenda = agenda;
         this.votes = votes;
         this.quotas = quotas;
@@ -67,7 +65,6 @@ public class PollQuotaRule {
             NamedUniformQuotaRule uniformQuotaRule, List<BinaryVote> votes) {
         int numVoters = votes.size();
         int quota = 0;
-
         switch (uniformQuotaRule) {
             case MAJORITY:
                 quota = (int) Math.ceil((numVoters + 1) / 2);
@@ -116,8 +113,6 @@ public class PollQuotaRule {
                 result.add(agenda.get(i));
             }
         }
-
         return result;
     }
-
 }

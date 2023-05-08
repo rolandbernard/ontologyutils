@@ -16,12 +16,9 @@ public class AppNormalize {
     private String ontologyName;
 
     public AppNormalize(String ontologyFilePath) {
-
         File ontologyFile = new File(ontologyFilePath);
-
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         IRI ontologyIRI = IRI.create(ontologyFile);
-
         try {
             ontology = manager.loadOntologyFromOntologyDocument(ontologyIRI);
             this.ontologyName = ontology.getOntologyID().getOntologyIRI().get().toString();

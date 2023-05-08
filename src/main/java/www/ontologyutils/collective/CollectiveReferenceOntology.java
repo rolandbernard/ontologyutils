@@ -37,7 +37,6 @@ public class CollectiveReferenceOntology {
                         "The agenda of all preferences must coincide with the agenda in parameter");
             }
         }
-
         this.agenda = agenda;
         this.preferences = preferences;
     }
@@ -53,7 +52,6 @@ public class CollectiveReferenceOntology {
                 return Ontology.withAxioms(set1);
             }
         }
-
         return null;
     }
 
@@ -100,5 +98,4 @@ public class CollectiveReferenceOntology {
         }
         return false;
     }
-
 }

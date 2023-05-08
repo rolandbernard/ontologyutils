@@ -19,17 +19,13 @@ public class RuleGeneration {
 
     @SuppressWarnings({ "unchecked", "unlikely-arg-type" })
     public String normalizedSubClassAxiomToRule(OWLAxiom ax) {
-
         if (!NormalForm.isNormalFormTBoxAxiom(ax)) {
             throw new IllegalArgumentException("Axiom " + ax + " must be in normal form.");
         }
-
         // a "group of axioms" is identified with the annotation of the original axiom
         String axiomGroup = mapAxioms.get(Ontology.axiomOriginAnnotations(ax).collect(Collectors.toSet()));
-
         OWLClassExpression left = ((OWLSubClassOfAxiom) ax).getSubClass();
         OWLClassExpression right = ((OWLSubClassOfAxiom) ax).getSuperClass();
-
         if (NormalForm.typeOneSubClassAxiom(left, right)) {
             // (isAtom(left) || isConjunctionOfAtoms(left)) && (isAtom(right) ||
             // isDisjunctionOfAtoms(right))
@@ -105,9 +101,7 @@ public class RuleGeneration {
 
     private static Map<OWLEntity, String> mapEntitiesToNumberedLetters(Ontology ontology) {
         HashMap<OWLEntity, String> map = new HashMap<OWLEntity, String>();
-
         Object[] entities = ontology.signature().toArray();
-
         int numClass = 0;
         int numProp = 0;
         for (int i = 0; i < entities.length; i++) {
@@ -119,13 +113,11 @@ public class RuleGeneration {
                 }
             }
         }
-
         return map;
     }
 
     private static Map<Collection<OWLAnnotation>, String> mapAxiomsToGroupNumbers(Ontology ontology) {
         HashMap<Collection<OWLAnnotation>, String> map = new HashMap<Collection<OWLAnnotation>, String>();
-
         int numAxGr = 0;
         for (OWLAxiom ax : ontology.tboxAxioms().collect(Collectors.toSet())) {
             assert (ax.isAnnotated());
@@ -134,8 +126,6 @@ public class RuleGeneration {
                 map.put(annotations, "" + ++numAxGr);
             }
         }
-
         return map;
     }
-
 }

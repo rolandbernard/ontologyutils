@@ -17,12 +17,9 @@ public class AppSuperNormalize {
     private String ontologyName;
 
     public AppSuperNormalize(String ontologyFilePath) {
-
         File ontologyFile = new File(ontologyFilePath);
-
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         IRI ontologyIRI = IRI.create(ontologyFile);
-
         try {
             ontology = manager.loadOntologyFromOntologyDocument(ontologyIRI);
             this.ontologyName = ontology.getOntologyID().getOntologyIRI().get().toString();
@@ -95,7 +92,6 @@ public class AppSuperNormalize {
      * @return an equivalent ontology where type-1 rules have at most 2 conjuncts on
      *         the left.
      */
-
     private static Ontology superNormalize(Ontology on) {
         Ontology res = Ontology.emptyOntology();
         on.tboxAxioms().forEach(a -> {
@@ -103,7 +99,6 @@ public class AppSuperNormalize {
         });
         res.addAxioms(on.rboxAxioms());
         res.addAxioms(on.aboxAxioms());
-
         return res;
     }
 

@@ -13,9 +13,7 @@ public class AppCondorRules {
     private Ontology ontology;
 
     public AppCondorRules(String ontologyFilePath) {
-
         ontology = Ontology.loadOntologyWithOriginAnnotations(ontologyFilePath);
-
     }
 
     private Ontology runCondor() {

@@ -38,7 +38,6 @@ public class Normalization {
      *         (IJCAI 2011).
      */
     public static Ontology normalizeCondor(Ontology ontology) {
-
         // we make a copy of the ontology without the TBox
         Ontology newOntology = Ontology.emptyOntology();
         newOntology.addAxioms(ontology.rboxAxioms());
@@ -70,7 +69,6 @@ public class Normalization {
             transformed.removeAxioms(axiom);
             transformed.addAxioms(NormalizationTools.normalizeSubClassAxiom((OWLSubClassOfAxiom) axiom));
         });
-
         return transformed;
     }
 
@@ -159,11 +157,9 @@ public class Normalization {
         Ontology newOntology = Ontology.emptyOntology();
         newOntology.addAxioms(ontology.rboxAxioms());
         newOntology.addAxioms(ontology.aboxAxioms());
-
         Collection<OWLSubClassOfAxiom> transformed = new ArrayList<>();
         List<OWLClassExpression> subConcepts = ontology.subConceptsOfTbox().toList();
         Map<OWLClassExpression, OWLClassExpression> map = new HashMap<>();
-
         for (OWLClassExpression e : subConcepts) {
             if (e.isOWLClass()) {
                 map.put(e, e);
@@ -172,7 +168,6 @@ public class Normalization {
                 map.put(e, fresh);
             }
         }
-
         for (OWLClassExpression e : subConcepts) {
             if (e.isOWLClass()) { // as per the article it shouldn't be skipped
                 continue;
@@ -196,7 +191,6 @@ public class Normalization {
                 });
             }
         }
-
         ontology.tboxAxioms().forEach((a) -> {
             if (!(a instanceof OWLSubClassOfAxiom)) {
                 throw new RuntimeException("Axiom " + a + " should be a subclass axiom.");
@@ -209,9 +203,7 @@ public class Normalization {
                 transformed.add(sba);
             }
         });
-
         newOntology.addAxioms(transformed);
-
         return newOntology;
     }
 
@@ -230,14 +222,12 @@ public class Normalization {
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_COMPLEMENT_OF)) {
             return isNegativeIn(e, ((OWLObjectComplementOf) in).getOperand());
         }
-
         return false;
     }
 
     private static boolean isPositiveIn(OWLClassExpression e, OWLAxiom ax) {
         OWLClassExpression left = ((OWLSubClassOfAxiom) ax).getSubClass();
         OWLClassExpression right = ((OWLSubClassOfAxiom) ax).getSuperClass();
-
         return isPositiveIn(e, right) || isNegativeIn(e, left);
     }
 
@@ -256,14 +246,12 @@ public class Normalization {
         } else if ((in.getClassExpressionType() == ClassExpressionType.OBJECT_COMPLEMENT_OF)) {
             return isPositiveIn(e, ((OWLObjectComplementOf) in).getOperand());
         }
-
         return false;
     }
 
     private static boolean isNegativeIn(OWLClassExpression e, OWLAxiom ax) {
         OWLClassExpression left = ((OWLSubClassOfAxiom) ax).getSubClass();
         OWLClassExpression right = ((OWLSubClassOfAxiom) ax).getSuperClass();
-
         return isPositiveIn(e, left) || isNegativeIn(e, right);
     }
 
@@ -297,5 +285,4 @@ public class Normalization {
             throw new InvalidParameterException("The expression " + e + " can not be transformed.");
         }
     }
-
 }

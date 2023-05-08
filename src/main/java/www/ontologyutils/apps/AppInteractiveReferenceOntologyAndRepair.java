@@ -14,9 +14,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
     Ontology ontology;
 
     public AppInteractiveReferenceOntologyAndRepair(String ontologyFilePath) {
-
         ontology = Ontology.loadOntology(ontologyFilePath);
-
     }
 
     private static int readNumber(String query, int min, int max) {
@@ -44,7 +42,6 @@ public class AppInteractiveReferenceOntologyAndRepair {
             return copyAxiomSet;
         }
         copyAxiomSet.removeAll(axiomsToKeep);
-
         OWLAxiom axiom = null;
         HashSet<OWLAxiom> smallerAxiomSet = null;
         boolean foundSmaller = true;
@@ -74,12 +71,10 @@ public class AppInteractiveReferenceOntologyAndRepair {
                 }
             }
         }
-
         return copyAxiomSet;
     }
 
     private static Set<OWLAxiom> findSomehowBadAxioms(Set<OWLAxiom> axiomSet, Set<OWLAxiom> axiomsToKeep) {
-
         int precision = (axiomSet.size() - axiomsToKeep.size()) / 2 + 1;
 
         HashMap<OWLAxiom, Integer> hm = new HashMap<OWLAxiom, Integer>();
@@ -138,7 +133,6 @@ public class AppInteractiveReferenceOntologyAndRepair {
     }
 
     static class InconsistentSetException extends RuntimeException {
-
         private static final long serialVersionUID = 1L;
 
         public InconsistentSetException(String message) {
@@ -187,7 +181,6 @@ public class AppInteractiveReferenceOntologyAndRepair {
         }
         weakerAxioms.remove(axiom.getAxiomWithoutAnnotations());
         weakerAxioms.add(0, axiom.getAxiomWithoutAnnotations());
-
         return weakerAxioms;
     }
 
@@ -291,5 +284,4 @@ public class AppInteractiveReferenceOntologyAndRepair {
         axiomsToKeep.forEach(System.out::println);
         System.out.println("Done.");
     }
-
 }

@@ -17,7 +17,6 @@ import www.ontologyutils.toolbox.*;
  * Information Systems (FOIS 2021). IOS Press.
  */
 public class BlendingDialogue {
-
     public static int NO_TURN_LIMIT = -1;
 
     private List<OWLAxiom> aone;
@@ -128,7 +127,6 @@ public class BlendingDialogue {
      * @return a consistent ontology resulting from the dialogue.
      */
     public Ontology get(double probabilityTurnOne, int maxTurns) {
-
         this.numWeakeningOne = 0;
         this.numWeakeningTwo = 0;
 
@@ -212,5 +210,4 @@ public class BlendingDialogue {
     public Ontology get(double probabilityTurnOne) {
         return this.get(probabilityTurnOne, NO_TURN_LIMIT);
     }
-
 }

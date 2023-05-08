@@ -170,7 +170,6 @@ public class AppBlendingDialogue {
                 }
             });
         });
-
         return result;
     }
 
@@ -284,7 +283,6 @@ public class AppBlendingDialogue {
      */
     private static Set<OWLClassExpression> computeSpecificAscendanstDescendants(Ontology ontology,
             OWLClassExpression concept, Ontology notHere) {
-
         OWLSubClassOfAxiom scoa;
 
         Set<OWLClassExpression> oces = new HashSet<OWLClassExpression>();
@@ -336,7 +334,6 @@ public class AppBlendingDialogue {
     public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2, String initialOntologyFilePath,
             String alignmentsOntologyFilePath, String testOntologyFilePath, String IRI1, String IRI2,
             String IRITarget) {
-
         whenLaunched = System.currentTimeMillis();
 
         Ontology base1 = Ontology.loadOnlyLogicalAxioms(ontologyFilePath1);
@@ -381,7 +378,6 @@ public class AppBlendingDialogue {
      *         highest-ranked axioms, while the other axioms appear at random.
      */
     private static List<Integer> randomRanking(PreferenceFactory pf, List<Integer> init) {
-
         List<Integer> ranking = new ArrayList<>();
         int maxSpecSoFar = 0;
         for (int i = 0; i < pf.getAgenda().size(); i++) {
@@ -654,7 +650,5 @@ public class AppBlendingDialogue {
             System.out.println(
                     Utils.prettyPrintAxiom(a) + " : " + (num == null ? 0 : num) + " out of " + numberOfTestRuns);
         }
-
     }
-
 }

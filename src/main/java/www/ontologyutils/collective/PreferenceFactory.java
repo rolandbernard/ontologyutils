@@ -25,7 +25,6 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * @author nico
  */
 public class PreferenceFactory {
-
     private List<OWLAxiom> agenda;
 
     public PreferenceFactory(List<OWLAxiom> agenda) {
@@ -44,7 +43,6 @@ public class PreferenceFactory {
     }
 
     private List<Integer> randomRanking() {
-
         List<Integer> ranking = new ArrayList<>();
         for (int i = 0; i < agenda.size(); i++) {
             ranking.add(-1);
@@ -75,7 +73,6 @@ public class PreferenceFactory {
      *         ax2 (rank 3). It must not contain duplicates.
      */
     public class Preference {
-
         private List<Integer> ranking;
 
         // we forbid direct instantiation
@@ -154,7 +151,6 @@ public class PreferenceFactory {
                     throw new IllegalStateException("The axioms in the second set must all be in the agenda.");
                 }
             }
-
             // set1 is lexicographically smaller than set2 if
             // there is an axiom axe in set1...
             return set1.stream().anyMatch(axe ->
@@ -168,14 +164,11 @@ public class PreferenceFactory {
                             || set1.contains(ax) && set2.contains(ax)
                             // ... or is not in set1 union set2
                             || (!set1.contains(ax) && !set2.contains(ax))))));
-
         }
 
         @Override
         public String toString() {
             return ranking.toString();
         }
-
     } // End of Preference
-
 }

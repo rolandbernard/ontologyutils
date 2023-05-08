@@ -43,12 +43,10 @@ public class FreshAtoms {
         OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
         String freshName = "#[" + e + "]";
         OWLClassExpression fresh = dataFactory.getOWLEntity(EntityType.CLASS, IRI.create(tag + freshName));
-
         Collection<OWLClassExpression> equiv = new ArrayList<>();
         equiv.add(e);
         equiv.add(fresh);
         freshAtomsEquivalenceAxioms.add(dataFactory.getOWLEquivalentClassesAxiom(equiv));
-
         return fresh;
     }
 }

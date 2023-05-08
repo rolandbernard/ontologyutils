@@ -65,7 +65,6 @@ public class BinaryVoteFactory {
     }
 
     public class BinaryVote {
-
         private List<Integer> ballot;
 
         // we forbid direct instantiation
@@ -77,7 +76,6 @@ public class BinaryVoteFactory {
                 throw new IllegalArgumentException(
                         "A binary vote must specify a 0/1 decision for every axiom of the agenda");
             }
-
             // check consistency
             try (var selectedAxioms = Ontology.emptyOntology()) {
                 for (int i = 0; i < agenda.size(); i++) {
@@ -90,7 +88,6 @@ public class BinaryVoteFactory {
                             "A binary vote must specify a selection of a consistent set of axioms from the agenda.");
                 }
             }
-
             this.ballot = ballot;
         }
 
@@ -103,7 +100,6 @@ public class BinaryVoteFactory {
         }
 
         public Set<OWLAxiom> getBallotAxioms() {
-
             Set<OWLAxiom> selectedAxioms = new HashSet<>();
             for (int i = 0; i < agenda.size(); i++) {
                 if (ballot.get(i) == 1) {
@@ -114,7 +110,6 @@ public class BinaryVoteFactory {
         }
 
         public HashMap<OWLAxiom, Float> getBallotAxiomsPreferences() {
-
             HashMap<OWLAxiom, Float> selectedAxiomsPreferences = new HashMap<OWLAxiom, Float>();
             List<Float> preferences = new ArrayList<Float>();
             int selectedAxiom = 0;
@@ -130,7 +125,6 @@ public class BinaryVoteFactory {
             ballot.stream().forEach(System.out::println);
             preferences.stream().forEach(System.out::println);
             System.out.println("///getBallotAxiomsPreferences");
-
             return selectedAxiomsPreferences;
         }
 
@@ -154,7 +148,5 @@ public class BinaryVoteFactory {
         public String toString() {
             return ballot.toString();
         }
-
     } // End BinaryVote
-
 }

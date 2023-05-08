@@ -18,15 +18,11 @@ import www.ontologyutils.toolbox.Ontology;
  */
 public class AppTurnBasedMechanism {
     private static int MAX_VOTERS = 1000;
-
     private Ontology ontology;
 
     public AppTurnBasedMechanism(String ontologyFilePath) {
-
         Ontology base = Ontology.loadOnlyLogicalAxioms(ontologyFilePath);
-
         ontology = Ontology.emptyOntology();
-
         ontology.addAxioms(base.aboxAxioms().collect(Collectors.toSet()));
         base.tboxAxioms().forEach(a -> ontology.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
     }
@@ -58,7 +54,6 @@ public class AppTurnBasedMechanism {
      */
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
-
         AppTurnBasedMechanism mApp = new AppTurnBasedMechanism(args[0]);
 
         if (mApp.ontology.isConsistent()) {
@@ -149,5 +144,4 @@ public class AppTurnBasedMechanism {
         System.out.println("\n--- RESULT ONTOLOGY\n");
         result.axioms().forEach(System.out::println);
     }
-
 }
