@@ -8,7 +8,7 @@ import java.util.stream.Stream;
  * Implements a simple cache for a preorder, i.e., a reflexive and transitive
  * relation.
  *
- * Loosely inspired by the approach presented in Shearer, R., & Horrocks, I.
+ * Loosely inspired by the approach presented in Shearer, R., &amp; Horrocks, I.
  * (2009). Exploiting partial information in taxonomy construction. In The
  * Semantic Web-ISWC 2009: 8th International Semantic Web Conference, ISWC 2009,
  * Chantilly, VA, USA, October 25-29, 2009. Proceedings 8 (pp. 569-584).
@@ -273,8 +273,7 @@ public class PreorderCache<T> {
     /**
      * Wrap the given preorder {@code preorder} using a {@code PreorderCache}.
      *
-     * @param <K>
-     * @param <V>
+     * @param <T>
      * @param preorder
      * @return The wrapped preorder.
      */

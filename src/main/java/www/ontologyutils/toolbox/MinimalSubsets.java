@@ -20,7 +20,7 @@ import java.util.stream.*;
  * Fast computation of multiple conflicts for diagnosis." Twenty-Fourth
  * International Joint Conference on Artificial Intelligence. 2015.
  * and
- * Kalyanpur, A., Parsia, B., Horridge, M., & Sirin, E. (2007). Finding all
+ * Kalyanpur, A., Parsia, B., Horridge, M., &amp; Sirin, E. (2007). Finding all
  * justifications of OWL DL entailments. ISWC/ASWC, 4825, 267-280.
  */
 public final class MinimalSubsets {
