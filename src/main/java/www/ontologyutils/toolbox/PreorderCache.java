@@ -104,6 +104,7 @@ public class PreorderCache<T> {
      * possible predecessors will not contain these unseen elements.
      *
      * @param domain
+     *            The collection of all elements for which to setup the cache.
      */
     public void setupDomain(Collection<T> domain) {
         for (var elem : domain) {
@@ -132,6 +133,7 @@ public class PreorderCache<T> {
 
     /**
      * @param pred
+     *            The element for which to find successors.
      * @return A stream of all known successors of {@code pred}.
      */
     public Set<T> getKnownSuccessors(T pred) {
@@ -141,6 +143,7 @@ public class PreorderCache<T> {
 
     /**
      * @param pred
+     *            The element for which to find successors.
      * @return A stream of all possible, but not known, successors of {@code pred}.
      */
     public Set<T> getPossibleSuccessors(T pred) {
@@ -150,6 +153,7 @@ public class PreorderCache<T> {
 
     /**
      * @param succ
+     *            The element for which to get predecessors.
      * @return A stream of all known predecessors of {@code succ}.
      */
     public Set<T> getKnownPredecessors(T succ) {
@@ -159,6 +163,7 @@ public class PreorderCache<T> {
 
     /**
      * @param succ
+     *            The element for which to get predecessors.
      * @return A stream of all possible, but not known, predecessors of
      *         {@code succ}.
      */
@@ -169,6 +174,7 @@ public class PreorderCache<T> {
 
     /**
      * @param pred
+     *            The element for which to find successors.
      * @return A stream of all known successors of {@code pred}.
      */
     public Stream<T> knownStrictSuccessors(T pred) {
@@ -180,6 +186,7 @@ public class PreorderCache<T> {
 
     /**
      * @param pred
+     *            The element for which to find successors.
      * @return A stream of all possible, but not known, successors of {@code pred}.
      */
     public Stream<T> possibleStrictSuccessors(T pred) {
@@ -194,6 +201,7 @@ public class PreorderCache<T> {
 
     /**
      * @param succ
+     *            The element for which to find predecessors.
      * @return A stream of all known predecessors of {@code succ}.
      */
     public Stream<T> knownStrictPredecessors(T succ) {
@@ -205,6 +213,7 @@ public class PreorderCache<T> {
 
     /**
      * @param succ
+     *            The element for which to find predecessors.
      * @return A stream of all possible, but not known, predecessors of
      *         {@code succ}.
      */
@@ -224,7 +233,9 @@ public class PreorderCache<T> {
      * immediately, other wise {@code order} is called to find the result.
      *
      * @param pred
+     *            The possible predecessor of {@code succ}.
      * @param succ
+     *            The possible successor of {@code pred}.
      * @param order
      *            A function defining the relation to cache.
      * @return True iff the relation contains a connection from {@code pred} to
@@ -249,12 +260,14 @@ public class PreorderCache<T> {
     /**
      * Get whether the relation contains the pair ({@code pred}, {@code succ}). If
      * the result is already known form the cached values it is returned
-     * immediately, other wise {@code order} is called to find the result. Unlike
+     * immediately, otherwise {@code order} is called to find the result. Unlike
      * {@code computeIfAbsent}, this method will not cache the result of the
      * computation.
      *
      * @param pred
+     *            The possible predecessor of {@code succ}.
      * @param succ
+     *            The possible successor of {@code pred}.
      * @param order
      *            A function defining the relation to cache.
      * @return True iff the relation contains a connection from {@code pred} to
@@ -274,7 +287,9 @@ public class PreorderCache<T> {
      * Wrap the given preorder {@code preorder} using a {@code PreorderCache}.
      *
      * @param <T>
+     *            The domain over which the preorder is defined.
      * @param preorder
+     *            The preorder that should be wrapped.
      * @return The wrapped preorder.
      */
     public static <T> BiPredicate<T, T> wrapPreorder(BiPredicate<T, T> preorder) {

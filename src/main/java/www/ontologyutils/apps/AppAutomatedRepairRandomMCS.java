@@ -6,6 +6,9 @@ import www.ontologyutils.normalization.SroiqNormalization;
 import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Repair the given ontology using a random maximal consistent subset.
+ */
 public class AppAutomatedRepairRandomMCS {
     private static String getTimeStamp() {
         return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new java.util.Date());
@@ -17,6 +20,8 @@ public class AppAutomatedRepairRandomMCS {
      * src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
      *
      * @param args
+     *            Must contain one argument representing the file path of an
+     *            ontology.
      */
     public static void main(String[] args) {
         if (args.length != 1) {

@@ -57,7 +57,9 @@ public class CollectiveReferenceOntology {
 
     /**
      * @param set
+     *            The set of axioms to test.
      * @param n
+     *            Which of the preferences element to look at.
      * @return the number of preferences in this.preferences whose n-th element
      *         (axiom at rank n) appears in {@code set}
      * @see PreferenceFactory.Preference#get(int rank)
@@ -74,7 +76,9 @@ public class CollectiveReferenceOntology {
 
     /**
      * @param set1
+     *            The first set.
      * @param set2
+     *            The second set.
      * @return true if set1 is lexicographically smaller than set2 in this.agenda
      *         with respect to the preference profile this.preferences
      */

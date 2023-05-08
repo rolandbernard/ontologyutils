@@ -26,8 +26,18 @@ public class PollQuotaRule {
     List<Integer> quotas;
     List<BinaryVote> votes;
 
+    /**
+     * Enum for how the vote should work.
+     */
     public enum NamedUniformQuotaRule {
-        MAJORITY, UNANIMITY;
+        /**
+         * Require a majority.
+         */
+        MAJORITY,
+        /**
+         * Require unanimity.
+         */
+        UNANIMITY;
     }
 
     /**
@@ -36,8 +46,11 @@ public class PollQuotaRule {
      * list of votes over the agenda.
      *
      * @param agenda
+     *            Agenda of the vote.
      * @param quotas
+     *            Quotas.
      * @param votes
+     *            List of votes.
      */
     public PollQuotaRule(List<OWLAxiom> agenda, List<Integer> quotas, List<BinaryVote> votes) {
         if (agenda.size() != quotas.size()) {
@@ -78,8 +91,11 @@ public class PollQuotaRule {
 
     /**
      * @param agenda
+     *            Agenda
      * @param name
+     *            Name
      * @param votes
+     *            List of votes.
      */
     public PollQuotaRule(List<OWLAxiom> agenda, NamedUniformQuotaRule name, List<BinaryVote> votes) {
         this(agenda, getNamedUniformRuleQuotas(agenda, name, votes), votes);
@@ -90,8 +106,11 @@ public class PollQuotaRule {
      * specified by the parameter {@code uniformQuota}.
      *
      * @param agenda
+     *            Agenda
      * @param uniformQuota
+     *            Quota to apply for all.
      * @param votes
+     *            List of votes.
      */
     public PollQuotaRule(List<OWLAxiom> agenda, int uniformQuota, List<BinaryVote> votes) {
         this(agenda, new ArrayList<>(Collections.nCopies(agenda.size(), uniformQuota)), votes);

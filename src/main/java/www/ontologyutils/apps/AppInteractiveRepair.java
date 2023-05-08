@@ -10,10 +10,13 @@ import www.ontologyutils.normalization.NormalizationTools;
 import www.ontologyutils.refinement.AxiomWeakener;
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Repair the ontology using interactive selection of weaker axioms.
+ */
 public class AppInteractiveRepair {
     Ontology ontology;
 
-    public AppInteractiveRepair(String ontologyFilePath) {
+    private AppInteractiveRepair(String ontologyFilePath) {
         ontology = Ontology.loadOntology(ontologyFilePath);
     }
 

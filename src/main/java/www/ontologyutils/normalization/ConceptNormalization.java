@@ -184,10 +184,17 @@ public class ConceptNormalization implements OntologyModification {
 
     private AxiomVisitor visitor;
 
+    /**
+     * @param binaryOperators
+     *            Whether to transform union and intersection to binary operations.
+     */
     public ConceptNormalization(boolean binaryOperators) {
         visitor = new AxiomVisitor(new ConceptVisitor(binaryOperators));
     }
 
+    /**
+     * Create a new concept normalization object.
+     */
     public ConceptNormalization() {
         this(false);
     }

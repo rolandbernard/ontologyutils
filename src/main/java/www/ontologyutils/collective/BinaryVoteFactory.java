@@ -21,6 +21,10 @@ import www.ontologyutils.toolbox.*;
 public class BinaryVoteFactory {
     private List<OWLAxiom> agenda;
 
+    /**
+     * @param agenda
+     *            The axiom agenda.
+     */
     public BinaryVoteFactory(List<OWLAxiom> agenda) {
         if ((new HashSet<OWLAxiom>(agenda)).size() != agenda.size()) {
             throw new IllegalArgumentException("The agenda must not contain duplicates");
@@ -28,10 +32,18 @@ public class BinaryVoteFactory {
         this.agenda = agenda;
     }
 
+    /**
+     * @return The agenda of the vote factory.
+     */
     public List<OWLAxiom> getAgenda() {
         return agenda;
     }
 
+    /**
+     * @param ballot
+     *            The ballot.
+     * @return A {@code BinaryVote}
+     */
     public BinaryVote makeBinaryVote(List<Integer> ballot) {
         return new BinaryVote(ballot);
     }
@@ -56,14 +68,27 @@ public class BinaryVoteFactory {
         return result;
     }
 
+    /**
+     * @param probablePositivity
+     *            Probable positivity used in ballot generation.
+     * @return The generated binary vote.
+     */
     public BinaryVote makeRandomBinaryVote(float probablePositivity) {
         return new BinaryVote(randomBallot(probablePositivity));
     }
 
+    /**
+     * Generate with {@code probablePositivity} 0.5.
+     *
+     * @return The generated binary vote.
+     */
     public BinaryVote makeRandomBinaryVote() {
         return new BinaryVote(randomBallot(0.5f));
     }
 
+    /**
+     * Class representing a binary vote.
+     */
     public class BinaryVote {
         private List<Integer> ballot;
 
@@ -91,14 +116,23 @@ public class BinaryVoteFactory {
             this.ballot = ballot;
         }
 
+        /**
+         * @return The ballot of this vote.
+         */
         public List<Integer> getBallot() {
             return ballot;
         }
 
+        /**
+         * @return The agenda of the vote.
+         */
         public List<OWLAxiom> getAgenda() {
             return agenda;
         }
 
+        /**
+         * @return The axioms from the agenda selected by the ballot.
+         */
         public Set<OWLAxiom> getBallotAxioms() {
             Set<OWLAxiom> selectedAxioms = new HashSet<>();
             for (int i = 0; i < agenda.size(); i++) {
@@ -109,6 +143,9 @@ public class BinaryVoteFactory {
             return selectedAxioms;
         }
 
+        /**
+         * @return The preference map.
+         */
         public HashMap<OWLAxiom, Float> getBallotAxiomsPreferences() {
             HashMap<OWLAxiom, Float> selectedAxiomsPreferences = new HashMap<OWLAxiom, Float>();
             List<Float> preferences = new ArrayList<Float>();
@@ -128,6 +165,9 @@ public class BinaryVoteFactory {
             return selectedAxiomsPreferences;
         }
 
+        /**
+         * @return The ontology with the ballot axioms of this vote.
+         */
         public Ontology getOnto() {
             Set<OWLAxiom> axioms = this.getBallotAxioms();
             Ontology onto = Ontology.withAxioms(axioms);
@@ -137,6 +177,11 @@ public class BinaryVoteFactory {
             return onto;
         }
 
+        /**
+         * @param ax
+         *            The axiom for which to get the vote value.
+         * @return The vote value on the ballot for this axiom.
+         */
         public int getVote(OWLAxiom ax) {
             if (!agenda.contains(ax)) {
                 throw new IllegalArgumentException("Argument must be an axiom from the agenda");

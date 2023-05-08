@@ -14,6 +14,17 @@ import www.ontologyutils.toolbox.Ontology;
  */
 public class AxiomStrengthener extends AxiomRefinement {
     private static class Visitor extends AxiomRefinement.Visitor {
+        /**
+         * @param up
+         *            The "upward"-refinement.
+         * @param down
+         *            The "downward"-refinement.
+         * @param simpleRoles
+         *            The set of simple roles. These are used for deciding whether it is
+         *            safe to refine a role inclusion axiom.
+         * @param flags
+         *            Flags that can be used to make the refinement ore strict.
+         */
         public Visitor(RefinementOperator up, RefinementOperator down,
                 Set<OWLObjectProperty> simpleRoles, int flags) {
             super(up, down, simpleRoles, flags);

@@ -14,9 +14,12 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
     private int cacheSize;
 
     /**
-     * Create a new cache with the specified size.
+     * Create a new cache with the specified size. Note that the cache will
+     * preallocate the space needed.
      *
      * @param cacheSize
+     *            The maximum number of entries to keep in the cache. Use
+     *            Integer.MAX_VALUE to disable the limit completely.
      */
     public LruCache(int cacheSize) {
         super(cacheSize != Integer.MAX_VALUE ? cacheSize * 2 : 256, 0.75f, cacheSize != Integer.MAX_VALUE);
@@ -28,9 +31,13 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
      * maximum number of {@code cacheSize} entries.
      *
      * @param <K>
+     *            The domain of the function.
      * @param <V>
+     *            The range of the function.
      * @param function
+     *            The function to wrap.
      * @param cacheSize
+     *            The cache size to use.
      * @return The wrapped function.
      */
     public static <K, V> Function<K, V> wrapFunction(Function<K, V> function, int cacheSize) {
@@ -45,8 +52,11 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
      * unspecified maximum size.
      *
      * @param <K>
+     *            The domain of the function.
      * @param <V>
+     *            The range of the function.
      * @param function
+     *            The function to wrap.
      * @return The wrapped function.
      */
     public static <K, V> Function<K, V> wrapFunction(Function<K, V> function) {
@@ -58,8 +68,11 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
      * converts the stream to a list, and then back to a stream whenever needed.
      *
      * @param <K>
+     *            The domain of the function.
      * @param <V>
+     *            The range of the function.
      * @param function
+     *            The function to wrap.
      * @param cacheSize
      *            The maximum number of entries in the cache.
      * @return The wrapped function.
@@ -74,8 +87,11 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
      * converts the stream to a list, and then back to a stream whenever needed.
      *
      * @param <K>
+     *            The domain of the function.
      * @param <V>
+     *            The range of the function.
      * @param function
+     *            The function to wrap.
      * @return The wrapped function.
      */
     public static <K, V> Function<K, Stream<V>> wrapStreamFunction(Function<K, Stream<V>> function) {

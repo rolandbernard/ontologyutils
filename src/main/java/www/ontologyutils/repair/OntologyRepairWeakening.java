@@ -19,17 +19,84 @@ import www.ontologyutils.toolbox.*;
  * assertion or subclass axioms.
  */
 public class OntologyRepairWeakening extends OntologyRepair {
+    /**
+     * Possible strategies for computing the reference ontology.
+     */
     public static enum RefOntologyStrategy {
-        RANDOM_MCS, SOME_MCS, ONE_MCS, LARGEST_MCS, INTERSECTION_OF_MCS, INTERSECTION_OF_SOME_MCS,
+        /**
+         * Compute all maximal consistent subsets and select one at random.
+         */
+        RANDOM_MCS,
+        /**
+         * Compute some (but not necessarily all) maximal consistent subsets and select
+         * one at random.
+         */
+        SOME_MCS,
+        /**
+         * Compute one maximal consistent subsets and select it.
+         */
+        ONE_MCS,
+        /**
+         * Compute the largest maximal consistent subsets and select one at random.
+         */
+        LARGEST_MCS,
+        /**
+         * Compute all maximal consistent subsets and select the intersection of them.
+         */
+        INTERSECTION_OF_MCS,
+        /**
+         * Compute some (but not necessarily all) maximal consistent subsets and select
+         * the intersection of them.
+         */
+        INTERSECTION_OF_SOME_MCS,
     }
 
+    /**
+     * Possible strategies for computing bad axioms.
+     */
     public static enum BadAxiomStrategy {
-        RANDOM, NOT_IN_SOME_MCS, NOT_IN_LARGEST_MCS, IN_LEAST_MCS, IN_SOME_MUS, IN_ONE_MUS, NOT_IN_ONE_MCS
+        /**
+         * Select any random refutable axiom in the ontology.
+         */
+        RANDOM,
+        /**
+         * Select any random axiom that is not in some maximal consistent subsets.
+         */
+        NOT_IN_SOME_MCS,
+        /**
+         * Select any random axiom that is not in the largest maximal consistent
+         * subsets.
+         */
+        NOT_IN_LARGEST_MCS,
+        /**
+         * Select the axiom that is in the least maximal consistent subsets.
+         */
+        IN_LEAST_MCS,
+        /**
+         * Select any random axiom that is in some minimal unsatisfiable subsets.
+         */
+        IN_SOME_MUS,
+        /**
+         * Select any random axiom that is in some minimal unsatisfiable subset.
+         */
+        IN_ONE_MUS,
+        /**
+         * Select any random axiom that is not in some maximal consistent subset.
+         */
+        NOT_IN_ONE_MCS
     }
 
     private RefOntologyStrategy refOntologySource;
     private BadAxiomStrategy badAxiomSource;
 
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing whether an ontology is repaired.
+     * @param refOntologySource
+     *            The strategy for computing the reference ontology.
+     * @param badAxiomSource
+     *            The strategy for computing bad axioms.
+     */
     public OntologyRepairWeakening(Predicate<Ontology> isRepaired, RefOntologyStrategy refOntologySource,
             BadAxiomStrategy badAxiomSource) {
         super(isRepaired);
@@ -37,6 +104,10 @@ public class OntologyRepairWeakening extends OntologyRepair {
         this.badAxiomSource = badAxiomSource;
     }
 
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing whether an ontology is repaired.
+     */
     public OntologyRepairWeakening(Predicate<Ontology> isRepaired) {
         this(isRepaired, RefOntologyStrategy.SOME_MCS, BadAxiomStrategy.IN_SOME_MUS);
     }
@@ -58,6 +129,8 @@ public class OntologyRepairWeakening extends OntologyRepair {
     }
 
     /**
+     * @param axioms
+     *            The axioms that must not be entailed by the repaired ontology.
      * @return An instance of {@code OntologyRepairWeakening} that tries to remove
      *         all {@code axioms} from being entailed by the ontology.
      */
@@ -66,6 +139,8 @@ public class OntologyRepairWeakening extends OntologyRepair {
     }
 
     /**
+     * @param concept
+     *            The concept that must be satisfiable in the repaired ontology.
      * @return An instance of {@code OntologyRepairWeakening} that tries to make
      *         {@code concept} satisfiable.
      */
@@ -75,6 +150,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
 
     /**
      * @param ontology
+     *            The ontology to find a reference ontology for.
      * @return The set of axioms to include in the reference ontology to use for
      *         repairs.
      */
@@ -107,6 +183,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
 
     /**
      * @param ontology
+     *            The ontology to find bad axioms in.
      * @return The stream of axioms between which to select the next axiom to
      *         weaken.
      */

@@ -6,6 +6,9 @@ package www.ontologyutils.toolbox;
  * plugin.
  */
 public class CanceledException extends RuntimeException {
+    /**
+     * Create a new canceled exception.
+     */
     public CanceledException() {
         super("The operation was canceled.");
     }

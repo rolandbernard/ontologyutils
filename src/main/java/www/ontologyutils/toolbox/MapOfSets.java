@@ -37,6 +37,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
          * Remove the child with the given key.
          *
          * @param key
+         *            The key to remove.
          */
         public void removeChild(Object key) {
             if (children != null) {
@@ -50,6 +51,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
         /**
          * @param key
+         *            The key ro get.
          * @return The child at {@code key} in this node.
          */
         public TrieNode<K, V> getChild(Object key) {
@@ -65,6 +67,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
          * child node.
          *
          * @param key
+         *            The key to get.
          * @return The child at {@code key}.
          */
         public TrieNode<K, V> getOrCreateChild(K key) {
@@ -182,6 +185,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     /**
      * @param key
+     *            The set to query.
      * @return True iff any key in the map is a subset of {@code key}:
      */
     public boolean containsSubset(Set<K> key) {
@@ -190,6 +194,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     /**
      * @param key
+     *            The set to query.
      * @return True iff any key in the map is disjoint with {@code key}:
      */
     public boolean containsDisjoint(Set<K> key) {
@@ -198,6 +203,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     /**
      * @param key
+     *            The set to query.
      * @return True iff any key in the map is a superset of {@code key}:
      */
     public boolean containsSuperset(Set<K> key) {
@@ -220,6 +226,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     /**
      * @param key
+     *            The set to query.
      * @return All entries for which the key is a subset of {@code key}.
      */
     public Set<Entry<Set<K>, V>> entrySetForSubsets(Set<K> key) {
@@ -245,6 +252,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     /**
      * @param key
+     *            The set to query.
      * @return All entries for which the key is a superset of {@code key}.
      */
     public Set<Entry<Set<K>, V>> entrySetForSupersets(Set<K> key) {
@@ -273,6 +281,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     /**
      * @param key
+     *            The set to query.
      * @return Some entry for which the key is a subset of {@code key} or null if no
      *         such entry exists.
      */
@@ -299,6 +308,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     /**
      * @param key
+     *            The set to query.
      * @return Some entry for which the key is disjoint with {@code key} or null if
      *         no such entry exists.
      */
@@ -327,6 +337,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
 
     /**
      * @param key
+     *            The set to query.
      * @return Some entry for which the key is a superset of {@code key} or null if
      *         no such entry exists.
      */

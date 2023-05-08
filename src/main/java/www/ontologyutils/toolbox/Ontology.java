@@ -29,7 +29,9 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
 public class Ontology implements AutoCloseable {
     private static final OWLOntologyManager defaultManager = OWLManager.createOWLOntologyManager();
     private static final OWLReasonerFactory defaultFactory = new FaCTPlusPlusReasonerFactory();
-    // This is only here for statistics
+    /**
+     * This is only here for statistics
+     */
     public static int reasonerCalls;
 
     private static class CachedReasoner {
@@ -41,16 +43,25 @@ public class Ontology implements AutoCloseable {
          * Create a new reasoner cache using the given reasoner factory.
          *
          * @param reasonerFactory
+         *            The factory to create the reasoner with if necessary.
          */
         public CachedReasoner(OWLReasonerFactory reasonerFactory) {
             this.reasonerFactory = reasonerFactory;
             this.references = new HashSet<>();
         }
 
+        /**
+         * @param ontology
+         *            The ontology using this reasoner.
+         */
         public void addReference(Ontology ontology) {
             references.add(ontology);
         }
 
+        /**
+         * @param ontology
+         *            The ontology, no longer using the reasoner after this call.
+         */
         public void removeReference(Ontology ontology) {
             references.remove(ontology);
             if (references.isEmpty() && reasoner != null) {
@@ -73,7 +84,8 @@ public class Ontology implements AutoCloseable {
         }
 
         /**
-         * @param axioms
+         * @param ontology
+         *            The ontology for which to create the reasoner.
          * @return A new {@code OWLReasoner} created using the factory in this cache.
          */
         public OWLReasoner getOwlReasoner(Ontology ontology) {
@@ -90,8 +102,11 @@ public class Ontology implements AutoCloseable {
          * Use the cached reasoner in this object for executing the given action.
          *
          * @param <T>
+         *            The return value of the action to be performed.
          * @param ontology
+         *            The ontology on which to create the reasoner.
          * @param action
+         *            The action to perform with the reasoner.
          * @return The value returned by {@code action}.
          */
         public <T> T withReasonerDo(Ontology ontology, Function<OWLReasoner, T> action) {
@@ -120,8 +135,11 @@ public class Ontology implements AutoCloseable {
      * it.
      *
      * @param staticAxioms
+     *            The set of static (i.e., not to be changed) axioms.
      * @param refutableAxioms
-     * @param reasonerFactory
+     *            The set of refutable (i.e., to be repaired) axioms.
+     * @param reasonerCache
+     *            The reasoner cache to be used for reasoning queries.
      */
     private Ontology(Collection<? extends OWLAxiom> staticAxioms, Collection<? extends OWLAxiom> refutableAxioms,
             CachedReasoner reasonerCache) {
@@ -132,29 +150,77 @@ public class Ontology implements AutoCloseable {
         this.reasonerCache.addReference(this);
     }
 
+    /**
+     * @param staticAxioms
+     *            The set of static (i.e., not to be changed) axioms.
+     * @param refutableAxioms
+     *            The set of refutable (i.e., to be repaired) axioms.
+     * @param reasonerFactory
+     *            The reasoner factory to be used for reasoning queries.
+     * @return The new ontology.
+     */
     public static Ontology withAxioms(Collection<? extends OWLAxiom> staticAxioms,
             Collection<? extends OWLAxiom> refutableAxioms, OWLReasonerFactory reasonerFactory) {
         return new Ontology(staticAxioms, refutableAxioms, new CachedReasoner(reasonerFactory));
     }
 
+    /**
+     * @param staticAxioms
+     *            The set of static (i.e., not to be changed) axioms.
+     * @param refutableAxioms
+     *            The set of refutable (i.e., to be repaired) axioms.
+     * @return The new ontology.
+     */
     public static Ontology withAxioms(Collection<? extends OWLAxiom> staticAxioms,
             Collection<? extends OWLAxiom> refutableAxioms) {
         return withAxioms(staticAxioms, refutableAxioms, defaultFactory);
     }
 
+    /**
+     * @param refutableAxioms
+     *            The set of refutable (i.e., to be repaired) axioms.
+     * @param reasonerFactory
+     *            The reasoner factory to be used for reasoning queries.
+     * @return The new ontology.
+     */
     public static Ontology withAxioms(Collection<? extends OWLAxiom> refutableAxioms,
             OWLReasonerFactory reasonerFactory) {
         return withAxioms(Set.of(), refutableAxioms, reasonerFactory);
     }
 
+    /**
+     * @param refutableAxioms
+     *            The set of refutable (i.e., to be repaired) axioms.
+     * @return The new ontology.
+     */
     public static Ontology withAxioms(Collection<? extends OWLAxiom> refutableAxioms) {
         return withAxioms(refutableAxioms, defaultFactory);
     }
 
+    /**
+     * @param reasonerFactory
+     *            The reasoner factory to be used for reasoning queries.
+     * @return The new empty ontology.
+     */
     public static Ontology emptyOntology(OWLReasonerFactory reasonerFactory) {
         return withAxioms(Set.of(), reasonerFactory);
     }
 
+    /**
+     * @return The new empty ontology.
+     */
+    public static Ontology emptyOntology() {
+        return emptyOntology(defaultFactory);
+    }
+
+    /**
+     * @param ontology
+     *            The {@code OWLOntology} form which to copy the axioms. Logical
+     *            axiom will be refutable, other will be static.
+     * @param reasonerFactory
+     *            The reasoner factory to be used for reasoning queries.
+     * @return The new ontology.
+     */
     public static Ontology withAxiomsFrom(OWLOntology ontology, OWLReasonerFactory reasonerFactory) {
         var logicalAxioms = ontology.logicalAxioms().collect(Collectors.toSet());
         var otherAxioms = ontology.axioms()
@@ -163,14 +229,23 @@ public class Ontology implements AutoCloseable {
         return withAxioms(otherAxioms, logicalAxioms, reasonerFactory);
     }
 
+    /**
+     * @param ontology
+     *            The {@code OWLOntology} form which to copy the axioms. Logical
+     *            axiom will be refutable, other will be static.
+     * @return The new ontology.
+     */
     public static Ontology withAxiomsFrom(OWLOntology ontology) {
         return withAxiomsFrom(ontology, defaultFactory);
     }
 
-    public static Ontology emptyOntology() {
-        return emptyOntology(defaultFactory);
-    }
-
+    /**
+     * @param filePath
+     *            The string to the file containing the ontology.
+     * @param reasonerFactory
+     *            The reasoner factory to be used for reasoning queries.
+     * @return The new ontology, loaded form the file.
+     */
     public static Ontology loadOntology(String filePath, OWLReasonerFactory reasonerFactory) {
         OWLOntology ontology = null;
         try {
@@ -184,16 +259,33 @@ public class Ontology implements AutoCloseable {
         }
     }
 
+    /**
+     * @param filePath
+     *            The string to the file containing the ontology.
+     * @return The new ontology, loaded form the file.
+     */
     public static Ontology loadOntology(String filePath) {
         return loadOntology(filePath, defaultFactory);
     }
 
+    /**
+     * @param filePath
+     *            The string to the file containing the ontology.
+     * @return The new ontology, containing only logical axioms, loaded form the
+     *         file.
+     */
     public static Ontology loadOnlyLogicalAxioms(String filePath) {
         var ontology = loadOntology(filePath, defaultFactory);
         ontology.removeAxioms(ontology.nonLogicalAxioms().toList());
         return ontology;
     }
 
+    /**
+     * @param filePath
+     *            The string to the file containing the ontology.
+     * @return The new ontology, with added origin annotations, loaded form the
+     *         file.
+     */
     public static Ontology loadOntologyWithOriginAnnotations(String filePath) {
         var ontology = loadOntology(filePath, defaultFactory);
         for (var axiom : ontology.axioms().toList()) {
@@ -206,6 +298,7 @@ public class Ontology implements AutoCloseable {
      * Save the ontology to the file given by the path {@code filePath}.
      *
      * @param filePath
+     *            The file to which the ontology should be saved.
      */
     public void saveOntology(String filePath) {
         this.<Void>withOwlOntologyDo(ontology -> {
@@ -219,6 +312,14 @@ public class Ontology implements AutoCloseable {
         });
     }
 
+    /**
+     * Add/remove axioms form {@code ontology} such that it contains the same axioms
+     * as this ontology.
+     *
+     * @param ontology
+     *            The ontology to which we want to add changes.
+     * @return true if some change was made to the ontology, false otherwise.
+     */
     public boolean applyChangesTo(OWLOntology ontology) {
         var oldAxioms = ontology.axioms().collect(Collectors.toSet());
         var newAxioms = axioms().collect(Collectors.toSet());
@@ -238,62 +339,124 @@ public class Ontology implements AutoCloseable {
         return defaultManager.getOWLDataFactory();
     }
 
+    /**
+     * @return Stream containing all static axioms of the ontology.
+     */
     public Stream<OWLAxiom> staticAxioms() {
         return staticAxioms.stream();
     }
 
+    /**
+     * @param types
+     *            The types of axioms to return.
+     * @return Stream containing all static axioms of the ontology of the given
+     *         types.
+     */
     public Stream<OWLAxiom> staticAxioms(AxiomType<?>... types) {
         return staticAxioms().filter(axiom -> axiom.isOfType(types));
     }
 
+    /**
+     * @param types
+     *            The types of axioms to return.
+     * @return Stream containing all static axioms of the ontology of the given
+     *         types.
+     */
     public Stream<OWLAxiom> staticAxioms(Collection<AxiomType<?>> types) {
         return staticAxioms().filter(axiom -> axiom.isOfType(types));
     }
 
+    /**
+     * @return Stream containing all refutable axioms.
+     */
     public Stream<OWLAxiom> refutableAxioms() {
         return refutableAxioms.stream();
     }
 
+    /**
+     * @param types
+     *            The types of axioms to return.
+     * @return Stream containing all refutable axioms of the ontology of the given
+     *         types.
+     */
     public Stream<OWLAxiom> refutableAxioms(AxiomType<?>... types) {
         return refutableAxioms().filter(axiom -> axiom.isOfType(types));
     }
 
+    /**
+     * @param types
+     *            The types of axioms to return.
+     * @return Stream containing all refutable axioms of the ontology of the given
+     *         types.
+     */
     public Stream<OWLAxiom> refutableAxioms(Collection<AxiomType<?>> types) {
         return refutableAxioms().filter(axiom -> axiom.isOfType(types));
     }
 
+    /**
+     * @return Stream containing all axioms.
+     */
     public Stream<OWLAxiom> axioms() {
         return Stream.concat(staticAxioms(), refutableAxioms());
     }
 
+    /**
+     * @param types
+     *            The types of axioms to return.
+     * @return Stream containing all axioms of the ontology of the given types.
+     */
     public Stream<OWLAxiom> axioms(AxiomType<?>... types) {
         return axioms().filter(axiom -> axiom.isOfType(types));
     }
 
+    /**
+     * @param types
+     *            The types of axioms to return.
+     * @return Stream containing all axioms of the ontology of the given types.
+     */
     public Stream<OWLAxiom> axioms(Collection<AxiomType<?>> types) {
         return axioms().filter(axiom -> axiom.isOfType(types));
     }
 
+    /**
+     * @return Stream containing all logical axioms.
+     */
     public Stream<OWLLogicalAxiom> logicalAxioms() {
         return axioms().filter(axiom -> axiom.isLogicalAxiom()).map(axiom -> (OWLLogicalAxiom) axiom);
     }
 
+    /**
+     * @return Stream containing all non-logical axioms.
+     */
     public Stream<OWLAxiom> nonLogicalAxioms() {
         return axioms().filter(axiom -> !axiom.isLogicalAxiom()).map(axiom -> (OWLAxiom) axiom);
     }
 
+    /**
+     * @return Stream containing all TBox axioms.
+     */
     public Stream<OWLAxiom> tboxAxioms() {
         return axioms().filter(axiom -> axiom.isOfType(AxiomType.TBoxAxiomTypes));
     }
 
+    /**
+     * @return Stream containing all ABox axioms.
+     */
     public Stream<OWLAxiom> aboxAxioms() {
         return axioms().filter(axiom -> axiom.isOfType(AxiomType.ABoxAxiomTypes));
     }
 
+    /**
+     * @return Stream containing all RBox axioms.
+     */
     public Stream<OWLAxiom> rboxAxioms() {
         return axioms().filter(axiom -> axiom.isOfType(AxiomType.RBoxAxiomTypes));
     }
 
+    /**
+     * @param axioms
+     *            The axioms to remove.
+     */
     public void removeAxioms(Stream<? extends OWLAxiom> axioms) {
         axioms.forEach(axiom -> {
             staticAxioms.remove(axiom);
@@ -301,6 +464,10 @@ public class Ontology implements AutoCloseable {
         });
     }
 
+    /**
+     * @param axioms
+     *            The axioms to add.
+     */
     public void addStaticAxioms(Stream<? extends OWLAxiom> axioms) {
         axioms.forEach(axiom -> {
             refutableAxioms.remove(axiom);
@@ -308,6 +475,10 @@ public class Ontology implements AutoCloseable {
         });
     }
 
+    /**
+     * @param axioms
+     *            The axioms to add.
+     */
     public void addAxioms(Stream<? extends OWLAxiom> axioms) {
         axioms.forEach(axiom -> {
             staticAxioms.remove(axiom);
@@ -315,26 +486,50 @@ public class Ontology implements AutoCloseable {
         });
     }
 
+    /**
+     * @param axioms
+     *            The axioms to remove.
+     */
     public void removeAxioms(Collection<? extends OWLAxiom> axioms) {
         removeAxioms(axioms.stream());
     }
 
+    /**
+     * @param axioms
+     *            The axioms to add.
+     */
     public void addStaticAxioms(Collection<? extends OWLAxiom> axioms) {
         addStaticAxioms(axioms.stream());
     }
 
+    /**
+     * @param axioms
+     *            The axioms to add.
+     */
     public void addAxioms(Collection<? extends OWLAxiom> axioms) {
         addAxioms(axioms.stream());
     }
 
+    /**
+     * @param axioms
+     *            The axioms to remove.
+     */
     public void removeAxioms(OWLAxiom... axioms) {
         removeAxioms(Stream.of(axioms));
     }
 
+    /**
+     * @param axioms
+     *            The axioms to add.
+     */
     public void addStaticAxioms(OWLAxiom... axioms) {
         addStaticAxioms(Stream.of(axioms));
     }
 
+    /**
+     * @param axioms
+     *            The axioms to add.
+     */
     public void addAxioms(OWLAxiom... axioms) {
         addAxioms(Stream.of(axioms));
     }
@@ -347,12 +542,19 @@ public class Ontology implements AutoCloseable {
         return getDefaultDataFactory().getOWLAnnotationProperty("origin");
     }
 
+    /**
+     * @param origin
+     *            The origin axiom.
+     * @return The owl annotation for this origin axiom.
+     */
     private static OWLAnnotation getNewOriginAnnotation(OWLAxiom origin) {
         var df = getDefaultDataFactory();
         return df.getOWLAnnotation(getOriginAnnotationProperty(), df.getOWLLiteral(origin.toString()));
     }
 
     /**
+     * @param axiom
+     *            The axiom for which to get axioms.
      * @return The annotations of {@code axiom}.
      */
     public static Stream<OWLAnnotation> axiomOriginAnnotations(OWLAxiom axiom) {
@@ -368,7 +570,9 @@ public class Ontology implements AutoCloseable {
      * of {@code axiom} is {@code origin}.
      *
      * @param axiom
+     *            The axiom to annotate.
      * @param origin
+     *            The origin axiom.
      * @return A new annotated axiom equivalent to {@code axiom}.
      */
     public static OWLAxiom getOriginAnnotatedAxiom(OWLAxiom axiom, OWLAxiom origin) {
@@ -379,6 +583,15 @@ public class Ontology implements AutoCloseable {
         }
     }
 
+    /**
+     * Replace a axiom with a collection of other axioms. All new axioms will be
+     * annotated with the original axioms as the origin.
+     *
+     * @param remove
+     *            The axiom to remove.
+     * @param replacement
+     *            The axioms to add.
+     */
     public void replaceAxiom(OWLAxiom remove, Stream<? extends OWLAxiom> replacement) {
         var annotated = replacement.map(a -> getOriginAnnotatedAxiom(a, remove));
         boolean isStatic = staticAxioms.contains(remove);
@@ -390,16 +603,35 @@ public class Ontology implements AutoCloseable {
         }
     }
 
+    /**
+     * Replace a axiom with a collection of other axioms. All new axioms will be
+     * annotated with the original axioms as the origin.
+     *
+     * @param remove
+     *            The axiom to remove.
+     * @param replacement
+     *            The axioms to add.
+     */
     public void replaceAxiom(OWLAxiom remove, Collection<? extends OWLAxiom> replacement) {
         replaceAxiom(remove, replacement.stream());
     }
 
+    /**
+     * Replace a axiom with a collection of other axioms. All new axioms will be
+     * annotated with the original axioms as the origin.
+     *
+     * @param remove
+     *            The axiom to remove.
+     * @param replacement
+     *            The axioms to add.
+     */
     public void replaceAxiom(OWLAxiom remove, OWLAxiom... replacement) {
         replaceAxiom(remove, Stream.of(replacement));
     }
 
     /**
      * @param remove
+     *            The set of axioms not to include in the result.
      * @return The axioms of the ontology without those in {@code remove}.
      */
     public Set<OWLAxiom> complement(Set<OWLAxiom> remove) {
@@ -435,57 +667,108 @@ public class Ontology implements AutoCloseable {
         return reasonerCache.withReasonerDo(this, reasoner -> action.apply(reasoner.getRootOntology()));
     }
 
+    /**
+     * @return true if the ontology is consistent, false otherwise.
+     */
     public boolean isConsistent() {
         return withReasonerDo(reasoner -> reasoner.isConsistent());
     }
 
+    /**
+     * @return true if the ontology is coherent, false otherwise.
+     */
     public boolean isCoherent() {
         return withReasonerDo(reasoner -> reasoner.isConsistent()
                 && reasoner.getUnsatisfiableClasses().getEntitiesMinusBottom().isEmpty());
     }
 
+    /**
+     * @param axioms
+     *            The axioms to check entailment for.
+     * @return true if all of the axioms are entailed, false otherwise.
+     */
     public boolean isEntailed(OWLAxiom... axioms) {
         return withReasonerDo(reasoner -> reasoner.isEntailed(axioms));
     }
 
+    /**
+     * @param axioms
+     *            The axioms to check entailment for.
+     * @return true if all of the axioms are entailed, false otherwise.
+     */
     public boolean isEntailed(Stream<? extends OWLAxiom> axioms) {
         return withReasonerDo(reasoner -> reasoner.isEntailed(axioms));
     }
 
+    /**
+     * @param other
+     *            The ontology to test.
+     * @return true if {@code other} is entailed by this ontology, false otherwise.
+     */
     public boolean isEntailed(Ontology other) {
         return isEntailed(other.logicalAxioms());
     }
 
-    public boolean isSatisfiable(OWLClassExpression concepts) {
-        return withReasonerDo(reasoner -> reasoner.isSatisfiable(concepts));
+    /**
+     * @param concept
+     *            The concept to test.
+     * @return true if the concept is satisfiable.
+     */
+    public boolean isSatisfiable(OWLClassExpression concept) {
+        return withReasonerDo(reasoner -> reasoner.isSatisfiable(concept));
     }
 
+    /**
+     * @return The list of profile reports for all OWL 2 profiles.
+     */
     public List<OWLProfileReport> checkOwlProfiles() {
         return withOwlOntologyDo(ontology -> Arrays.stream(Profiles.values())
                 .map(profile -> profile.checkOntology(ontology))
                 .toList());
     }
 
+    /**
+     * @return The steam containing all maximal consistent subsets (including static
+     *         axioms) of the ontologies axioms.
+     */
     public Stream<Set<OWLAxiom>> maximalConsistentSubsets() {
         return minimalCorrectionSubsets().map(this::complement);
     }
 
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return The stream containing all maximal subsets (including static axioms)
+     *         of the ontologies axioms that satisfy {@code isRepaired}.
+     */
     public Stream<Set<OWLAxiom>> maximalConsistentSubsets(Predicate<Ontology> isRepaired) {
         return minimalCorrectionSubsets(isRepaired).map(this::complement);
     }
 
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return The stream of largest maximal subsets (including static axioms) of
+     *         the ontologies axioms that satisfy {@code isRepaired}.
+     */
     public Stream<Set<OWLAxiom>> largestMaximalConsistentSubsets(Predicate<Ontology> isRepaired) {
         return (new MaximalConsistentSubsets(this, isRepaired, true)).stream();
     }
 
     /**
-     * @return A stream of all sets of axioms that when removed from the ontology
+     * @return A stream of all minimal subsets that when removed from the ontology
      *         yield an optimal classical repair for consistency of the ontology.
      */
     public Stream<Set<OWLAxiom>> minimalCorrectionSubsets() {
         return minimalCorrectionSubsets(Ontology::isConsistent);
     }
 
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return A stream of all minimal subsets that when removed from the ontology
+     *         yield an optimal classical repair for consistency of the ontology.
+     */
     public Stream<Set<OWLAxiom>> minimalCorrectionSubsets(Predicate<Ontology> isRepaired) {
         return MinimalSubsets.allMinimalSubsets(refutableAxioms, axioms -> {
             try (var ontology = new Ontology(staticAxioms, complement(axioms), reasonerCache)) {
@@ -494,6 +777,11 @@ public class Ontology implements AutoCloseable {
         });
     }
 
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return A stream of all minimal subsets that are not repaired.
+     */
     public Stream<Set<OWLAxiom>> minimalUnsatisfiableSubsets(Predicate<Ontology> isRepaired) {
         return MinimalSubsets.allMinimalSubsets(refutableAxioms, axioms -> {
             try (var ontology = new Ontology(staticAxioms, axioms, reasonerCache)) {
@@ -502,11 +790,20 @@ public class Ontology implements AutoCloseable {
         });
     }
 
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return A stream of smallest minimal subsets that when removed from the
+     *         ontology yield an optimal classical repair for consistency of the
+     *         ontology.
+     */
     public Stream<Set<OWLAxiom>> smallestMinimalCorrectionSubsets(Predicate<Ontology> isRepaired) {
         return (new MaximalConsistentSubsets(this, isRepaired, true)).correctionStream();
     }
 
     /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
      * @return A single maximal consistent subset.
      */
     public Set<OWLAxiom> maximalConsistentSubset(Predicate<Ontology> isRepaired) {
@@ -514,6 +811,8 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
      * @return A single minimal correction subset.
      */
     public Set<OWLAxiom> minimalCorrectionSubset(Predicate<Ontology> isRepaired) {
@@ -525,6 +824,8 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
      * @return A single set with the refutable axioms of a minimal unsatisfiable
      *         subset.
      */
@@ -537,14 +838,18 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * @return A single maximal consistent subset.
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return A stream of some maximal consistent subset.
      */
     public Stream<Set<OWLAxiom>> someMaximalConsistentSubsets(Predicate<Ontology> isRepaired) {
         return someMinimalCorrectionSubsets(isRepaired).map(this::complement);
     }
 
     /**
-     * @return A single minimal correction subset.
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return A stream of some minimal correction subset.
      */
     public Stream<Set<OWLAxiom>> someMinimalCorrectionSubsets(Predicate<Ontology> isRepaired) {
         return MinimalSubsets.randomizedMinimalSubsets(refutableAxioms, 1, axioms -> {
@@ -555,8 +860,10 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * @return A single set with the refutable axioms of a minimal unsatisfiable
-     *         subset.
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return A stream of some set with the refutable axioms of a minimal
+     *         unsatisfiable subset.
      */
     public Stream<Set<OWLAxiom>> someMinimalUnsatisfiableSubsets(Predicate<Ontology> isRepaired) {
         return MinimalSubsets.randomizedMinimalSubsets(refutableAxioms, 1, axioms -> {

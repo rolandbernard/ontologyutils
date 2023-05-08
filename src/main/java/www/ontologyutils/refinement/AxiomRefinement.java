@@ -21,18 +21,60 @@ import www.ontologyutils.toolbox.*;
  * Toquard, N. (2020). Towards even more irresistible axiom weakening.
  */
 public abstract class AxiomRefinement implements AutoCloseable {
+    /**
+     * Default, do not apply any strict constraints.
+     */
     public static final int FLAG_NON_STRICT = 0;
+    /**
+     * Accept and produce only axioms with concepts in negation normal form.
+     */
     public static final int FLAG_NNF_STRICT = 1 << 0;
+    /**
+     * Accept only axioms that have direct equivalents in ALC.
+     */
     public static final int FLAG_ALC_STRICT = 1 << 1;
+    /**
+     * Accept only axioms that have direct equivalents in SROIQ.
+     */
     public static final int FLAG_SROIQ_STRICT = 1 << 2;
 
+    /**
+     * Visitor implementing the actual weakening.
+     */
     protected static abstract class Visitor implements OWLAxiomVisitorEx<Stream<OWLAxiom>> {
+        /**
+         * OWL data factory to use for the creation of new axioms.
+         */
         protected OWLDataFactory df;
+        /**
+         * The refinement operator to use for "upward" refinement.
+         */
         protected RefinementOperator up;
+        /**
+         * The refinement operator to use for "downward" refinement.
+         */
         protected RefinementOperator down;
+        /**
+         * The set of all roles that is guaranteed to be simple and whose simplicity
+         * must be
+         */
         protected Set<OWLObjectProperty> simpleRoles;
+        /**
+         * The flags.
+         */
         protected int flags;
 
+        /**
+         * @param up
+         *            The "upward"-refinement.
+         * @param down
+         *            The "downward"-refinement.
+         * @param simpleRoles
+         *            The set of simple roles. These are used for deciding whether it is
+         *            safe to refine a role inclusion axiom.
+         * @param flags
+         *            Flags that can be used to make the refinement ore strict.
+         */
         public Visitor(RefinementOperator up, RefinementOperator down,
                 Set<OWLObjectProperty> simpleRoles, int flags) {
             df = Ontology.getDefaultDataFactory();
@@ -42,6 +84,10 @@ public abstract class AxiomRefinement implements AutoCloseable {
             this.flags = flags;
         }
 
+        /**
+         * @return The axiom that should be used as a last resort, in case no other
+         *         weakening/strengthening is available.
+         */
         protected abstract OWLAxiom noopAxiom();
 
         @Override
@@ -198,6 +244,14 @@ public abstract class AxiomRefinement implements AutoCloseable {
     private Visitor visitor;
     private Covers covers;
 
+    /**
+     * @param visitor
+     *            The visitor used by this operator.
+     * @param covers
+     *            The covers used by this operator. Ownership of the covers object
+     *            is transferred to this object, and it will be closed when the new
+     *            axiom refinement object is closed.
+     */
     protected AxiomRefinement(Visitor visitor, Covers covers) {
         this.visitor = visitor;
         this.covers = covers;

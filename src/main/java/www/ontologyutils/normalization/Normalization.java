@@ -8,6 +8,9 @@ import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Class with utility methods for normalization.
+ */
 public class Normalization {
     /**
      * @param ontology

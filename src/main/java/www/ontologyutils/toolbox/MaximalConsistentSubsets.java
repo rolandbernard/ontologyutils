@@ -71,7 +71,9 @@ public class MaximalConsistentSubsets {
      * make the ontology inconsistent.
      *
      * @param ontology
+     *            The ontology to test.
      * @param axioms
+     *            The axioms to test adding in to confirm maximal consistency.
      * @return True iff {@code ontology} is maximally consistent with respect to
      *         {@code axioms}.
      */
@@ -97,7 +99,9 @@ public class MaximalConsistentSubsets {
 
     /**
      * @param subset
+     *            The subset to test.
      * @param set
+     *            The complete test, of which it is a maximal consistent subset.
      * @return True iff {@code subset} is a maximal consistent subset of
      *         {@code set}.
      */

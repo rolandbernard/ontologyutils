@@ -8,6 +8,9 @@ import www.ontologyutils.repair.OntologyRepairWeakening.BadAxiomStrategy;
 import www.ontologyutils.repair.OntologyRepairWeakening.RefOntologyStrategy;
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Repair the given ontology using the axiom weakening repair algorithm.
+ */
 public class AppAutomatedRepairWeakening {
     private static String getTimeStamp() {
         return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new java.util.Date());
@@ -19,6 +22,8 @@ public class AppAutomatedRepairWeakening {
      * src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
      *
      * @param args
+     *            Must contain one or two argument representing the keyword "fast"
+     *            or file path of an ontology.
      */
     public static void main(String[] args) {
         if (args.length < 1 || args.length > 2 || args.length == 2 && !args[0].equals("fast")) {

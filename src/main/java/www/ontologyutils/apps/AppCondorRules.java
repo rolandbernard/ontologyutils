@@ -9,10 +9,13 @@ import www.ontologyutils.normalization.*;
 import www.ontologyutils.rules.RuleGeneration;
 import www.ontologyutils.toolbox.*;
 
+/**
+ *
+ */
 public class AppCondorRules {
     private Ontology ontology;
 
-    public AppCondorRules(String ontologyFilePath) {
+    private AppCondorRules(String ontologyFilePath) {
         ontology = Ontology.loadOntologyWithOriginAnnotations(ontologyFilePath);
     }
 

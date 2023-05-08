@@ -11,11 +11,14 @@ import www.ontologyutils.normalization.*;
 import www.ontologyutils.rules.RuleGeneration;
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Normalize the ontology.
+ */
 public class AppNormalize {
     private OWLOntology ontology;
     private String ontologyName;
 
-    public AppNormalize(String ontologyFilePath) {
+    private AppNormalize(String ontologyFilePath) {
         File ontologyFile = new File(ontologyFilePath);
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         IRI ontologyIRI = IRI.create(ontologyFile);

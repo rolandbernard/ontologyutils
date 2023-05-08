@@ -17,6 +17,9 @@ import www.ontologyutils.toolbox.*;
  * Information Systems (FOIS 2021). IOS Press.
  */
 public class BlendingDialogue {
+    /**
+     * Constant to use for disabling the turn limit.
+     */
     public static int NO_TURN_LIMIT = -1;
 
     private List<OWLAxiom> aone;
@@ -36,6 +39,11 @@ public class BlendingDialogue {
         }
     }
 
+    /**
+     * @param verbose
+     *            Whether to be verbose or not.
+     * @return This object.
+     */
     public BlendingDialogue setVerbose(boolean verbose) {
         this.verbose = verbose;
         return this;
@@ -111,12 +119,6 @@ public class BlendingDialogue {
         return result;
     }
 
-    /**
-     * @param probabilityTurnOne
-     *            the probability of the first ontology to take turn
-     *            in the blending dialogue.
-     * @return a consistent ontology resulting from the dialogue.
-     */
     /**
      * @param probabilityTurnOne
      *            the probability of the first ontology to take turn

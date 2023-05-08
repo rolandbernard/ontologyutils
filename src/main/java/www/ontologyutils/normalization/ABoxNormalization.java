@@ -96,6 +96,9 @@ public class ABoxNormalization implements OntologyModification {
         visitor = new Visitor(fullEquality);
     }
 
+    /**
+     * Create a new normalization object that does not use full equality.
+     */
     public ABoxNormalization() {
         this(false);
     }

@@ -17,6 +17,10 @@ public class AppCheckConsistencyBasic {
         }
     }
 
+    /**
+     * @param args
+     *            A single argument with the file path to the ontology.
+     */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.err.println("Ontology file name expected as parameter.");

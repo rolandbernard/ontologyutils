@@ -127,6 +127,7 @@ public class TurnBasedMechanism {
 
     /**
      * @param ax
+     *            The axiom to test.
      * @return true if axiom {code ax} is approved in at least one of the binary
      *         votes in {@code approvals}.
      */
@@ -134,12 +135,16 @@ public class TurnBasedMechanism {
         return approvals.stream().anyMatch(bv -> (bv.getVote(ax) == 1));
     }
 
+    /**
+     * Enum for the type of initialization.
+     */
     public enum Initialization {
         EMPTY, REFERENCE, REFERENCE_WITH_SUPPORT;
     }
 
     /**
      * @param initizalization
+     *            The kind of initialization to use.
      * @return the reference ontology, the accepted subset of the reference
      *         ontology, or an empty ontology depending on {@code initialization}
      *         parameter.

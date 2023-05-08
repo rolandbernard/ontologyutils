@@ -20,7 +20,7 @@ public class AppTurnBasedMechanism {
     private static int MAX_VOTERS = 1000;
     private Ontology ontology;
 
-    public AppTurnBasedMechanism(String ontologyFilePath) {
+    private AppTurnBasedMechanism(String ontologyFilePath) {
         Ontology base = Ontology.loadOnlyLogicalAxioms(ontologyFilePath);
         ontology = Ontology.emptyOntology();
         ontology.addAxioms(base.aboxAxioms().collect(Collectors.toSet()));

@@ -11,13 +11,20 @@ import www.ontologyutils.toolbox.*;
 /**
  * Implementation that can be used for weakening an axiom. Must be closed
  * after usage to free up resources used by the inner {@code Covers} object.
- *
- * The implementation is based on the approach presented in Troquard, Nicolas,
- * et al. "Repairing ontologies via axiom weakening." Proceedings of the AAAI
- * Conference on Artificial Intelligence. Vol. 32. No. 1. 2018. Definition 19.
  */
 public class AxiomWeakener extends AxiomRefinement {
     private static class Visitor extends AxiomRefinement.Visitor {
+        /**
+         * @param up
+         *            The "upward"-refinement.
+         * @param down
+         *            The "downward"-refinement.
+         * @param simpleRoles
+         *            The set of simple roles. These are used for deciding whether it is
+         *            safe to refine a role inclusion axiom.
+         * @param flags
+         *            Flags that can be used to make the refinement ore strict.
+         */
         public Visitor(RefinementOperator up, RefinementOperator down,
                 Set<OWLObjectProperty> simpleRoles, int flags) {
             super(up, down, simpleRoles, flags);

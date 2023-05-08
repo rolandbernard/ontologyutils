@@ -7,18 +7,22 @@ import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Class with utility methods for normalization.
+ */
 public class NormalizationTools {
     /**
-     * @param ax
-     * @return a collection of subclass axioms that are equivalent to ax
+     * This is a function that completes {@code asSubClassOfAxioms} that
+     * already exists for {@code OWLEquivalentClassesAxiomImpl} and
+     * {@code OWLDisjointClassesAxiomImpl} and for
+     * {@code OWLSubClassOfAxiomShortCut} in general. It thus obviously
+     * works for axiom types subclass, equivalent class, disjoint class.
+     * Moreover, we extend it to axiom types: disjoint union, object
+     * property range, object property domain.
      *
-     *         This is a function that completes {@code asSubClassOfAxioms} that
-     *         already exists for {@code OWLEquivalentClassesAxiomImpl} and
-     *         {@code OWLDisjointClassesAxiomImpl} and for
-     *         {@code OWLSubClassOfAxiomShortCut} in general. It thus obviously
-     *         works for axiom types subclass, equivalent class, disjoint class.
-     *         Moreover, we extend it to axiom types: disjoint union, object
-     *         property range, object property domain.
+     * @param ax
+     *            The axiom to convert.
+     * @return a collection of subclass axioms that are equivalent to ax
      */
     public static Collection<OWLSubClassOfAxiom> asSubClassOfAxioms(OWLAxiom ax) throws InvalidParameterException {
         OWLDataFactory df = Ontology.getDefaultDataFactory();
@@ -87,7 +91,8 @@ public class NormalizationTools {
 
     /**
      * @param ax
-     * @return
+     *            The axiom to convert.
+     * @return The collection of subClassOf axioms equivalent to {@code ax}.
      */
     @SuppressWarnings("unchecked")
     public static Collection<OWLSubClassOfAxiom> normalizeSubClassAxiom(OWLSubClassOfAxiom ax) {
@@ -319,7 +324,6 @@ public class NormalizationTools {
             }
 
         } // end while
-
         return normalizedAxioms;
     }
 }

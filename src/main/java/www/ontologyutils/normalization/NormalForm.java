@@ -17,6 +17,11 @@ import org.semanticweb.owlapi.model.*;
  * @author nico
  */
 public class NormalForm {
+    /**
+     * @param ax
+     *            The axiom to test.
+     * @return true if the axiom is in normal form.
+     */
     public static boolean isNormalFormTBoxAxiom(OWLAxiom ax) {
         if (!ax.isOfType(AxiomType.SUBCLASS_OF)) {
             return false;
@@ -30,34 +35,82 @@ public class NormalForm {
         return false;
     }
 
+    /**
+     * @param left
+     *            The left concept.
+     * @param right
+     *            The right concept.
+     * @return true if the axiom is a type one subclass axiom.
+     */
     public static boolean typeOneSubClassAxiom(OWLClassExpression left, OWLClassExpression right) {
         return ((isAtom(left) || isConjunctionOfAtoms(left)) && (isAtom(right) || isDisjunctionOfAtoms(right)));
     }
 
+    /**
+     * @param left
+     *            The left concept.
+     * @param right
+     *            The right concept.
+     * @return true if the axiom is a type two subclass axiom.
+     */
     public static boolean typeTwoSubClassAxiom(OWLClassExpression left, OWLClassExpression right) {
         return (isAtom(left) && isExistentialOfAtom(right));
     }
 
+    /**
+     * @param left
+     *            The left concept.
+     * @param right
+     *            The right concept.
+     * @return true if the axiom is a type three subclass axiom.
+     */
     public static boolean typeThreeSubClassAxiom(OWLClassExpression left, OWLClassExpression right) {
         return (isAtom(left) && isUniversalOfAtom(right));
     }
 
+    /**
+     * @param left
+     *            The left concept.
+     * @param right
+     *            The right concept.
+     * @return true if the axiom is a type four subclass axiom.
+     */
     public static boolean typeFourSubClassAxiom(OWLClassExpression left, OWLClassExpression right) {
         return (isExistentialOfAtom(left) && isAtom(right));
     }
 
+    /**
+     * @param e
+     *            The concept.
+     * @return true if the concept is a atom.
+     */
     public static boolean isAtom(OWLClassExpression e) {
         return e.isOWLClass() || e.isTopEntity() || e.isBottomEntity();
     }
 
+    /**
+     * @param e
+     *            The concept.
+     * @return true if the concept is a type A atom.
+     */
     static boolean isTypeAAtom(OWLClassExpression e) {
         return e.isOWLClass() || e.isTopEntity();
     }
 
+    /**
+     * @param e
+     *            The concept.
+     * @return true if the concept is a type V atom.
+     */
     static boolean isTypeBAtom(OWLClassExpression e) {
         return e.isOWLClass() || e.isBottomEntity();
     }
 
+    /**
+     * @param e
+     *            The concept.
+     * @return true if the concept is a conjunction of atom.
+     */
     static boolean isConjunctionOfAtoms(OWLClassExpression e) {
         if (!(e.getClassExpressionType() == ClassExpressionType.OBJECT_INTERSECTION_OF)) {
             return false;
@@ -71,6 +124,11 @@ public class NormalForm {
         return true;
     }
 
+    /**
+     * @param e
+     *            The concept.
+     * @return true if the concept is a disjunction of atom.
+     */
     static boolean isDisjunctionOfAtoms(OWLClassExpression e) {
         if (!(e.getClassExpressionType() == ClassExpressionType.OBJECT_UNION_OF)) {
             return false;
@@ -84,6 +142,11 @@ public class NormalForm {
         return true;
     }
 
+    /**
+     * @param e
+     *            The concept.
+     * @return true if the concept is an existential of an atom.
+     */
     @SuppressWarnings("unchecked")
     static boolean isExistentialOfAtom(OWLClassExpression e) {
         if (!(e.getClassExpressionType() == ClassExpressionType.OBJECT_SOME_VALUES_FROM)) {
@@ -96,6 +159,11 @@ public class NormalForm {
         return true;
     }
 
+    /**
+     * @param e
+     *            The concept.
+     * @return true if the concept is a universal of an atom.
+     */
     @SuppressWarnings("unchecked")
     static boolean isUniversalOfAtom(OWLClassExpression e) {
         if (!(e.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM)) {

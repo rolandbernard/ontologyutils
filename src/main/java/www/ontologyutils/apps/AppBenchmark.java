@@ -7,6 +7,10 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import www.ontologyutils.refinement.*;
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Small benchmark for computing repeated refinements on the same ontology.
+ * Mainly useful for profiling and comparing performance of reasoners.
+ */
 public class AppBenchmark {
     private static void benchRun(Ontology ontology) {
         Utils.randomSeed(42);
@@ -38,6 +42,8 @@ public class AppBenchmark {
      * src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
      *
      * @param args
+     *            Must contain one argument representing the file path of an
+     *            ontology.
      */
     public static void main(String[] args) {
         if (args.length != 1) {

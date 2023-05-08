@@ -8,10 +8,17 @@ import org.semanticweb.owlapi.model.*;
 import www.ontologyutils.normalization.NormalForm;
 import www.ontologyutils.toolbox.Ontology;
 
+/**
+ * Class that implements role generation.
+ */
 public class RuleGeneration {
     private Map<OWLEntity, String> mapEntities;
     private Map<Collection<OWLAnnotation>, String> mapAxioms;
 
+    /**
+     * @param ontology
+     *            The ontology to get entities and axioms from.
+     */
     public RuleGeneration(Ontology ontology) {
         mapEntities = mapEntitiesToNumberedLetters(ontology);
         mapAxioms = mapAxiomsToGroupNumbers(ontology);
@@ -82,6 +89,11 @@ public class RuleGeneration {
         }
     }
 
+    /**
+     * @param e
+     *            The entity.
+     * @return The role for the entity.
+     */
     public String entityToRule(OWLEntity e) {
         if (e.isOWLClass()) {
             return "nc(" + mapEntities.get(e) + ").";
@@ -91,10 +103,16 @@ public class RuleGeneration {
         throw new IllegalArgumentException();
     }
 
+    /**
+     * @return The map of entities to rules.
+     */
     public Map<OWLEntity, String> getMapEntities() {
         return mapEntities;
     }
 
+    /**
+     * @return The map of axioms to rules.
+     */
     public Map<Collection<OWLAnnotation>, String> getMapAxioms() {
         return mapAxioms;
     }

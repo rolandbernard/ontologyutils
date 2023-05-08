@@ -65,9 +65,14 @@ public final class MinimalSubsets {
      * Computes a single minimal subset of {@code set} that satisfies the
      * predicate together with {@code contained}. The predicate must be monotone.
      *
+     * @param <T>
+     *            The type of the set elements.
      * @param contained
+     *            The set of axioms that must be included before testing.
      * @param set
+     *            The set of axioms for which to find a minimal subset.
      * @param isValid
+     *            The monotone predicate that should be satisfied by the subset.
      * @return A minimal subset that satisfies {@code isValid} or null if no such
      *         set exists.
      */
@@ -99,8 +104,12 @@ public final class MinimalSubsets {
      * Computes a single minimal subset of {@code set} that satisfies the
      * predicate. The predicate must be monotone.
      *
+     * @param <T>
+     *            The type of the set elements.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return A minimal subset that satisfies {@code isValid} or null if no such
      *         set exists.
      */
@@ -114,8 +123,12 @@ public final class MinimalSubsets {
      * {@code getMinimalSubset} this method randomly shuffles the input set before
      * searching.
      *
+     * @param <T>
+     *            The type of the set elements.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return A minimal subset that satisfies {@code isValid}.
      */
     public static <T> Set<T> getRandomizedMinimalSubset(Collection<T> set, Predicate<Set<T>> isValid) {
@@ -151,9 +164,13 @@ public final class MinimalSubsets {
      * this implementation is not designed to find all minimal sets.
      *
      * @param <T>
+     *            The type of the set elements.
      * @param contained
+     *            The set of axioms that must be included before testing.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return A set containing minimal sets.
      */
     public static <T> Set<Set<T>> getMinimalSubsets(Collection<T> contained, Collection<T> set,
@@ -171,8 +188,11 @@ public final class MinimalSubsets {
      * find all minimal sets.
      *
      * @param <T>
+     *            The type of the set elements.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return A set containing minimal sets.
      */
     public static <T> Set<Set<T>> getMinimalSubsets(Collection<T> set, Predicate<Set<T>> isValid) {
@@ -181,9 +201,13 @@ public final class MinimalSubsets {
 
     /**
      * @param <T>
+     *            The type of the set elements.
      * @param set
+     *            The set to find a subset for.
      * @param tries
+     *            The number of times to reorder and compute subsets.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return A set containing minimal sets.
      */
     public static <T> Stream<Set<T>> randomizedMinimalSubsets(Collection<T> set, int tries, Predicate<Set<T>> isValid) {
@@ -237,9 +261,13 @@ public final class MinimalSubsets {
 
     /**
      * @param <T>
+     *            The type of the set elements.
      * @param contained
+     *            The set of axioms that must be included before testing.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return All minimal subsets that together with {@code contained} satisfy the
      *         monotone predicate {@code isValid}.
      */
@@ -259,8 +287,11 @@ public final class MinimalSubsets {
 
     /**
      * @param <T>
+     *            The type of the set elements.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return All minimal subsets that satisfy the monotone predicate
      *         {@code isValid}.
      */
@@ -271,9 +302,13 @@ public final class MinimalSubsets {
 
     /**
      * @param <T>
+     *            The type of the set elements.
      * @param contained
+     *            The set of axioms that must be included before testing.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return All minimal hitting sets for the justifications of {@code isValid}.
      */
     public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalHittingSets(Collection<T> contained,
@@ -293,8 +328,11 @@ public final class MinimalSubsets {
 
     /**
      * @param <T>
+     *            The type of the set elements.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return All minimal hitting sets for the justifications of {@code isValid}.
      */
     public static <T extends Comparable<? super T>> Set<Set<T>> getAllMinimalHittingSets(Collection<T> set,
@@ -337,9 +375,13 @@ public final class MinimalSubsets {
 
     /**
      * @param <T>
+     *            The type of the set elements.
      * @param contained
+     *            The set of axioms that must be included before testing.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return All minimal subsets that together with {@code contained} satisfy the
      *         monotone predicate {@code isValid}.
      */
@@ -377,8 +419,11 @@ public final class MinimalSubsets {
 
     /**
      * @param <T>
+     *            The type of the set elements.
      * @param set
+     *            The set to find a subset for.
      * @param isValid
+     *            The monotone predicate that must be satisfied.
      * @return All minimal subsets that satisfy the monotone predicate
      *         {@code isValid}.
      */

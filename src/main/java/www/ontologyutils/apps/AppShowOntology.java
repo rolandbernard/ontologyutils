@@ -2,7 +2,15 @@ package www.ontologyutils.apps;
 
 import www.ontologyutils.toolbox.Ontology;
 
+/**
+ * Show the ontology.
+ */
 public class AppShowOntology {
+    /**
+     * @param args
+     *            Must contain one argument representing the file path of an
+     *            ontology.
+     */
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("Ontology file name expected as parameter.");

@@ -9,6 +9,10 @@ import www.ontologyutils.normalization.SroiqNormalization;
 import www.ontologyutils.refinement.AxiomStrengthener;
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Take the given ontology and make it inconsistent by adding some strengthened
+ * axioms.
+ */
 public class AppMakeInconsistent {
     /**
      * A first argument must be given, corresponding to an OWL ontology file path.
@@ -18,6 +22,9 @@ public class AppMakeInconsistent {
      * iterations needed that must be done after reaching inconsistency.
      *
      * @param args
+     *            Up to three arguments containing in order: ontology file path,
+     *            minimum number of iterations, and minimum number of iterations
+     *            after making the ontology inconsistent.
      */
     public static void main(String[] args) {
         var ontology = Ontology.loadOntology(args[0]);

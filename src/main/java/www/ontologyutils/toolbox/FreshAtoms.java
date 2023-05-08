@@ -5,6 +5,10 @@ import java.util.*;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 
+/**
+ * Utility class for creating fresh atom equivalent to some other atom, creating
+ * the required axiom for asserting equivalence.
+ */
 public class FreshAtoms {
     private static Set<OWLAxiom> freshAtomsEquivalenceAxioms = new HashSet<>();
 
@@ -26,6 +30,7 @@ public class FreshAtoms {
 
     /**
      * @param e
+     *            The class expression for the new atom.
      * @return a fresh {@code OWLClassExpression} with name "#FRESH[string
      *         representing {@code e}]"
      */
@@ -35,7 +40,9 @@ public class FreshAtoms {
 
     /**
      * @param e
+     *            The class expression for the new axiom
      * @param tag
+     *            A tag to prepend to the IRI of the new atom.
      * @return a fresh {@code OWLClassExpression} with name "#tag[string
      *         representing {@code e}]"
      */

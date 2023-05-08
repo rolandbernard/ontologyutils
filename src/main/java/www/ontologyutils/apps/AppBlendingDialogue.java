@@ -153,6 +153,7 @@ public class AppBlendingDialogue {
 
     /**
      * @param ontology
+     *            The ontology for which to compute the axioms.
      * @return the set of C1 subclass C2 axioms, C1 and C2 classes in the signature
      *         of {@code ontology}, that are not entailed by {@code ontology}.
      */
@@ -327,9 +328,14 @@ public class AppBlendingDialogue {
      *            (normalized) axioms of this ontology will
      *            be part of the moves of both agent one and
      *            agent two.
+     * @param testOntologyFilePath
+     *            the path to an ontology.
      * @param IRI1
+     *            IRI of the first concept.
      * @param IRI2
+     *            IRI of the second concept.
      * @param IRITarget
+     *            IRI of the target concept.
      */
     public AppBlendingDialogue(String ontologyFilePath1, String ontologyFilePath2, String initialOntologyFilePath,
             String alignmentsOntologyFilePath, String testOntologyFilePath, String IRI1, String IRI2,
@@ -397,6 +403,11 @@ public class AppBlendingDialogue {
         return ranking;
     }
 
+    /**
+     * @param args
+     *            Array of at least eight arguments containing ontology file paths
+     *            and concept names.
+     */
     public static void main(String[] args) {
         usage(args);
 

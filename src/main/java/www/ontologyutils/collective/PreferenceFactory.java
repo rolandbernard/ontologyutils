@@ -27,6 +27,10 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 public class PreferenceFactory {
     private List<OWLAxiom> agenda;
 
+    /**
+     * @param agenda
+     *            The axioms for which to create the preference factory.
+     */
     public PreferenceFactory(List<OWLAxiom> agenda) {
         if ((new HashSet<OWLAxiom>(agenda)).size() != agenda.size()) {
             throw new IllegalArgumentException("The agenda must not contain duplicates");
@@ -34,10 +38,18 @@ public class PreferenceFactory {
         this.agenda = agenda;
     }
 
+    /**
+     * @return The agenda, i.e., list of axioms considered.
+     */
     public List<OWLAxiom> getAgenda() {
         return agenda;
     }
 
+    /**
+     * @param ranking
+     *            The ranking for the new preference.
+     * @return The generated preference.
+     */
     public Preference makePreference(List<Integer> ranking) {
         return new Preference(ranking);
     }
@@ -65,12 +77,12 @@ public class PreferenceFactory {
     }
 
     /**
-     * @author nico
+     * An agenda is a list of OWLAxioms, e.g., [ax1,ax2,ax3]. A preference
+     * over an agenda is a list of Integers, e.g., [2,3,1]. [2,3,1] says
+     * that ax3 (rank 1) is preferred to ax1 (rank 2), which is preferred to
+     * ax2 (rank 3). It must not contain duplicates.
      *
-     *         An agenda is a list of OWLAxioms, e.g., [ax1,ax2,ax3]. A preference
-     *         over an agenda is a list of Integers, e.g., [2,3,1]. [2,3,1] says
-     *         that ax3 (rank 1) is preferred to ax1 (rank 2), which is preferred to
-     *         ax2 (rank 3). It must not contain duplicates.
+     * @author nico
      */
     public class Preference {
         private List<Integer> ranking;
@@ -79,6 +91,10 @@ public class PreferenceFactory {
         private Preference() {
         }
 
+        /**
+         * @param ranking
+         *            The list ranking the axioms.
+         */
         private Preference(List<Integer> ranking) {
             if (ranking.size() != agenda.size()) {
                 throw new IllegalArgumentException("A ranking must specify a rank for every axiom of the agenda.");
@@ -92,18 +108,32 @@ public class PreferenceFactory {
             this.ranking = ranking;
         }
 
+        /**
+         * @return The number of items in the ranking.
+         */
         public int size() {
             return ranking.size();
         }
 
+        /**
+         * @return The ranking list.
+         */
         public List<Integer> getRanking() {
             return ranking;
         }
 
+        /**
+         * @return The agenda.
+         */
         public List<OWLAxiom> getAgenda() {
             return agenda;
         }
 
+        /**
+         * @param ax
+         *            The axiom to rank.
+         * @return The rank of the axiom.
+         */
         public int getRank(OWLAxiom ax) {
             if (!agenda.contains(ax)) {
                 throw new IllegalArgumentException("Argument must be an axiom from the agenda.");
@@ -113,6 +143,7 @@ public class PreferenceFactory {
 
         /**
          * @param rank
+         *            Rank to query.
          * @return OWLAxiom with rank {@code rank} in this.ranking (the rank-th element
          *         according to the preference)
          */
@@ -125,7 +156,9 @@ public class PreferenceFactory {
 
         /**
          * @param a1
+         *            First axiom.
          * @param a2
+         *            Second axiom.
          * @return true if a1 is preferred to a2 (a1 is smaller than a2)
          */
         public boolean prefers(OWLAxiom a1, OWLAxiom a2) {
@@ -137,7 +170,9 @@ public class PreferenceFactory {
 
         /**
          * @param set1
+         *            First set
          * @param set2
+         *            Second set.
          * @return true if set1 is lexicographically smaller than set2
          */
         public boolean prefers(Set<OWLAxiom> set1, Set<OWLAxiom> set2) {

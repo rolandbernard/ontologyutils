@@ -129,6 +129,9 @@ public class RBoxNormalization implements OntologyModification {
         visitor = new Visitor(fullEquality);
     }
 
+    /**
+     * Create a new RBox normalization object.
+     */
     public RBoxNormalization() {
         this(false);
     }

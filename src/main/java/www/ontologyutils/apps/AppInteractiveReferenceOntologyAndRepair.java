@@ -10,10 +10,14 @@ import www.ontologyutils.normalization.NormalizationTools;
 import www.ontologyutils.refinement.AxiomWeakener;
 import www.ontologyutils.toolbox.*;
 
+/**
+ * Repair the ontology using interactive reference ontology and weaker axiom
+ * selection.
+ */
 public class AppInteractiveReferenceOntologyAndRepair {
     Ontology ontology;
 
-    public AppInteractiveReferenceOntologyAndRepair(String ontologyFilePath) {
+    private AppInteractiveReferenceOntologyAndRepair(String ontologyFilePath) {
         ontology = Ontology.loadOntology(ontologyFilePath);
     }
 
