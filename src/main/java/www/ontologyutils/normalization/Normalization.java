@@ -20,7 +20,7 @@ public class Normalization {
      */
     public static Ontology normalizeNaive(Ontology ontology) {
         // we make a copy of the ontology without the TBox
-        Ontology newOntology = Ontology.emptyOntology();
+        Ontology newOntology = ontology.cloneOnlyStatic();
         newOntology.addAxioms(ontology.rboxAxioms());
         newOntology.addAxioms(ontology.aboxAxioms());
 
@@ -42,7 +42,7 @@ public class Normalization {
      */
     public static Ontology normalizeCondor(Ontology ontology) {
         // we make a copy of the ontology without the TBox
-        Ontology newOntology = Ontology.emptyOntology();
+        Ontology newOntology = ontology.cloneOnlyStatic();
         newOntology.addAxioms(ontology.rboxAxioms());
         newOntology.addAxioms(ontology.aboxAxioms());
 
@@ -157,7 +157,7 @@ public class Normalization {
      */
     private static Ontology structuralTransformation(Ontology ontology) {
         OWLDataFactory df = Ontology.getDefaultDataFactory();
-        Ontology newOntology = Ontology.emptyOntology();
+        Ontology newOntology = ontology.cloneOnlyStatic();
         newOntology.addAxioms(ontology.rboxAxioms());
         newOntology.addAxioms(ontology.aboxAxioms());
         Collection<OWLSubClassOfAxiom> transformed = new ArrayList<>();

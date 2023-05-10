@@ -224,7 +224,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
     public void repair(Ontology ontology) {
         var refAxioms = getRefAxioms(ontology);
         infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
-        try (var refOntology = ontology.cloneWith(refAxioms)) {
+        try (var refOntology = ontology.cloneWithRefutable(refAxioms)) {
             try (var axiomWeakener = new AxiomWeakener(refOntology, ontology)) {
                 while (!isRepaired(ontology)) {
                     var badAxioms = findBadAxioms(ontology).toList();

@@ -35,8 +35,7 @@ public class AppNormalize {
     private Ontology runCondor() {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
 
-        Ontology copy = Ontology.emptyOntology();
-        copy.addAxioms(this.ontology.axioms());
+        Ontology copy = Ontology.withAxiomsFrom(this.ontology);
 
         List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
         tBoxAxioms.forEach((ax) -> {
@@ -62,8 +61,7 @@ public class AppNormalize {
     private Ontology runNaive() {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
 
-        Ontology copy = Ontology.emptyOntology();
-        copy.addAxioms(this.ontology.axioms());
+        Ontology copy = Ontology.withAxiomsFrom(this.ontology);
 
         List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
         tBoxAxioms.forEach((ax) -> {

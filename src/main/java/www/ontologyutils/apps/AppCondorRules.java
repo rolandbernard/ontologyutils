@@ -51,13 +51,12 @@ public class AppCondorRules {
      */
 
     private static Ontology superNormalize(Ontology on) {
-        Ontology res = Ontology.emptyOntology();
+        Ontology res = on.cloneOnlyStatic();
         on.tboxAxioms().forEach(a -> {
             res.addAxioms(superNormalize(a));
         });
         res.addAxioms(on.rboxAxioms());
         res.addAxioms(on.aboxAxioms());
-
         return res;
     }
 

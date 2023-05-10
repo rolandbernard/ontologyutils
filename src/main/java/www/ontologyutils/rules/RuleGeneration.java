@@ -25,7 +25,8 @@ public class RuleGeneration {
     }
 
     /**
-     * @param ax The axiom to convert.
+     * @param ax
+     *            The axiom to convert.
      * @return A rule string for the axiom.
      */
     @SuppressWarnings({ "unchecked", "unlikely-arg-type" })

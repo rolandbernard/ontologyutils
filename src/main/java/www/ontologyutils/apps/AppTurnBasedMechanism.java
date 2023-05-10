@@ -22,7 +22,7 @@ public class AppTurnBasedMechanism {
 
     private AppTurnBasedMechanism(String ontologyFilePath) {
         Ontology base = Ontology.loadOnlyLogicalAxioms(ontologyFilePath);
-        ontology = Ontology.emptyOntology();
+        ontology = base.cloneOnlyStatic();
         ontology.addAxioms(base.aboxAxioms().collect(Collectors.toSet()));
         base.tboxAxioms().forEach(a -> ontology.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
     }

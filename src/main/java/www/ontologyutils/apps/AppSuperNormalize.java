@@ -36,8 +36,7 @@ public class AppSuperNormalize {
     private Ontology runCondor() {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
 
-        Ontology copy = Ontology.emptyOntology();
-        copy.addAxioms(this.ontology.axioms());
+        Ontology copy = Ontology.withAxiomsFrom(this.ontology);
 
         List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
         tBoxAxioms.forEach((ax) -> {
@@ -64,8 +63,7 @@ public class AppSuperNormalize {
     private Ontology runNaive() {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms(); // optional; for verification purpose
 
-        Ontology copy = Ontology.emptyOntology();
-        copy.addAxioms(this.ontology.axioms());
+        Ontology copy = Ontology.withAxiomsFrom(this.ontology);
 
         Stream<OWLAxiom> tBoxAxioms = copy.tboxAxioms();
         tBoxAxioms.forEach((ax) -> {
@@ -96,7 +94,7 @@ public class AppSuperNormalize {
      *         the left.
      */
     private static Ontology superNormalize(Ontology on) {
-        Ontology res = Ontology.emptyOntology();
+        Ontology res = on.cloneOnlyStatic();
         on.tboxAxioms().forEach(a -> {
             res.addAxioms(superNormalize(a));
         });

@@ -23,16 +23,16 @@ public class NormalizationsTest {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms();
         var path = NormalizationsTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path, OpenlletReasonerFactory.getInstance())) {
-            Ontology copy = Ontology.emptyOntology(OpenlletReasonerFactory.getInstance());
-            copy.addAxioms(ontology.axioms());
-            List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
-            tBoxAxioms.forEach((ax) -> {
-                copy.replaceAxiom(ax, NormalizationTools.asSubClassOfAxioms(ax));
-            });
-            Ontology condor = Normalization.normalizeCondor(copy);
-            assertTrue(ontology.axioms().allMatch(ax -> copy.isEntailed(ax)));
-            copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
-            assertTrue(condor.axioms().allMatch(ax -> condor.isEntailed(ax)));
+            try (Ontology copy = ontology.clone()) {
+                List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
+                tBoxAxioms.forEach((ax) -> {
+                    copy.replaceAxiom(ax, NormalizationTools.asSubClassOfAxioms(ax));
+                });
+                Ontology condor = Normalization.normalizeCondor(copy);
+                assertTrue(ontology.axioms().allMatch(ax -> copy.isEntailed(ax)));
+                copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
+                assertTrue(condor.axioms().allMatch(ax -> condor.isEntailed(ax)));
+            }
         }
     }
 
@@ -44,16 +44,16 @@ public class NormalizationsTest {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms();
         var path = NormalizationsTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path, OpenlletReasonerFactory.getInstance())) {
-            Ontology copy = Ontology.emptyOntology(OpenlletReasonerFactory.getInstance());
-            copy.addAxioms(ontology.axioms());
-            List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
-            tBoxAxioms.forEach((ax) -> {
-                copy.replaceAxiom(ax, NormalizationTools.asSubClassOfAxioms(ax));
-            });
-            Ontology condor = Normalization.normalizeNaive(copy);
-            assertTrue(ontology.axioms().allMatch(ax -> copy.isEntailed(ax)));
-            copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
-            assertTrue(condor.axioms().allMatch(ax -> condor.isEntailed(ax)));
+            try (var copy = ontology.clone()) {
+                List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
+                tBoxAxioms.forEach((ax) -> {
+                    copy.replaceAxiom(ax, NormalizationTools.asSubClassOfAxioms(ax));
+                });
+                Ontology condor = Normalization.normalizeNaive(copy);
+                assertTrue(ontology.axioms().allMatch(ax -> copy.isEntailed(ax)));
+                copy.addAxioms(FreshAtoms.getFreshAtomsEquivalenceAxioms());
+                assertTrue(condor.axioms().allMatch(ax -> condor.isEntailed(ax)));
+            }
         }
     }
 }

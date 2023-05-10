@@ -946,6 +946,20 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * Some reasoners do not work if some declarations are missing. This will
+     * generate all missing declarations and add them as static axioms.
+     */
+    public void generateDeclarationAxioms() {
+        var df = getDefaultDataFactory();
+        for (var entity : signature().toList()) {
+            var newAxiom = df.getOWLDeclarationAxiom(entity);
+            if (!staticAxioms.contains(newAxiom) && !refutableAxioms.contains(newAxiom)) {
+                staticAxioms.add(newAxiom);
+            }
+        }
+    }
+
+    /**
      * Clone this ontology, but give it a cache using the hermit reasoner.
      *
      * @return The new ontology.
@@ -986,7 +1000,7 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * Clone this ontology, but only retain axioms in {@code axioms}.
+     * Clone this ontology, but only axioms in {@code axioms}.
      *
      * @param axioms
      *            The axioms that should be retained.
@@ -995,6 +1009,28 @@ public class Ontology implements AutoCloseable {
     public Ontology cloneWith(Set<? extends OWLAxiom> axioms) {
         return new Ontology(staticAxioms.stream().filter(axiom -> axioms.contains(axiom)).toList(),
                 refutableAxioms.stream().filter(axiom -> axioms.contains(axiom)).toList(), reasonerCache);
+    }
+
+    /**
+     * Clone this ontology, but only static axioms and those axioms in
+     * {@code axioms}.
+     *
+     * @param axioms
+     *            The axioms that should be retained.
+     * @return The new ontology.
+     */
+    public Ontology cloneWithRefutable(Set<? extends OWLAxiom> axioms) {
+        return new Ontology(staticAxioms, refutableAxioms.stream().filter(axiom -> axioms.contains(axiom)).toList(),
+                reasonerCache);
+    }
+
+    /**
+     * Clone this ontology, but only static axioms.
+     *
+     * @return The new ontology.
+     */
+    public Ontology cloneOnlyStatic() {
+        return new Ontology(staticAxioms, Set.of(), reasonerCache);
     }
 
     /**

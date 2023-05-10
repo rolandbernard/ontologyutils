@@ -50,7 +50,7 @@ public class AppMakeInconsistent {
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
             System.err.println("No minimal number of iterations after reaching inconsistency specified.");
         }
-        var emptyOntology = Ontology.emptyOntology();
+        var emptyOntology = ontology.cloneOnlyStatic();
         var axiomStrengthener = new AxiomStrengthener(ontology);
         int iter = 0;
         int iterSinceInconsistency = 0;
