@@ -19,7 +19,7 @@ public class AxiomWeakenerTest {
     private AxiomWeakener axiomWeakener;
 
     public AxiomWeakenerTest() {
-        var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        var path = RoleCoverTest.class.getResource("/catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomWeakener = new AxiomWeakener(ontology, ontology);
     }

@@ -11,7 +11,7 @@ import www.ontologyutils.toolbox.Ontology;
 public class TBoxNormalizationTest {
     @ParameterizedTest
     @ValueSource(strings = {
-            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
+            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl",
     })
     public void allTBoxAxiomsAreSubclassOf(String resourceName) throws OWLOntologyCreationException {
         var path = TBoxNormalizationTest.class.getResource(resourceName).getFile();
@@ -25,7 +25,7 @@ public class TBoxNormalizationTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
+            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl",
     })
     public void normalizedOntologyIsEquivalent(String resourceName) throws OWLOntologyCreationException {
         var path = TBoxNormalizationTest.class.getResource(resourceName).getFile();

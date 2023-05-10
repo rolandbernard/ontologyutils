@@ -19,7 +19,7 @@ public class SroiqAxiomStrengthenerTest {
     private AxiomStrengthener axiomStrengthener;
 
     public SroiqAxiomStrengthenerTest() {
-        var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
+        var path = RoleCoverTest.class.getResource("/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomStrengthener = new AxiomStrengthener(ontology);
     }
@@ -149,11 +149,11 @@ public class SroiqAxiomStrengthenerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl",
-            "../a-and-b.owl", "../Empty.owl", "../FishVehicle/Alignment.owl", "../owl-tests.owl",
-            "../FishVehicle/Disalignment.owl", "../FishVehicle/Fish.owl", "../FishVehicle/InitialOntology.owl",
-            "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
-            "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Vehicle.owl",
+            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl",
+            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
+            "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
+            "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
+            "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Vehicle.owl",
     })
     public void allStrongAxiomsEntailWeakerAxiomsFromFile(String resourceName)
             throws OWLOntologyCreationException {

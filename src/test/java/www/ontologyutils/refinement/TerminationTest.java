@@ -19,7 +19,7 @@ public class TerminationTest {
     static RefinementOperator generalization;
 
     public TerminationTest() {
-        var path = RoleCoverTest.class.getResource("../a-and-b.owl").getFile();
+        var path = RoleCoverTest.class.getResource("/a-and-b.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
         var upCover = covers.upCover().cached();

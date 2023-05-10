@@ -19,7 +19,7 @@ public class CoverTest {
     private Covers covers;
 
     public CoverTest() {
-        var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        var path = RoleCoverTest.class.getResource("/catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
     }

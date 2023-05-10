@@ -21,7 +21,7 @@ public class SroiqRefinementOperatorTest {
     static RefinementOperator specialization;
 
     public SroiqRefinementOperatorTest() {
-        var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
+        var path = RoleCoverTest.class.getResource("/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
         var upCover = covers.upCover().cached();
@@ -373,12 +373,12 @@ public class SroiqRefinementOperatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
-            "../a-and-b.owl", "../Empty.owl", "../FishVehicle/Alignment.owl", "../owl-tests.owl",
-            "../FishVehicle/Disalignment.owl", "../FishVehicle/Fish.owl", "../FishVehicle/InitialOntology.owl",
-            "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
-            "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
-            "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
+            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl",
+            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
+            "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
+            "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
+            "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",
+            "/FishVehicle/Vehicle.owl", "/Random/C50_R10_0.001_0.001_0.001_62888.owl",
     })
     public void generalizationFromFile(String resourceName) throws OWLOntologyCreationException {
         var df = Ontology.getDefaultDataFactory();
@@ -399,12 +399,12 @@ public class SroiqRefinementOperatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
-            "../a-and-b.owl", "../Empty.owl", "../FishVehicle/Alignment.owl", "../owl-tests.owl",
-            "../FishVehicle/Disalignment.owl", "../FishVehicle/Fish.owl", "../FishVehicle/InitialOntology.owl",
-            "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
-            "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
-            "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
+            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl",
+            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
+            "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
+            "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
+            "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",
+            "/FishVehicle/Vehicle.owl", "/Random/C50_R10_0.001_0.001_0.001_62888.owl",
     })
     public void specializationFromFile(String resourceName) throws OWLOntologyCreationException {
         var df = Ontology.getDefaultDataFactory();

@@ -19,7 +19,7 @@ public class AxiomStrengthenerTest {
     private AxiomStrengthener axiomStrengthener;
 
     public AxiomStrengthenerTest() {
-        var path = RoleCoverTest.class.getResource("../catsandnumbers.owl").getFile();
+        var path = RoleCoverTest.class.getResource("/catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomStrengthener = new AxiomStrengthener(ontology);
     }

@@ -19,7 +19,7 @@ public class SroiqAxiomWeakenerTest {
     private AxiomWeakener axiomWeakener;
 
     public SroiqAxiomWeakenerTest() {
-        var path = RoleCoverTest.class.getResource("../sroiq-tests.owl").getFile();
+        var path = RoleCoverTest.class.getResource("/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomWeakener = new AxiomWeakener(ontology, ontology);
     }
@@ -258,12 +258,12 @@ public class SroiqAxiomWeakenerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "../catsandnumbers.owl", "../bodysystem.owl", "../bfo.owl", "../apo.owl", "../aeo.owl", "../duo.owl",
-            "../a-and-b.owl", "../Empty.owl", "../FishVehicle/Alignment.owl", "../owl-tests.owl",
-            "../FishVehicle/Disalignment.owl", "../FishVehicle/Fish.owl", "../FishVehicle/InitialOntology.owl",
-            "../FishVehicle/InitialOntologyAlignment.owl", "../FishVehicle/InitialOntologyInsta.owl",
-            "../FishVehicle/InitialOntologyInstantiationAlignment.owl", "../FishVehicle/Test_hybrid.owl",
-            "../FishVehicle/Vehicle.owl", "../Random/C50_R10_0.001_0.001_0.001_62888.owl",
+            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl",
+            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
+            "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
+            "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
+            "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",
+            "/FishVehicle/Vehicle.owl", "/Random/C50_R10_0.001_0.001_0.001_62888.owl",
     })
     public void allWeakerAxiomsAreEntailedFromFile(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();

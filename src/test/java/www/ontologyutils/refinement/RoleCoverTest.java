@@ -19,7 +19,7 @@ public class RoleCoverTest {
     private Covers covers;
 
     public RoleCoverTest() {
-        var path = CoverTest.class.getResource("../sroiq-tests.owl").getFile();
+        var path = CoverTest.class.getResource("/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
     }
