@@ -20,9 +20,21 @@ import www.ontologyutils.toolbox.Utils;
 public class RefinementOperator {
     // These are set to be equal to those in AxiomRefinement so they can be passed
     // through.
+    /**
+     * Default, do not apply any strict constraints.
+     */
     public static final int FLAG_NON_STRICT = AxiomRefinement.FLAG_NON_STRICT;
+    /**
+     * Accept and produce only axioms with concepts in negation normal form.
+     */
     public static final int FLAG_NNF_STRICT = AxiomRefinement.FLAG_NNF_STRICT;
+    /**
+     * Accept only axioms that have direct equivalents in ALC.
+     */
     public static final int FLAG_ALC_STRICT = AxiomRefinement.FLAG_ALC_STRICT;
+    /**
+     * Accept only axioms that have direct equivalents in SROIQ.
+     */
     public static final int FLAG_SROIQ_STRICT = AxiomRefinement.FLAG_SROIQ_STRICT;
 
     private static class Visitor implements OWLClassExpressionVisitorEx<Stream<OWLClassExpression>> {
@@ -189,7 +201,11 @@ public class RefinementOperator {
      * Create a new refinement operator.
      *
      * @param way
+     *            For generalization the upward cover, for specialization the
+     *            downward cover.
      * @param back
+     *            For generalization the downward cover, for specialization the
+     *            upward cover.
      * @param flags
      *            Bitset containing flags for restricting the implementation. If
      *            FLAG_ALC_STRICT is set, an exception will be raised if a concept
@@ -202,6 +218,16 @@ public class RefinementOperator {
         visitor.reverse.reverse = visitor;
     }
 
+    /**
+     * Create a new refinement operator, without any strict flags.
+     *
+     * @param way
+     *            For generalization the upward cover, for specialization the
+     *            downward cover.
+     * @param back
+     *            For generalization the downward cover, for specialization the
+     *            upward cover.
+     */
     public RefinementOperator(Cover way, Cover back) {
         this(way, back, FLAG_NON_STRICT);
     }

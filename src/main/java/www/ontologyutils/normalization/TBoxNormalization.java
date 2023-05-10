@@ -45,6 +45,9 @@ public class TBoxNormalization implements OntologyModification {
 
     private Visitor visitor;
 
+    /**
+     * Create a new TBox normalization object.
+     */
     public TBoxNormalization() {
         visitor = new Visitor();
     }

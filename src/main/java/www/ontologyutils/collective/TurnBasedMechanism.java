@@ -139,7 +139,18 @@ public class TurnBasedMechanism {
      * Enum for the type of initialization.
      */
     public enum Initialization {
-        EMPTY, REFERENCE, REFERENCE_WITH_SUPPORT;
+        /**
+         * Initialize with empty ontology.
+         */
+        EMPTY,
+        /**
+         * Initialize with the reference ontology.
+         */
+        REFERENCE,
+        /**
+         * Initialize with the support axioms of the reference ontology.
+         */
+        REFERENCE_WITH_SUPPORT;
     }
 
     /**

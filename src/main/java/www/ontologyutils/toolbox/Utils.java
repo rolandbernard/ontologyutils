@@ -41,7 +41,7 @@ public final class Utils {
     /**
      * Set the seed for the currently used random instance to {@code seed}.
      *
-     * @param seed
+     * @param seed The value with which to seed the random number generator.
      */
     public static void randomSeed(long seed) {
         random.get().setSeed(seed);
@@ -50,8 +50,8 @@ public final class Utils {
     /**
      * Select a random from a finite stream uniformly at random.
      *
-     * @param <T>
-     * @param stream
+     * @param <T> The element type of the stream.
+     * @param stream The stream containing the elements to select from.
      * @return A random element in {@code stream}.
      */
     public static <T> T randomChoice(Stream<? extends T> stream) {
@@ -63,8 +63,8 @@ public final class Utils {
     /**
      * Select a random element for the collection uniformly ar random.
      *
-     * @param <T>
-     * @param collection
+     * @param <T> The element type of the collection.
+     * @param collection The collection from which to select a random element.
      * @return A random element in {@code collection}.
      */
     public static <T> T randomChoice(Collection<? extends T> collection) {
@@ -74,8 +74,8 @@ public final class Utils {
     /**
      * Return a random order from the finite stream.
      *
-     * @param <T>
-     * @param stream
+     * @param <T> The element type of the stream.
+     * @param stream The stream we want to reorder.
      * @return A random order of {@code stream}.
      */
     public static <T> List<T> randomOrder(Stream<? extends T> stream) {
@@ -87,8 +87,8 @@ public final class Utils {
     /**
      * Return a random order if the collection.
      *
-     * @param <T>
-     * @param collection
+     * @param <T> The element type of the collection.
+     * @param collection The collection we want to reorder.
      * @return A random order of {@code collection}.
      */
     public static <T> List<T> randomOrder(Collection<? extends T> collection) {
@@ -96,10 +96,10 @@ public final class Utils {
     }
 
     /**
-     * @param <T>
-     * @param list
-     * @param idx
-     * @param value
+     * @param <T> The element type of the list.
+     * @param list The list we want to manipulate.
+     * @param idx The index to change.
+     * @param value The new value to place at the index.
      * @return A stream that contains all elements in {@code list} but the one at
      *         {@code idx} which is replace by {@code value}.
      */
@@ -109,9 +109,9 @@ public final class Utils {
     }
 
     /**
-     * @param <T>
-     * @param list
-     * @param idx
+     * @param <T> The element type of the list.
+     * @param list Tne list we want to manipulate.
+     * @param idx The index of the element to remove.
      * @return A stream that contains all elements in {@code list} except the one at
      *         {@code idx}.
      */
@@ -123,8 +123,8 @@ public final class Utils {
      * Compute the power set of the given collection. The implementation here is
      * only able to handle up to 63 elements in {@code set}.
      *
-     * @param <T>
-     * @param set
+     * @param <T> The element type of the list.
+     * @param set The set for which to compute the power set.
      * @return The power set of {@code set}
      * @throws IllegalArgumentException
      *             If {@code set} contains more than 63
@@ -153,8 +153,8 @@ public final class Utils {
      * C1 != C2 or !C1.equals(C2). On the other hand, we say that A and B is the
      * same as B and A.
      *
-     * @param c1
-     * @param c2
+     * @param c1 The first concept.
+     * @param c2 The second concept.
      * @return true when {@code c1} and {@code c2} are the same concept at the
      *         syntactic level.
      */
@@ -196,15 +196,15 @@ public final class Utils {
     }
 
     /**
-     * @param owlString
-     * @return
+     * @param owlString The string we want to clean up.
+     * @return A cleaned up version of {@code owlString}.
      */
     public static String pretty(String owlString) {
         return owlString.replaceAll("<http.*?#", "").replaceAll(">", "").replaceAll("<", "");
     }
 
     /**
-     * @param ax
+     * @param ax The axiom to convert.
      * @return a pretty string representing {@code ax}, without its annotations and
      *         without namespaces.
      */
@@ -215,7 +215,7 @@ public final class Utils {
     }
 
     /**
-     * @param axioms
+     * @param axioms The set of axioms we want to test consistency for.
      * @return True iff {@code axioms} are consistent together.
      */
     public static boolean isConsistent(Collection<? extends OWLAxiom> axioms) {
@@ -227,8 +227,8 @@ public final class Utils {
     /**
      * Utility method that creates an array with the appropriate type.
      *
-     * @param <T>
-     * @param collection
+     * @param <T> The element type of the collection.
+     * @param collection The collection to convert.
      * @return The array with the elements of the collection.
      */
     @SuppressWarnings("unchecked")

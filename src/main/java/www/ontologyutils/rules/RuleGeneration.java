@@ -24,6 +24,10 @@ public class RuleGeneration {
         mapAxioms = mapAxiomsToGroupNumbers(ontology);
     }
 
+    /**
+     * @param ax The axiom to convert.
+     * @return A rule string for the axiom.
+     */
     @SuppressWarnings({ "unchecked", "unlikely-arg-type" })
     public String normalizedSubClassAxiomToRule(OWLAxiom ax) {
         if (!NormalForm.isNormalFormTBoxAxiom(ax)) {

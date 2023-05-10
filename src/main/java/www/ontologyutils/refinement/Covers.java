@@ -233,7 +233,6 @@ public class Covers implements AutoCloseable {
                             .filter(other -> subConcepts.contains(other) && isStrictSubClass(other, candidate)))
                     .sorted((a, b) -> Integer.compare(isSubClass.getKnownPredecessors(b).size(),
                             isSubClass.getKnownPredecessors(a).size()))
-                    .toList().stream()
                     .anyMatch(other -> isStrictSubClass(concept, other));
         } else {
             return !subConcepts.stream()
@@ -273,7 +272,6 @@ public class Covers implements AutoCloseable {
                             .filter(other -> subConcepts.contains(other) && isStrictSubClass(candidate, other)))
                     .sorted((a, b) -> Integer.compare(isSubClass.getKnownSuccessors(b).size(),
                             isSubClass.getKnownSuccessors(a).size()))
-                    .toList().stream()
                     .anyMatch(other -> isStrictSubClass(other, concept));
         } else {
             return !subConcepts.stream()
@@ -334,7 +332,6 @@ public class Covers implements AutoCloseable {
                                     && isStrictSubRole(other, candidate)))
                     .sorted((a, b) -> Integer.compare(isSubRole.getKnownPredecessors(b).size(),
                             isSubRole.getKnownPredecessors(a).size()))
-                    .toList().stream()
                     .anyMatch(other -> isStrictSubRole(role, other));
         } else {
             return !allSimpleRoles()
@@ -373,7 +370,6 @@ public class Covers implements AutoCloseable {
                                     && isStrictSubRole(candidate, other)))
                     .sorted((a, b) -> Integer.compare(isSubRole.getKnownSuccessors(b).size(),
                             isSubRole.getKnownSuccessors(a).size()))
-                    .toList().stream()
                     .anyMatch(other -> isStrictSubRole(other, role));
         } else {
             return !allSimpleRoles()
