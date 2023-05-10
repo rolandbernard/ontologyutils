@@ -719,6 +719,20 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @param subClass
+     *            The possible sub concept.
+     * @param superClass
+     *            The possible super concept.
+     * @return true if the extension of {@code subClass} is a subset of the
+     *         extension of {@code superClass} in every model of the ontology, false
+     *         otherwise.
+     */
+    public boolean isSubClass(OWLClassExpression subClass, OWLClassExpression superClass) {
+        var df = getDefaultDataFactory();
+        return withReasonerDo(reasoner -> reasoner.isEntailed(df.getOWLSubClassOfAxiom(subClass, superClass)));
+    }
+
+    /**
      * @return The list of profile reports for all OWL 2 profiles.
      */
     public List<OWLProfileReport> checkOwlProfiles() {

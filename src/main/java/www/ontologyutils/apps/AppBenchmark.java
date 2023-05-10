@@ -17,12 +17,11 @@ public class AppBenchmark {
         for (int i = 0; i < 10; i++) {
             try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
                 var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
-                OWLClassExpression toRefine = Ontology.getDefaultDataFactory().getOWLNothing();
-                for (int j = 0; j < 1_000; j++) {
-                    if (toRefine.isOWLThing()) {
-                        toRefine = Ontology.getDefaultDataFactory().getOWLNothing();
+                for (int j = 0; j < 10; j++) {
+                    OWLClassExpression toRefine = Ontology.getDefaultDataFactory().getOWLNothing();
+                    for (int k = 0; k < 10; k++) {
+                        toRefine = Utils.randomChoice(refinement.refine(toRefine));
                     }
-                    toRefine = Utils.randomChoice(refinement.refine(toRefine));
                 }
             }
         }
