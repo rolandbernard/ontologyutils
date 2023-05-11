@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
 
-import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.*;
 
 public class RoleCoverTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/roland/ontologies/2023/3/untitled/";
@@ -21,7 +21,7 @@ public class RoleCoverTest {
     public RoleCoverTest() {
         var path = CoverTest.class.getResource("/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
+        covers = new Covers(ontology, Utils.toSet(ontology.simpleRoles()));
     }
 
     private static Stream<Arguments> expectedUpCover() {
@@ -87,7 +87,7 @@ public class RoleCoverTest {
     @MethodSource("expectedUpCover")
     public void upCover(Set<OWLObjectPropertyExpression> expected,
             OWLObjectPropertyExpression concept) {
-        assertEquals(expected, covers.upCover(concept).collect(Collectors.toSet()));
+        assertEquals(expected, Utils.toSet(covers.upCover(concept)));
     }
 
     private static Stream<Arguments> expectedDownCover() {
@@ -143,7 +143,7 @@ public class RoleCoverTest {
     @MethodSource("expectedDownCover")
     public void downCover(Set<OWLObjectPropertyExpression> expected,
             OWLObjectPropertyExpression concept) {
-        assertEquals(expected, covers.downCover(concept).collect(Collectors.toSet()));
+        assertEquals(expected, Utils.toSet(covers.downCover(concept)));
     }
 
     @Test

@@ -158,7 +158,7 @@ public abstract class AxiomRefinement implements AutoCloseable {
             if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
                 throw new IllegalArgumentException("The axiom " + axiom + " is not a SROIQ axiom.");
             }
-            var concepts = axiom.classExpressions().toList();
+            var concepts = Utils.toList(axiom.classExpressions());
             return IntStream.range(0, concepts.size()).mapToObj(i -> i)
                     .flatMap(i -> down.refine(concepts.get(i))
                             .map(refined -> df.getOWLDisjointClassesAxiom(Utils.replaceInList(concepts, i, refined))));
@@ -212,7 +212,7 @@ public abstract class AxiomRefinement implements AutoCloseable {
                     IntStream.range(0, chain.size()).mapToObj(i -> i)
                             .flatMap(i -> down.refine(chain.get(i))
                                     .map(role -> df.getOWLSubPropertyChainOfAxiom(
-                                            Utils.replaceInList(chain, i, role).toList(), axiom.getSuperProperty()))));
+                                            Utils.toList(Utils.replaceInList(chain, i, role)), axiom.getSuperProperty()))));
         }
 
         @Override
@@ -222,12 +222,12 @@ public abstract class AxiomRefinement implements AutoCloseable {
             } else if ((flags & FLAG_SROIQ_STRICT) != 0 && axiom.properties().count() > 2) {
                 throw new IllegalArgumentException("The axiom " + axiom + " is not a SROIQ axiom.");
             }
-            var properties = axiom.properties().toList();
+            var properties = Utils.toList(axiom.properties());
             return Stream.concat(Stream.of(noopAxiom()),
                     IntStream.range(0, properties.size()).mapToObj(i -> i)
                             .flatMap(i -> down.refine(properties.get(i))
                                     .map(role -> df.getOWLDisjointObjectPropertiesAxiom(
-                                            Utils.replaceInList(properties, i, role).toList()))));
+                                            Utils.toList(Utils.replaceInList(properties, i, role))))));
         }
 
         @Override

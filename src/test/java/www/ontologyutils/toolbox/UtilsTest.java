@@ -42,7 +42,7 @@ public class UtilsTest {
 
     @Test
     public void powerSet() {
-        var powerSet = Utils.powerSet(axioms).toList();
+        var powerSet = Utils.toList(Utils.powerSet(axioms));
         assertEquals((int) Math.pow(2, axioms.size()), powerSet.size());
         assertTrue(powerSet.stream().allMatch(subset -> axioms.containsAll(subset)));
     }

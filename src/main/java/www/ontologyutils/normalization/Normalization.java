@@ -2,7 +2,6 @@ package www.ontologyutils.normalization;
 
 import java.security.InvalidParameterException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -24,7 +23,7 @@ public class Normalization {
         newOntology.addAxioms(ontology.rboxAxioms());
         newOntology.addAxioms(ontology.aboxAxioms());
 
-        Set<OWLAxiom> tBoxAxioms = ontology.tboxAxioms().collect(Collectors.toSet());
+        Set<OWLAxiom> tBoxAxioms = Utils.toSet(ontology.tboxAxioms());
 
         tBoxAxioms.forEach(
                 ax -> newOntology.addAxioms(NormalizationTools.normalizeSubClassAxiom((OWLSubClassOfAxiom) ax)));
@@ -46,10 +45,10 @@ public class Normalization {
         newOntology.addAxioms(ontology.rboxAxioms());
         newOntology.addAxioms(ontology.aboxAxioms());
 
-        Set<OWLAxiom> tBoxAxioms = ontology.tboxAxioms().collect(Collectors.toSet());
+        Set<OWLAxiom> tBoxAxioms = Utils.toSet(ontology.tboxAxioms());
 
         // we replace negative occurrences of forall p C with not exists p not C
-        List<OWLClassExpression> subConcepts = ontology.subConceptsOfTbox().toList();
+        List<OWLClassExpression> subConcepts = Utils.toList(ontology.subConceptsOfTbox());
         for (OWLClassExpression e : subConcepts) {
             Set<OWLAxiom> newtBoxAxioms = new HashSet<OWLAxiom>(tBoxAxioms);
             if (e.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM) {
@@ -68,7 +67,7 @@ public class Normalization {
         // replace X or Y -> Z with two axioms X -> Z and Y -> Z
         // replace X -> not Y with X and Y -> bot
         // replace not X -> Y with top -> X or Y
-        transformed.tboxAxioms().toList().forEach(axiom -> {
+        Utils.toList(transformed.tboxAxioms()).forEach(axiom -> {
             transformed.removeAxioms(axiom);
             transformed.addAxioms(NormalizationTools.normalizeSubClassAxiom((OWLSubClassOfAxiom) axiom));
         });
@@ -87,7 +86,7 @@ public class Normalization {
         OWLClassExpression newLeft = replaceIfPolarity(e, substitute, a.getSubClass(), true);
         OWLClassExpression newRight = replaceIfPolarity(e, substitute, a.getSuperClass(), false);
 
-        return df.getOWLSubClassOfAxiom(newLeft, newRight, Ontology.axiomOriginAnnotations(a).toList());
+        return df.getOWLSubClassOfAxiom(newLeft, newRight, Utils.toList(Ontology.axiomOriginAnnotations(a)));
     }
 
     /**
@@ -161,7 +160,7 @@ public class Normalization {
         newOntology.addAxioms(ontology.rboxAxioms());
         newOntology.addAxioms(ontology.aboxAxioms());
         Collection<OWLSubClassOfAxiom> transformed = new ArrayList<>();
-        List<OWLClassExpression> subConcepts = ontology.subConceptsOfTbox().toList();
+        List<OWLClassExpression> subConcepts = Utils.toList(ontology.subConceptsOfTbox());
         Map<OWLClassExpression, OWLClassExpression> map = new HashMap<>();
         for (OWLClassExpression e : subConcepts) {
             if (e.isOWLClass()) {
@@ -179,7 +178,7 @@ public class Normalization {
                 ontology.tboxAxioms().forEach(ax -> {
                     if (isNegativeIn(e, ax)) {
                         OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(structuralTransformation(e, map),
-                                map.get(e), Ontology.axiomOriginAnnotations(ax).toList());
+                                map.get(e), Utils.toList(Ontology.axiomOriginAnnotations(ax)));
                         transformed.add(sba);
                     }
                 });
@@ -188,7 +187,7 @@ public class Normalization {
                 ontology.tboxAxioms().forEach(ax -> {
                     if (isPositiveIn(e, ax)) {
                         OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(map.get(e),
-                                structuralTransformation(e, map), Ontology.axiomOriginAnnotations(ax).toList());
+                                structuralTransformation(e, map), Utils.toList(Ontology.axiomOriginAnnotations(ax)));
                         transformed.add(sba);
                     }
                 });
@@ -202,7 +201,7 @@ public class Normalization {
                 OWLClassExpression right = ((OWLSubClassOfAxiom) a).getSuperClass();
 
                 OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(map.get(left), map.get(right),
-                        Ontology.axiomOriginAnnotations(a).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(a)));
                 transformed.add(sba);
             }
         });

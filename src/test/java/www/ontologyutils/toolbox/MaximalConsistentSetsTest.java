@@ -3,7 +3,6 @@ package www.ontologyutils.toolbox;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
@@ -43,7 +42,7 @@ public class MaximalConsistentSetsTest {
     @Test
     public void maximalConsistentSubsetsNaive() {
         var agenda = Set.copyOf(axioms);
-        var results = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(agenda, Set.of()).toList();
+        var results = Utils.toList(MaximalConsistentSubsets.maximalConsistentSubsetsNaive(agenda, Set.of()));
         for (var subset : results) {
             assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
             assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
@@ -76,8 +75,7 @@ public class MaximalConsistentSetsTest {
     @MethodSource("axiomPowerSet")
     public void maximalConsistentSubsetsContaining(Set<OWLAxiom> contained) {
         var results = MaximalConsistentSubsets.maximalConsistentSubsets(axioms, contained);
-        var resultsNaive = MaximalConsistentSubsets.maximalConsistentSubsetsNaive(axioms, contained)
-                .collect(Collectors.toSet());
+        var resultsNaive = Utils.toSet(MaximalConsistentSubsets.maximalConsistentSubsetsNaive(axioms, contained));
         assertTrue(results.containsAll(resultsNaive));
         assertTrue(resultsNaive.containsAll(results));
     }

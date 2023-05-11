@@ -58,7 +58,7 @@ public final class Utils {
      * @return A random element in {@code stream}.
      */
     public static <T> T randomChoice(Stream<? extends T> stream) {
-        var flatList = stream.toList();
+        var flatList = Utils.toList(stream);
         int randomIdx = random.get().nextInt(flatList.size());
         return flatList.get(randomIdx);
     }
@@ -86,7 +86,7 @@ public final class Utils {
      * @return A random order of {@code stream}.
      */
     public static <T> List<T> randomOrder(Stream<? extends T> stream) {
-        var flatList = stream.map(t -> (T) t).collect(Collectors.toList());
+        var flatList = Utils.toList(stream.map(t -> (T) t));
         Collections.shuffle(flatList, random.get());
         return flatList;
     }
@@ -259,5 +259,27 @@ public final class Utils {
     @SuppressWarnings("unchecked")
     public static <T> T[] toArray(Collection<T> collection) {
         return (T[]) collection.toArray();
+    }
+
+    /**
+     * @param <T>
+     *            The element type of the stream.
+     * @param stream
+     *            The stream to convert.
+     * @return The list with the elements of the stream.
+     */
+    public static <T> List<T> toList(Stream<? extends T> stream) {
+        return stream.collect(Collectors.toList());
+    }
+
+    /**
+     * @param <T>
+     *            The element type of the stream.
+     * @param stream
+     *            The stream to convert.
+     * @return The set with the elements of the stream.
+     */
+    public static <T> Set<T> toSet(Stream<? extends T> stream) {
+        return stream.collect(Collectors.toSet());
     }
 }

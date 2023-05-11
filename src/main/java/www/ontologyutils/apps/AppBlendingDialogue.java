@@ -189,8 +189,8 @@ public class AppBlendingDialogue {
      *         pages 1942-1948.
      */
     private static double happinessTolerant(Ontology agent, Ontology ontology) {
-        Set<OWLAxiom> axioms = agent.inferredTaxonomyAxioms().collect(Collectors.toSet());
-        axioms.addAll(agent.axioms().collect(Collectors.toSet()));
+        Set<OWLAxiom> axioms = Utils.toSet(agent.inferredTaxonomyAxioms());
+        axioms.addAll(Utils.toList(agent.axioms()));
 
         long countSatisfiedAxioms = axioms.stream().filter(a -> ontology.isEntailed(a)).count();
 
@@ -227,10 +227,10 @@ public class AppBlendingDialogue {
      *         pages 1942-1948.
      */
     private static double happinessStrict(Ontology agent, Ontology ontology) {
-        Set<OWLAxiom> axioms = agent.inferredTaxonomyAxioms().collect(Collectors.toSet());
-        axioms.addAll(agent.axioms().collect(Collectors.toSet()));
-        axioms.addAll(ontology.inferredTaxonomyAxioms().collect(Collectors.toSet()));
-        axioms.addAll(ontology.axioms().collect(Collectors.toSet()));
+        Set<OWLAxiom> axioms = Utils.toSet(agent.inferredTaxonomyAxioms());
+        axioms.addAll(Utils.toList(agent.axioms()));
+        axioms.addAll(Utils.toList(ontology.inferredTaxonomyAxioms()));
+        axioms.addAll(Utils.toList(ontology.axioms()));
 
         long countSatisfiedAxioms = axioms.stream().filter(a -> agent.isEntailed(a) && ontology.isEntailed(a))
                 .count();
@@ -288,9 +288,9 @@ public class AppBlendingDialogue {
 
         Set<OWLClassExpression> oces = new HashSet<OWLClassExpression>();
 
-        Set<OWLClassExpression> notThose = notHere.subConcepts().collect(Collectors.toSet());
+        Set<OWLClassExpression> notThose = Utils.toSet(notHere.subConcepts());
         OWLDataFactory df = Ontology.getDefaultDataFactory();
-        for (OWLClassExpression ce : ontology.subConcepts().toList()) {
+        for (OWLClassExpression ce : Utils.toList(ontology.subConcepts())) {
             if (notThose.contains(ce)) {
                 continue;
             }
@@ -354,13 +354,13 @@ public class AppBlendingDialogue {
         }
 
         this.ontologyOne = Ontology.emptyOntology();
-        this.ontologyOne.addAxioms(base1.aboxAxioms().collect(Collectors.toSet()));
+        this.ontologyOne.addAxioms(Utils.toSet(base1.aboxAxioms()));
         base1.tboxAxioms().forEach(a -> this.ontologyOne.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
         this.ontologyTwo = Ontology.emptyOntology();
-        this.ontologyTwo.addAxioms(base2.aboxAxioms().collect(Collectors.toSet()));
+        this.ontologyTwo.addAxioms(Utils.toSet(base2.aboxAxioms()));
         base2.tboxAxioms().forEach(a -> this.ontologyTwo.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
         this.alignmentOntology = Ontology.emptyOntology();
-        this.alignmentOntology.addAxioms(baseAlignments.aboxAxioms().collect(Collectors.toSet()));
+        this.alignmentOntology.addAxioms(Utils.toSet(baseAlignments.aboxAxioms()));
         baseAlignments.tboxAxioms()
                 .forEach(a -> this.alignmentOntology.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
 
@@ -417,9 +417,9 @@ public class AppBlendingDialogue {
         ArrayList<String> metricsResults = new ArrayList<String>();
         metricsResults.add(STATS_HEADER);
         // Preferences
-        List<OWLAxiom> listAxiomsOne = mApp.ontologyOne.axioms().collect(Collectors.toList());
-        List<OWLAxiom> listAxiomsTwo = mApp.ontologyTwo.axioms().collect(Collectors.toList());
-        List<OWLAxiom> listAxiomsAlignments = mApp.alignmentOntology.axioms().collect(Collectors.toList());
+        List<OWLAxiom> listAxiomsOne = Utils.toList(mApp.ontologyOne.axioms());
+        List<OWLAxiom> listAxiomsTwo = Utils.toList(mApp.ontologyTwo.axioms());
+        List<OWLAxiom> listAxiomsAlignments = Utils.toList(mApp.alignmentOntology.axioms());
         listAxiomsOne.addAll(listAxiomsAlignments);
         listAxiomsTwo.addAll(listAxiomsAlignments);
         removeDuplicates(listAxiomsOne);
@@ -443,8 +443,7 @@ public class AppBlendingDialogue {
         for (int i = 0; i < prefFactoryOne.getAgenda().size(); i++) {
             System.out.println((i + 1) + " : " + Utils.prettyPrintAxiom(prefFactoryOne.getAgenda().get(i)));
         }
-        List<Integer> initRankingOne = Stream.generate(String::new).limit(prefFactoryOne.getAgenda().size())
-                .map(s -> INIT_NUM).collect(Collectors.toList());
+        List<Integer> initRankingOne = Utils.toList(Stream.generate(String::new).limit(prefFactoryOne.getAgenda().size()).map(s -> INIT_NUM));
         for (int j = 1; j <= prefFactoryOne.getAgenda().size(); j++) {
             System.out.println("- Current ranking: " + initRankingOne);
             int axiomIndex = readNumber("Next favorite axiom of agent one (enter " + STOP + " to stop)?", 1,
@@ -465,8 +464,7 @@ public class AppBlendingDialogue {
         for (int i = 0; i < prefFactoryTwo.getAgenda().size(); i++) {
             System.out.println((i + 1) + " : " + Utils.prettyPrintAxiom(prefFactoryTwo.getAgenda().get(i)));
         }
-        List<Integer> initRankingTwo = Stream.generate(String::new).limit(prefFactoryTwo.getAgenda().size())
-                .map(s -> INIT_NUM).collect(Collectors.toList());
+        List<Integer> initRankingTwo = Utils.toList(Stream.generate(String::new).limit(prefFactoryTwo.getAgenda().size()).map(s -> INIT_NUM));
         for (int j = 1; j <= prefFactoryTwo.getAgenda().size(); j++) {
             System.out.println("- Current ranking: " + initRankingTwo);
             int axiomIndex = readNumber("Next favorite axiom of agent two (enter " + STOP + " to stop)?", 1,
@@ -511,7 +509,7 @@ public class AppBlendingDialogue {
         int sumNumWeakeningsOne = 0;
         int sumNumWeakeningsTwo = 0;
 
-        List<OWLAxiom> listAxiomsTest = mApp.testOntology.axioms().collect(Collectors.toList());
+        List<OWLAxiom> listAxiomsTest = Utils.toList(mApp.testOntology.axioms());
         Collections.sort(listAxiomsTest);
         Map<OWLAxiom, Integer> counts = new HashMap<OWLAxiom, Integer>();
 

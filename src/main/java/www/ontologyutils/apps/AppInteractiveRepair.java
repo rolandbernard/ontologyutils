@@ -2,7 +2,6 @@ package www.ontologyutils.apps;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -30,14 +29,13 @@ public class AppInteractiveRepair {
         final int MCS_SAMPLE_SIZE = 1;
         AppInteractiveRepair mApp = new AppInteractiveRepair(args[0]);
         System.out.println("Loaded... " + mApp.ontology);
-        Set<OWLAxiom> axioms = mApp.ontology.axioms().collect(Collectors.toSet());
-        Set<OWLAxiom> nonLogicalAxioms = axioms.stream().filter(ax -> !ax.isLogicalAxiom()).collect(Collectors.toSet());
+        Set<OWLAxiom> axioms = Utils.toSet(mApp.ontology.axioms());
+        Set<OWLAxiom> nonLogicalAxioms = Utils.toSet(axioms.stream().filter(ax -> !ax.isLogicalAxiom()));
         // 0- We isolate the logical axioms, and make sure the TBox axioms are all
         // subclass axioms, converting them when necessary.
-        Set<OWLAxiom> logicalAxioms = new HashSet<>();// axioms.stream().filter(ax ->
-                                                      // ax.isLogicalAxiom()).collect(Collectors.toSet());
-        logicalAxioms.addAll(mApp.ontology.aboxAxioms().collect(Collectors.toSet()));
-        logicalAxioms.addAll(mApp.ontology.rboxAxioms().collect(Collectors.toSet()));
+        Set<OWLAxiom> logicalAxioms = new HashSet<>();
+        logicalAxioms.addAll(Utils.toSet(mApp.ontology.aboxAxioms()));
+        logicalAxioms.addAll(Utils.toSet(mApp.ontology.rboxAxioms()));
         mApp.ontology.tboxAxioms().forEach(ax -> {
             logicalAxioms.addAll(NormalizationTools.asSubClassOfAxioms(ax));
         });
@@ -79,7 +77,7 @@ public class AppInteractiveRepair {
 
             // SELECT WEAKENING
             ArrayList<OWLAxiom> weakerAxiomsAux = new ArrayList<OWLAxiom>(
-                    aw.weakerAxioms((OWLSubClassOfAxiom) badAxiom).toList());
+                    Utils.toList(aw.weakerAxioms((OWLSubClassOfAxiom) badAxiom)));
             ArrayList<OWLAxiom> weakerAxioms = new ArrayList<OWLAxiom>();
             for (OWLAxiom ax : weakerAxiomsAux) {
                 weakerAxioms.add(ax.getAxiomWithoutAnnotations());

@@ -256,7 +256,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      * @return All entries for which the key is a superset of {@code key}.
      */
     public Set<Entry<Set<K>, V>> entrySetForSupersets(Set<K> key) {
-        var sorted = key.stream().sorted().toList();
+        var sorted = Utils.toList(key.stream().sorted());
         var result = new HashSet<Entry<Set<K>, V>>();
         entrySetForSupersetHelper(root, sorted, 0, new ArrayList<>(), result);
         return result;
@@ -342,7 +342,7 @@ public class MapOfSets<K extends Comparable<? super K>, V> extends AbstractMap<S
      *         no such entry exists.
      */
     public Entry<Set<K>, V> getSuperset(Set<K> key) {
-        var sorted = key.stream().sorted().toList();
+        var sorted = Utils.toList(key.stream().sorted());
         return getSupersetHelper(root, sorted, 0, new ArrayList<>());
     }
 }

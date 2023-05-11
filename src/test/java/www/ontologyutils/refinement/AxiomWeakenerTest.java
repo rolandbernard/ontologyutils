@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.Utils;
 
 public class AxiomWeakenerTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/ontologies/dl2017_example#";
@@ -115,7 +116,7 @@ public class AxiomWeakenerTest {
     @ParameterizedTest
     @MethodSource("expectedWeakening")
     public void weakenAxiom(Set<OWLAxiom> expected, OWLAxiom axiom) {
-        assertEquals(expected, axiomWeakener.weakerAxioms(axiom).collect(Collectors.toSet()));
+        assertEquals(expected, Utils.toSet(axiomWeakener.weakerAxioms(axiom)));
     }
 
     @Test

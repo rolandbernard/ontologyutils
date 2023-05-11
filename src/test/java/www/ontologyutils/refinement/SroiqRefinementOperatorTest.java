@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
 
-import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.*;
 
 public class SroiqRefinementOperatorTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/roland/ontologies/2023/3/untitled/";
@@ -23,7 +23,7 @@ public class SroiqRefinementOperatorTest {
     public SroiqRefinementOperatorTest() {
         var path = RoleCoverTest.class.getResource("/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
+        covers = new Covers(ontology, Utils.toSet(ontology.simpleRoles()));
         var upCover = covers.upCover().cached();
         var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);
@@ -179,7 +179,7 @@ public class SroiqRefinementOperatorTest {
     @ParameterizedTest
     @MethodSource("expectedGeneralization")
     public void generalize(Set<OWLClassExpression> expected, OWLClassExpression concept) {
-        assertEquals(expected, generalization.refine(concept).collect(Collectors.toSet()));
+        assertEquals(expected, Utils.toSet(generalization.refine(concept)));
     }
 
     private static Stream<Arguments> expectedSpecialization() {
@@ -358,7 +358,7 @@ public class SroiqRefinementOperatorTest {
     @ParameterizedTest
     @MethodSource("expectedSpecialization")
     public void specialize(Set<OWLClassExpression> expected, OWLClassExpression concept) {
-        assertEquals(expected, specialization.refine(concept).collect(Collectors.toSet()));
+        assertEquals(expected, Utils.toSet(specialization.refine(concept)));
     }
 
     @Test
@@ -374,7 +374,7 @@ public class SroiqRefinementOperatorTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl",
-            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
+            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl", "/pizza.owl",
             "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
             "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
             "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",
@@ -384,12 +384,12 @@ public class SroiqRefinementOperatorTest {
         var df = Ontology.getDefaultDataFactory();
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
+            try (var covers = new Covers(ontology, Utils.toSet(ontology.simpleRoles()))) {
                 var upCover = covers.upCover().cached();
                 var downCover = covers.downCover().cached();
                 generalization = new RefinementOperator(upCover, downCover);
                 ontology.subConcepts().forEach(special -> {
-                    for (var general : generalization.refine(special).toList()) {
+                    for (var general : Utils.toList(generalization.refine(special))) {
                         assertTrue(ontology.isEntailed(df.getOWLSubClassOfAxiom(special, general)));
                     }
                 });
@@ -400,7 +400,7 @@ public class SroiqRefinementOperatorTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl",
-            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
+            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl", "/pizza.owl",
             "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
             "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
             "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",
@@ -410,12 +410,12 @@ public class SroiqRefinementOperatorTest {
         var df = Ontology.getDefaultDataFactory();
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
+            try (var covers = new Covers(ontology, Utils.toSet(ontology.simpleRoles()))) {
                 var upCover = covers.upCover().cached();
                 var downCover = covers.downCover().cached();
                 specialization = new RefinementOperator(downCover, upCover);
                 ontology.subConcepts().forEach(general -> {
-                    for (var special : specialization.refine(general).toList()) {
+                    for (var special : Utils.toList(specialization.refine(general))) {
                         assertTrue(ontology.isEntailed(df.getOWLSubClassOfAxiom(special, general)));
                     }
                 });

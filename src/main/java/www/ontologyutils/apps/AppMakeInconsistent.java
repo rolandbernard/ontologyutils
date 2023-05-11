@@ -1,7 +1,6 @@
 package www.ontologyutils.apps;
 
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -58,9 +57,9 @@ public class AppMakeInconsistent {
         System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         while (isConsistent || iter < minNumIter || iterSinceInconsistency < minNumIterAfterInconsistency) {
             OWLAxiom axiom = Utils.randomChoice(ontology.logicalAxioms());
-            var strongerAxioms = axiomStrengthener.strongerAxioms(axiom).collect(Collectors.toSet());
+            var strongerAxioms = Utils.toSet(axiomStrengthener.strongerAxioms(axiom));
             // We do not consider the axioms already in the ontology.
-            strongerAxioms.removeAll(ontology.axioms().toList());
+            strongerAxioms.removeAll(Utils.toList(ontology.axioms()));
             // We do not consider axioms that are inconsistent on their own, could be made
             // optional.
             var tooStrong = new HashSet<OWLAxiom>();

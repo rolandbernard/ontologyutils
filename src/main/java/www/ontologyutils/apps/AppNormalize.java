@@ -37,7 +37,7 @@ public class AppNormalize {
 
         Ontology copy = Ontology.withAxiomsFrom(this.ontology);
 
-        List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
+        List<OWLAxiom> tBoxAxioms = Utils.toList(copy.tboxAxioms());
         tBoxAxioms.forEach((ax) -> {
             copy.removeAxioms(ax);
             copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));
@@ -63,7 +63,7 @@ public class AppNormalize {
 
         Ontology copy = Ontology.withAxiomsFrom(this.ontology);
 
-        List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
+        List<OWLAxiom> tBoxAxioms = Utils.toList(copy.tboxAxioms());
         tBoxAxioms.forEach((ax) -> {
             copy.removeAxioms(ax);
             copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));

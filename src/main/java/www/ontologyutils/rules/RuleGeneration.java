@@ -1,12 +1,12 @@
 package www.ontologyutils.rules;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.normalization.NormalForm;
 import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.Utils;
 
 /**
  * Class that implements role generation.
@@ -35,7 +35,7 @@ public class RuleGeneration {
             throw new IllegalArgumentException("Axiom " + ax + " must be in normal form.");
         }
         // a "group of axioms" is identified with the annotation of the original axiom
-        String axiomGroup = mapAxioms.get(Ontology.axiomOriginAnnotations(ax).collect(Collectors.toSet()));
+        String axiomGroup = mapAxioms.get(Utils.toSet(Ontology.axiomOriginAnnotations(ax)));
         OWLClassExpression left = ((OWLSubClassOfAxiom) ax).getSubClass();
         OWLClassExpression right = ((OWLSubClassOfAxiom) ax).getSuperClass();
         if (NormalForm.typeOneSubClassAxiom(left, right)) {
@@ -142,9 +142,9 @@ public class RuleGeneration {
     private static Map<Collection<OWLAnnotation>, String> mapAxiomsToGroupNumbers(Ontology ontology) {
         HashMap<Collection<OWLAnnotation>, String> map = new HashMap<Collection<OWLAnnotation>, String>();
         int numAxGr = 0;
-        for (OWLAxiom ax : ontology.tboxAxioms().collect(Collectors.toSet())) {
+        for (OWLAxiom ax : Utils.toList(ontology.tboxAxioms())) {
             assert (ax.isAnnotated());
-            var annotations = Ontology.axiomOriginAnnotations(ax).collect(Collectors.toSet());
+            var annotations = Utils.toSet(Ontology.axiomOriginAnnotations(ax));
             if (!map.containsKey(annotations)) {
                 map.put(annotations, "" + ++numAxGr);
             }

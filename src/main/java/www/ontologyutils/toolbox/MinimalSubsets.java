@@ -36,11 +36,11 @@ public final class MinimalSubsets {
 
     @SafeVarargs
     private static <T> Set<T> getUnion(Collection<T>... parts) {
-        return Arrays.stream(parts).flatMap(c -> c.stream()).collect(Collectors.toSet());
+        return Utils.toSet(Arrays.stream(parts).flatMap(c -> c.stream()));
     }
 
     private static <T> Set<T> getDifference(Collection<T> base, Collection<T> remove) {
-        return base.stream().filter(c -> !remove.contains(c)).collect(Collectors.toSet());
+        return Utils.toSet(base.stream().filter(c -> !remove.contains(c)));
     }
 
     private static <T> boolean isValidWithoutFirst(Collection<T> contained, List<T> search, int n,

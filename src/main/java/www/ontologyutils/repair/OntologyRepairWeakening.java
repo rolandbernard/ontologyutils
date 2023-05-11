@@ -196,7 +196,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 var max = occurrences.values().stream().max(Long::compareTo);
                 if (max.isEmpty()) {
                     throw new RuntimeException(
-                            "Did not find a bad subclass or assertion axiom in " + ontology.axioms().toList());
+                            "Did not find a bad subclass or assertion axiom in " + Utils.toList(ontology.refutableAxioms()));
                 }
                 return occurrences.entrySet().stream()
                         .filter(entry -> entry.getValue() == max.get())
@@ -227,11 +227,11 @@ public class OntologyRepairWeakening extends OntologyRepair {
         try (var refOntology = ontology.cloneWithRefutable(refAxioms)) {
             try (var axiomWeakener = new AxiomWeakener(refOntology, ontology)) {
                 while (!isRepaired(ontology)) {
-                    var badAxioms = findBadAxioms(ontology).toList();
+                    var badAxioms = Utils.toList(findBadAxioms(ontology));
                     infoMessage("Found " + badAxioms.size() + " possible bad axioms.");
                     var badAxiom = Utils.randomChoice(badAxioms);
                     infoMessage("Selected the bad axiom " + Utils.prettyPrintAxiom(badAxiom) + ".");
-                    var weakerAxioms = axiomWeakener.weakerAxioms(badAxiom).toList();
+                    var weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(badAxiom));
                     infoMessage("Found  " + weakerAxioms.size() + " weaker axioms.");
                     var weakerAxiom = Utils.randomChoice(weakerAxioms);
                     infoMessage("Selected the weaker axiom " + Utils.prettyPrintAxiom(weakerAxiom) + ".");

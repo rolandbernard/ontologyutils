@@ -64,8 +64,7 @@ public class TBoxNormalization implements OntologyModification {
 
     @Override
     public void apply(Ontology ontology) throws IllegalArgumentException {
-        var tBox = ontology.tboxAxioms()
-                .filter(axiom -> !axiom.isOfType(AxiomType.SUBCLASS_OF)).toList();
+        var tBox = Utils.toList(ontology.tboxAxioms().filter(axiom -> !axiom.isOfType(AxiomType.SUBCLASS_OF)));
         for (var axiom : tBox) {
             ontology.replaceAxiom(axiom, asSubclassOfAxioms(axiom));
         }

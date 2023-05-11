@@ -3,7 +3,6 @@ package www.ontologyutils.toolbox;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +10,7 @@ public class SetOfSetsTest {
     @Test
     public void emptySetHasEmpty() {
         var set = new SetOfSets<Integer>();
-        assertEquals(List.of(), set.stream().toList());
+        assertEquals(List.of(), Utils.toList(set.stream()));
     }
 
     @Test
@@ -57,7 +56,7 @@ public class SetOfSetsTest {
         set.add(Set.of(1, 4, 5, 6));
         assertEquals(
                 Set.of(Set.of(), Set.of(2), Set.of(1, 3), Set.of(1, 4, 5, 6)),
-                set.stream().collect(Collectors.toSet()));
+                Utils.toSet(set.stream()));
     }
 
     @Test
@@ -239,7 +238,7 @@ public class SetOfSetsTest {
         set.add(Set.of(1, 4, 5, 6));
         assertEquals(
                 Set.of(Set.of(), Set.of(1, 3), Set.of(1, 4, 5, 6)),
-                set.subsets(Set.of(1, 4, 5, 6, 3)).collect(Collectors.toSet()));
+                Utils.toSet(set.subsets(Set.of(1, 4, 5, 6, 3))));
     }
 
     @Test
@@ -251,10 +250,10 @@ public class SetOfSetsTest {
         set.add(Set.of(1, 4, 5, 6));
         assertEquals(
                 Set.of(Set.of(1, 3), Set.of(1, 4, 5, 6)),
-                set.supersets(Set.of(1)).collect(Collectors.toSet()));
+                Utils.toSet(set.supersets(Set.of(1))));
         assertEquals(
                 Set.of(Set.of(1, 4, 5, 6)),
-                set.supersets(Set.of(1, 4)).collect(Collectors.toSet()));
+                Utils.toSet(set.supersets(Set.of(1, 4))));
     }
 
     @Test

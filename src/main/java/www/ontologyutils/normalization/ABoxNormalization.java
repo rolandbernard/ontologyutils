@@ -53,28 +53,25 @@ public class ABoxNormalization implements OntologyModification {
         @Override
         public Collection<OWLAxiom> visit(OWLDifferentIndividualsAxiom axiom) {
             var individuals = axiom.getIndividualsAsList();
-            return individuals.stream()
+            return Utils.toList(individuals.stream()
                     .flatMap(first -> individuals.stream()
                             .filter(second -> !first.equals(second))
-                            .map(second -> (OWLAxiom) df.getOWLDifferentIndividualsAxiom(first, second)))
-                    .toList();
+                            .map(second -> (OWLAxiom) df.getOWLDifferentIndividualsAxiom(first, second))));
         }
 
         @Override
         public Collection<OWLAxiom> visit(OWLSameIndividualAxiom axiom) {
             var individuals = axiom.getIndividualsAsList();
             if (fullEquality) {
-                return individuals.stream()
+                return Utils.toList(individuals.stream()
                         .flatMap(first -> individuals.stream()
                                 .filter(second -> !first.equals(second))
-                                .map(second -> (OWLAxiom) df.getOWLSameIndividualAxiom(first, second)))
-                        .toList();
+                                .map(second -> (OWLAxiom) df.getOWLSameIndividualAxiom(first, second))));
             } else {
                 var first = individuals.get(0);
-                return individuals.stream()
+                return Utils.toList(individuals.stream()
                         .filter(second -> !first.equals(second))
-                        .map(second -> (OWLAxiom) df.getOWLSameIndividualAxiom(first, second))
-                        .toList();
+                        .map(second -> (OWLAxiom) df.getOWLSameIndividualAxiom(first, second)));
             }
         }
 
@@ -115,7 +112,7 @@ public class ABoxNormalization implements OntologyModification {
 
     @Override
     public void apply(Ontology ontology) throws IllegalArgumentException {
-        var aBox = ontology.aboxAxioms().toList();
+        var aBox = Utils.toList(ontology.aboxAxioms());
         for (var axiom : aBox) {
             ontology.replaceAxiom(axiom, asSroiqAxioms(axiom));
         }

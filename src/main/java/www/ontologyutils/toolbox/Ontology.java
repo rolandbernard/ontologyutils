@@ -217,15 +217,14 @@ public class Ontology implements AutoCloseable {
      * @param ontology
      *            The {@code OWLOntology} form which to copy the axioms. Logical
      *            axiom will be refutable, other will be static.
-     * @param reasonerFactory
+     * @param reas
      *            The reasoner factory to be used for reasoning queries.
      * @return The new ontology.
      */
     public static Ontology withAxiomsFrom(OWLOntology ontology, OWLReasonerFactory reasonerFactory) {
-        var logicalAxioms = ontology.logicalAxioms().collect(Collectors.toSet());
-        var otherAxioms = ontology.axioms()
-                .filter(axiom -> !logicalAxioms.contains(axiom))
-                .collect(Collectors.toSet());
+        var logicalAxioms = Utils.toSet(ontology.logicalAxioms());
+        var otherAxioms = Utils.toSet(ontology.axioms()
+                .filter(axiom -> !logicalAxioms.contains(axiom)));
         return withAxioms(otherAxioms, logicalAxioms, reasonerFactory);
     }
 
@@ -241,7 +240,7 @@ public class Ontology implements AutoCloseable {
 
     /**
      * @param filePath
-     *            The string to the file containing the ontology.
+     *            ontaining the ontology.
      * @param reasonerFactory
      *            The reasoner factory to be used for reasoning queries.
      * @return The new ontology, loaded form the file.
@@ -276,7 +275,7 @@ public class Ontology implements AutoCloseable {
      */
     public static Ontology loadOnlyLogicalAxioms(String filePath) {
         var ontology = loadOntology(filePath, defaultFactory);
-        ontology.removeAxioms(ontology.nonLogicalAxioms().toList());
+        ontology.removeAxioms(Utils.toList(ontology.nonLogicalAxioms()));
         return ontology;
     }
 
@@ -288,7 +287,7 @@ public class Ontology implements AutoCloseable {
      */
     public static Ontology loadOntologyWithOriginAnnotations(String filePath) {
         var ontology = loadOntology(filePath, defaultFactory);
-        for (var axiom : ontology.axioms().toList()) {
+        for (var axiom : Utils.toList(ontology.axioms())) {
             ontology.replaceAxiom(axiom, axiom);
         }
         return ontology;
@@ -321,8 +320,8 @@ public class Ontology implements AutoCloseable {
      * @return true if some change was made to the ontology, false otherwise.
      */
     public boolean applyChangesTo(OWLOntology ontology) {
-        var oldAxioms = ontology.axioms().collect(Collectors.toSet());
-        var newAxioms = axioms().collect(Collectors.toSet());
+        var oldAxioms = Utils.toSet(ontology.axioms());
+        var newAxioms = Utils.toSet(axioms());
         if (oldAxioms.equals(newAxioms)) {
             return false;
         } else {
@@ -570,7 +569,7 @@ public class Ontology implements AutoCloseable {
      * of {@code axiom} is {@code origin}.
      *
      * @param axiom
-     *            The axiom to annotate.
+     *            iom to annotate.
      * @param origin
      *            The origin axiom.
      * @return A new annotated axiom equivalent to {@code axiom}.
@@ -588,7 +587,7 @@ public class Ontology implements AutoCloseable {
      * annotated with the original axioms as the origin.
      *
      * @param remove
-     *            The axiom to remove.
+     *            ove.
      * @param replacement
      *            The axioms to add.
      */
@@ -608,7 +607,7 @@ public class Ontology implements AutoCloseable {
      * annotated with the original axioms as the origin.
      *
      * @param remove
-     *            The axiom to remove.
+     *            ove.
      * @param replacement
      *            The axioms to add.
      */
@@ -621,7 +620,7 @@ public class Ontology implements AutoCloseable {
      * annotated with the original axioms as the origin.
      *
      * @param remove
-     *            The axiom to remove.
+     *            ove.
      * @param replacement
      *            The axioms to add.
      */
@@ -635,7 +634,7 @@ public class Ontology implements AutoCloseable {
      * @return The axioms of the ontology without those in {@code remove}.
      */
     public Set<OWLAxiom> complement(Set<OWLAxiom> remove) {
-        return axioms().filter(axiom -> !remove.contains(axiom)).collect(Collectors.toSet());
+        return Utils.toSet(axioms().filter(axiom -> !remove.contains(axiom)));
     }
 
     /**
@@ -720,7 +719,7 @@ public class Ontology implements AutoCloseable {
 
     /**
      * @param subClass
-     *            The possible sub concept.
+     *            ub concept.
      * @param superClass
      *            The possible super concept.
      * @return true if the extension of {@code subClass} is a subset of the
@@ -736,9 +735,8 @@ public class Ontology implements AutoCloseable {
      * @return The list of profile reports for all OWL 2 profiles.
      */
     public List<OWLProfileReport> checkOwlProfiles() {
-        return withOwlOntologyDo(ontology -> Arrays.stream(Profiles.values())
-                .map(profile -> profile.checkOntology(ontology))
-                .toList());
+        return withOwlOntologyDo(ontology -> Utils.toList(
+            Arrays.stream(Profiles.values()).map(profile -> profile.checkOntology(ontology))));
     }
 
     /**
@@ -906,9 +904,9 @@ public class Ontology implements AutoCloseable {
      * @return A stream containing all simple roles.
      */
     public Stream<OWLObjectProperty> simpleRoles() {
-        var nonSimple = withOwlOntologyDo(
-                ontology -> (new OWLObjectPropertyManager(ontology)).getNonSimpleProperties()).stream()
-                .map(role -> role.getNamedProperty()).collect(Collectors.toSet());
+        var nonSimple = this.withOwlOntologyDo(
+                ontology -> Utils.toSet((new OWLObjectPropertyManager(ontology))
+                        .getNonSimpleProperties().stream().map(role -> role.getNamedProperty())));
         return rolesInSignature().filter(role -> !nonSimple.contains(role));
     }
 
@@ -920,7 +918,7 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * @return A stream containing all entities in the signature of this ontology.
+     * @return A str eam containing all entities in the signature of this ontology.
      */
     public Stream<OWLEntity> signature() {
         return axioms().flatMap(OWLAxiom::signature);
@@ -951,11 +949,10 @@ public class Ontology implements AutoCloseable {
             var df = getDefaultDataFactory();
             var ontology = reasoner.getRootOntology();
             var isConsistent = reasoner.isConsistent();
-            return ontology.classesInSignature()
+            return Utils.toSet(ontology.classesInSignature()
                     .flatMap(left -> ontology.classesInSignature()
                             .map(right -> df.getOWLSubClassOfAxiom(left, right))
-                            .filter(axiom -> !isConsistent || reasoner.isEntailed(axiom)))
-                    .collect(Collectors.toSet());
+                            .filter(axiom -> !isConsistent || reasoner.isEntailed(axiom))));
         }).stream();
     }
 
@@ -965,7 +962,7 @@ public class Ontology implements AutoCloseable {
      */
     public void generateDeclarationAxioms() {
         var df = getDefaultDataFactory();
-        for (var entity : signature().toList()) {
+        for (var entity : Utils.toList(signature())) {
             var newAxiom = df.getOWLDeclarationAxiom(entity);
             if (!staticAxioms.contains(newAxiom) && !refutableAxioms.contains(newAxiom)) {
                 staticAxioms.add(newAxiom);
@@ -1016,13 +1013,13 @@ public class Ontology implements AutoCloseable {
     /**
      * Clone this ontology, but only axioms in {@code axioms}.
      *
-     * @param axioms
+     * @param axio
      *            The axioms that should be retained.
      * @return The new ontology.
      */
     public Ontology cloneWith(Set<? extends OWLAxiom> axioms) {
-        return new Ontology(staticAxioms.stream().filter(axiom -> axioms.contains(axiom)).toList(),
-                refutableAxioms.stream().filter(axiom -> axioms.contains(axiom)).toList(), reasonerCache);
+        return new Ontology(Utils.toList(staticAxioms.stream().filter(axiom -> axioms.contains(axiom))),
+                Utils.toList(refutableAxioms.stream().filter(axiom -> axioms.contains(axiom))), reasonerCache);
     }
 
     /**
@@ -1034,8 +1031,7 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithRefutable(Set<? extends OWLAxiom> axioms) {
-        return new Ontology(staticAxioms, refutableAxioms.stream().filter(axiom -> axioms.contains(axiom)).toList(),
-                reasonerCache);
+        return new Ontology(staticAxioms, Utils.toList(refutableAxioms.stream().filter(axiom -> axioms.contains(axiom))), reasonerCache);
     }
 
     /**

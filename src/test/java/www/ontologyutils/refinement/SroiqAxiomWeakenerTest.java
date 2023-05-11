@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
 
-import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.*;
 
 public class SroiqAxiomWeakenerTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/roland/ontologies/2023/3/untitled/";
@@ -242,7 +242,7 @@ public class SroiqAxiomWeakenerTest {
     @ParameterizedTest
     @MethodSource("expectedWeakening")
     public void weakenAxiom(Set<OWLAxiom> expected, OWLAxiom axiom) {
-        assertEquals(expected, axiomWeakener.weakerAxioms(axiom).collect(Collectors.toSet()));
+        assertEquals(expected, Utils.toSet(axiomWeakener.weakerAxioms(axiom)));
     }
 
     @Test
@@ -259,7 +259,7 @@ public class SroiqAxiomWeakenerTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl",
-            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
+            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl", "/pizza.owl",
             "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
             "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
             "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",

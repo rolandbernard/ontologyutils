@@ -2,7 +2,6 @@ package www.ontologyutils.apps;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -126,7 +125,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
 
     private static OWLAxiom selectAxiomManual(Set<OWLAxiom> allAxioms, Set<OWLAxiom> axiomsToKeep) {
         ArrayList<OWLAxiom> axioms = new ArrayList<OWLAxiom>(
-                allAxioms.stream().filter(ax -> !axiomsToKeep.contains(ax)).collect(Collectors.toSet()));
+                Utils.toList(allAxioms.stream().filter(ax -> !axiomsToKeep.contains(ax))));
         System.out.println("Select an axiom to act upon.");
         for (int i = 0; i < axioms.size(); i++) {
             System.out.println((i + 1) + "\t" + Utils.prettyPrintAxiom(axioms.get(i)));
@@ -178,7 +177,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
     }
 
     private static ArrayList<OWLAxiom> getWeakerAxioms(OWLAxiom axiom, AxiomWeakener aw) {
-        ArrayList<OWLAxiom> weakerAxiomsAux = new ArrayList<OWLAxiom>(aw.weakerAxioms(axiom).toList());
+        ArrayList<OWLAxiom> weakerAxiomsAux = new ArrayList<OWLAxiom>(Utils.toList(aw.weakerAxioms(axiom)));
         ArrayList<OWLAxiom> weakerAxioms = new ArrayList<OWLAxiom>();
         for (OWLAxiom ax : weakerAxiomsAux) {
             weakerAxioms.add(ax.getAxiomWithoutAnnotations());
@@ -197,13 +196,13 @@ public class AppInteractiveReferenceOntologyAndRepair {
     public static void main(String[] args) {
         AppInteractiveReferenceOntologyAndRepair mApp = new AppInteractiveReferenceOntologyAndRepair(args[0]);
         System.out.println("Loaded " + mApp.ontology);
-        Set<OWLAxiom> axioms = mApp.ontology.axioms().collect(Collectors.toSet());
-        Set<OWLAxiom> nonLogicalAxioms = axioms.stream().filter(ax -> !ax.isLogicalAxiom()).collect(Collectors.toSet());
+        Set<OWLAxiom> axioms = Utils.toSet(mApp.ontology.axioms());
+        Set<OWLAxiom> nonLogicalAxioms = Utils.toSet(axioms.stream().filter(ax -> !ax.isLogicalAxiom()));
         // 0- We isolate the logical axioms, and make sure the TBox axioms are all
         // subclass axioms, converting them when necessary.
         Set<OWLAxiom> logicalAxioms = new HashSet<>();
-        logicalAxioms.addAll(mApp.ontology.aboxAxioms().collect(Collectors.toSet()));
-        logicalAxioms.addAll(mApp.ontology.rboxAxioms().collect(Collectors.toSet()));
+        logicalAxioms.addAll(Utils.toSet(mApp.ontology.aboxAxioms()));
+        logicalAxioms.addAll(Utils.toSet(mApp.ontology.rboxAxioms()));
         mApp.ontology.tboxAxioms().forEach(ax -> {
             logicalAxioms.addAll(NormalizationTools.asSubClassOfAxioms(ax));
         });
@@ -219,7 +218,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
         }
         // We keep the axioms of the reference ontology, that is, we make sure to have
         // them untouched in the repaired ontology
-        Set<OWLAxiom> axiomsToKeep = new HashSet<>(referenceOntology.axioms().collect(Collectors.toSet()));
+        Set<OWLAxiom> axiomsToKeep = new HashSet<>(Utils.toSet(referenceOntology.axioms()));
 
         // 2- AxiomWeakener
         AxiomWeakener aw = new AxiomWeakener(referenceOntology, mApp.ontology);
@@ -265,7 +264,7 @@ public class AppInteractiveReferenceOntologyAndRepair {
                     keepAxiom(axiomsToKeep, axiomOfInterest);
                 } catch (InconsistentSetException e) {
                     System.out.println("The set of axioms to keep is inconsistent; we reset it.");
-                    axiomsToKeep = new HashSet<>(referenceOntology.axioms().collect(Collectors.toSet()));
+                    axiomsToKeep = new HashSet<>(Utils.toSet(referenceOntology.axioms()));
                 }
                 continue;
             } else {

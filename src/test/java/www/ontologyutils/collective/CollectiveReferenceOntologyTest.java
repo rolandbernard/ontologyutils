@@ -3,7 +3,6 @@ package www.ontologyutils.collective;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.*;
@@ -105,7 +104,7 @@ public class CollectiveReferenceOntologyTest {
         assertTrue(ontology.isConsistent());
         assertTrue(Utils.powerSet(new HashSet<>(agenda))
                 .allMatch(set -> (!collective.lexicographicallySmaller(set,
-                        ontology.axioms().collect(Collectors.toSet())))
+                        Utils.toSet(ontology.axioms())))
                         || !Utils.isConsistent(set)));
     }
 
@@ -127,7 +126,7 @@ public class CollectiveReferenceOntologyTest {
 
         assertTrue(Utils.powerSet(new HashSet<>(agenda))
                 .allMatch(set -> (!collective.lexicographicallySmaller(set,
-                        ontology.axioms().collect(Collectors.toSet())))
+                        Utils.toSet(ontology.axioms())))
                         || !Utils.isConsistent(set)));
     }
 
@@ -149,7 +148,7 @@ public class CollectiveReferenceOntologyTest {
 
         assertTrue(Utils.powerSet(new HashSet<>(agenda))
                 .allMatch(set -> (!collective.lexicographicallySmaller(set,
-                        ontology.axioms().collect(Collectors.toSet())))
+                        Utils.toSet(ontology.axioms())))
                         || !Utils.isConsistent(set)));
     }
 
@@ -171,7 +170,7 @@ public class CollectiveReferenceOntologyTest {
 
         assertTrue(Utils.powerSet(new HashSet<>(agenda))
                 .allMatch(set -> (!collective.lexicographicallySmaller(set,
-                        ontology.axioms().collect(Collectors.toSet())))
+                        Utils.toSet(ontology.axioms())))
                         || !Utils.isConsistent(set)));
     }
 
@@ -193,7 +192,7 @@ public class CollectiveReferenceOntologyTest {
 
         assertTrue(Utils.powerSet(new HashSet<>(agenda))
                 .allMatch(set -> (!collective.lexicographicallySmaller(set,
-                        ontology.axioms().collect(Collectors.toSet())))
+                        Utils.toSet(ontology.axioms())))
                         || !Utils.isConsistent(set)));
     }
 
@@ -215,7 +214,7 @@ public class CollectiveReferenceOntologyTest {
 
         assertTrue(Utils.powerSet(new HashSet<>(agenda))
                 .allMatch(set -> (!collective.lexicographicallySmaller(set,
-                        ontology.axioms().collect(Collectors.toSet())))
+                        Utils.toSet(ontology.axioms())))
                         || !Utils.isConsistent(set)));
     }
 
@@ -235,7 +234,7 @@ public class CollectiveReferenceOntologyTest {
 
             assertTrue(Utils.powerSet(new HashSet<>(agenda))
                     .allMatch(set -> (!collective.lexicographicallySmaller(set,
-                            ontology.axioms().collect(Collectors.toSet())))
+                            Utils.toSet(ontology.axioms())))
                             || !Utils.isConsistent(set)));
         }
 
@@ -264,7 +263,7 @@ public class CollectiveReferenceOntologyTest {
 
         Set<OWLAxiom> expected = new HashSet<>(Arrays.asList(ax2, ax3));
 
-        assertTrue(ontology.axioms().collect(Collectors.toSet()).equals(expected));
+        assertTrue(Utils.toSet(ontology.axioms()).equals(expected));
     }
 
 }

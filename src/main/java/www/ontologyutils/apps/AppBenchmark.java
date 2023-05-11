@@ -1,7 +1,5 @@
 package www.ontologyutils.apps;
 
-import java.util.stream.Collectors;
-
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
 import www.ontologyutils.refinement.*;
@@ -15,7 +13,7 @@ public class AppBenchmark {
     private static void benchRun(Ontology ontology) {
         Utils.randomSeed(42);
         for (int i = 0; i < 10; i++) {
-            try (var covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()))) {
+            try (var covers = new Covers(ontology, Utils.toSet(ontology.simpleRoles()))) {
                 var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
                 for (int j = 0; j < 10; j++) {
                     OWLClassExpression toRefine = Ontology.getDefaultDataFactory().getOWLNothing();

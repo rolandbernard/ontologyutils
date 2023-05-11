@@ -12,6 +12,7 @@ import www.ontologyutils.collective.PreferenceFactory.Preference;
 import www.ontologyutils.collective.TurnBasedMechanism.Initialization;
 import www.ontologyutils.normalization.NormalizationTools;
 import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.Utils;
 
 /**
  * @author nico
@@ -23,7 +24,7 @@ public class AppTurnBasedMechanism {
     private AppTurnBasedMechanism(String ontologyFilePath) {
         Ontology base = Ontology.loadOnlyLogicalAxioms(ontologyFilePath);
         ontology = base.cloneOnlyStatic();
-        ontology.addAxioms(base.aboxAxioms().collect(Collectors.toSet()));
+        ontology.addAxioms(Utils.toList(base.aboxAxioms()));
         base.tboxAxioms().forEach(a -> ontology.addAxioms(NormalizationTools.asSubClassOfAxioms(a)));
     }
 
@@ -63,7 +64,7 @@ public class AppTurnBasedMechanism {
         }
 
         // Agenda
-        ArrayList<OWLAxiom> agenda = new ArrayList<>(mApp.ontology.axioms().collect(Collectors.toList()));
+        ArrayList<OWLAxiom> agenda = new ArrayList<>(Utils.toList(mApp.ontology.axioms()));
 
         // Voters
         System.out.println("\n--- Voters.");
@@ -79,8 +80,7 @@ public class AppTurnBasedMechanism {
         }
         for (int i = 0; i < numVoters; i++) {
             System.out.println("- Preferences voter " + (i + 1));
-            List<Integer> ranking = Stream.generate(String::new).limit(prefFactory.getAgenda().size()).map(s -> 0)
-                    .collect(Collectors.toList());
+            List<Integer> ranking = Utils.toList(Stream.generate(String::new).limit(prefFactory.getAgenda().size()).map(s -> 0));
             for (int j = 1; j <= prefFactory.getAgenda().size(); j++) {
                 System.out.println("- Current ranking: " + ranking);
                 int axiomIndex = readNumber("Next favorite axiom?", 1, prefFactory.getAgenda().size());

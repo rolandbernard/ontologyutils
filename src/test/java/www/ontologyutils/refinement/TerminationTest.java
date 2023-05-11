@@ -21,7 +21,7 @@ public class TerminationTest {
     public TerminationTest() {
         var path = RoleCoverTest.class.getResource("/a-and-b.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
+        covers = new Covers(ontology, Utils.toSet(ontology.simpleRoles()));
         var upCover = covers.upCover().cached();
         var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);

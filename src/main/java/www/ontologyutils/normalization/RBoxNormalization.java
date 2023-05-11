@@ -82,33 +82,30 @@ public class RBoxNormalization implements OntologyModification {
 
         @Override
         public Collection<OWLAxiom> visit(OWLDisjointObjectPropertiesAxiom axiom) {
-            var properties = axiom.properties().toList();
-            return properties.stream()
+            var properties = Utils.toList(axiom.properties());
+            return Utils.toList(properties.stream()
                     .flatMap(first -> properties.stream()
                             .filter(second -> !first.equals(second))
-                            .map(second -> (OWLAxiom) df.getOWLDisjointObjectPropertiesAxiom(first, second)))
-                    .toList();
+                            .map(second -> (OWLAxiom) df.getOWLDisjointObjectPropertiesAxiom(first, second))));
         }
 
         @Override
         public Collection<OWLAxiom> visit(OWLEquivalentObjectPropertiesAxiom axiom) {
-            var properties = axiom.properties().toList();
+            var properties = Utils.toList(axiom.properties());
             if (fullEquality) {
-                return properties.stream()
+                return Utils.toList(properties.stream()
                         .flatMap(first -> properties.stream()
                                 .filter(second -> !first.equals(second))
                                 .flatMap(second -> Stream.of(
                                         (OWLAxiom) df.getOWLSubObjectPropertyOfAxiom(second, first),
-                                        (OWLAxiom) df.getOWLSubObjectPropertyOfAxiom(first, second))))
-                        .toList();
+                                        (OWLAxiom) df.getOWLSubObjectPropertyOfAxiom(first, second)))));
             } else {
                 var first = properties.get(0);
-                return properties.stream()
+                return Utils.toList(properties.stream()
                         .filter(second -> !first.equals(second))
                         .flatMap(second -> Stream.of(
                                 (OWLAxiom) df.getOWLSubObjectPropertyOfAxiom(second, first),
-                                (OWLAxiom) df.getOWLSubObjectPropertyOfAxiom(first, second)))
-                        .toList();
+                                (OWLAxiom) df.getOWLSubObjectPropertyOfAxiom(first, second))));
             }
         }
 
@@ -168,7 +165,7 @@ public class RBoxNormalization implements OntologyModification {
 
     @Override
     public void apply(Ontology ontology) throws IllegalArgumentException {
-        var rBox = ontology.rboxAxioms().toList();
+        var rBox = Utils.toList(ontology.rboxAxioms());
         for (var axiom : rBox) {
             ontology.replaceAxiom(axiom, asSroiqAxioms(axiom));
         }

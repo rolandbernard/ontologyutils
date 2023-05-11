@@ -6,7 +6,7 @@ import java.util.stream.*;
 import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.refinement.Covers.Cover;
-import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.*;
 
 /**
  * Implementation that can be used for strengthening an axiom. Must be closed
@@ -42,8 +42,33 @@ public class AxiomStrengthener extends AxiomRefinement {
                 new RefinementOperator(upCover, downCover, flags), simpleRoles, flags), covers);
     }
 
-    private AxiomStrengthener(Covers covers, Set<OWLObjectProperty> simpleRoles, int flags) {
-        this(covers, covers.upCover().cached(), covers.downCover().cached(), simpleRoles, flags);
+    private AxiomStrengthener(Covers covers, Set<OWLObjectProperty> simpleRoles, int flags, boolean uncached) {
+        this(covers, uncached ? covers.upCover() : covers.upCover().cached(),
+                uncached ? covers.downCover() : covers.downCover().cached(), simpleRoles, flags);
+    }
+
+    /**
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
+     * @param simpleRoles
+     *            The roles that are guaranteed to be simple.
+     * @param uncached
+     *            Do not use any caching, always call the reasoner.
+     */
+    public AxiomStrengthener(Ontology refOntology, Set<OWLObjectProperty> simpleRoles, boolean uncached) {
+        this(new Covers(refOntology, simpleRoles, uncached), simpleRoles, FLAG_NON_STRICT, uncached);
+    }
+
+    /**
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
+     * @param simpleRoles
+     *            The roles that are guaranteed to be simple.
+     * @param uncached
+     *            Do not use any caching, always call the reasoner.
+     */
+    public AxiomStrengthener(Ontology refOntology, Ontology fullOntology, boolean uncached) {
+        this(refOntology, Utils.toSet(fullOntology.simpleRoles()), uncached);
     }
 
     /**
@@ -57,7 +82,7 @@ public class AxiomStrengthener extends AxiomRefinement {
      *            The roles that are guaranteed to be simple.
      */
     public AxiomStrengthener(Ontology refOntology, Set<OWLObjectProperty> simpleRoles) {
-        this(new Covers(refOntology, simpleRoles), simpleRoles, FLAG_NON_STRICT);
+        this(new Covers(refOntology, simpleRoles), simpleRoles, FLAG_NON_STRICT, false);
     }
 
     /**
@@ -70,7 +95,7 @@ public class AxiomStrengthener extends AxiomRefinement {
      *            used in.
      */
     public AxiomStrengthener(Ontology refOntology, Ontology fullOntology) {
-        this(refOntology, fullOntology.simpleRoles().collect(Collectors.toSet()));
+        this(refOntology, fullOntology, false);
     }
 
     /**

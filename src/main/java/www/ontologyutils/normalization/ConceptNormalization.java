@@ -219,7 +219,7 @@ public class ConceptNormalization implements OntologyModification {
 
     @Override
     public void apply(Ontology ontology) throws IllegalArgumentException {
-        var axioms = ontology.axioms().toList();
+        var axioms = Utils.toList(ontology.axioms());
         for (var axiom : axioms) {
             ontology.replaceAxiom(axiom, asSroiqAxiom(axiom));
         }

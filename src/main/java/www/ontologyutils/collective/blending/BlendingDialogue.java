@@ -2,7 +2,6 @@ package www.ontologyutils.collective.blending;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -111,7 +110,7 @@ public class BlendingDialogue {
         assert (axioms.stream().allMatch(a -> pref.getAgenda().contains(a)));
 
         OWLAxiom result = null;
-        for (OWLAxiom a : axioms.stream().filter(b -> !context.isEntailed(b)).collect(Collectors.toList())) {
+        for (OWLAxiom a : Utils.toList(axioms.stream().filter(b -> !context.isEntailed(b)))) {
             if (result == null || pref.prefers(a, result)) {
                 result = a;
             }
@@ -187,8 +186,7 @@ public class BlendingDialogue {
                 result.removeAxioms(consideredAxiom);
                 try (AxiomWeakener axiomWeakener = new AxiomWeakener(result)) {
                     log(" .");
-                    Set<OWLAxiom> weakerAxioms = axiomWeakener.weakerAxioms(consideredAxiom)
-                            .collect(Collectors.toSet());
+                    Set<OWLAxiom> weakerAxioms = Utils.toSet(axiomWeakener.weakerAxioms(consideredAxiom));
                     log(".(" + weakerAxioms.size() + " refinements)");
                     int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
                     log(". ");

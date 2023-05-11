@@ -2,7 +2,6 @@ package www.ontologyutils.collective;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -171,7 +170,7 @@ public class TurnBasedMechanism {
                 break;
             case REFERENCE_WITH_SUPPORT:
                 result = referenceOntology.clone();
-                for (OWLAxiom ax : referenceOntology.axioms().collect(Collectors.toSet())) {
+                for (OWLAxiom ax : Utils.toList(referenceOntology.axioms())) {
                     if (!hasSupport(ax)) {
                         result.removeAxioms(ax);
                     }
@@ -196,7 +195,7 @@ public class TurnBasedMechanism {
     public Ontology get(Initialization initialization) {
         Ontology result = init(initialization);
         List<OWLAxiom> currentAgenda = new ArrayList<>();
-        currentAgenda.addAll(agenda.stream().collect(Collectors.toList()));
+        currentAgenda.addAll(Utils.toList(agenda.stream()));
         // trim the current agenda from the axioms already in the reference ontology
         result.axioms().forEach(a -> currentAgenda.remove(a));
         // init turn
@@ -223,7 +222,7 @@ public class TurnBasedMechanism {
                     // weakening of favorite axiom
                     try (AxiomWeakener axiomWeakener = new AxiomWeakener(referenceOntology)) {
                         currentAxioms.removeAxioms(favorite);
-                        List<OWLAxiom> weakerAxioms = axiomWeakener.weakerAxioms(favorite).toList();
+                        List<OWLAxiom> weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(favorite));
                         int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
                         favorite = weakerAxioms.get(randomPick);
                         currentAxioms.addAxioms(favorite);

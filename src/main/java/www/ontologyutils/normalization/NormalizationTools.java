@@ -121,7 +121,7 @@ public class NormalizationTools {
                 Set<OWLClassExpression> disjunctions = left.asDisjunctSet();
                 for (OWLClassExpression d : disjunctions) {
                     OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(d, right,
-                            Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                            Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                     axioms.add(sba);
                 }
             }
@@ -130,7 +130,7 @@ public class NormalizationTools {
                 Set<OWLClassExpression> conjunctions = right.asConjunctSet();
                 for (OWLClassExpression c : conjunctions) {
                     OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(left, c,
-                            Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                            Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                     axioms.add(sba);
                 }
             }
@@ -154,11 +154,11 @@ public class NormalizationTools {
 
                             // adding fresh -> conj
                             OWLSubClassOfAxiom sbaFreshOce = df.getOWLSubClassOfAxiom(fresh, conj,
-                                    Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                                    Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                             axioms.add(sbaFreshOce);
                             // adding conj -> fresh
                             OWLSubClassOfAxiom sbaOceFresh = df.getOWLSubClassOfAxiom(conj, fresh,
-                                    Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                                    Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                             axioms.add(sbaOceFresh);
 
                         }
@@ -166,7 +166,7 @@ public class NormalizationTools {
                     // adding new_conjunction -> right
                     OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(
                             df.getOWLObjectIntersectionOf(newConjuncts.stream()), right,
-                            Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                            Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                     axioms.add(sba);
                 }
 
@@ -188,11 +188,11 @@ public class NormalizationTools {
 
                             // adding fresh -> disj
                             OWLSubClassOfAxiom sbaFreshOce = df.getOWLSubClassOfAxiom(fresh, disj,
-                                    Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                                    Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                             axioms.add(sbaFreshOce);
                             // adding disj -> fresh
                             OWLSubClassOfAxiom sbaOceFresh = df.getOWLSubClassOfAxiom(disj, fresh,
-                                    Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                                    Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                             axioms.add(sbaOceFresh);
 
                         }
@@ -200,7 +200,7 @@ public class NormalizationTools {
                     // adding left -> new_disjunction
                     OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(left,
                             df.getOWLObjectUnionOf(newDisjuncts.stream()),
-                            Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                            Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                     axioms.add(sba);
                 }
             }
@@ -218,7 +218,7 @@ public class NormalizationTools {
                 OWLObjectUnionOf newRight = df.getOWLObjectUnionOf(operands.stream());
 
                 OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(df.getOWLThing(), newRight,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sba);
             }
             // right is negation
@@ -232,7 +232,7 @@ public class NormalizationTools {
                 OWLObjectIntersectionOf newLeft = df.getOWLObjectIntersectionOf(operands.stream());
 
                 OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(newLeft, df.getOWLNothing(),
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sba);
             }
 
@@ -250,17 +250,17 @@ public class NormalizationTools {
                 // we add exists property fresh -> right
                 OWLObjectSomeValuesFrom evf = df.getOWLObjectSomeValuesFrom(property, fresh);
                 OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(evf, right,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sba);
 
                 // we add fresh -> filler
                 OWLSubClassOfAxiom sbaFreshFiller = df.getOWLSubClassOfAxiom(fresh, filler,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sbaFreshFiller);
 
                 // we add filler -> fresh
                 OWLSubClassOfAxiom sbaFillerFresh = df.getOWLSubClassOfAxiom(filler, fresh,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sbaFillerFresh);
             } else if ((right.getClassExpressionType() == ClassExpressionType.OBJECT_SOME_VALUES_FROM)
                     && !NormalForm.isExistentialOfAtom(right)) { // right existential atom is fine
@@ -274,17 +274,17 @@ public class NormalizationTools {
                 // we add left -> exists property fresh
                 OWLObjectSomeValuesFrom evf = df.getOWLObjectSomeValuesFrom(property, fresh);
                 OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(left, evf,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sba);
 
                 // we add fresh -> filler
                 OWLSubClassOfAxiom sbaFreshFiller = df.getOWLSubClassOfAxiom(fresh, filler,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sbaFreshFiller);
 
                 // we add filler -> fresh
                 OWLSubClassOfAxiom sbaFillerFresh = df.getOWLSubClassOfAxiom(filler, fresh,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sbaFillerFresh);
             }
 
@@ -293,7 +293,7 @@ public class NormalizationTools {
             else if ((left.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM)) {
                 // we just take the contrapositive
                 OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(right.getComplementNNF(), left.getComplementNNF(),
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sba);
             } else if ((right.getClassExpressionType() == ClassExpressionType.OBJECT_ALL_VALUES_FROM)
                     && !NormalForm.isUniversalOfAtom(right)) { // right universal atom is fine
@@ -307,17 +307,17 @@ public class NormalizationTools {
                 // we add left -> forall property fresh
                 OWLObjectAllValuesFrom avf = df.getOWLObjectAllValuesFrom(property, fresh);
                 OWLSubClassOfAxiom sba = df.getOWLSubClassOfAxiom(left, avf,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sba);
 
                 // we add fresh -> filler
                 OWLSubClassOfAxiom sbaFreshFiller = df.getOWLSubClassOfAxiom(fresh, filler,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sbaFreshFiller);
 
                 // we add filler -> fresh
                 OWLSubClassOfAxiom sbaFillerFresh = df.getOWLSubClassOfAxiom(filler, fresh,
-                        Ontology.axiomOriginAnnotations(currentAxiom).toList());
+                        Utils.toList(Ontology.axiomOriginAnnotations(currentAxiom)));
                 axioms.add(sbaFillerFresh);
             } else {
                 throw new RuntimeException("I don't know what to do with " + ax);

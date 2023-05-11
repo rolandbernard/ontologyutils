@@ -37,7 +37,7 @@ public class MaximalConsistentSubsets {
             boolean largest) {
         this.ontology = ontology;
         this.isRepaired = isRepaired;
-        axioms = ontology.refutableAxioms().toList();
+        axioms = Utils.toList(ontology.refutableAxioms());
         queue = new ArrayDeque<>();
         queue.add(new QueueItem(0, new HashSet<>()));
         results = new SetOfSets<>();
@@ -82,7 +82,7 @@ public class MaximalConsistentSubsets {
         if (!ontology.isConsistent()) {
             return false;
         }
-        var contained = ontology.axioms().collect(Collectors.toSet());
+        var contained = Utils.toSet(ontology.axioms());
         try (var copy = ontology.clone()) {
             for (var axiom : axioms) {
                 if (!contained.contains(axiom)) {
@@ -142,7 +142,7 @@ public class MaximalConsistentSubsets {
     public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Collection<? extends OWLAxiom> axioms,
             int howMany, Collection<? extends OWLAxiom> contained) {
         try (var ontology = Ontology.withAxioms(contained, axioms)) {
-            return ontology.maximalConsistentSubsets().limit(howMany).collect(Collectors.toSet());
+            return Utils.toSet(ontology.maximalConsistentSubsets().limit(howMany));
         }
     }
 
@@ -157,7 +157,7 @@ public class MaximalConsistentSubsets {
      */
     public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Collection<? extends OWLAxiom> axioms, int howMany) {
         try (var ontology = Ontology.withAxioms(Set.of(), axioms)) {
-            return ontology.maximalConsistentSubsets().limit(howMany).collect(Collectors.toSet());
+            return Utils.toSet(ontology.maximalConsistentSubsets().limit(howMany));
         }
     }
 

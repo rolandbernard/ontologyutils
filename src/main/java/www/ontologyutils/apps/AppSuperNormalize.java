@@ -38,7 +38,7 @@ public class AppSuperNormalize {
 
         Ontology copy = Ontology.withAxiomsFrom(this.ontology);
 
-        List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
+        List<OWLAxiom> tBoxAxioms = Utils.toList(copy.tboxAxioms());
         tBoxAxioms.forEach((ax) -> {
             copy.removeAxioms(ax);
             copy.addAxioms(NormalizationTools.asSubClassOfAxioms(ax));
@@ -123,7 +123,7 @@ public class AppSuperNormalize {
             assert (newConj.asConjunctSet().size() == 2);
             if (leftConj.size() == 2) {
                 assert (!iter.hasNext());
-                OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, right, Ontology.axiomOriginAnnotations(a).toList());
+                OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, right, Utils.toList(Ontology.axiomOriginAnnotations(a)));
                 res.add(axiom);
                 return res;
             }
@@ -133,7 +133,7 @@ public class AppSuperNormalize {
             leftConj.remove(two);
             leftConj.add(newAtom);
 
-            OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, newAtom, Ontology.axiomOriginAnnotations(a).toList());
+            OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, newAtom, Utils.toList(Ontology.axiomOriginAnnotations(a)));
             res.add(axiom);
         }
     }

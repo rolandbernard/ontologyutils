@@ -23,7 +23,7 @@ public class NormalizationsTest {
         var path = NormalizationsTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             try (Ontology copy = ontology.clone()) {
-                List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
+                List<OWLAxiom> tBoxAxioms = Utils.toList(copy.tboxAxioms());
                 tBoxAxioms.forEach((ax) -> {
                     copy.replaceAxiom(ax, NormalizationTools.asSubClassOfAxioms(ax));
                 });
@@ -45,7 +45,7 @@ public class NormalizationsTest {
         var path = NormalizationsTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             try (var copy = ontology.clone()) {
-                List<OWLAxiom> tBoxAxioms = copy.tboxAxioms().toList();
+                List<OWLAxiom> tBoxAxioms = Utils.toList(copy.tboxAxioms());
                 tBoxAxioms.forEach((ax) -> {
                     copy.replaceAxiom(ax, NormalizationTools.asSubClassOfAxioms(ax));
                 });

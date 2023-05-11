@@ -120,7 +120,7 @@ public class Covers implements AutoCloseable {
         df = Ontology.getDefaultDataFactory();
         this.refOntology = refOntology;
         this.reasoner = refOntology.getOwlReasoner();
-        this.subConcepts = refOntology.subConcepts().collect(Collectors.toSet());
+        this.subConcepts = Utils.toSet(refOntology.subConcepts());
         this.subConcepts.add(df.getOWLThing());
         this.subConcepts.add(df.getOWLNothing());
         this.simpleRoles = simpleRoles;
@@ -128,7 +128,7 @@ public class Covers implements AutoCloseable {
             this.isSubClass = new PreorderCache<>();
             this.isSubClass.setupDomain(subConcepts);
             this.isSubRole = new PreorderCache<>();
-            this.isSubRole.setupDomain(allSimpleRoles().toList());
+            this.isSubRole.setupDomain(Utils.toList(allSimpleRoles()));
         }
     }
 

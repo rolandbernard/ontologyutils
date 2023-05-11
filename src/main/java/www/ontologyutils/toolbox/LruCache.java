@@ -81,7 +81,7 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
      * @return The wrapped function.
      */
     public static <K, V> Function<K, Stream<V>> wrapStreamFunction(Function<K, Stream<V>> function, int cacheSize) {
-        var cached = wrapFunction((K input) -> function.apply(input).toList(), cacheSize);
+        var cached = wrapFunction((K input) -> Utils.toList(function.apply(input)), cacheSize);
         return input -> cached.apply(input).stream();
     }
 
@@ -98,7 +98,7 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
      * @return The wrapped function.
      */
     public static <K, V> Function<K, Stream<V>> wrapStreamFunction(Function<K, Stream<V>> function) {
-        var cached = wrapFunction((K input) -> function.apply(input).toList());
+        var cached = wrapFunction((K input) -> Utils.toList(function.apply(input)));
         return input -> cached.apply(input).stream();
     }
 

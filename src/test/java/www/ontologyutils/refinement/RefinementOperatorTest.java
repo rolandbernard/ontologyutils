@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
 
-import www.ontologyutils.toolbox.Ontology;
+import www.ontologyutils.toolbox.*;
 
 public class RefinementOperatorTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/ontologies/dl2017_example#";
@@ -23,7 +23,7 @@ public class RefinementOperatorTest {
     public RefinementOperatorTest() {
         var path = RoleCoverTest.class.getResource("/catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        covers = new Covers(ontology, ontology.simpleRoles().collect(Collectors.toSet()));
+        covers = new Covers(ontology, Utils.toSet(ontology.simpleRoles()));
         var upCover = covers.upCover().cached();
         var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);
@@ -111,7 +111,7 @@ public class RefinementOperatorTest {
     @ParameterizedTest
     @MethodSource("expectedGeneralization")
     public void generalize(Set<OWLClassExpression> expected, OWLClassExpression concept) {
-        assertEquals(expected, generalization.refine(concept).collect(Collectors.toSet()));
+        assertEquals(expected, Utils.toSet(generalization.refine(concept)));
     }
 
     private static Stream<Arguments> expectedSpecialization() {
@@ -208,7 +208,7 @@ public class RefinementOperatorTest {
     @ParameterizedTest
     @MethodSource("expectedSpecialization")
     public void specialize(Set<OWLClassExpression> expected, OWLClassExpression concept) {
-        assertEquals(expected, specialization.refine(concept).collect(Collectors.toSet()));
+        assertEquals(expected, Utils.toSet(specialization.refine(concept)));
     }
 
     @Test
