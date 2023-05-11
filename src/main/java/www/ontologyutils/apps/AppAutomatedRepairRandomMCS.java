@@ -28,7 +28,8 @@ public class AppAutomatedRepairRandomMCS {
             System.err.println("Usage: java " + AppAutomatedRepairRandomMCS.class.getCanonicalName() + " FILENAME");
             System.exit(1);
         }
-        var ontology = Ontology.loadOntology(args[0]);
+        var file = args[0];
+        var ontology = Ontology.loadOntology(file);
         System.err.println("Loaded...");
         var normalization = new SroiqNormalization();
         var repair = OntologyRepairRandomMcs.forConsistency();
@@ -46,6 +47,7 @@ public class AppAutomatedRepairRandomMCS {
         assert ontology.isConsistent();
         ontology.close();
         System.err.println("==== END RESULT ====");
+        ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-consistent.owl");
         System.err.println("Done.");
     }
 }

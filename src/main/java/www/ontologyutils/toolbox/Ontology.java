@@ -11,6 +11,8 @@ import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.profiles.*;
 import org.semanticweb.owlapi.reasoner.*;
+import org.semanticweb.owlapi.util.DLExpressivityChecker;
+import org.semanticweb.owlapi.util.Languages;
 import org.semanticweb.owlapi.util.OWLObjectPropertyManager;
 
 import openllet.owlapi.OpenlletReasonerFactory;
@@ -254,7 +256,9 @@ public class Ontology implements AutoCloseable {
         } catch (OWLOntologyCreationException e) {
             throw Utils.panic(e);
         } finally {
-            defaultManager.removeOntology(ontology);
+            if (ontology != null) {
+                defaultManager.removeOntology(ontology);
+            }
         }
     }
 
@@ -737,6 +741,14 @@ public class Ontology implements AutoCloseable {
     public List<OWLProfileReport> checkOwlProfiles() {
         return withOwlOntologyDo(ontology -> Utils.toList(
                 Arrays.stream(Profiles.values()).map(profile -> profile.checkOntology(ontology))));
+    }
+
+    /**
+     * @return The list of languages the ontology can be expressed in.
+     */
+    public List<Languages> checkDlExpressivity() {
+        return withOwlOntologyDo(ontology -> Utils
+                .toList((new DLExpressivityChecker(List.of(ontology))).expressibleInLanguages().stream()));
     }
 
     /**

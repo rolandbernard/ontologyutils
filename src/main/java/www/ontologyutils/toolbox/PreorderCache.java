@@ -296,7 +296,7 @@ public class PreorderCache<T> {
      * @return True iff the relation contains a connection from {@code pred} to
      *         {@code succ}.
      */
-    public boolean computeIfAbsent(T pred, T succ, BiPredicate<T, T> order) {
+    public synchronized boolean computeIfAbsent(T pred, T succ, BiPredicate<T, T> order) {
         assureExistence(pred);
         assureExistence(succ);
         if (isKnownSuccessor(pred, succ)) {

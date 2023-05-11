@@ -28,11 +28,13 @@ public class AppAutomatedRepairWeakening {
     public static void main(String[] args) {
         if (args.length < 1 || args.length > 2 || args.length == 2 && !args[0].equals("fast")) {
             System.err
-                    .println("Usage: java " + AppAutomatedRepairWeakening.class.getCanonicalName() + "[fast] FILENAME");
+                    .println(
+                            "Usage: java " + AppAutomatedRepairWeakening.class.getCanonicalName() + " [fast] FILENAME");
             System.exit(1);
         }
-        boolean fast = args[0].equals("fast");
-        var ontology = Ontology.loadOntology(fast ? args[1] : args[0]);
+        var fast = args[0].equals("fast");
+        var file = fast ? args[1] : args[0];
+        var ontology = Ontology.loadOntology(file);
         System.err.println("Loaded...");
         var normalization = new SroiqNormalization();
         var repair = fast
@@ -53,6 +55,7 @@ public class AppAutomatedRepairWeakening {
         assert ontology.isConsistent();
         ontology.close();
         System.err.println("==== END RESULT ====");
+        ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-consistent.owl");
         System.err.println("Done.");
     }
 }
