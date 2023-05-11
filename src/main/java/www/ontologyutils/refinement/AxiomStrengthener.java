@@ -26,7 +26,7 @@ public class AxiomStrengthener extends AxiomRefinement {
          *            Flags that can be used to make the refinement ore strict.
          */
         public Visitor(RefinementOperator up, RefinementOperator down,
-                Set<OWLObjectProperty> simpleRoles, int flags) {
+                Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
             super(up, down, simpleRoles, flags);
         }
 
@@ -37,12 +37,13 @@ public class AxiomStrengthener extends AxiomRefinement {
     }
 
     private AxiomStrengthener(Covers covers, Cover upCover, Cover downCover,
-            Set<OWLObjectProperty> simpleRoles, int flags) {
+            Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
         super(new Visitor(new RefinementOperator(downCover, upCover, flags),
                 new RefinementOperator(upCover, downCover, flags), simpleRoles, flags), covers);
     }
 
-    private AxiomStrengthener(Covers covers, Set<OWLObjectProperty> simpleRoles, int flags, boolean uncached) {
+    private AxiomStrengthener(Covers covers, Set<OWLObjectPropertyExpression> simpleRoles, int flags,
+            boolean uncached) {
         this(covers, uncached ? covers.upCover() : covers.upCover().cached(),
                 uncached ? covers.downCover() : covers.downCover().cached(), simpleRoles, flags);
     }
@@ -50,13 +51,16 @@ public class AxiomStrengthener extends AxiomRefinement {
     /**
      * @param refOntology
      *            The reference ontology to use for the up and down covers.
+     * @param subConcepts
+     *            Return only concepts that are in this set.
      * @param simpleRoles
      *            The roles that are guaranteed to be simple.
      * @param uncached
      *            Do not use any caching, always call the reasoner.
      */
-    public AxiomStrengthener(Ontology refOntology, Set<OWLObjectProperty> simpleRoles, boolean uncached) {
-        this(new Covers(refOntology, simpleRoles, uncached), simpleRoles, FLAG_NON_STRICT, uncached);
+    public AxiomStrengthener(Ontology refOntology, Set<OWLClassExpression> subConcepts,
+            Set<OWLObjectPropertyExpression> simpleRoles, boolean uncached) {
+        this(new Covers(refOntology, subConcepts, simpleRoles, uncached), simpleRoles, FLAG_NON_STRICT, uncached);
     }
 
     /**
@@ -68,7 +72,7 @@ public class AxiomStrengthener extends AxiomRefinement {
      *            Do not use any caching, always call the reasoner.
      */
     public AxiomStrengthener(Ontology refOntology, Ontology fullOntology, boolean uncached) {
-        this(refOntology, Utils.toSet(fullOntology.simpleRoles()), uncached);
+        this(refOntology, Utils.toSet(fullOntology.subConcepts()), Utils.toSet(fullOntology.simpleRoles()), uncached);
     }
 
     /**
@@ -81,8 +85,8 @@ public class AxiomStrengthener extends AxiomRefinement {
      * @param simpleRoles
      *            The roles that are guaranteed to be simple.
      */
-    public AxiomStrengthener(Ontology refOntology, Set<OWLObjectProperty> simpleRoles) {
-        this(new Covers(refOntology, simpleRoles), simpleRoles, FLAG_NON_STRICT, false);
+    public AxiomStrengthener(Ontology refOntology, Set<OWLObjectPropertyExpression> simpleRoles) {
+        this(refOntology, Utils.toSet(refOntology.subConcepts()), simpleRoles, false);
     }
 
     /**

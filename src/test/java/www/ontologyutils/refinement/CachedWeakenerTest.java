@@ -67,9 +67,10 @@ public class CachedWeakenerTest {
     public void cachedAndUncachedCoversAreEqual(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
+            var subConcepts = Utils.toSet(ontology.subConcepts());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
-            try (var cached = new Covers(ontology, simpleRoles)) {
-                try (var uncached = new Covers(ontology, simpleRoles, true)) {
+            try (var cached = new Covers(ontology, subConcepts, simpleRoles)) {
+                try (var uncached = new Covers(ontology, subConcepts, simpleRoles, true)) {
                     ontology.subConcepts().forEach(concept -> {
                         assertEquals(Utils.toSet(uncached.upCover(concept)), Utils.toSet(cached.upCover(concept)));
                         assertEquals(Utils.toSet(uncached.downCover(concept)), Utils.toSet(cached.downCover(concept)));

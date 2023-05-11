@@ -58,7 +58,7 @@ public abstract class AxiomRefinement implements AutoCloseable {
          * The set of all roles that is guaranteed to be simple and whose simplicity
          * must be
          */
-        protected Set<OWLObjectProperty> simpleRoles;
+        protected Set<OWLObjectPropertyExpression> simpleRoles;
         /**
          * The flags.
          */
@@ -76,7 +76,7 @@ public abstract class AxiomRefinement implements AutoCloseable {
          *            Flags that can be used to make the refinement ore strict.
          */
         public Visitor(RefinementOperator up, RefinementOperator down,
-                Set<OWLObjectProperty> simpleRoles, int flags) {
+                Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
             df = Ontology.getDefaultDataFactory();
             this.up = up;
             this.down = down;
@@ -195,7 +195,7 @@ public abstract class AxiomRefinement implements AutoCloseable {
                     Stream.concat(
                             down.refine(axiom.getSubProperty())
                                     .map(role -> df.getOWLSubObjectPropertyOfAxiom(role, axiom.getSuperProperty())),
-                            simpleRoles.contains(axiom.getSubProperty().getNamedProperty())
+                            simpleRoles.contains(axiom.getSubProperty())
                                     ? up.refine(axiom.getSuperProperty())
                                             .map(role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(),
                                                     role))

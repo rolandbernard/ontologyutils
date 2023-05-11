@@ -21,7 +21,9 @@ public class RoleCoverTest {
     public RoleCoverTest() {
         var path = CoverTest.class.getResource("/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        covers = new Covers(ontology, Utils.toSet(ontology.simpleRoles()));
+        var subConcepts = Utils.toSet(ontology.subConcepts());
+        var simpleRoles = Utils.toSet(ontology.simpleRoles());
+        covers = new Covers(ontology, subConcepts, simpleRoles);
     }
 
     private static Stream<Arguments> expectedUpCover() {

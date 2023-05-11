@@ -889,32 +889,35 @@ public class Ontology implements AutoCloseable {
      * @return A stream providing all subconcepts used in the ontology.
      */
     public Stream<OWLClassExpression> subConcepts() {
-        return axioms().flatMap(OWLAxiom::nestedClassExpressions);
+        var df = getDefaultDataFactory();
+        return Stream.concat(axioms().flatMap(OWLAxiom::nestedClassExpressions),
+                Stream.of(df.getOWLThing(), df.getOWLNothing())).distinct();
     }
 
     /**
      * @return A stream containing all non-simple roles.
      */
-    public Stream<OWLObjectProperty> nonSimpleRoles() {
-        return withOwlOntologyDo(ontology -> (new OWLObjectPropertyManager(ontology)).getNonSimpleProperties()).stream()
-                .map(role -> role.getNamedProperty()).distinct();
+    public Stream<OWLObjectPropertyExpression> nonSimpleRoles() {
+        return withOwlOntologyDo(ontology -> (new OWLObjectPropertyManager(ontology)).getNonSimpleProperties())
+                .stream();
     }
 
     /**
      * @return A stream containing all simple roles.
      */
-    public Stream<OWLObjectProperty> simpleRoles() {
-        var nonSimple = this.withOwlOntologyDo(
-                ontology -> Utils.toSet((new OWLObjectPropertyManager(ontology))
-                        .getNonSimpleProperties().stream().map(role -> role.getNamedProperty())));
-        return rolesInSignature().filter(role -> !nonSimple.contains(role));
+    public Stream<OWLObjectPropertyExpression> simpleRoles() {
+        var nonSimple = Utils.toSet(nonSimpleRoles());
+        return rolesInSignature().flatMap(r -> Stream.of(r, r.getInverseProperty()))
+                .filter(role -> !nonSimple.contains(role));
     }
 
     /**
      * @return A stream providing all subconcepts used in the ontology's TBox.
      */
     public Stream<OWLClassExpression> subConceptsOfTbox() {
-        return tboxAxioms().flatMap(OWLAxiom::nestedClassExpressions);
+        var df = getDefaultDataFactory();
+        return Stream.concat(tboxAxioms().flatMap(OWLAxiom::nestedClassExpressions),
+                Stream.of(df.getOWLThing(), df.getOWLNothing())).distinct();
     }
 
     /**
