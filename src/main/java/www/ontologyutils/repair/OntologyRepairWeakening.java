@@ -196,7 +196,8 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 var max = occurrences.values().stream().max(Long::compareTo);
                 if (max.isEmpty()) {
                     throw new RuntimeException(
-                            "Did not find a bad subclass or assertion axiom in " + Utils.toList(ontology.refutableAxioms()));
+                            "Did not find a bad subclass or assertion axiom in "
+                                    + Utils.toList(ontology.refutableAxioms()));
                 }
                 return occurrences.entrySet().stream()
                         .filter(entry -> entry.getValue() == max.get())

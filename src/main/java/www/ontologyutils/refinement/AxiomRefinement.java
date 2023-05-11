@@ -212,7 +212,8 @@ public abstract class AxiomRefinement implements AutoCloseable {
                     IntStream.range(0, chain.size()).mapToObj(i -> i)
                             .flatMap(i -> down.refine(chain.get(i))
                                     .map(role -> df.getOWLSubPropertyChainOfAxiom(
-                                            Utils.toList(Utils.replaceInList(chain, i, role)), axiom.getSuperProperty()))));
+                                            Utils.toList(Utils.replaceInList(chain, i, role)),
+                                            axiom.getSuperProperty()))));
         }
 
         @Override

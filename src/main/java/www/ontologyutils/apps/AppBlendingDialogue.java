@@ -443,7 +443,8 @@ public class AppBlendingDialogue {
         for (int i = 0; i < prefFactoryOne.getAgenda().size(); i++) {
             System.out.println((i + 1) + " : " + Utils.prettyPrintAxiom(prefFactoryOne.getAgenda().get(i)));
         }
-        List<Integer> initRankingOne = Utils.toList(Stream.generate(String::new).limit(prefFactoryOne.getAgenda().size()).map(s -> INIT_NUM));
+        List<Integer> initRankingOne = Utils
+                .toList(Stream.generate(String::new).limit(prefFactoryOne.getAgenda().size()).map(s -> INIT_NUM));
         for (int j = 1; j <= prefFactoryOne.getAgenda().size(); j++) {
             System.out.println("- Current ranking: " + initRankingOne);
             int axiomIndex = readNumber("Next favorite axiom of agent one (enter " + STOP + " to stop)?", 1,
@@ -464,7 +465,8 @@ public class AppBlendingDialogue {
         for (int i = 0; i < prefFactoryTwo.getAgenda().size(); i++) {
             System.out.println((i + 1) + " : " + Utils.prettyPrintAxiom(prefFactoryTwo.getAgenda().get(i)));
         }
-        List<Integer> initRankingTwo = Utils.toList(Stream.generate(String::new).limit(prefFactoryTwo.getAgenda().size()).map(s -> INIT_NUM));
+        List<Integer> initRankingTwo = Utils
+                .toList(Stream.generate(String::new).limit(prefFactoryTwo.getAgenda().size()).map(s -> INIT_NUM));
         for (int j = 1; j <= prefFactoryTwo.getAgenda().size(); j++) {
             System.out.println("- Current ranking: " + initRankingTwo);
             int axiomIndex = readNumber("Next favorite axiom of agent two (enter " + STOP + " to stop)?", 1,

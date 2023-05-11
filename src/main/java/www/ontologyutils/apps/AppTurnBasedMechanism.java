@@ -80,7 +80,8 @@ public class AppTurnBasedMechanism {
         }
         for (int i = 0; i < numVoters; i++) {
             System.out.println("- Preferences voter " + (i + 1));
-            List<Integer> ranking = Utils.toList(Stream.generate(String::new).limit(prefFactory.getAgenda().size()).map(s -> 0));
+            List<Integer> ranking = Utils
+                    .toList(Stream.generate(String::new).limit(prefFactory.getAgenda().size()).map(s -> 0));
             for (int j = 1; j <= prefFactory.getAgenda().size(); j++) {
                 System.out.println("- Current ranking: " + ranking);
                 int axiomIndex = readNumber("Next favorite axiom?", 1, prefFactory.getAgenda().size());

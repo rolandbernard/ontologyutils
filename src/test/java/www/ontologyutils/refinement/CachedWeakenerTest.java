@@ -25,7 +25,8 @@ public class CachedWeakenerTest {
             try (var cached = new AxiomWeakener(ontology)) {
                 try (var uncached = new AxiomWeakener(ontology, ontology, true)) {
                     ontology.logicalAxioms().forEach(axiom -> {
-                        assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)), Utils.toSet(cached.weakerAxioms(axiom)));
+                        assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)),
+                                Utils.toSet(cached.weakerAxioms(axiom)));
                     });
                 }
             }
@@ -47,7 +48,8 @@ public class CachedWeakenerTest {
             try (var cached = new AxiomStrengthener(ontology)) {
                 try (var uncached = new AxiomStrengthener(ontology, ontology, true)) {
                     ontology.logicalAxioms().forEach(axiom -> {
-                        assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)), Utils.toSet(cached.strongerAxioms(axiom)));
+                        assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)),
+                                Utils.toSet(cached.strongerAxioms(axiom)));
                     });
                 }
             }

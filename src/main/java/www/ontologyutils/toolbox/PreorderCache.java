@@ -44,7 +44,13 @@ public class PreorderCache<T> {
         }
     }
 
-    private void removePossibleSuccessors(T pred, T succ) {
+    /**
+     * @param pred
+     *            The element known to not be a predecessor of {@code succ}.
+     * @param succ
+     *            The element known to not be a successor of {@code pred}.
+     */
+    protected void removePossibleSuccessors(T pred, T succ) {
         if (possibleSuccessors.get(pred).remove(succ)) {
             possiblePredecessors.get(succ).remove(pred);
             for (var pred2 : Utils.toArray(knownSuccessors.get(pred))) {
@@ -57,7 +63,13 @@ public class PreorderCache<T> {
         }
     }
 
-    private void addKnownSuccessors(T pred, T succ) {
+    /**
+     * @param pred
+     *            The element known to be a predecessor of {@code succ}.
+     * @param succ
+     *            The element known to be a successor of {@code pred}.
+     */
+    protected void addKnownSuccessors(T pred, T succ) {
         if (knownSuccessors.get(pred).add(succ)) {
             knownPredecessors.get(succ).add(pred);
             possibleSuccessors.get(pred).remove(succ);
@@ -228,6 +240,49 @@ public class PreorderCache<T> {
     }
 
     /**
+     * @param pred
+     *            The possible predecessor.
+     * @param succ
+     *            The possible successor.
+     * @return True if {@code pred} is a predecessor of {@code succ}.
+     */
+    public boolean isKnownSuccessor(T pred, T succ) {
+        var set = knownSuccessors.get(pred);
+        if (set == null) {
+            return false;
+        }
+        return set.contains(succ);
+    }
+
+    /**
+     * @param pred
+     *            The possible predecessor.
+     * @param succ
+     *            The possible successor.
+     * @return False if {@code pred} is not a predecessor of {@code succ}.
+     */
+    public boolean isPossibleSuccessor(T pred, T succ) {
+        var set = possibleSuccessors.get(pred);
+        if (set == null) {
+            return true;
+        }
+        return set.contains(succ);
+    }
+
+    /**
+     * @param pred
+     *            The possible predecessor.
+     * @param succ
+     *            The possible successor.
+     * @param order
+     *            The predicate to test with.
+     * @return True if {@code pred} is a predecessor of {@code succ}.
+     */
+    protected boolean compute(T pred, T succ, BiPredicate<T, T> order) {
+        return order.test(pred, succ);
+    }
+
+    /**
      * Get whether the relation contains the pair ({@code pred}, {@code succ}). If
      * the result is already known form the cached values it is returned
      * immediately, other wise {@code order} is called to find the result.
@@ -244,42 +299,16 @@ public class PreorderCache<T> {
     public boolean computeIfAbsent(T pred, T succ, BiPredicate<T, T> order) {
         assureExistence(pred);
         assureExistence(succ);
-        if (knownSuccessors.get(pred).contains(succ)) {
+        if (isKnownSuccessor(pred, succ)) {
             return true;
-        } else if (!possibleSuccessors.get(pred).contains(succ)) {
+        } else if (!isPossibleSuccessor(pred, succ)) {
             return false;
-        } else if (order.test(pred, succ)) {
+        } else if (compute(pred, succ, order)) {
             addKnownSuccessors(pred, succ);
             return true;
         } else {
             removePossibleSuccessors(pred, succ);
             return false;
-        }
-    }
-
-    /**
-     * Get whether the relation contains the pair ({@code pred}, {@code succ}). If
-     * the result is already known form the cached values it is returned
-     * immediately, otherwise {@code order} is called to find the result. Unlike
-     * {@code computeIfAbsent}, this method will not cache the result of the
-     * computation.
-     *
-     * @param pred
-     *            The possible predecessor of {@code succ}.
-     * @param succ
-     *            The possible successor of {@code pred}.
-     * @param order
-     *            A function defining the relation to cache.
-     * @return True iff the relation contains a connection from {@code pred} to
-     *         {@code succ}.
-     */
-    public boolean computeIfAbsentNoCache(T pred, T succ, BiPredicate<T, T> order) {
-        if (knownSuccessors.containsKey(pred) && knownSuccessors.get(pred).contains(succ)) {
-            return true;
-        } else if (possibleSuccessors.containsKey(pred) && !possibleSuccessors.get(pred).contains(succ)) {
-            return false;
-        } else {
-            return order.test(pred, succ);
         }
     }
 

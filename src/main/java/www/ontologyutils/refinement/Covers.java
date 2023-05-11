@@ -125,9 +125,9 @@ public class Covers implements AutoCloseable {
         this.subConcepts.add(df.getOWLNothing());
         this.simpleRoles = simpleRoles;
         if (!uncached) {
-            this.isSubClass = new PreorderCache<>();
+            this.isSubClass = new SubClassCache();
             this.isSubClass.setupDomain(subConcepts);
-            this.isSubRole = new PreorderCache<>();
+            this.isSubRole = new SubRoleCache();
             this.isSubRole.setupDomain(Utils.toList(allSimpleRoles()));
         }
     }

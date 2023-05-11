@@ -736,7 +736,7 @@ public class Ontology implements AutoCloseable {
      */
     public List<OWLProfileReport> checkOwlProfiles() {
         return withOwlOntologyDo(ontology -> Utils.toList(
-            Arrays.stream(Profiles.values()).map(profile -> profile.checkOntology(ontology))));
+                Arrays.stream(Profiles.values()).map(profile -> profile.checkOntology(ontology))));
     }
 
     /**
@@ -1031,7 +1031,8 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithRefutable(Set<? extends OWLAxiom> axioms) {
-        return new Ontology(staticAxioms, Utils.toList(refutableAxioms.stream().filter(axiom -> axioms.contains(axiom))), reasonerCache);
+        return new Ontology(staticAxioms,
+                Utils.toList(refutableAxioms.stream().filter(axiom -> axioms.contains(axiom))), reasonerCache);
     }
 
     /**

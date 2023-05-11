@@ -80,7 +80,8 @@ public class AppCondorRules {
             assert (newConj.asConjunctSet().size() == 2);
             if (leftConj.size() == 2) {
                 assert (!iter.hasNext());
-                OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, right, Utils.toList(Ontology.axiomOriginAnnotations(a)));
+                OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, right,
+                        Utils.toList(Ontology.axiomOriginAnnotations(a)));
                 res.add(axiom);
                 return res;
             }
@@ -90,7 +91,8 @@ public class AppCondorRules {
             leftConj.remove(two);
             leftConj.add(newAtom);
 
-            OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, newAtom, Utils.toList(Ontology.axiomOriginAnnotations(a)));
+            OWLAxiom axiom = df.getOWLSubClassOfAxiom(newConj, newAtom,
+                    Utils.toList(Ontology.axiomOriginAnnotations(a)));
             res.add(axiom);
         }
     }

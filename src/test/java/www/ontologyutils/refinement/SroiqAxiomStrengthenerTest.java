@@ -164,8 +164,7 @@ public class SroiqAxiomStrengthenerTest {
                     copy.removeAxioms(weakAxiom);
                     try (var axiomStrengthener = new AxiomStrengthener(copy)) {
                         axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
-                            try (var copy2 = resourceName.equals("../owl-tests.owl") ? copy.clone()
-                                    : copy.clone()) {
+                            try (var copy2 = copy.clone()) {
                                 copy2.addAxioms(strongAxiom);
                                 // Some reasoners don't like entailment on inconsistent ontologies.
                                 assertTrue(!copy2.isConsistent() || copy2.isEntailed(weakAxiom));
