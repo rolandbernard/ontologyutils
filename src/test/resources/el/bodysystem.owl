@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:xsp="http://www.owl-ontologies.com/2005/08/07/xsp.owl#"
+    xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+    xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
+    xmlns="http://who.int/bodysystem.owl#"
+    xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+    xmlns:protege="http://protege.stanford.edu/plugins/owl/protege#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xml:base="http://who.int/bodysystem.owl">
+  <owl:Ontology rdf:about=""/>
+  <owl:Class rdf:ID="CentralNervousSystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="NervousSystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Central Nervous System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="AuditorySystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="BodySystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Auditory System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="PeripheralNervousSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Peripheral Nervous System</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#NervousSystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="NutritionalSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Nutritional System</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="MaleGenitalSystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="GenitourinarySystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Male Genital System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="AutonomicNervousSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Autonomic Nervous System</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#NervousSystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="ParasympatheticNervousSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Parasympathetic Nervous System</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#AutonomicNervousSystem"/>
+  </owl:Class>
+  <owl:Class rdf:ID="HaemolymphoidSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Haemolymphoid System</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="FemaleGenitalSystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#GenitourinarySystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Female Genital System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="VestibularSystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Vestibular System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.w3.org/2002/07/owl#Thing"/>
+  <owl:Class rdf:ID="MentalSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Mental System</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="MusculoskeletalSystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Musculoskeletal System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="SkinSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Skin System (Integumentary System)</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="HaematopoieticSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Haematopoietic System</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#HaemolymphoidSystem"/>
+  </owl:Class>
+  <owl:Class rdf:ID="RespiratorySystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Respiratory System</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="CirculatorySystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Circulatory System (Cardiovascular System)</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="EndocrineSystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Endocrine System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="SceletalSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Sceletal System</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#MusculoskeletalSystem"/>
+  </owl:Class>
+  <owl:Class rdf:ID="MotoricSystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#NervousSystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Motoric System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="VisualSystem">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Visual System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="DigestiveSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Digestive System</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#BodySystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="UrinarySystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Urinary System</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#GenitourinarySystem"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="ImmuneSystem">
+    <rdfs:subClassOf rdf:resource="#HaemolymphoidSystem"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Immune System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="MuscularSystem">
+    <rdfs:subClassOf rdf:resource="#MusculoskeletalSystem"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Muscular System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="#BodySystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Body System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="SympatheticNervousSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Sympathetic Nervous System</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#AutonomicNervousSystem"/>
+  </owl:Class>
+  <owl:Class rdf:about="#NervousSystem">
+    <rdfs:subClassOf rdf:resource="#BodySystem"/>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Nervous System</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="#GenitourinarySystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Genitourinary System</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#BodySystem"/>
+  </owl:Class>
+  <owl:Class rdf:ID="MetabolicSystem">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Metabolic System</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#BodySystem"/>
+  </owl:Class>
+</rdf:RDF>
+
+<!-- Created with Protege (with OWL Plugin 3.4.4, Build 579)  http://protege.stanford.edu -->

@@ -1,0 +1,149 @@
+Prefix: dc: <http://purl.org/dc/elements/1.1/>
+Prefix: owl: <http://www.w3.org/2002/07/owl#>
+Prefix: rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+Prefix: rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+Prefix: xml: <http://www.w3.org/XML/1998/namespace>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+
+
+
+Ontology: <http://www.semanticweb.org/ontologies/dl2017_example>
+
+
+ObjectProperty: <http://www.semanticweb.org/ontologies/dl2017_example#hasColour>
+
+    SubPropertyOf: 
+        owl:topObjectProperty
+    
+    Domain: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#PhysicalObject>
+    
+    Range: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Colour>
+    
+    
+ObjectProperty: <http://www.semanticweb.org/ontologies/dl2017_example#hasQuality>
+
+    SubPropertyOf: 
+        owl:topObjectProperty
+    
+    Domain: 
+        owl:Thing
+    
+    Range: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Quality>
+    
+    
+ObjectProperty: owl:topObjectProperty
+
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#AbstractObject>
+
+    DisjointWith: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#PhysicalObject>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Animal>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#PhysicalObject>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Black>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#GrayScale>
+    
+    DisjointWith: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#White>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#BlackCat>
+
+    EquivalentTo: 
+        (<http://www.semanticweb.org/ontologies/dl2017_example#Cat>
+         and (<http://www.semanticweb.org/ontologies/dl2017_example#hasColour> some <http://www.semanticweb.org/ontologies/dl2017_example#Black>))
+         and (<http://www.semanticweb.org/ontologies/dl2017_example#hasColour> only <http://www.semanticweb.org/ontologies/dl2017_example#Black>)
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Cat>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Pet>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Colour>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Quality>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#GrayScale>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Colour>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Integer>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Number>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Number>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#AbstractObject>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Pet>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Animal>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#PhysicalObject>
+
+    DisjointWith: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#AbstractObject>, <http://www.semanticweb.org/ontologies/dl2017_example#Quality>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#PrimeNumber>
+
+    EquivalentTo: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Integer>
+         and (<http://www.semanticweb.org/ontologies/dl2017_example#hasQuality> only <http://www.semanticweb.org/ontologies/dl2017_example#Primeness>)
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Primeness>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Quality>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#Quality>
+
+    DisjointWith: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#PhysicalObject>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#White>
+
+    SubClassOf: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#GrayScale>
+    
+    DisjointWith: 
+        <http://www.semanticweb.org/ontologies/dl2017_example#Black>
+    
+    
+Class: <http://www.semanticweb.org/ontologies/dl2017_example#WhiteCat>
+
+    EquivalentTo: 
+        (<http://www.semanticweb.org/ontologies/dl2017_example#Cat>
+         and (<http://www.semanticweb.org/ontologies/dl2017_example#hasColour> some <http://www.semanticweb.org/ontologies/dl2017_example#White>))
+         and (<http://www.semanticweb.org/ontologies/dl2017_example#hasColour> only <http://www.semanticweb.org/ontologies/dl2017_example#White>)
+    
+    
+Class: owl:Thing
+
+    

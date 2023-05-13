@@ -9,4 +9,5 @@ bin/
 *.class
 /bin/
 *-made-inconsistent.owl
+*-made-consistent.owl
 tmp.*
