@@ -27,24 +27,29 @@ public class AppMakeInconsistent {
      */
     public static void main(String[] args) {
         var startTime = System.nanoTime();
-        var ontology = Ontology.loadOntology(args[0]);
+        var fast = args[0].equals("fast");
+        var file = fast ? args[1] : args[0];
+        var ontology = Ontology.loadOntology(file);
         var normalization = new SroiqNormalization();
-        normalization.apply(ontology);
-        System.err.println("Loaded...");
+        System.err.println("Loaded... (" + ontology.logicalAxioms().count() + " axioms)");
+        if (!fast) {
+            normalization.apply(ontology);
+            System.err.println("Normalized. (" + ontology.logicalAxioms().count() + " axioms)");
+        }
         if (!ontology.isConsistent()) {
             System.err.println("Ontology is already inconsistent.");
             return;
         }
         int minNumIter = 0;
         try {
-            minNumIter = Integer.parseInt(args[1]);
+            minNumIter = Integer.parseInt(fast ? args[2] : args[1]);
             System.err.println("Minimal number of strengthening iterations: " + minNumIter);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
             System.err.println("No minimal number of strengthening iterations specified.");
         }
         int minNumIterAfterInconsistency = 0;
         try {
-            minNumIterAfterInconsistency = Integer.parseInt(args[2]);
+            minNumIterAfterInconsistency = Integer.parseInt(fast ? args[3] : args[2]);
             System.err.println(
                     "Minimal number of iterations after reaching inconsistency: " + minNumIterAfterInconsistency);
         } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
@@ -99,7 +104,7 @@ public class AppMakeInconsistent {
         ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                 .sorted().forEach(System.out::println);
         System.err.println("==== END RESULT ====");
-        ontology.saveOntology(args[0].replaceAll(".owl$", "") + "-made-inconsistent.owl");
+        ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-inconsistent.owl");
         axiomStrengthener.close();
         emptyOntology.close();
         ontology.close();

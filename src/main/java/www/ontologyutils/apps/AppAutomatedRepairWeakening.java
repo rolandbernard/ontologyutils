@@ -36,15 +36,18 @@ public class AppAutomatedRepairWeakening {
         var fast = args[0].equals("fast");
         var file = fast ? args[1] : args[0];
         var ontology = Ontology.loadOntology(file);
-        System.err.println("Loaded...");
+        System.err.println("Loaded... (" + ontology.logicalAxioms().count() + " axioms)");
         var normalization = new SroiqNormalization();
         var repair = fast
                 ? new OntologyRepairWeakening(Ontology::isConsistent, RefOntologyStrategy.ONE_MCS,
                         BadAxiomStrategy.IN_ONE_MUS)
                 : OntologyRepairWeakening.forConsistency();
         repair.setInfoCallback(msg -> System.out.println("[" + getTimeStamp() + "] " + msg));
-        System.err.println("Normalizing...");
-        normalization.apply(ontology);
+        if (!fast) {
+            System.err.println("Normalizing...");
+            normalization.apply(ontology);
+            System.err.println("Normalized. (" + ontology.logicalAxioms().count() + " axioms)");
+        }
         System.err.println("Repairing...");
         repair.apply(ontology);
         System.err.println("Repaired.");

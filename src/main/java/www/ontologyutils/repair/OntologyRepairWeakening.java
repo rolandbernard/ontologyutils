@@ -233,7 +233,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
                     var badAxiom = Utils.randomChoice(badAxioms);
                     infoMessage("Selected the bad axiom " + Utils.prettyPrintAxiom(badAxiom) + ".");
                     var weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(badAxiom));
-                    infoMessage("Found  " + weakerAxioms.size() + " weaker axioms.");
+                    infoMessage("Found " + weakerAxioms.size() + " weaker axioms.");
                     var weakerAxiom = Utils.randomChoice(weakerAxioms);
                     infoMessage("Selected the weaker axiom " + Utils.prettyPrintAxiom(weakerAxiom) + ".");
                     ontology.replaceAxiom(badAxiom, weakerAxiom);
