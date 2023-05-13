@@ -24,6 +24,7 @@ public class AppAutomatedRepairRandomMCS {
      *            ontology.
      */
     public static void main(String[] args) {
+        var startTime = System.nanoTime();
         if (args.length != 1) {
             System.err.println("Usage: java " + AppAutomatedRepairRandomMCS.class.getCanonicalName() + " FILENAME");
             System.exit(1);
@@ -48,6 +49,7 @@ public class AppAutomatedRepairRandomMCS {
         ontology.close();
         System.err.println("==== END RESULT ====");
         ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-consistent.owl");
-        System.err.println("Done.");
+        var endTime = System.nanoTime();
+        System.err.println("Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
     }
 }

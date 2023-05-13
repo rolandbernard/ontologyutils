@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import java.util.stream.*;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
@@ -18,12 +18,19 @@ public class RoleCoverTest {
     private Ontology ontology;
     private Covers covers;
 
-    public RoleCoverTest() {
-        var path = CoverTest.class.getResource("/sroiq-tests.owl").getFile();
+    @BeforeEach
+    public void setup() {
+        var path = CoverTest.class.getResource("/alcri/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         var subConcepts = Utils.toSet(ontology.subConcepts());
         var simpleRoles = Utils.toSet(ontology.simpleRoles());
         covers = new Covers(ontology, subConcepts, simpleRoles);
+    }
+
+    @AfterEach
+    public void teardown() {
+        ontology.close();
+        covers.close();
     }
 
     private static Stream<Arguments> expectedUpCover() {

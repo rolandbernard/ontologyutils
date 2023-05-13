@@ -2,6 +2,7 @@ package www.ontologyutils.refinement;
 
 import java.util.stream.*;
 
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
@@ -17,9 +18,10 @@ public class TerminationTest {
     private Ontology ontology;
     private Covers covers;
     static RefinementOperator generalization;
-
-    public TerminationTest() {
-        var path = RoleCoverTest.class.getResource("/a-and-b.owl").getFile();
+    
+    @BeforeEach
+    public void setup() {
+        var path = RoleCoverTest.class.getResource("/el/a-and-b.owl").getFile();
         ontology = Ontology.loadOntology(path);
         var subConcepts = Utils.toSet(ontology.subConcepts());
         var simpleRoles = Utils.toSet(ontology.simpleRoles());
@@ -27,6 +29,12 @@ public class TerminationTest {
         var upCover = covers.upCover().cached();
         var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);
+    }
+
+    @AfterEach
+    public void teardown() {
+        ontology.close();
+        covers.close();
     }
 
     public boolean areEquivalent(OWLClassExpression c1, OWLClassExpression c2) {

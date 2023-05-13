@@ -61,7 +61,8 @@ public abstract class OntologyRepairTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "/inconsistent/leftpolicies-small.owl", "/inconsistent/leftpolicies.owl" })
+    @ValueSource(strings = { "/inconsistent/leftpolicies-small.owl", "/inconsistent/leftpolicies.owl",
+            "/inconsistent/pizza.owl" })
     public void repairInconsistentOntologyFromFile(String resourceName) {
         var path = OntologyRepairTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
@@ -74,7 +75,8 @@ public abstract class OntologyRepairTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "/inconsistent/leftpolicies-small.owl", "/inconsistent/leftpolicies.owl" })
+    @ValueSource(strings = { "/inconsistent/leftpolicies-small.owl", "/inconsistent/leftpolicies.owl",
+            "/inconsistent/pizza.owl" })
     public void repairWithNormalizationInconsistentOntologyFromFile(String resourceName) {
         var path = OntologyRepairTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {

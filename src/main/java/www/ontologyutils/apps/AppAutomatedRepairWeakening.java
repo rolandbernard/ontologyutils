@@ -26,6 +26,7 @@ public class AppAutomatedRepairWeakening {
      *            or file path of an ontology.
      */
     public static void main(String[] args) {
+        var startTime = System.nanoTime();
         if (args.length < 1 || args.length > 2 || args.length == 2 && !args[0].equals("fast")) {
             System.err
                     .println(
@@ -56,6 +57,7 @@ public class AppAutomatedRepairWeakening {
         ontology.close();
         System.err.println("==== END RESULT ====");
         ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-consistent.owl");
-        System.err.println("Done.");
+        var endTime = System.nanoTime();
+        System.err.println("Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
     }
 }

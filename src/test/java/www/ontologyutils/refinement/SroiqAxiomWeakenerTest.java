@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import java.util.stream.*;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
@@ -18,10 +18,17 @@ public class SroiqAxiomWeakenerTest {
     private Ontology ontology;
     private AxiomWeakener axiomWeakener;
 
-    public SroiqAxiomWeakenerTest() {
-        var path = RoleCoverTest.class.getResource("/sroiq-tests.owl").getFile();
+    @BeforeEach
+    public void setup() {
+        var path = RoleCoverTest.class.getResource("/alcri/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomWeakener = new AxiomWeakener(ontology, ontology);
+    }
+
+    @AfterEach
+    public void teardown() {
+        ontology.close();
+        axiomWeakener.close();
     }
 
     private static Stream<Arguments> expectedWeakening() {

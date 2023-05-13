@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import java.util.stream.*;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
@@ -19,10 +19,17 @@ public class AxiomStrengthenerTest {
     private Ontology ontology;
     private AxiomStrengthener axiomStrengthener;
 
-    public AxiomStrengthenerTest() {
-        var path = RoleCoverTest.class.getResource("/catsandnumbers.owl").getFile();
+    @BeforeEach
+    public void setup() {
+        var path = RoleCoverTest.class.getResource("/alch/catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         axiomStrengthener = new AxiomStrengthener(ontology);
+    }
+
+    @AfterEach
+    public void teardown() {
+        ontology.close();
+        axiomStrengthener.close();
     }
 
     private static Stream<Arguments> expectedStrengthening() {

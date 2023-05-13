@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 import java.util.stream.*;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
@@ -19,9 +19,10 @@ public class SroiqRefinementOperatorTest {
     private Covers covers;
     static RefinementOperator generalization;
     static RefinementOperator specialization;
-
-    public SroiqRefinementOperatorTest() {
-        var path = RoleCoverTest.class.getResource("/sroiq-tests.owl").getFile();
+    
+    @BeforeEach
+    public void setup() {
+        var path = RoleCoverTest.class.getResource("/alcri/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         var subConcepts = Utils.toSet(ontology.subConcepts());
         var simpleRoles = Utils.toSet(ontology.simpleRoles());
@@ -30,6 +31,12 @@ public class SroiqRefinementOperatorTest {
         var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);
         specialization = new RefinementOperator(downCover, upCover);
+    }
+
+    @AfterEach
+    public void teardown() {
+        ontology.close();
+        covers.close();
     }
 
     private static Stream<Arguments> expectedGeneralization() {

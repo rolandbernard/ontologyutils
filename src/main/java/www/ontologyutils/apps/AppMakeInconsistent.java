@@ -26,6 +26,7 @@ public class AppMakeInconsistent {
      *            after making the ontology inconsistent.
      */
     public static void main(String[] args) {
+        var startTime = System.nanoTime();
         var ontology = Ontology.loadOntology(args[0]);
         var normalization = new SroiqNormalization();
         normalization.apply(ontology);
@@ -102,6 +103,7 @@ public class AppMakeInconsistent {
         axiomStrengthener.close();
         emptyOntology.close();
         ontology.close();
-        System.err.println("Done.");
+        var endTime = System.nanoTime();
+        System.err.println("Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
     }
 }
