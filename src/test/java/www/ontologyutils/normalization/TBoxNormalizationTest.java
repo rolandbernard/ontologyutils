@@ -11,7 +11,11 @@ import www.ontologyutils.toolbox.Ontology;
 public class TBoxNormalizationTest {
     @ParameterizedTest
     @ValueSource(strings = {
-            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl", "/pizza.owl",
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl", "/el/apo.owl", "/el/aeo.owl",
+            "/el/duo.owl", "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
+            "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
+            "/alc/InitialOntologyInsta.owl", "/alc/Test_hybrid.owl",
+            "/alc/Vehicle.owl", "/alc/C50_R10_0.001_0.001_0.001_62888.owl", "/shoin/pizza.owl"
     })
     public void allTBoxAxiomsAreSubclassOf(String resourceName) throws OWLOntologyCreationException {
         var path = TBoxNormalizationTest.class.getResource(resourceName).getFile();
@@ -25,7 +29,11 @@ public class TBoxNormalizationTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl", "/pizza.owl",
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl", "/el/apo.owl", "/el/aeo.owl",
+            "/el/duo.owl", "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
+            "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
+            "/alc/InitialOntologyInsta.owl", "/alc/Test_hybrid.owl",
+            "/alc/Vehicle.owl", "/alc/C50_R10_0.001_0.001_0.001_62888.owl", "/shoin/pizza.owl"
     })
     public void normalizedOntologyIsEquivalent(String resourceName) throws OWLOntologyCreationException {
         var path = TBoxNormalizationTest.class.getResource(resourceName).getFile();

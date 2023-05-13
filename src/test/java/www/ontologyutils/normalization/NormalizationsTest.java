@@ -16,7 +16,8 @@ import www.ontologyutils.toolbox.*;
 public class NormalizationsTest {
     @ParameterizedTest
     @ValueSource(strings = {
-            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl", "/tiny.owl"
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl", "/el/apo.owl", "/el/aeo.owl",
+            "/el/duo.owl", "/el/tiny.owl"
     })
     public void testNormalizeCondor(String resourceName) throws OWLOntologyCreationException {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms();
@@ -38,7 +39,8 @@ public class NormalizationsTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/apo.owl", "/aeo.owl", "/duo.owl", "/tiny.owl"
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl", "/el/apo.owl", "/el/aeo.owl",
+            "/el/duo.owl", "/el/tiny.owl"
     })
     public void testNormalizeNaive(String resourceName) throws OWLOntologyCreationException {
         FreshAtoms.resetFreshAtomsEquivalenceAxioms();

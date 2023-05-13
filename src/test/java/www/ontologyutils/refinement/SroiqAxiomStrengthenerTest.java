@@ -149,11 +149,12 @@ public class SroiqAxiomStrengthenerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/pizza.owl",
-            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
-            "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
-            "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
-            "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Vehicle.owl",
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl",
+            "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
+            "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
+            "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl",
+            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Test_hybrid.owl",
+            "/alc/Vehicle.owl", "/shoin/pizza.owl"
     })
     public void allStrongAxiomsEntailWeakerAxiomsFromFile(String resourceName)
             throws OWLOntologyCreationException {

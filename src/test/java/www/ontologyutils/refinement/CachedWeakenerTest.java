@@ -12,12 +12,12 @@ import www.ontologyutils.toolbox.*;
 public class CachedWeakenerTest {
     @ParameterizedTest
     @ValueSource(strings = {
-            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl",
-            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
-            "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
-            "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
-            "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",
-            "/FishVehicle/Vehicle.owl", "/pizza.owl"
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl",
+            "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
+            "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
+            "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl",
+            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Test_hybrid.owl",
+            "/alc/Vehicle.owl", "/shoin/pizza.owl"
     })
     public void cachedAndUncachedWeakeningAreEqual(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
@@ -35,12 +35,12 @@ public class CachedWeakenerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl",
-            "/a-and-b.owl", "/Empty.owl", "/FishVehicle/Alignment.owl", "/owl-tests.owl",
-            "/FishVehicle/Disalignment.owl", "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl",
-            "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
-            "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",
-            "/FishVehicle/Vehicle.owl", "/pizza.owl"
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl",
+            "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
+            "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
+            "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl",
+            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Test_hybrid.owl",
+            "/alc/Vehicle.owl", "/shoin/pizza.owl"
     })
     public void cachedAndUncachedStrengtheningAreEqual(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
@@ -58,11 +58,12 @@ public class CachedWeakenerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "/catsandnumbers.owl", "/bodysystem.owl", "/bfo.owl", "/a-and-b.owl", "/Empty.owl",
-            "/FishVehicle/Alignment.owl", "/owl-tests.owl", "/FishVehicle/Disalignment.owl",
-            "/FishVehicle/Fish.owl", "/FishVehicle/InitialOntology.owl", "/FishVehicle/Vehicle.owl",
-            "/FishVehicle/InitialOntologyAlignment.owl", "/FishVehicle/InitialOntologyInsta.owl",
-            "/FishVehicle/InitialOntologyInstantiationAlignment.owl", "/FishVehicle/Test_hybrid.owl",
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl",
+            "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
+            "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
+            "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl",
+            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Test_hybrid.owl",
+            "/alc/Vehicle.owl",
     })
     public void cachedAndUncachedCoversAreEqual(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
