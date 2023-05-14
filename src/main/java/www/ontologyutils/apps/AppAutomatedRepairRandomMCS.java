@@ -50,6 +50,7 @@ public class AppAutomatedRepairRandomMCS {
         System.err.println("==== END RESULT ====");
         ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-consistent.owl");
         var endTime = System.nanoTime();
-        System.err.println("Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
+        System.err.println(
+                "Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
     }
 }

@@ -109,6 +109,7 @@ public class AppMakeInconsistent {
         emptyOntology.close();
         ontology.close();
         var endTime = System.nanoTime();
-        System.err.println("Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
+        System.err.println(
+                "Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
     }
 }

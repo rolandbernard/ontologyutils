@@ -19,7 +19,7 @@ public class SroiqRefinementOperatorTest {
     private Covers covers;
     static RefinementOperator generalization;
     static RefinementOperator specialization;
-    
+
     @BeforeEach
     public void setup() {
         var path = RoleCoverTest.class.getResource("/alcri/sroiq-tests.owl").getFile();

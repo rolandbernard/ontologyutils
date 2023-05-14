@@ -18,7 +18,7 @@ public class TerminationTest {
     private Ontology ontology;
     private Covers covers;
     static RefinementOperator generalization;
-    
+
     @BeforeEach
     public void setup() {
         var path = RoleCoverTest.class.getResource("/el/a-and-b.owl").getFile();
