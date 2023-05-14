@@ -66,8 +66,9 @@ public class AxiomStrengthener extends AxiomRefinement {
     /**
      * @param refOntology
      *            The reference ontology to use for the up and down covers.
-     * @param simpleRoles
-     *            The roles that are guaranteed to be simple.
+     * @param fullOntology
+     *            The maximal ontology in which the weaker axioms will be
+     *            used in.
      * @param uncached
      *            Do not use any caching, always call the reasoner.
      */

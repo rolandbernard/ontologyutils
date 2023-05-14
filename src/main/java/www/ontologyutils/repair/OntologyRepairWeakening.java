@@ -175,8 +175,14 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 return mcsPeekInfo(false, ontology.maximalConsistentSubsets(isRepaired));
             case SOME_MCS:
                 return mcsPeekInfo(false, ontology.someMaximalConsistentSubsets(isRepaired));
-            case ONE_MCS:
-                return Stream.of(ontology.maximalConsistentSubset(isRepaired));
+            case ONE_MCS: {
+                var mcs = ontology.maximalConsistentSubset(isRepaired);
+                if (mcs == null) {
+                    return Stream.of();
+                } else {
+                    return Stream.of(mcs);
+                }
+            }
             default:
                 throw new IllegalArgumentException("Unimplemented reference ontology choice strategy.");
         }
@@ -211,10 +217,22 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 return ontology.someMinimalCorrectionSubsets(isRepaired).flatMap(mcs -> mcs.stream());
             case IN_SOME_MUS:
                 return ontology.someMinimalUnsatisfiableSubsets(isRepaired).flatMap(mus -> mus.stream());
-            case IN_ONE_MUS:
-                return ontology.minimalUnsatisfiableSubset(isRepaired).stream();
-            case NOT_IN_ONE_MCS:
-                return ontology.minimalCorrectionSubset(isRepaired).stream();
+            case IN_ONE_MUS: {
+                var mus = ontology.minimalUnsatisfiableSubset(isRepaired);
+                if (mus == null) {
+                    return Stream.of();
+                } else {
+                    return mus.stream();
+                }
+            }
+            case NOT_IN_ONE_MCS: {
+                var mcs = ontology.minimalCorrectionSubset(isRepaired);
+                if (mcs == null) {
+                    return Stream.of();
+                } else {
+                    return mcs.stream();
+                }
+            }
             case RANDOM:
                 return ontology.refutableAxioms();
             default:

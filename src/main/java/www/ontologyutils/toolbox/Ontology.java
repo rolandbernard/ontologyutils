@@ -219,7 +219,7 @@ public class Ontology implements AutoCloseable {
      * @param ontology
      *            The {@code OWLOntology} form which to copy the axioms. Logical
      *            axiom will be refutable, other will be static.
-     * @param reas
+     * @param reasonerFactory
      *            The reasoner factory to be used for reasoning queries.
      * @return The new ontology.
      */
@@ -604,6 +604,17 @@ public class Ontology implements AutoCloseable {
         } else {
             addAxioms(annotated);
         }
+    }
+
+    /**
+     * Remove all refutable axioms, and add the axioms from axioms.
+     *
+     * @param axioms
+     *            The axioms to use.
+     */
+    public void setRefutableAxioms(Collection<? extends OWLAxiom> axioms) {
+        refutableAxioms.clear();
+        refutableAxioms.addAll(axioms);
     }
 
     /**
@@ -1055,7 +1066,7 @@ public class Ontology implements AutoCloseable {
     /**
      * Clone this ontology, but only axioms in {@code axioms}.
      *
-     * @param axio
+     * @param axioms
      *            The axioms that should be retained.
      * @return The new ontology.
      */

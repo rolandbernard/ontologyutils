@@ -15,13 +15,13 @@ import www.ontologyutils.toolbox.*;
  */
 public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
     /**
-     * Used for saving the replacements performed during a run.
+     * The function to use as a quality measure.
      */
-    protected static record RepairChange(OWLAxiom original, OWLAxiom weaker) {
-    }
-
-    private Function<Ontology, Double> quality;
-    private int numberOfRounds;
+    protected Function<Ontology, Double> quality;
+    /**
+     * The number of rounds of repairs that should be performed.
+     */
+    protected int numberOfRounds;
 
     /**
      * @param isRepaired
@@ -77,13 +77,12 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
     public void repair(Ontology ontology) {
         var refAxioms = Utils.randomChoice(getRefAxioms(ontology));
         infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
-        var bestChange = List.<RepairChange>of();
+        var bestAxioms = Set.<OWLAxiom>of();
         var bestQuality = Double.NEGATIVE_INFINITY;
         try (var refOntology = ontology.cloneWithRefutable(refAxioms)) {
             try (var axiomWeakener = new AxiomWeakener(refOntology, ontology)) {
                 for (int k = 0; k < numberOfRounds; k++) {
                     try (var copy = ontology.clone()) {
-                        var changes = new ArrayList<RepairChange>();
                         checkpoint(copy);
                         while (!isRepaired(copy)) {
                             var badAxioms = Utils.toList(findBadAxioms(copy));
@@ -95,20 +94,17 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
                             var weakerAxiom = Utils.randomChoice(weakerAxioms);
                             infoMessage("Selected the weaker axiom " + Utils.prettyPrintAxiom(weakerAxiom) + ".");
                             copy.replaceAxiom(badAxiom, weakerAxiom);
-                            changes.add(new RepairChange(badAxiom, weakerAxiom));
                             checkpoint(copy);
                         }
                         var thisQuality = quality.apply(copy);
                         if (thisQuality > bestQuality) {
-                            bestChange = changes;
+                            bestAxioms = Utils.toSet(copy.axioms());
                             bestQuality = thisQuality;
                         }
                     }
                 }
             }
         }
-        for (var change : bestChange) {
-            ontology.replaceAxiom(change.original, change.weaker);
-        }
+        ontology.setRefutableAxioms(bestAxioms);
     }
 }
