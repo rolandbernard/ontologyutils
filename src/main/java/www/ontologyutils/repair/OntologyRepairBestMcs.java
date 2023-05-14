@@ -6,9 +6,9 @@ import java.util.function.Predicate;
 import www.ontologyutils.toolbox.*;
 
 /**
- * A simple implementation of {@code OntologyRepair}. It repairs an inconsistent
- * ontology into an ontology made of a randomly chosen maximally consistent set
- * of axioms in the input ontology.
+ * An implementation of {@code OntologyRepair}. It repairs an inconsistent
+ * ontology by choosing the best maximal consistent subset according to some
+ * quality measure.
  */
 public class OntologyRepairBestMcs extends OntologyRepairRandomMcs {
     private Function<Ontology, Double> quality;
@@ -18,6 +18,8 @@ public class OntologyRepairBestMcs extends OntologyRepairRandomMcs {
      *            The predicate testing whether an ontology is repaired.
      * @param mcs
      *            The strategy for computing maximal consistent subsets.
+     * @param quality
+     *            Function for evaluating the quality of a repair.
      */
     public OntologyRepairBestMcs(Predicate<Ontology> isRepaired, McsComputationStrategy mcs,
             Function<Ontology, Double> quality) {
@@ -34,19 +36,19 @@ public class OntologyRepairBestMcs extends OntologyRepairRandomMcs {
     }
 
     /**
-     * @return An instance of {@code OntologyRepairRandomMcs} that tries to make the
+     * @return An instance of {@code OntologyRepairBestMcs} that tries to make the
      *         ontology consistent.
      */
     public static OntologyRepair forConsistency() {
-        return new OntologyRepairRandomMcs(Ontology::isConsistent);
+        return new OntologyRepairBestMcs(Ontology::isConsistent);
     }
 
     /**
-     * @return An instance of {@code OntologyRepairRandomMcs} that tries to make the
+     * @return An instance of {@code OntologyRepairBestMcs} that tries to make the
      *         ontology coherent.
      */
     public static OntologyRepair forCoherence() {
-        return new OntologyRepairRandomMcs(isCoherent());
+        return new OntologyRepairBestMcs(isCoherent());
     }
 
     @Override
