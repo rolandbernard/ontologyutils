@@ -969,19 +969,33 @@ public class Ontology implements AutoCloseable {
 
     /**
      * @return The stream of C1 subclass C2 axioms, C1 and C2 classes in the
-     *         signature
-     *         of {@code ontology}, entailed by {@code ontology}.
+     *         signature of {@code ontology}, entailed by {@code ontology}.
      */
     public Stream<OWLSubClassOfAxiom> inferredTaxonomyAxioms() {
-        return withReasonerDo(reasoner -> {
-            var df = getDefaultDataFactory();
-            var ontology = reasoner.getRootOntology();
-            var isConsistent = reasoner.isConsistent();
-            return Utils.toSet(ontology.classesInSignature()
-                    .flatMap(left -> ontology.classesInSignature()
-                            .map(right -> df.getOWLSubClassOfAxiom(left, right))
-                            .filter(axiom -> !isConsistent || reasoner.isEntailed(axiom))));
-        }).stream();
+        var df = getDefaultDataFactory();
+        var cache = new SubClassCache();
+        cache.precomputeFor(Utils.toList(conceptsInSignature()), this::isSubClass);
+        return conceptsInSignature().flatMap(subClass -> conceptsInSignature()
+                .filter(superClass -> cache.computeIfAbsent(subClass, superClass, this::isSubClass))
+                .map(superClass -> df.getOWLSubClassOfAxiom(subClass, superClass)));
+    }
+
+    /**
+     * @param other
+     *            The other ontology.
+     * @return The inferable information content of this ontology with respect to
+     *         the other ontology.
+     */
+    public double iicWithRespectTo(Ontology other) {
+        var inferredThis = Utils.toSet(inferredTaxonomyAxioms());
+        var inferredOther = Utils.toSet(other.inferredTaxonomyAxioms());
+        var onlyThis = inferredThis.stream().filter(ax -> !inferredOther.contains(ax)).count();
+        var onlyOther = inferredOther.stream().filter(ax -> !inferredThis.contains(ax)).count();
+        if (onlyOther == 0 && onlyThis == 0) {
+            return 0.5;
+        } else {
+            return ((double) onlyThis) / ((double) onlyThis + (double) onlyOther);
+        }
     }
 
     /**
