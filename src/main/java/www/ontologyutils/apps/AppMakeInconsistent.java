@@ -71,7 +71,7 @@ public class AppMakeInconsistent {
             var tooStrong = new HashSet<OWLAxiom>();
             for (var strongerAxiom : strongerAxioms) {
                 emptyOntology.addAxioms(strongerAxiom);
-                if (!ontology.isConsistent()) {
+                if (!emptyOntology.isConsistent()) {
                     tooStrong.add(strongerAxiom);
                 }
                 emptyOntology.removeAxioms(strongerAxiom);
