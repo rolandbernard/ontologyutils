@@ -960,7 +960,7 @@ public class Ontology implements AutoCloseable {
      * @return A str eam containing all entities in the signature of this ontology.
      */
     public Stream<OWLEntity> signature() {
-        return axioms().flatMap(OWLAxiom::signature);
+        return axioms().flatMap(OWLAxiom::signature).distinct();
     }
 
     /**
@@ -968,14 +968,14 @@ public class Ontology implements AutoCloseable {
      *         ontology.
      */
     public Stream<OWLClass> conceptsInSignature() {
-        return axioms().flatMap(OWLAxiom::classesInSignature);
+        return axioms().flatMap(OWLAxiom::classesInSignature).distinct();
     }
 
     /**
      * @return A stream containing all roles in the signature of this ontology.
      */
     public Stream<OWLObjectProperty> rolesInSignature() {
-        return axioms().flatMap(OWLAxiom::objectPropertiesInSignature);
+        return axioms().flatMap(OWLAxiom::objectPropertiesInSignature).distinct();
     }
 
     /**
