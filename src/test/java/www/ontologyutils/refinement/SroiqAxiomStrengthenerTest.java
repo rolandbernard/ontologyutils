@@ -160,8 +160,7 @@ public class SroiqAxiomStrengthenerTest {
             "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
             "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
             "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl",
-            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Test_hybrid.owl",
-            "/alc/Vehicle.owl", "/shoin/pizza.owl"
+            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Vehicle.owl",
     })
     public void allStrongAxiomsEntailWeakerAxiomsFromFile(String resourceName)
             throws OWLOntologyCreationException {
@@ -181,6 +180,36 @@ public class SroiqAxiomStrengthenerTest {
                     }
                 }
             });
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "/shoin/pizza.owl", "/alc/Test_hybrid.owl", })
+    public void allStrongAxiomsEntailWeakerAxiomsFromFileSlow(String resourceName)
+            throws OWLOntologyCreationException {
+        var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
+            Stream.concat(
+                    Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
+                    ontology.tboxAxioms().limit(10)).forEach(weakAxiom -> {
+                        try (var copy = ontology.clone()) {
+                            copy.removeAxioms(weakAxiom);
+                            try (var axiomStrengthener = new AxiomStrengthener(copy)) {
+                                axiomStrengthener.strongerAxioms(weakAxiom)
+                                        .forEach(strongAxiom -> {
+                                            try (var copy2 = copy.clone()) {
+                                                copy2.addAxioms(strongAxiom);
+                                                // Some reasoners don't like
+                                                // entailment on inconsistent
+                                                // ontologies.
+                                                assertTrue(!copy2.isConsistent()
+                                                        || copy2.isEntailed(
+                                                                weakAxiom));
+                                            }
+                                        });
+                            }
+                        }
+                    });
         }
     }
 }

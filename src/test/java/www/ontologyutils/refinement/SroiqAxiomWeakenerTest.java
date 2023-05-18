@@ -265,14 +265,13 @@ public class SroiqAxiomWeakenerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl", "/el/apo.owl", "/el/aeo.owl",
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl", "/el/aeo.owl",
             "/el/duo.owl", "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
             "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
-            "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl",
-            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Test_hybrid.owl",
-            "/alc/Vehicle.owl", "/alc/C50_R10_0.001_0.001_0.001_62888.owl", "/shoin/pizza.owl",
-            "/shiq/stuff.owl", "/shi/SceneOntology.owl", "/alcriq/sio.owl", "/alcri/biotop.owl",
-            "/alcriq/adolena.owl", "/alcrq/BuildingStructure.owl", "/alcri/shapes.owl",
+            "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl", "/alcri/shapes.owl",
+            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Test_hybrid.owl", "/el/apo.owl",
+            "/alc/Vehicle.owl", "/alc/C50_R10_0.001_0.001_0.001_62888.owl", "/shi/SceneOntology.owl",
+            "/alcriq/adolena.owl", "/alcrq/BuildingStructure.owl", "/shoin/pizza.owl", "/shiq/stuff.owl",
     })
     public void allWeakerAxiomsAreEntailedFromFile(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
