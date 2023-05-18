@@ -103,6 +103,21 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
     }
 
     @Override
+    public V computeIfAbsent(K key, Function<? super K, ? extends V> func) {
+        V result;
+        synchronized (this) {
+            result = get(key);
+        }
+        if (result == null) {
+            result = func.apply(key);
+            synchronized (this) {
+                put(key, result);
+            }
+        }
+        return result;
+    }
+
+    @Override
     protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
         if (cacheSize == Integer.MAX_VALUE) {
             return false;

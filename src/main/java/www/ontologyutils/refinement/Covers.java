@@ -230,9 +230,9 @@ public class Covers implements AutoCloseable {
             return false;
         } else if (isSubClass != null) {
             return !Stream.concat(
-                    isSubClass.knownStrictPredecessors(candidate)
+                    isSubClass.knownStrictPredecessors(candidate).stream()
                             .filter(other -> subConcepts.contains(other)),
-                    isSubClass.possibleStrictPredecessors(candidate)
+                    isSubClass.possibleStrictPredecessors(candidate).stream()
                             .sorted((a, b) -> Integer.compare(isSubClass.getKnownSuccessors(b).size(),
                                     isSubClass.getKnownSuccessors(a).size()))
                             .filter(other -> subConcepts.contains(other) && isStrictSubClass(other, candidate)))
@@ -269,9 +269,9 @@ public class Covers implements AutoCloseable {
             return false;
         } else if (isSubClass != null) {
             return !Stream.concat(
-                    isSubClass.knownStrictSuccessors(candidate)
+                    isSubClass.knownStrictSuccessors(candidate).stream()
                             .filter(other -> subConcepts.contains(other)),
-                    isSubClass.possibleStrictSuccessors(candidate)
+                    isSubClass.possibleStrictSuccessors(candidate).stream()
                             .sorted((a, b) -> Integer.compare(isSubClass.getKnownPredecessors(b).size(),
                                     isSubClass.getKnownPredecessors(a).size()))
                             .filter(other -> subConcepts.contains(other) && isStrictSubClass(candidate, other)))
@@ -321,9 +321,9 @@ public class Covers implements AutoCloseable {
             return false;
         } else if (isSubClass != null) {
             return !Stream.concat(
-                    isSubRole.knownStrictPredecessors(candidate)
+                    isSubRole.knownStrictPredecessors(candidate).stream()
                             .filter(other -> simpleRoles.contains(other)),
-                    isSubRole.possibleStrictPredecessors(candidate)
+                    isSubRole.possibleStrictPredecessors(candidate).stream()
                             .sorted((a, b) -> Integer.compare(isSubRole.getKnownSuccessors(b).size(),
                                     isSubRole.getKnownSuccessors(a).size()))
                             .filter(other -> simpleRoles.contains(other)
@@ -359,9 +359,9 @@ public class Covers implements AutoCloseable {
             return false;
         } else if (isSubClass != null) {
             return !Stream.concat(
-                    isSubRole.knownStrictSuccessors(candidate)
+                    isSubRole.knownStrictSuccessors(candidate).stream()
                             .filter(other -> simpleRoles.contains(other)),
-                    isSubRole.possibleStrictSuccessors(candidate)
+                    isSubRole.possibleStrictSuccessors(candidate).stream()
                             .sorted((a, b) -> Integer.compare(isSubRole.getKnownPredecessors(b).size(),
                                     isSubRole.getKnownPredecessors(a).size()))
                             .filter(other -> simpleRoles.contains(other)
