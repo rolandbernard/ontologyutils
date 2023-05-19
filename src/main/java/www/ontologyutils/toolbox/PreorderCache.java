@@ -149,49 +149,10 @@ public class PreorderCache<T> {
     }
 
     /**
-     * @param pred
-     *            The element for which to find successors.
-     * @return A stream of all known successors of {@code pred}.
-     */
-    public synchronized Set<T> getKnownSuccessors(T pred) {
-        assureExistence(pred);
-        return Set.copyOf(knownSuccessors.get(pred));
-    }
-
-    /**
-     * @param pred
-     *            The element for which to find successors.
-     * @return A stream of all possible, but not known, successors of {@code pred}.
-     */
-    public synchronized Set<T> getPossibleSuccessors(T pred) {
-        assureExistence(pred);
-        return Set.copyOf(possibleSuccessors.get(pred));
-    }
-
-    /**
-     * @param succ
-     *            The element for which to get predecessors.
-     * @return A stream of all known predecessors of {@code succ}.
-     */
-    public synchronized Set<T> getKnownPredecessors(T succ) {
-        assureExistence(succ);
-        return Set.copyOf(knownPredecessors.get(succ));
-    }
-
-    /**
-     * @param succ
-     *            The element for which to get predecessors.
-     * @return A stream of all possible, but not known, predecessors of
-     *         {@code succ}.
-     */
-    public synchronized Set<T> getPossiblePredecessors(T succ) {
-        assureExistence(succ);
-        return Set.copyOf(possiblePredecessors.get(succ));
-    }
-
-    /**
-     * @param a First element.
-     * @param b Second element.
+     * @param a
+     *            First element.
+     * @param b
+     *            Second element.
      * @return < 0 if a has more known successors, > 0 if b has more
      */
     public synchronized int compareKnownSuccessors(T a, T b) {
@@ -201,8 +162,10 @@ public class PreorderCache<T> {
     }
 
     /**
-     * @param a First element.
-     * @param b Second element.
+     * @param a
+     *            First element.
+     * @param b
+     *            Second element.
      * @return < 0 if a has more known predecessors, > 0 if b has more
      */
     public synchronized int compareKnownPredecessors(T a, T b) {
@@ -216,9 +179,9 @@ public class PreorderCache<T> {
      *            The element for which to find successors.
      * @return A stream of all known successors of {@code pred}.
      */
-    public synchronized Set<T> knownStrictSuccessors(T pred) {
+    public synchronized List<T> knownStrictSuccessors(T pred) {
         assureExistence(pred);
-        return Utils.toSet(knownSuccessors.get(pred).stream()
+        return Utils.toList(knownSuccessors.get(pred).stream()
                 .filter(succ -> !knownSuccessors.get(succ).contains(pred)
                         && !possibleSuccessors.get(succ).contains(pred)));
     }
@@ -228,9 +191,9 @@ public class PreorderCache<T> {
      *            The element for which to find successors.
      * @return A stream of all possible, but not known, successors of {@code pred}.
      */
-    public synchronized Set<T> possibleStrictSuccessors(T pred) {
+    public synchronized List<T> possibleStrictSuccessors(T pred) {
         assureExistence(pred);
-        return Utils.toSet(Stream.concat(
+        return Utils.toList(Stream.concat(
                 knownSuccessors.get(pred).stream()
                         .filter(succ -> !knownSuccessors.get(succ).contains(pred)
                                 && possibleSuccessors.get(succ).contains(pred)),
@@ -243,9 +206,9 @@ public class PreorderCache<T> {
      *            The element for which to find predecessors.
      * @return A stream of all known predecessors of {@code succ}.
      */
-    public synchronized Set<T> knownStrictPredecessors(T succ) {
+    public synchronized List<T> knownStrictPredecessors(T succ) {
         assureExistence(succ);
-        return Utils.toSet(knownPredecessors.get(succ).stream()
+        return Utils.toList(knownPredecessors.get(succ).stream()
                 .filter(pred -> !knownPredecessors.get(pred).contains(succ)
                         && !possiblePredecessors.get(pred).contains(succ)));
     }
@@ -256,9 +219,9 @@ public class PreorderCache<T> {
      * @return A stream of all possible, but not known, predecessors of
      *         {@code succ}.
      */
-    public synchronized Set<T> possibleStrictPredecessors(T succ) {
+    public synchronized List<T> possibleStrictPredecessors(T succ) {
         assureExistence(succ);
-        return Utils.toSet(Stream.concat(
+        return Utils.toList(Stream.concat(
                 knownPredecessors.get(succ).stream()
                         .filter(pred -> !knownPredecessors.get(pred).contains(succ)
                                 && possiblePredecessors.get(pred).contains(succ)),

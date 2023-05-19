@@ -13,12 +13,30 @@ public class AppBenchmark {
     private static void benchRun(Ontology ontology) {
         Utils.randomSeed(42);
         for (int i = 0; i < 10; i++) {
-            var covers = new Covers(ontology, Utils.toSet(ontology.subConcepts()), Utils.toSet(ontology.simpleRoles()));
-            var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
-            for (int j = 0; j < 10; j++) {
-                OWLClassExpression toRefine = Ontology.getDefaultDataFactory().getOWLNothing();
-                for (int k = 0; k < 10; k++) {
-                    toRefine = Utils.randomChoice(refinement.refine(toRefine));
+            if (ontology.isConsistent()) {
+                var covers = new Covers(ontology, Utils.toSet(ontology.subConcepts()),
+                        Utils.toSet(ontology.simpleRoles()));
+                var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
+                for (int j = 0; j < 10; j++) {
+                    OWLClassExpression toRefine = Ontology.getDefaultDataFactory().getOWLNothing();
+                    for (int k = 0; k < 10; k++) {
+                        toRefine = Utils.randomChoice(refinement.refine(toRefine));
+                    }
+                }
+            } else {
+                var mcs = Utils.randomChoice(ontology.someMaximalConsistentSubsets(Ontology::isConsistent));
+                var refOnto = ontology.cloneWithRefutable(mcs);
+                var covers = new Covers(refOnto, Utils.toSet(ontology.subConcepts()),
+                        Utils.toSet(ontology.simpleRoles()));
+                var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
+                for (int j = 0; j < 10; j++) {
+                    var badAxioms = ontology.someMinimalUnsatisfiableSubsets(Ontology::isConsistent)
+                            .flatMap(s -> s.stream());
+                    OWLClassExpression toRefine = Utils
+                            .randomChoice(Utils.randomChoice(badAxioms).nestedClassExpressions());
+                    for (int k = 0; k < 10; k++) {
+                        toRefine = Utils.randomChoice(refinement.refine(toRefine));
+                    }
                 }
             }
         }
