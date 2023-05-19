@@ -46,9 +46,9 @@ public class AppAutomatedRepairRandomMCS {
         ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                 .sorted().forEach(System.out::println);
         assert ontology.isConsistent();
-        ontology.close();
         System.err.println("==== END RESULT ====");
         ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-consistent.owl");
+        ontology.close();
         var endTime = System.nanoTime();
         System.err.println(
                 "Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
