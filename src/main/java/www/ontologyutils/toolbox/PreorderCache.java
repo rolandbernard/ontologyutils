@@ -138,7 +138,8 @@ public class PreorderCache<T> {
             List<T> possible;
             synchronized (this) {
                 possible = possibleSuccessors.get(element).stream()
-                        .sorted((a, b) -> Integer.compare(knownPredecessors.get(b).size(), knownPredecessors.get(a).size()))
+                        .sorted((a, b) -> Integer.compare(knownPredecessors.get(b).size(),
+                                knownPredecessors.get(a).size()))
                         .toList();
             }
             for (var elem : possible) {

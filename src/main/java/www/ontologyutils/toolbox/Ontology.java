@@ -11,9 +11,7 @@ import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.profiles.*;
 import org.semanticweb.owlapi.reasoner.*;
-import org.semanticweb.owlapi.util.DLExpressivityChecker;
-import org.semanticweb.owlapi.util.Languages;
-import org.semanticweb.owlapi.util.OWLObjectPropertyManager;
+import org.semanticweb.owlapi.util.*;
 
 import openllet.owlapi.OpenlletReasonerFactory;
 import uk.ac.manchester.cs.factplusplus.owlapi.FaCTPlusPlusReasonerFactory;
@@ -36,10 +34,10 @@ public class Ontology implements AutoCloseable {
      */
     public static int reasonerCalls;
 
-    private static class CachedReasoner {
+    private static class ReasonerCache {
         private OWLReasonerFactory reasonerFactory;
         private Set<Ontology> references;
-        private OWLReasoner reasoner;
+        private Deque<OWLReasoner> unusedReasoners;
 
         /**
          * Create a new reasoner cache using the given reasoner factory.
@@ -47,16 +45,17 @@ public class Ontology implements AutoCloseable {
          * @param reasonerFactory
          *            The factory to create the reasoner with if necessary.
          */
-        public CachedReasoner(OWLReasonerFactory reasonerFactory) {
+        public ReasonerCache(OWLReasonerFactory reasonerFactory) {
             this.reasonerFactory = reasonerFactory;
             this.references = new HashSet<>();
+            this.unusedReasoners = new ArrayDeque<>();
         }
 
         /**
          * @param ontology
          *            The ontology using this reasoner.
          */
-        public void addReference(Ontology ontology) {
+        public synchronized void addReference(Ontology ontology) {
             references.add(ontology);
         }
 
@@ -64,11 +63,15 @@ public class Ontology implements AutoCloseable {
          * @param ontology
          *            The ontology, no longer using the reasoner after this call.
          */
-        public void removeReference(Ontology ontology) {
+        public synchronized void removeReference(Ontology ontology) {
             references.remove(ontology);
-            if (references.isEmpty() && reasoner != null) {
-                disposeOwlReasoner(reasoner);
-                reasoner = null;
+            if (references.isEmpty()) {
+                for (var reasoner : unusedReasoners) {
+                    var owlOntology = reasoner.getRootOntology();
+                    reasoner.dispose();
+                    owlOntology.getOWLOntologyManager().removeOntology(owlOntology);
+                }
+                unusedReasoners.clear();
             }
         }
 
@@ -79,10 +82,8 @@ public class Ontology implements AutoCloseable {
          * @param reasoner
          *            The {@code OWLReasoner} to dispose.
          */
-        public void disposeOwlReasoner(OWLReasoner reasoner) {
-            var owlOntology = reasoner.getRootOntology();
-            reasoner.dispose();
-            owlOntology.getOWLOntologyManager().removeOntology(owlOntology);
+        public synchronized void disposeOwlReasoner(OWLReasoner reasoner) {
+            unusedReasoners.push(reasoner);
         }
 
         /**
@@ -90,13 +91,37 @@ public class Ontology implements AutoCloseable {
          *            The ontology for which to create the reasoner.
          * @return A new {@code OWLReasoner} created using the factory in this cache.
          */
-        public OWLReasoner getOwlReasoner(Ontology ontology) {
+        public OWLReasoner getNewOwlReasoner(Ontology ontology) {
             try {
                 var owlOntology = defaultManager.createOntology();
                 owlOntology.addAxioms(ontology.axioms());
                 return reasonerFactory.createReasoner(owlOntology);
             } catch (OWLOntologyCreationException e) {
                 throw Utils.panic(e);
+            }
+        }
+
+        /**
+         * @param ontology
+         *            The ontology for which to create the reasoner.
+         * @return A new or reused {@code OWLReasoner} created using the factory in this
+         *         cache.
+         */
+        public OWLReasoner getOwlReasoner(Ontology ontology) {
+            OWLReasoner reasoner = null;
+            synchronized (this) {
+                if (!unusedReasoners.isEmpty()) {
+                    reasoner = unusedReasoners.pop();
+                }
+            }
+            if (reasoner == null) {
+                return getNewOwlReasoner(ontology);
+            } else {
+                var owlOntology = reasoner.getRootOntology();
+                if (ontology.applyChangesTo(owlOntology)) {
+                    reasoner.flush();
+                }
+                return reasoner;
             }
         }
 
@@ -114,22 +139,20 @@ public class Ontology implements AutoCloseable {
         public <T> T withReasonerDo(Ontology ontology, Function<OWLReasoner, T> action) {
             if (Thread.interrupted()) {
                 throw new CanceledException();
-            } else if (reasoner == null) {
-                reasoner = getOwlReasoner(ontology);
-            } else {
-                var owlOntology = reasoner.getRootOntology();
-                if (ontology.applyChangesTo(owlOntology)) {
-                    reasoner.flush();
-                }
             }
-            reasonerCalls += 1;
-            return action.apply(reasoner);
+            var reasoner = getOwlReasoner(ontology);
+            try {
+                reasonerCalls += 1;
+                return action.apply(reasoner);
+            } finally {
+                disposeOwlReasoner(reasoner);
+            }
         }
     }
 
     private Set<OWLAxiom> staticAxioms;
     private Set<OWLAxiom> refutableAxioms;
-    private CachedReasoner reasonerCache;
+    private ReasonerCache reasonerCache;
 
     /**
      * Create a new ontology around the given static and refutable axioms. Should
@@ -144,7 +167,7 @@ public class Ontology implements AutoCloseable {
      *            The reasoner cache to be used for reasoning queries.
      */
     private Ontology(Collection<? extends OWLAxiom> staticAxioms, Collection<? extends OWLAxiom> refutableAxioms,
-            CachedReasoner reasonerCache) {
+            ReasonerCache reasonerCache) {
         this.staticAxioms = new HashSet<>(staticAxioms);
         this.refutableAxioms = new HashSet<>(refutableAxioms);
         this.refutableAxioms.removeAll(staticAxioms);
@@ -163,7 +186,7 @@ public class Ontology implements AutoCloseable {
      */
     public static Ontology withAxioms(Collection<? extends OWLAxiom> staticAxioms,
             Collection<? extends OWLAxiom> refutableAxioms, OWLReasonerFactory reasonerFactory) {
-        return new Ontology(staticAxioms, refutableAxioms, new CachedReasoner(reasonerFactory));
+        return new Ontology(staticAxioms, refutableAxioms, new ReasonerCache(reasonerFactory));
     }
 
     /**
@@ -1029,7 +1052,7 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithHermit() {
-        var newReasonerCache = new CachedReasoner(new ReasonerFactory());
+        var newReasonerCache = new ReasonerCache(new ReasonerFactory());
         return new Ontology(staticAxioms, refutableAxioms, newReasonerCache);
     }
 
@@ -1039,7 +1062,7 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithOpenllet() {
-        var newReasonerCache = new CachedReasoner(OpenlletReasonerFactory.getInstance());
+        var newReasonerCache = new ReasonerCache(OpenlletReasonerFactory.getInstance());
         return new Ontology(staticAxioms, refutableAxioms, newReasonerCache);
     }
 
@@ -1049,7 +1072,7 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithJFact() {
-        var newReasonerCache = new CachedReasoner(new JFactFactory());
+        var newReasonerCache = new ReasonerCache(new JFactFactory());
         return new Ontology(staticAxioms, refutableAxioms, newReasonerCache);
     }
 
@@ -1059,7 +1082,7 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithFactPP() {
-        var newReasonerCache = new CachedReasoner(new FaCTPlusPlusReasonerFactory());
+        var newReasonerCache = new ReasonerCache(new FaCTPlusPlusReasonerFactory());
         return new Ontology(staticAxioms, refutableAxioms, newReasonerCache);
     }
 
@@ -1103,7 +1126,7 @@ public class Ontology implements AutoCloseable {
      * @return The new ontology.
      */
     public Ontology cloneWithSeparateCache() {
-        return new Ontology(staticAxioms, refutableAxioms, new CachedReasoner(reasonerCache.reasonerFactory));
+        return new Ontology(staticAxioms, refutableAxioms, new ReasonerCache(reasonerCache.reasonerFactory));
     }
 
     @Override

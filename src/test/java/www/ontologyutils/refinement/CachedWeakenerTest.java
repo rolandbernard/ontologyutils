@@ -41,12 +41,13 @@ public class CachedWeakenerTest {
         try (var ontology = Ontology.loadOntology(path)) {
             try (var cached = new AxiomWeakener(ontology)) {
                 try (var uncached = new AxiomWeakener(ontology, ontology, true)) {
-                    Stream.concat(
+                    var axioms = Stream.concat(
                             Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
-                            ontology.tboxAxioms().limit(10)).forEach(axiom -> {
-                                assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)),
-                                        Utils.toSet(cached.weakerAxioms(axiom)));
-                            });
+                            ontology.tboxAxioms().limit(10));
+                    axioms.forEach(axiom -> {
+                        assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)),
+                                Utils.toSet(cached.weakerAxioms(axiom)));
+                    });
                 }
             }
         }
@@ -81,12 +82,13 @@ public class CachedWeakenerTest {
         try (var ontology = Ontology.loadOntology(path)) {
             try (var cached = new AxiomStrengthener(ontology)) {
                 try (var uncached = new AxiomStrengthener(ontology, ontology, true)) {
-                    Stream.concat(
+                    var axioms = Stream.concat(
                             Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
-                            ontology.tboxAxioms().limit(10)).forEach(axiom -> {
-                                assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)),
-                                        Utils.toSet(cached.strongerAxioms(axiom)));
-                            });
+                            ontology.tboxAxioms().limit(10));
+                    axioms.forEach(axiom -> {
+                        assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)),
+                                Utils.toSet(cached.strongerAxioms(axiom)));
+                    });
                 }
             }
         }

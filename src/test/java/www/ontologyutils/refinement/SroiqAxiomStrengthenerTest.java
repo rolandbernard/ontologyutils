@@ -139,7 +139,7 @@ public class SroiqAxiomStrengthenerTest {
     @Test
     public void allStrongAxiomsEntailWeakerAxioms() {
         ontology.logicalAxioms().forEach(weakAxiom -> {
-            try (var copy = ontology.clone()) {
+            try (var copy = ontology.cloneWithSeparateCache()) {
                 copy.removeAxioms(weakAxiom);
                 try (var axiomStrengthener = new AxiomStrengthener(copy)) {
                     axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
@@ -167,7 +167,7 @@ public class SroiqAxiomStrengthenerTest {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             ontology.logicalAxioms().forEach(weakAxiom -> {
-                try (var copy = ontology.clone()) {
+                try (var copy = ontology.cloneWithSeparateCache()) {
                     copy.removeAxioms(weakAxiom);
                     try (var axiomStrengthener = new AxiomStrengthener(copy)) {
                         axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
@@ -189,27 +189,28 @@ public class SroiqAxiomStrengthenerTest {
             throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            Stream.concat(
+            var axioms = Stream.concat(
                     Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
-                    ontology.tboxAxioms().limit(10)).forEach(weakAxiom -> {
-                        try (var copy = ontology.clone()) {
-                            copy.removeAxioms(weakAxiom);
-                            try (var axiomStrengthener = new AxiomStrengthener(copy)) {
-                                axiomStrengthener.strongerAxioms(weakAxiom)
-                                        .forEach(strongAxiom -> {
-                                            try (var copy2 = copy.clone()) {
-                                                copy2.addAxioms(strongAxiom);
-                                                // Some reasoners don't like
-                                                // entailment on inconsistent
-                                                // ontologies.
-                                                assertTrue(!copy2.isConsistent()
-                                                        || copy2.isEntailed(
-                                                                weakAxiom));
-                                            }
-                                        });
-                            }
-                        }
-                    });
+                    ontology.tboxAxioms().limit(10));
+            axioms.forEach(weakAxiom -> {
+                try (var copy = ontology.cloneWithSeparateCache()) {
+                    copy.removeAxioms(weakAxiom);
+                    try (var axiomStrengthener = new AxiomStrengthener(copy)) {
+                        axiomStrengthener.strongerAxioms(weakAxiom)
+                                .forEach(strongAxiom -> {
+                                    try (var copy2 = copy.clone()) {
+                                        copy2.addAxioms(strongAxiom);
+                                        // Some reasoners don't like
+                                        // entailment on inconsistent
+                                        // ontologies.
+                                        assertTrue(!copy2.isConsistent()
+                                                || copy2.isEntailed(
+                                                        weakAxiom));
+                                    }
+                                });
+                    }
+                }
+            });
         }
     }
 }

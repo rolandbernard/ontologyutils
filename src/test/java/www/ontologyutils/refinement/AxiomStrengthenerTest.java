@@ -85,7 +85,7 @@ public class AxiomStrengthenerTest {
     @Test
     public void allStrongAxiomsEntailWeakerAxioms() {
         ontology.logicalAxioms().forEach(weakAxiom -> {
-            try (var copy = ontology.clone()) {
+            try (var copy = ontology.cloneWithSeparateCache()) {
                 copy.removeAxioms(weakAxiom);
                 try (var axiomStrengthener = new AxiomStrengthener(copy)) {
                     axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
