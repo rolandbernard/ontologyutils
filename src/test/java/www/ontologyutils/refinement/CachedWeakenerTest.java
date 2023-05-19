@@ -23,14 +23,12 @@ public class CachedWeakenerTest {
     public void cachedAndUncachedWeakeningAreEqual(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            try (var cached = new AxiomWeakener(ontology)) {
-                try (var uncached = new AxiomWeakener(ontology, ontology, true)) {
-                    ontology.logicalAxioms().forEach(axiom -> {
-                        assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)),
-                                Utils.toSet(cached.weakerAxioms(axiom)));
-                    });
-                }
-            }
+            var cached = new AxiomWeakener(ontology);
+            var uncached = new AxiomWeakener(ontology, ontology, true);
+            ontology.logicalAxioms().forEach(axiom -> {
+                assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)),
+                        Utils.toSet(cached.weakerAxioms(axiom)));
+            });
         }
     }
 
@@ -39,17 +37,15 @@ public class CachedWeakenerTest {
     public void cachedAndUncachedWeakeningAreEqualSlow(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            try (var cached = new AxiomWeakener(ontology)) {
-                try (var uncached = new AxiomWeakener(ontology, ontology, true)) {
-                    var axioms = Stream.concat(
-                            Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
-                            ontology.tboxAxioms().limit(10));
-                    axioms.forEach(axiom -> {
-                        assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)),
-                                Utils.toSet(cached.weakerAxioms(axiom)));
-                    });
-                }
-            }
+            var cached = new AxiomWeakener(ontology);
+            var uncached = new AxiomWeakener(ontology, ontology, true);
+            var axioms = Stream.concat(
+                    Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
+                    ontology.tboxAxioms().limit(10));
+            axioms.forEach(axiom -> {
+                assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)),
+                        Utils.toSet(cached.weakerAxioms(axiom)));
+            });
         }
     }
 
@@ -64,14 +60,12 @@ public class CachedWeakenerTest {
     public void cachedAndUncachedStrengtheningAreEqual(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            try (var cached = new AxiomStrengthener(ontology)) {
-                try (var uncached = new AxiomStrengthener(ontology, ontology, true)) {
-                    ontology.logicalAxioms().forEach(axiom -> {
-                        assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)),
-                                Utils.toSet(cached.strongerAxioms(axiom)));
-                    });
-                }
-            }
+            var cached = new AxiomStrengthener(ontology);
+            var uncached = new AxiomStrengthener(ontology, ontology, true);
+            ontology.logicalAxioms().forEach(axiom -> {
+                assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)),
+                        Utils.toSet(cached.strongerAxioms(axiom)));
+            });
         }
     }
 
@@ -80,17 +74,15 @@ public class CachedWeakenerTest {
     public void cachedAndUncachedStrengtheningAreEqualSlow(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            try (var cached = new AxiomStrengthener(ontology)) {
-                try (var uncached = new AxiomStrengthener(ontology, ontology, true)) {
-                    var axioms = Stream.concat(
-                            Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
-                            ontology.tboxAxioms().limit(10));
-                    axioms.forEach(axiom -> {
-                        assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)),
-                                Utils.toSet(cached.strongerAxioms(axiom)));
-                    });
-                }
-            }
+            var cached = new AxiomStrengthener(ontology);
+            var uncached = new AxiomStrengthener(ontology, ontology, true);
+            var axioms = Stream.concat(
+                    Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
+                    ontology.tboxAxioms().limit(10));
+            axioms.forEach(axiom -> {
+                assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)),
+                        Utils.toSet(cached.strongerAxioms(axiom)));
+            });
         }
     }
 
@@ -108,18 +100,16 @@ public class CachedWeakenerTest {
         try (var ontology = Ontology.loadOntology(path)) {
             var subConcepts = Utils.toSet(ontology.subConcepts());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
-            try (var cached = new Covers(ontology, subConcepts, simpleRoles)) {
-                try (var uncached = new Covers(ontology, subConcepts, simpleRoles, true)) {
-                    ontology.subConcepts().forEach(concept -> {
-                        assertEquals(Utils.toSet(uncached.upCover(concept)), Utils.toSet(cached.upCover(concept)));
-                        assertEquals(Utils.toSet(uncached.downCover(concept)), Utils.toSet(cached.downCover(concept)));
-                    });
-                    ontology.rolesInSignature().forEach(role -> {
-                        assertEquals(Utils.toSet(uncached.upCover(role)), Utils.toSet(cached.upCover(role)));
-                        assertEquals(Utils.toSet(uncached.downCover(role)), Utils.toSet(cached.downCover(role)));
-                    });
-                }
-            }
+            var cached = new Covers(ontology, subConcepts, simpleRoles);
+            var uncached = new Covers(ontology, subConcepts, simpleRoles, true);
+            ontology.subConcepts().forEach(concept -> {
+                assertEquals(Utils.toSet(uncached.upCover(concept)), Utils.toSet(cached.upCover(concept)));
+                assertEquals(Utils.toSet(uncached.downCover(concept)), Utils.toSet(cached.downCover(concept)));
+            });
+            ontology.rolesInSignature().forEach(role -> {
+                assertEquals(Utils.toSet(uncached.upCover(role)), Utils.toSet(cached.upCover(role)));
+                assertEquals(Utils.toSet(uncached.downCover(role)), Utils.toSet(cached.downCover(role)));
+            });
         }
     }
 }

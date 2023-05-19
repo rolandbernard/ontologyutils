@@ -105,7 +105,6 @@ public class AppMakeInconsistent {
                 .sorted().forEach(System.out::println);
         System.err.println("==== END RESULT ====");
         ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-inconsistent.owl");
-        axiomStrengthener.close();
         emptyOntology.close();
         ontology.close();
         var endTime = System.nanoTime();

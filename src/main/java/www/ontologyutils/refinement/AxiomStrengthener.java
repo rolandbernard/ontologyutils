@@ -36,15 +36,14 @@ public class AxiomStrengthener extends AxiomRefinement {
         }
     }
 
-    private AxiomStrengthener(Covers covers, Cover upCover, Cover downCover,
-            Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
+    private AxiomStrengthener(Cover upCover, Cover downCover, Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
         super(new Visitor(new RefinementOperator(downCover, upCover, flags),
-                new RefinementOperator(upCover, downCover, flags), simpleRoles, flags), covers);
+                new RefinementOperator(upCover, downCover, flags), simpleRoles, flags));
     }
 
     private AxiomStrengthener(Covers covers, Set<OWLObjectPropertyExpression> simpleRoles, int flags,
             boolean uncached) {
-        this(covers, uncached ? covers.upCover() : covers.upCover().cached(),
+        this(uncached ? covers.upCover() : covers.upCover().cached(),
                 uncached ? covers.downCover() : covers.downCover().cached(), simpleRoles, flags);
     }
 

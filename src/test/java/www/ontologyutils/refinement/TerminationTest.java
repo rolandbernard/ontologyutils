@@ -34,7 +34,6 @@ public class TerminationTest {
     @AfterEach
     public void teardown() {
         ontology.close();
-        covers.close();
     }
 
     public boolean areEquivalent(OWLClassExpression c1, OWLClassExpression c2) {

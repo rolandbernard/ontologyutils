@@ -29,7 +29,6 @@ public class AxiomWeakenerTest {
     @AfterEach
     public void teardown() {
         ontology.close();
-        axiomWeakener.close();
     }
 
     private static Stream<Arguments> expectedWeakening() {

@@ -220,13 +220,12 @@ public class TurnBasedMechanism {
                 while (!currentAxioms.isConsistent()) {
                     log("\n** Weakening. **");
                     // weakening of favorite axiom
-                    try (AxiomWeakener axiomWeakener = new AxiomWeakener(referenceOntology)) {
-                        currentAxioms.removeAxioms(favorite);
-                        List<OWLAxiom> weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(favorite));
-                        int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
-                        favorite = weakerAxioms.get(randomPick);
-                        currentAxioms.addAxioms(favorite);
-                    }
+                    AxiomWeakener axiomWeakener = new AxiomWeakener(referenceOntology);
+                    currentAxioms.removeAxioms(favorite);
+                    List<OWLAxiom> weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(favorite));
+                    int randomPick = ThreadLocalRandom.current().nextInt(0, weakerAxioms.size());
+                    favorite = weakerAxioms.get(randomPick);
+                    currentAxioms.addAxioms(favorite);
                 }
             }
             log("\nAdding axiom: " + favorite);

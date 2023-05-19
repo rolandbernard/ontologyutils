@@ -80,27 +80,26 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
         var bestAxioms = Set.<OWLAxiom>of();
         var bestQuality = Double.NEGATIVE_INFINITY;
         try (var refOntology = ontology.cloneWithRefutable(refAxioms)) {
-            try (var axiomWeakener = new AxiomWeakener(refOntology, ontology)) {
-                for (int k = 0; k < numberOfRounds; k++) {
-                    try (var copy = ontology.clone()) {
+            var axiomWeakener = new AxiomWeakener(refOntology, ontology);
+            for (int k = 0; k < numberOfRounds; k++) {
+                try (var copy = ontology.clone()) {
+                    checkpoint(copy);
+                    while (!isRepaired(copy)) {
+                        var badAxioms = Utils.toList(findBadAxioms(copy));
+                        infoMessage("Found " + badAxioms.size() + " possible bad axioms.");
+                        var badAxiom = Utils.randomChoice(badAxioms);
+                        infoMessage("Selected the bad axiom " + Utils.prettyPrintAxiom(badAxiom) + ".");
+                        var weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(badAxiom));
+                        infoMessage("Found " + weakerAxioms.size() + " weaker axioms.");
+                        var weakerAxiom = Utils.randomChoice(weakerAxioms);
+                        infoMessage("Selected the weaker axiom " + Utils.prettyPrintAxiom(weakerAxiom) + ".");
+                        copy.replaceAxiom(badAxiom, weakerAxiom);
                         checkpoint(copy);
-                        while (!isRepaired(copy)) {
-                            var badAxioms = Utils.toList(findBadAxioms(copy));
-                            infoMessage("Found " + badAxioms.size() + " possible bad axioms.");
-                            var badAxiom = Utils.randomChoice(badAxioms);
-                            infoMessage("Selected the bad axiom " + Utils.prettyPrintAxiom(badAxiom) + ".");
-                            var weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(badAxiom));
-                            infoMessage("Found " + weakerAxioms.size() + " weaker axioms.");
-                            var weakerAxiom = Utils.randomChoice(weakerAxioms);
-                            infoMessage("Selected the weaker axiom " + Utils.prettyPrintAxiom(weakerAxiom) + ".");
-                            copy.replaceAxiom(badAxiom, weakerAxiom);
-                            checkpoint(copy);
-                        }
-                        var thisQuality = quality.apply(copy);
-                        if (thisQuality > bestQuality) {
-                            bestAxioms = Utils.toSet(copy.axioms());
-                            bestQuality = thisQuality;
-                        }
+                    }
+                    var thisQuality = quality.apply(copy);
+                    if (thisQuality > bestQuality) {
+                        bestAxioms = Utils.toSet(copy.axioms());
+                        bestQuality = thisQuality;
                     }
                 }
             }

@@ -38,6 +38,7 @@ public class Ontology implements AutoCloseable {
         private OWLReasonerFactory reasonerFactory;
         private Set<Ontology> references;
         private Deque<OWLReasoner> unusedReasoners;
+        private Map<OWLReasoner, Ontology> lastOntologies;
 
         /**
          * Create a new reasoner cache using the given reasoner factory.
@@ -49,6 +50,7 @@ public class Ontology implements AutoCloseable {
             this.reasonerFactory = reasonerFactory;
             this.references = new HashSet<>();
             this.unusedReasoners = new ArrayDeque<>();
+            this.lastOntologies = new HashMap<>();
         }
 
         /**
@@ -115,14 +117,17 @@ public class Ontology implements AutoCloseable {
                 }
             }
             if (reasoner == null) {
-                return getNewOwlReasoner(ontology);
+                reasoner = getNewOwlReasoner(ontology);
             } else {
+                var lastOntology = lastOntologies.get(reasoner);
                 var owlOntology = reasoner.getRootOntology();
-                if (ontology.applyChangesTo(owlOntology)) {
+                if ((lastOntology != ontology || ontology.changed) && ontology.applyChangesTo(owlOntology)) {
                     reasoner.flush();
                 }
-                return reasoner;
             }
+            ontology.changed = false;
+            lastOntologies.put(reasoner, ontology);
+            return reasoner;
         }
 
         /**
@@ -153,6 +158,7 @@ public class Ontology implements AutoCloseable {
     private Set<OWLAxiom> staticAxioms;
     private Set<OWLAxiom> refutableAxioms;
     private ReasonerCache reasonerCache;
+    private boolean changed;
 
     /**
      * Create a new ontology around the given static and refutable axioms. Should
@@ -173,6 +179,7 @@ public class Ontology implements AutoCloseable {
         this.refutableAxioms.removeAll(staticAxioms);
         this.reasonerCache = reasonerCache;
         this.reasonerCache.addReference(this);
+        this.changed = false;
     }
 
     /**
@@ -347,15 +354,17 @@ public class Ontology implements AutoCloseable {
      * @return true if some change was made to the ontology, false otherwise.
      */
     public boolean applyChangesTo(OWLOntology ontology) {
-        var oldAxioms = Utils.toSet(ontology.axioms());
-        var newAxioms = Utils.toSet(axioms());
-        if (oldAxioms.equals(newAxioms)) {
-            return false;
-        } else {
-            ontology.addAxioms(newAxioms.stream().filter(axiom -> !oldAxioms.contains(axiom)));
-            ontology.removeAxioms(oldAxioms.stream().filter(axiom -> !newAxioms.contains(axiom)));
-            return true;
+        var oldAxioms = ontology.getAxioms();
+        var toAdd = Utils.toList(axioms().filter(axiom -> !oldAxioms.contains(axiom)));
+        var toRemove = Utils.toList(
+                oldAxioms.stream().filter(axiom -> !refutableAxioms.contains(axiom) && !staticAxioms.contains(axiom)));
+        if (!toAdd.isEmpty()) {
+            ontology.addAxioms(toAdd);
         }
+        if (!toRemove.isEmpty()) {
+            ontology.removeAxioms(toRemove);
+        }
+        return !toAdd.isEmpty() || !toRemove.isEmpty();
     }
 
     /**
@@ -485,8 +494,8 @@ public class Ontology implements AutoCloseable {
      */
     public void removeAxioms(Stream<? extends OWLAxiom> axioms) {
         axioms.forEach(axiom -> {
-            staticAxioms.remove(axiom);
-            refutableAxioms.remove(axiom);
+            changed |= staticAxioms.remove(axiom);
+            changed |= refutableAxioms.remove(axiom);
         });
     }
 
@@ -496,8 +505,8 @@ public class Ontology implements AutoCloseable {
      */
     public void addStaticAxioms(Stream<? extends OWLAxiom> axioms) {
         axioms.forEach(axiom -> {
-            refutableAxioms.remove(axiom);
-            staticAxioms.add(axiom);
+            changed |= refutableAxioms.remove(axiom);
+            changed |= staticAxioms.add(axiom);
         });
     }
 
@@ -507,8 +516,8 @@ public class Ontology implements AutoCloseable {
      */
     public void addAxioms(Stream<? extends OWLAxiom> axioms) {
         axioms.forEach(axiom -> {
-            staticAxioms.remove(axiom);
-            refutableAxioms.add(axiom);
+            changed |= staticAxioms.remove(axiom);
+            changed |= refutableAxioms.add(axiom);
         });
     }
 
@@ -636,6 +645,7 @@ public class Ontology implements AutoCloseable {
      *            The axioms to use.
      */
     public void setRefutableAxioms(Collection<? extends OWLAxiom> axioms) {
+        changed = true;
         refutableAxioms.clear();
         refutableAxioms.addAll(axioms);
     }
@@ -1041,7 +1051,7 @@ public class Ontology implements AutoCloseable {
         for (var entity : Utils.toList(signature())) {
             var newAxiom = df.getOWLDeclarationAxiom(entity);
             if (!staticAxioms.contains(newAxiom) && !refutableAxioms.contains(newAxiom)) {
-                staticAxioms.add(newAxiom);
+                changed |= staticAxioms.add(newAxiom);
             }
         }
     }
@@ -1129,6 +1139,17 @@ public class Ontology implements AutoCloseable {
         return new Ontology(staticAxioms, refutableAxioms, new ReasonerCache(reasonerCache.reasonerFactory));
     }
 
+    /**
+     * Close this ontology and create one with a separate cache.
+     *
+     * @return The new ontology.
+     */
+    public Ontology withSeparateCache() {
+        try (var current = this) {
+            return this.cloneWithSeparateCache();
+        }
+    }
+
     @Override
     public Ontology clone() {
         return new Ontology(staticAxioms, refutableAxioms, reasonerCache);
@@ -1136,6 +1157,9 @@ public class Ontology implements AutoCloseable {
 
     @Override
     public void close() {
-        reasonerCache.removeReference(this);
+        if (reasonerCache != null) {
+            reasonerCache.removeReference(this);
+            reasonerCache = null;
+        }
     }
 }

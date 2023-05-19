@@ -126,7 +126,6 @@ public class AppInteractiveRepair {
                     + Ontology.getOriginAnnotatedAxiom(weakerAxiom, badAxiom) + "\n");
         }
 
-        aw.close();
         System.out.println("Repaired ontology.");
         logicalAxioms.forEach(System.out::println);
         nonLogicalAxioms.forEach(System.out::println);

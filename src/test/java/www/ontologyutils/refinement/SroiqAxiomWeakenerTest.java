@@ -28,7 +28,6 @@ public class SroiqAxiomWeakenerTest {
     @AfterEach
     public void teardown() {
         ontology.close();
-        axiomWeakener.close();
     }
 
     private static Stream<Arguments> expectedWeakening() {
@@ -276,13 +275,12 @@ public class SroiqAxiomWeakenerTest {
     public void allWeakerAxiomsAreEntailedFromFile(String resourceName) throws OWLOntologyCreationException {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
-            try (var axiomWeakener = new AxiomWeakener(ontology)) {
-                ontology.logicalAxioms().forEach(strongAxiom -> {
-                    axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
-                        assertTrue(ontology.isEntailed(weakAxiom));
-                    });
+            var axiomWeakener = new AxiomWeakener(ontology);
+            ontology.logicalAxioms().forEach(strongAxiom -> {
+                axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
+                    assertTrue(ontology.isEntailed(weakAxiom));
                 });
-            }
+            });
         }
     }
 }

@@ -20,7 +20,7 @@ import www.ontologyutils.toolbox.*;
  * Confalonieri, R., Galliani, P., Kutz, O., Porello, D., Righetti, G., &amp;
  * Toquard, N. (2020). Towards even more irresistible axiom weakening.
  */
-public abstract class AxiomRefinement implements AutoCloseable {
+public abstract class AxiomRefinement {
     /**
      * Default, do not apply any strict constraints.
      */
@@ -243,19 +243,13 @@ public abstract class AxiomRefinement implements AutoCloseable {
     }
 
     private Visitor visitor;
-    private Covers covers;
 
     /**
      * @param visitor
      *            The visitor used by this operator.
-     * @param covers
-     *            The covers used by this operator. Ownership of the covers object
-     *            is transferred to this object, and it will be closed when the new
-     *            axiom refinement object is closed.
      */
-    protected AxiomRefinement(Visitor visitor, Covers covers) {
+    protected AxiomRefinement(Visitor visitor) {
         this.visitor = visitor;
-        this.covers = covers;
     }
 
     /**
@@ -268,10 +262,5 @@ public abstract class AxiomRefinement implements AutoCloseable {
      */
     public Stream<OWLAxiom> refineAxioms(OWLAxiom axiom) {
         return axiom.accept(visitor).distinct();
-    }
-
-    @Override
-    public void close() {
-        covers.close();
     }
 }

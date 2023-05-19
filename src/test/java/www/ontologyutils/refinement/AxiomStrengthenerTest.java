@@ -29,7 +29,6 @@ public class AxiomStrengthenerTest {
     @AfterEach
     public void teardown() {
         ontology.close();
-        axiomStrengthener.close();
     }
 
     private static Stream<Arguments> expectedStrengthening() {
@@ -87,15 +86,14 @@ public class AxiomStrengthenerTest {
         ontology.logicalAxioms().forEach(weakAxiom -> {
             try (var copy = ontology.cloneWithSeparateCache()) {
                 copy.removeAxioms(weakAxiom);
-                try (var axiomStrengthener = new AxiomStrengthener(copy)) {
-                    axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
-                        try (var copy2 = copy.clone()) {
-                            copy2.addAxioms(strongAxiom);
-                            // Some reasoners don't like entailment on inconsistent ontologies.
-                            assertTrue(!copy2.isConsistent() || copy2.isEntailed(weakAxiom));
-                        }
-                    });
-                }
+                var axiomStrengthener = new AxiomStrengthener(copy);
+                axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
+                    try (var copy2 = copy.clone()) {
+                        copy2.addAxioms(strongAxiom);
+                        // Some reasoners don't like entailment on inconsistent ontologies.
+                        assertTrue(!copy2.isConsistent() || copy2.isEntailed(weakAxiom));
+                    }
+                });
             }
         });
     }

@@ -36,7 +36,6 @@ public class SroiqRefinementOperatorTest {
     @AfterEach
     public void teardown() {
         ontology.close();
-        covers.close();
     }
 
     private static Stream<Arguments> expectedGeneralization() {
@@ -390,21 +389,19 @@ public class SroiqRefinementOperatorTest {
             "/alc/Vehicle.owl", "/alc/C50_R10_0.001_0.001_0.001_62888.owl", "/shoin/pizza.owl"
     })
     public void generalizationFromFile(String resourceName) throws OWLOntologyCreationException {
-        var df = Ontology.getDefaultDataFactory();
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var subConcepts = Utils.toSet(ontology.subConcepts());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
-            try (var covers = new Covers(ontology, subConcepts, simpleRoles)) {
-                var upCover = covers.upCover().cached();
-                var downCover = covers.downCover().cached();
-                generalization = new RefinementOperator(upCover, downCover);
-                ontology.subConcepts().forEach(special -> {
-                    for (var general : Utils.toList(generalization.refine(special))) {
-                        assertTrue(ontology.isEntailed(df.getOWLSubClassOfAxiom(special, general)));
-                    }
-                });
-            }
+            var covers = new Covers(ontology, subConcepts, simpleRoles);
+            var upCover = covers.upCover().cached();
+            var downCover = covers.downCover().cached();
+            generalization = new RefinementOperator(upCover, downCover);
+            ontology.subConcepts().forEach(special -> {
+                for (var general : Utils.toList(generalization.refine(special))) {
+                    assertTrue(ontology.isSubClass(special, general));
+                }
+            });
         }
     }
 
@@ -418,21 +415,19 @@ public class SroiqRefinementOperatorTest {
             "/alc/Vehicle.owl", "/alc/C50_R10_0.001_0.001_0.001_62888.owl", "/shoin/pizza.owl"
     })
     public void specializationFromFile(String resourceName) throws OWLOntologyCreationException {
-        var df = Ontology.getDefaultDataFactory();
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var subConcepts = Utils.toSet(ontology.subConcepts());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
-            try (var covers = new Covers(ontology, subConcepts, simpleRoles)) {
-                var upCover = covers.upCover().cached();
-                var downCover = covers.downCover().cached();
-                specialization = new RefinementOperator(downCover, upCover);
-                ontology.subConcepts().forEach(general -> {
-                    for (var special : Utils.toList(specialization.refine(general))) {
-                        assertTrue(ontology.isEntailed(df.getOWLSubClassOfAxiom(special, general)));
-                    }
-                });
-            }
+            var covers = new Covers(ontology, subConcepts, simpleRoles);
+            var upCover = covers.upCover().cached();
+            var downCover = covers.downCover().cached();
+            specialization = new RefinementOperator(downCover, upCover);
+            ontology.subConcepts().forEach(general -> {
+                for (var special : Utils.toList(specialization.refine(general))) {
+                    assertTrue(ontology.isSubClass(special, general));
+                }
+            });
         }
     }
 }

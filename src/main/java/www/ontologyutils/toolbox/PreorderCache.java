@@ -190,6 +190,28 @@ public class PreorderCache<T> {
     }
 
     /**
+     * @param a First element.
+     * @param b Second element.
+     * @return < 0 if a has more known successors, > 0 if b has more
+     */
+    public synchronized int compareKnownSuccessors(T a, T b) {
+        var knownB = knownSuccessors.get(b);
+        var knownA = knownSuccessors.get(a);
+        return knownB.size() - knownA.size();
+    }
+
+    /**
+     * @param a First element.
+     * @param b Second element.
+     * @return < 0 if a has more known predecessors, > 0 if b has more
+     */
+    public synchronized int compareKnownPredecessors(T a, T b) {
+        var knownB = knownPredecessors.get(b);
+        var knownA = knownPredecessors.get(a);
+        return knownB.size() - knownA.size();
+    }
+
+    /**
      * @param pred
      *            The element for which to find successors.
      * @return A stream of all known successors of {@code pred}.

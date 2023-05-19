@@ -131,19 +131,18 @@ public class OntologyRepairMctsWeakening extends OntologyRepairBestOfKWeakening 
         var bestAxioms = new Set<?>[] { Set.of() };
         var bestQuality = new Double[] { Double.NEGATIVE_INFINITY };
         try (var refOntology = ontology.cloneWithRefutable(refAxioms)) {
-            try (var axiomWeakener = new AxiomWeakener(refOntology, ontology)) {
-                var game = new Game(ontology, axiomWeakener, onto -> {
-                    var thisQuality = quality.apply(onto);
-                    if (thisQuality > bestQuality[0]) {
-                        bestAxioms[0] = Utils.toSet(onto.axioms());
-                        bestQuality[0] = thisQuality;
-                    }
-                    return thisQuality;
-                });
-                try (var mcts = new Mcts<>(game)) {
-                    for (int i = 0; i < numberOfRounds; i++) {
-                        mcts.runSimulation();
-                    }
+            var axiomWeakener = new AxiomWeakener(refOntology, ontology);
+            var game = new Game(ontology, axiomWeakener, onto -> {
+                var thisQuality = quality.apply(onto);
+                if (thisQuality > bestQuality[0]) {
+                    bestAxioms[0] = Utils.toSet(onto.axioms());
+                    bestQuality[0] = thisQuality;
+                }
+                return thisQuality;
+            });
+            try (var mcts = new Mcts<>(game)) {
+                for (int i = 0; i < numberOfRounds; i++) {
+                    mcts.runSimulation();
                 }
             }
         }

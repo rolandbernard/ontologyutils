@@ -30,7 +30,6 @@ public class CoverTest {
     @AfterEach
     public void teardown() {
         ontology.close();
-        covers.close();
     }
 
     private static Stream<Arguments> expectedUpCover() {

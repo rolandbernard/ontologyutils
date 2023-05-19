@@ -36,7 +36,6 @@ public class RefinementOperatorTest {
     @AfterEach
     public void teardown() {
         ontology.close();
-        covers.close();
     }
 
     private static Stream<Arguments> expectedGeneralization() {
