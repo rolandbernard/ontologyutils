@@ -113,7 +113,7 @@ public abstract class OntologyRepair implements OntologyModification {
      * @param message
      *            The new info message to send.
      */
-    protected void infoMessage(String message) {
+    protected synchronized void infoMessage(String message) {
         if (infoCallback != null) {
             infoCallback.accept(message);
         }

@@ -50,7 +50,7 @@ public class Ontology implements AutoCloseable {
             this.reasonerFactory = reasonerFactory;
             this.references = new HashSet<>();
             this.unusedReasoners = new ArrayDeque<>();
-            this.lastOntologies = new HashMap<>();
+            this.lastOntologies = new IdentityHashMap<>();
         }
 
         /**
@@ -111,22 +111,26 @@ public class Ontology implements AutoCloseable {
          */
         public OWLReasoner getOwlReasoner(Ontology ontology) {
             OWLReasoner reasoner = null;
+            Ontology lastOntology = null;
             synchronized (this) {
                 if (!unusedReasoners.isEmpty()) {
                     reasoner = unusedReasoners.pop();
+                    lastOntology = lastOntologies.get(reasoner);
                 }
             }
             if (reasoner == null) {
                 reasoner = getNewOwlReasoner(ontology);
             } else {
-                var lastOntology = lastOntologies.get(reasoner);
                 var owlOntology = reasoner.getRootOntology();
                 if ((lastOntology != ontology || ontology.changed) && ontology.applyChangesTo(owlOntology)) {
                     reasoner.flush();
                 }
             }
-            ontology.changed = false;
-            lastOntologies.put(reasoner, ontology);
+            synchronized (this) {
+                reasonerCalls += 1;
+                ontology.changed = false;
+                lastOntologies.put(reasoner, ontology);
+            }
             return reasoner;
         }
 
@@ -147,7 +151,6 @@ public class Ontology implements AutoCloseable {
             }
             var reasoner = getOwlReasoner(ontology);
             try {
-                reasonerCalls += 1;
                 return action.apply(reasoner);
             } finally {
                 disposeOwlReasoner(reasoner);
@@ -493,9 +496,10 @@ public class Ontology implements AutoCloseable {
      *            The axioms to remove.
      */
     public void removeAxioms(Stream<? extends OWLAxiom> axioms) {
+        changed = true;
         axioms.forEach(axiom -> {
-            changed |= staticAxioms.remove(axiom);
-            changed |= refutableAxioms.remove(axiom);
+            staticAxioms.remove(axiom);
+            refutableAxioms.remove(axiom);
         });
     }
 
@@ -504,9 +508,10 @@ public class Ontology implements AutoCloseable {
      *            The axioms to add.
      */
     public void addStaticAxioms(Stream<? extends OWLAxiom> axioms) {
+        changed = true;
         axioms.forEach(axiom -> {
-            changed |= refutableAxioms.remove(axiom);
-            changed |= staticAxioms.add(axiom);
+            refutableAxioms.remove(axiom);
+            staticAxioms.add(axiom);
         });
     }
 
@@ -515,9 +520,10 @@ public class Ontology implements AutoCloseable {
      *            The axioms to add.
      */
     public void addAxioms(Stream<? extends OWLAxiom> axioms) {
+        changed = true;
         axioms.forEach(axiom -> {
-            changed |= staticAxioms.remove(axiom);
-            changed |= refutableAxioms.add(axiom);
+            staticAxioms.remove(axiom);
+            refutableAxioms.add(axiom);
         });
     }
 
@@ -1047,11 +1053,12 @@ public class Ontology implements AutoCloseable {
      * generate all missing declarations and add them as static axioms.
      */
     public void generateDeclarationAxioms() {
+        changed = true;
         var df = getDefaultDataFactory();
         for (var entity : Utils.toList(signature())) {
             var newAxiom = df.getOWLDeclarationAxiom(entity);
             if (!staticAxioms.contains(newAxiom) && !refutableAxioms.contains(newAxiom)) {
-                changed |= staticAxioms.add(newAxiom);
+                staticAxioms.add(newAxiom);
             }
         }
     }

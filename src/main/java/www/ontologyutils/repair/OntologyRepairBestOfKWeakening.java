@@ -2,6 +2,7 @@ package www.ontologyutils.repair;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.IntStream;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -78,31 +79,25 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
         var refAxioms = Utils.randomChoice(getRefAxioms(ontology));
         infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
         var bestAxioms = Set.<OWLAxiom>of();
-        var bestQuality = Double.NEGATIVE_INFINITY;
+        checkpoint(ontology);
         try (var refOntology = ontology.cloneWithRefutable(refAxioms)) {
             var axiomWeakener = new AxiomWeakener(refOntology, ontology);
-            for (int k = 0; k < numberOfRounds; k++) {
-                try (var copy = ontology.clone()) {
-                    checkpoint(copy);
-                    while (!isRepaired(copy)) {
-                        var badAxioms = Utils.toList(findBadAxioms(copy));
-                        infoMessage("Found " + badAxioms.size() + " possible bad axioms.");
-                        var badAxiom = Utils.randomChoice(badAxioms);
-                        infoMessage("Selected the bad axiom " + Utils.prettyPrintAxiom(badAxiom) + ".");
-                        var weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(badAxiom));
-                        infoMessage("Found " + weakerAxioms.size() + " weaker axioms.");
-                        var weakerAxiom = Utils.randomChoice(weakerAxioms);
-                        infoMessage("Selected the weaker axiom " + Utils.prettyPrintAxiom(weakerAxiom) + ".");
-                        copy.replaceAxiom(badAxiom, weakerAxiom);
-                        checkpoint(copy);
-                    }
-                    var thisQuality = quality.apply(copy);
-                    if (thisQuality > bestQuality) {
-                        bestAxioms = Utils.toSet(copy.axioms());
-                        bestQuality = thisQuality;
-                    }
-                }
-            }
+            bestAxioms = IntStream.range(0, numberOfRounds)
+                    .mapToObj(k -> {
+                        try (var copy = ontology.clone()) {
+                            while (!isRepaired(copy)) {
+                                var badAxioms = Utils.toList(findBadAxioms(copy));
+                                var badAxiom = Utils.randomChoice(badAxioms);
+                                var weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(badAxiom));
+                                var weakerAxiom = Utils.randomChoice(weakerAxioms);
+                                copy.replaceAxiom(badAxiom, weakerAxiom);
+                            }
+                            infoMessage("Found a repair.");
+                            return new AbstractMap.SimpleEntry<>(Utils.toSet(copy.refutableAxioms()), quality.apply(copy));
+                        }
+                    })
+                    .max(Comparator.comparingDouble(e -> e.getValue()))
+                    .get().getKey();
         }
         ontology.setRefutableAxioms(bestAxioms);
     }
