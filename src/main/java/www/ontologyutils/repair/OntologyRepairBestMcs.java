@@ -1,7 +1,7 @@
 package www.ontologyutils.repair;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import www.ontologyutils.toolbox.*;
 
@@ -54,15 +54,18 @@ public class OntologyRepairBestMcs extends OntologyRepairRandomMcs {
     @Override
     public void repair(Ontology ontology) {
         var possibleCorrections = Utils.toList(mcsPeekInfo(true, computeMcs(ontology)));
-        var bestCorrection = possibleCorrections.parallelStream()
-                .map(correction -> {
-                    try (var copy = ontology.clone()) {
-                        copy.removeAxioms(correction);
-                        return new AbstractMap.SimpleEntry<>(correction, quality.apply(copy));
-                    }
-                })
-                .max(Comparator.comparingDouble(e -> e.getValue()))
-                .get().getKey();
+        var bestCorrection = possibleCorrections.get(0);
+        var bestQuality = Double.NEGATIVE_INFINITY;
+        for (var correction : possibleCorrections) {
+            try (var copy = ontology.clone()) {
+                copy.removeAxioms(correction);
+                var thisQuality = quality.apply(copy);
+                if (thisQuality > bestQuality) {
+                    bestCorrection = correction;
+                    bestQuality = thisQuality;
+                }
+            }
+        }
         ontology.removeAxioms(bestCorrection);
         infoMessage("Selected a repair with " + ontology.axioms().count() + " axioms.");
     }
