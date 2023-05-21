@@ -64,9 +64,9 @@ public class ABoxNormalizationTest {
             var normalization = new ABoxNormalization();
             normalization.apply(ontology);
             ontology.axioms(AxiomType.SAME_INDIVIDUAL)
-                    .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).getIndividuals().size()));
+                    .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).individuals().count()));
             ontology.axioms(AxiomType.DIFFERENT_INDIVIDUALS)
-                    .forEach(axiom -> assertEquals(2, ((OWLDifferentIndividualsAxiom) axiom).getIndividuals().size()));
+                    .forEach(axiom -> assertEquals(2, ((OWLDifferentIndividualsAxiom) axiom).individuals().count()));
         }
     }
 
@@ -77,9 +77,9 @@ public class ABoxNormalizationTest {
             var normalization = new ABoxNormalization(true);
             normalization.apply(ontology);
             ontology.axioms(AxiomType.SAME_INDIVIDUAL)
-                    .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).getIndividuals().size()));
+                    .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).individuals().count()));
             ontology.axioms(AxiomType.DIFFERENT_INDIVIDUALS)
-                    .forEach(axiom -> assertEquals(2, ((OWLDifferentIndividualsAxiom) axiom).getIndividuals().size()));
+                    .forEach(axiom -> assertEquals(2, ((OWLDifferentIndividualsAxiom) axiom).individuals().count()));
         }
     }
 

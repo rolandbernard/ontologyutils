@@ -53,7 +53,7 @@ public class UtilsTest {
         // api implementation.
         var df = Ontology.getDefaultDataFactory();
 
-        assertNotSame(concepts.get(0), concepts.get(4));
+        assertSame(concepts.get(0), concepts.get(4));
         assertTrue(Utils.sameConcept(concepts.get(0), concepts.get(4)));
 
         var union1A = df.getOWLObjectUnionOf(concepts.get(0), concepts.get(1));

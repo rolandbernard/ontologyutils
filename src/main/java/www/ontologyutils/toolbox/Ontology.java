@@ -357,7 +357,7 @@ public class Ontology implements AutoCloseable {
      * @return true if some change was made to the ontology, false otherwise.
      */
     public boolean applyChangesTo(OWLOntology ontology) {
-        var oldAxioms = ontology.getAxioms();
+        var oldAxioms = Utils.toSet(ontology.axioms());
         var toAdd = Utils.toList(axioms().filter(axiom -> !oldAxioms.contains(axiom)));
         var toRemove = Utils.toList(
                 oldAxioms.stream().filter(axiom -> !refutableAxioms.contains(axiom) && !staticAxioms.contains(axiom)));

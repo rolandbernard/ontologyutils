@@ -77,7 +77,7 @@ public class RBoxNormalizationTest {
             });
             ontology.axioms(AxiomType.DISJOINT_OBJECT_PROPERTIES)
                     .forEach(axiom -> assertEquals(2,
-                            ((OWLDisjointObjectPropertiesAxiom) axiom).getProperties().size()));
+                            ((OWLDisjointObjectPropertiesAxiom) axiom).properties().count()));
         }
     }
 
@@ -88,9 +88,9 @@ public class RBoxNormalizationTest {
             var normalization = new RBoxNormalization(true);
             normalization.apply(ontology);
             ontology.axioms(AxiomType.SAME_INDIVIDUAL)
-                    .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).getIndividuals().size()));
+                    .forEach(axiom -> assertEquals(2, ((OWLSameIndividualAxiom) axiom).individuals().count()));
             ontology.axioms(AxiomType.DIFFERENT_INDIVIDUALS)
-                    .forEach(axiom -> assertEquals(2, ((OWLDifferentIndividualsAxiom) axiom).getIndividuals().size()));
+                    .forEach(axiom -> assertEquals(2, ((OWLDifferentIndividualsAxiom) axiom).individuals().count()));
         }
     }
 
