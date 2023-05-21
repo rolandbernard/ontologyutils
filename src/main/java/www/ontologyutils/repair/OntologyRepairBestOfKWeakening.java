@@ -80,7 +80,7 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
         infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
         var bestAxioms = Set.<OWLAxiom>of();
         checkpoint(ontology);
-        try (var refOntology = ontology.cloneWithRefutable(refAxioms)) {
+        try (var refOntology = ontology.cloneWithRefutable(refAxioms).withSeparateCache()) {
             var axiomWeakener = new AxiomWeakener(refOntology, ontology);
             bestAxioms = IntStream.range(0, numberOfRounds)
                     .mapToObj(k -> {

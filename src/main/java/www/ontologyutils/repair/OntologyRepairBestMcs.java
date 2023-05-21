@@ -58,7 +58,6 @@ public class OntologyRepairBestMcs extends OntologyRepairRandomMcs {
                 .map(correction -> {
                     try (var copy = ontology.clone()) {
                         copy.removeAxioms(correction);
-                        assert copy.isConsistent();
                         return new AbstractMap.SimpleEntry<>(correction, quality.apply(copy));
                     }
                 })

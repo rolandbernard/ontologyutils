@@ -39,6 +39,7 @@ public class Ontology implements AutoCloseable {
         private Set<Ontology> references;
         private Deque<OWLReasoner> unusedReasoners;
         private Map<OWLReasoner, Ontology> lastOntologies;
+        private boolean hardRefresh = false;
 
         /**
          * Create a new reasoner cache using the given reasoner factory.
@@ -85,7 +86,7 @@ public class Ontology implements AutoCloseable {
          *            The {@code OWLReasoner} to dispose.
          */
         public synchronized void disposeOwlReasoner(OWLReasoner reasoner) {
-            unusedReasoners.push(reasoner);
+            unusedReasoners.add(reasoner);
         }
 
         /**
@@ -123,7 +124,14 @@ public class Ontology implements AutoCloseable {
             } else {
                 var owlOntology = reasoner.getRootOntology();
                 if ((lastOntology != ontology || ontology.changed) && ontology.applyChangesTo(owlOntology)) {
-                    reasoner.flush();
+                    if (hardRefresh) {
+                        // Some reasoners are not performing the flushing correctly. This is an ugly
+                        // workaround. The performance impact of this depends on the reasoner.
+                        reasoner.dispose();
+                        reasoner = reasonerFactory.createReasoner(owlOntology);
+                    } else {
+                        reasoner.flush();
+                    }
                 }
             }
             synchronized (this) {
@@ -275,7 +283,7 @@ public class Ontology implements AutoCloseable {
 
     /**
      * @param filePath
-     *            ontaining the ontology.
+     *            File containing the ontology.
      * @param reasonerFactory
      *            The reasoner factory to be used for reasoning queries.
      * @return The new ontology, loaded form the file.

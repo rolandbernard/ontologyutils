@@ -130,7 +130,7 @@ public class OntologyRepairMctsWeakening extends OntologyRepairBestOfKWeakening 
         infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
         var bestAxioms = new Set<?>[] { Set.of() };
         var bestQuality = new Double[] { Double.NEGATIVE_INFINITY };
-        try (var refOntology = ontology.cloneWithRefutable(refAxioms)) {
+        try (var refOntology = ontology.cloneWithRefutable(refAxioms).withSeparateCache()) {
             var axiomWeakener = new AxiomWeakener(refOntology, ontology);
             var game = new Game(ontology, axiomWeakener, onto -> {
                 var thisQuality = quality.apply(onto);

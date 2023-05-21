@@ -102,6 +102,10 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
         return input -> cached.apply(input).stream();
     }
 
+    public void removeFirst() {
+        remove(keySet().iterator().next());
+    }
+
     @Override
     public V computeIfAbsent(K key, Function<? super K, ? extends V> func) {
         V result;
