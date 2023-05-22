@@ -54,7 +54,7 @@ public class OntologyRepairBestMcs extends OntologyRepairRandomMcs {
     @Override
     public void repair(Ontology ontology) {
         var possibleCorrections = Utils.toList(mcsPeekInfo(true, computeMcs(ontology)));
-        var bestCorrection = possibleCorrections.stream()
+        var bestCorrection = possibleCorrections.parallelStream()
                 .map(correction -> {
                     try (var copy = ontology.clone()) {
                         copy.removeAxioms(correction);
