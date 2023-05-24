@@ -1,6 +1,6 @@
 package www.ontologyutils.refinement;
 
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.*;
 
@@ -222,9 +222,7 @@ public class Covers {
                     isSubClass.knownStrictPredecessors(candidate).stream()
                             .filter(other -> subConcepts.contains(other)),
                     isSubClass.possibleStrictPredecessors(candidate).stream()
-                            .sorted(isSubClass::compareKnownSuccessors)
                             .filter(other -> subConcepts.contains(other) && isStrictSubClass(other, candidate)))
-                    .sorted(isSubClass::compareKnownPredecessors)
                     .anyMatch(other -> isStrictSubClass(concept, other));
         } else {
             return !subConcepts.stream()
@@ -259,9 +257,7 @@ public class Covers {
                     isSubClass.knownStrictSuccessors(candidate).stream()
                             .filter(other -> subConcepts.contains(other)),
                     isSubClass.possibleStrictSuccessors(candidate).stream()
-                            .sorted(isSubClass::compareKnownPredecessors)
                             .filter(other -> subConcepts.contains(other) && isStrictSubClass(candidate, other)))
-                    .sorted(isSubClass::compareKnownSuccessors)
                     .anyMatch(other -> isStrictSubClass(other, concept));
         } else {
             return !subConcepts.stream()
@@ -309,10 +305,8 @@ public class Covers {
                     isSubRole.knownStrictPredecessors(candidate).stream()
                             .filter(other -> simpleRoles.contains(other)),
                     isSubRole.possibleStrictPredecessors(candidate).stream()
-                            .sorted(isSubRole::compareKnownSuccessors)
                             .filter(other -> simpleRoles.contains(other)
                                     && isStrictSubRole(other, candidate)))
-                    .sorted(isSubRole::compareKnownPredecessors)
                     .anyMatch(other -> isStrictSubRole(role, other));
         } else {
             return !simpleRoles.stream()
@@ -345,10 +339,8 @@ public class Covers {
                     isSubRole.knownStrictSuccessors(candidate).stream()
                             .filter(other -> simpleRoles.contains(other)),
                     isSubRole.possibleStrictSuccessors(candidate).stream()
-                            .sorted(isSubRole::compareKnownPredecessors)
                             .filter(other -> simpleRoles.contains(other)
                                     && isStrictSubRole(candidate, other)))
-                    .sorted(isSubRole::compareKnownSuccessors)
                     .anyMatch(other -> isStrictSubRole(other, role));
         } else {
             return !simpleRoles.stream()

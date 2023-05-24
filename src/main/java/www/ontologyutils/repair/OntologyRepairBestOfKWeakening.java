@@ -1,8 +1,7 @@
 package www.ontologyutils.repair;
 
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.*;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -80,11 +79,11 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
         var refAxioms = Utils.randomChoice(getRefAxioms(ontology));
         infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
         checkpoint(ontology);
-        var parallelism = Runtime.getRuntime().availableProcessors();
-        var executor = Executors.newFixedThreadPool(parallelism);
         var repairs = new ArrayList<Map.Entry<Set<OWLAxiom>, Double>>();
         try (var refOntology = ontology.cloneWithRefutable(refAxioms).withSeparateCache()) {
             var axiomWeakener = new AxiomWeakener(refOntology, ontology);
+            var parallelism = Runtime.getRuntime().availableProcessors();
+            var executor = Executors.newFixedThreadPool(parallelism);
             for (int i = 0; i < numberOfRounds; i++) {
                 executor.execute(() -> {
                     try (var copy = ontology.cloneWithSeparateCache()) {
@@ -115,16 +114,5 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
                 .max(Comparator.comparingDouble(e -> e.getValue()))
                 .get().getKey();
         ontology.setRefutableAxioms(bestAxioms);
-    }
-
-    public static void main(String[] args) {
-        var path = "src/test/resources/inconsistent/leftpolicies-small.owl";
-        try (var ontology = Ontology.loadOntology(path)) {
-            Utils.randomSeed(0);
-            var repair = OntologyRepairBestOfKWeakening.forConsistency(100);
-            System.out.println(ontology.isConsistent());
-            repair.apply(ontology);
-            System.out.println(ontology.isConsistent());
-        }
     }
 }

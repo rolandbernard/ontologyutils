@@ -125,56 +125,6 @@ public class PreorderCache<T> {
     }
 
     /**
-     * Precompute the complete preorder for the given domain and relation.
-     *
-     * @param domain
-     *            The domain for which to compute the order.
-     * @param order
-     *            The relation to be computed.
-     */
-    public void precomputeFor(Collection<T> domain, BiPredicate<T, T> order) {
-        setupDomain(domain);
-        for (var element : domain) {
-            List<T> possible;
-            synchronized (this) {
-                possible = possibleSuccessors.get(element).stream()
-                        .sorted((a, b) -> Integer.compare(knownPredecessors.get(b).size(),
-                                knownPredecessors.get(a).size()))
-                        .toList();
-            }
-            for (var elem : possible) {
-                computeIfAbsent(element, elem, order);
-            }
-        }
-    }
-
-    /**
-     * @param a
-     *            First element.
-     * @param b
-     *            Second element.
-     * @return < 0 if a has more known successors, > 0 if b has more
-     */
-    public synchronized int compareKnownSuccessors(T a, T b) {
-        var knownB = knownSuccessors.get(b);
-        var knownA = knownSuccessors.get(a);
-        return knownB.size() - knownA.size();
-    }
-
-    /**
-     * @param a
-     *            First element.
-     * @param b
-     *            Second element.
-     * @return < 0 if a has more known predecessors, > 0 if b has more
-     */
-    public synchronized int compareKnownPredecessors(T a, T b) {
-        var knownB = knownPredecessors.get(b);
-        var knownA = knownPredecessors.get(a);
-        return knownB.size() - knownA.size();
-    }
-
-    /**
      * @param pred
      *            The element for which to find successors.
      * @return A stream of all known successors of {@code pred}.
