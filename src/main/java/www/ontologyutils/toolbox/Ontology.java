@@ -27,7 +27,7 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
  * to the {@code OWLOntology} object and the {@code OWLreasoner}.
  */
 public class Ontology implements AutoCloseable {
-    private static final OWLOntologyManager defaultManager = OWLManager.createOWLOntologyManager();
+    private static final OWLOntologyManager defaultManager = OWLManager.createConcurrentOWLOntologyManager();
     private static final OWLReasonerFactory defaultFactory = new FaCTPlusPlusReasonerFactory();
     /**
      * This is only here for statistics
@@ -288,7 +288,7 @@ public class Ontology implements AutoCloseable {
      *            The reasoner factory to be used for reasoning queries.
      * @return The new ontology, loaded form the file.
      */
-    public static Ontology loadOntology(String filePath, OWLReasonerFactory reasonerFactory) {
+    public static synchronized Ontology loadOntology(String filePath, OWLReasonerFactory reasonerFactory) {
         OWLOntology ontology = null;
         try {
             var ontologyFile = new File(filePath);
