@@ -366,16 +366,16 @@ public class Ontology implements AutoCloseable {
      */
     public boolean applyChangesTo(OWLOntology ontology) {
         var oldAxioms = Utils.toSet(ontology.axioms());
-        var toAdd = Utils.toList(axioms().filter(axiom -> !oldAxioms.contains(axiom)));
         var toRemove = Utils.toList(
                 oldAxioms.stream().filter(axiom -> !refutableAxioms.contains(axiom) && !staticAxioms.contains(axiom)));
-        if (!toAdd.isEmpty()) {
-            ontology.addAxioms(toAdd);
-        }
+        var toAdd = Utils.toList(axioms().filter(axiom -> !oldAxioms.contains(axiom)));
         if (!toRemove.isEmpty()) {
             ontology.removeAxioms(toRemove);
         }
-        return !toAdd.isEmpty() || !toRemove.isEmpty();
+        if (!toAdd.isEmpty()) {
+            ontology.addAxioms(toAdd);
+        }
+        return !toRemove.isEmpty() || !toAdd.isEmpty();
     }
 
     /**

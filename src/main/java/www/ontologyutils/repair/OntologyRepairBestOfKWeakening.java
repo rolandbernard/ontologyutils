@@ -116,4 +116,15 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
                 .get().getKey();
         ontology.setRefutableAxioms(bestAxioms);
     }
+
+    public static void main(String[] args) {
+        var path = "src/test/resources/inconsistent/leftpolicies-small.owl";
+        try (var ontology = Ontology.loadOntology(path)) {
+            Utils.randomSeed(0);
+            var repair = OntologyRepairBestOfKWeakening.forConsistency(100);
+            System.out.println(ontology.isConsistent());
+            repair.apply(ontology);
+            System.out.println(ontology.isConsistent());
+        }
+    }
 }
