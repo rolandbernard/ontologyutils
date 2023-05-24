@@ -6,18 +6,21 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.*;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class MaximalConsistentSetsTest {
-    private static OWLDataFactory df;
-    private static List<OWLClassExpression> concepts;
-    private static List<OWLIndividual> individuals;
-    private static List<OWLAxiom> axioms;
+    private OWLDataFactory df;
+    private List<OWLClassExpression> concepts;
+    private List<OWLIndividual> individuals;
+    private List<OWLAxiom> axioms;
 
-    static {
+    @BeforeEach
+    public void setup() {
         df = Ontology.getDefaultDataFactory();
         concepts = List.of(
                 df.getOWLClass("www.first.org#", "A"),
@@ -68,7 +71,9 @@ public class MaximalConsistentSetsTest {
     }
 
     private static Stream<Arguments> axiomPowerSet() {
-        return Utils.powerSet(axioms).map(Arguments::of);
+        var temp = new MaximalConsistentSetsTest();
+        temp.setup();
+        return Utils.powerSet(temp.axioms).map(Arguments::of);
     }
 
     @ParameterizedTest

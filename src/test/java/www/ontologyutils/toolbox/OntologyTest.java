@@ -7,7 +7,9 @@ import java.util.*;
 import org.semanticweb.owlapi.model.*;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.*;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class OntologyTest {
     private OWLDataFactory df;
     private List<OWLClassExpression> concepts;

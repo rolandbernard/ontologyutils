@@ -1,8 +1,10 @@
 package www.ontologyutils.repair;
 
+import org.junit.jupiter.api.parallel.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class OntologyRepairBestOfKWeakeningTest extends OntologyRepairTest {
     @Override
     protected OntologyRepair getRepairForConsistency() {

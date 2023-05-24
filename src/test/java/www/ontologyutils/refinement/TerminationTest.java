@@ -3,6 +3,7 @@ package www.ontologyutils.refinement;
 import java.util.stream.*;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.parallel.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
@@ -14,10 +15,11 @@ import www.ontologyutils.toolbox.Utils;
  * Testing almost-sure termination for the problem of reaching TOP by
  * iterated generalization from BOT.
  */
+@Execution(ExecutionMode.CONCURRENT)
 public class TerminationTest {
     private Ontology ontology;
     private Covers covers;
-    static RefinementOperator generalization;
+    private RefinementOperator generalization;
 
     @BeforeEach
     public void setup() {
