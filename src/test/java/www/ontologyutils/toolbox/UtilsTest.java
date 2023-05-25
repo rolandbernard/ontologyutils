@@ -7,7 +7,9 @@ import java.util.*;
 import org.semanticweb.owlapi.model.*;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.*;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class UtilsTest {
     private OWLDataFactory df;
     private List<OWLClassExpression> concepts;
@@ -53,7 +55,7 @@ public class UtilsTest {
         // api implementation.
         var df = Ontology.getDefaultDataFactory();
 
-        assertNotSame(concepts.get(0), concepts.get(4));
+        assertSame(concepts.get(0), concepts.get(4));
         assertTrue(Utils.sameConcept(concepts.get(0), concepts.get(4)));
 
         var union1A = df.getOWLObjectUnionOf(concepts.get(0), concepts.get(1));

@@ -7,7 +7,9 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.*;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class LruCacheTest {
     @Test
     public void keepAllEntriesUntilLimit() {

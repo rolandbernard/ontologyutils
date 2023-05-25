@@ -6,7 +6,9 @@ import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.*;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class MapOfSetsTest {
     @Test
     public void emptyMapHasEmptyEntrySet() {

@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.*;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class SetOfSetsTest {
     @Test
     public void emptySetHasEmpty() {

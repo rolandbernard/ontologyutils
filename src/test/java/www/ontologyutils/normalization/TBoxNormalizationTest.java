@@ -2,12 +2,14 @@ package www.ontologyutils.normalization;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.parallel.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.toolbox.Ontology;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class TBoxNormalizationTest {
     @ParameterizedTest
     @ValueSource(strings = {

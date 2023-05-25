@@ -27,7 +27,7 @@ import uk.ac.manchester.cs.jfact.JFactFactory;
  * to the {@code OWLOntology} object and the {@code OWLreasoner}.
  */
 public class Ontology implements AutoCloseable {
-    private static final OWLOntologyManager defaultManager = OWLManager.createOWLOntologyManager();
+    private static final OWLOntologyManager defaultManager = OWLManager.createConcurrentOWLOntologyManager();
     private static final OWLReasonerFactory defaultFactory = new FaCTPlusPlusReasonerFactory();
     /**
      * This is only here for statistics
@@ -39,6 +39,7 @@ public class Ontology implements AutoCloseable {
         private Set<Ontology> references;
         private Deque<OWLReasoner> unusedReasoners;
         private Map<OWLReasoner, Ontology> lastOntologies;
+        private boolean hardRefresh = false;
 
         /**
          * Create a new reasoner cache using the given reasoner factory.
@@ -50,7 +51,7 @@ public class Ontology implements AutoCloseable {
             this.reasonerFactory = reasonerFactory;
             this.references = new HashSet<>();
             this.unusedReasoners = new ArrayDeque<>();
-            this.lastOntologies = new HashMap<>();
+            this.lastOntologies = new IdentityHashMap<>();
         }
 
         /**
@@ -85,7 +86,7 @@ public class Ontology implements AutoCloseable {
          *            The {@code OWLReasoner} to dispose.
          */
         public synchronized void disposeOwlReasoner(OWLReasoner reasoner) {
-            unusedReasoners.push(reasoner);
+            unusedReasoners.add(reasoner);
         }
 
         /**
@@ -111,22 +112,33 @@ public class Ontology implements AutoCloseable {
          */
         public OWLReasoner getOwlReasoner(Ontology ontology) {
             OWLReasoner reasoner = null;
+            Ontology lastOntology = null;
             synchronized (this) {
                 if (!unusedReasoners.isEmpty()) {
                     reasoner = unusedReasoners.pop();
+                    lastOntology = lastOntologies.get(reasoner);
                 }
             }
             if (reasoner == null) {
                 reasoner = getNewOwlReasoner(ontology);
             } else {
-                var lastOntology = lastOntologies.get(reasoner);
                 var owlOntology = reasoner.getRootOntology();
                 if ((lastOntology != ontology || ontology.changed) && ontology.applyChangesTo(owlOntology)) {
-                    reasoner.flush();
+                    if (hardRefresh) {
+                        // Some reasoners are not performing the flushing correctly. This is an ugly
+                        // workaround. The performance impact of this depends on the reasoner.
+                        reasoner.dispose();
+                        reasoner = reasonerFactory.createReasoner(owlOntology);
+                    } else {
+                        reasoner.flush();
+                    }
                 }
             }
-            ontology.changed = false;
-            lastOntologies.put(reasoner, ontology);
+            synchronized (this) {
+                reasonerCalls += 1;
+                ontology.changed = false;
+                lastOntologies.put(reasoner, ontology);
+            }
             return reasoner;
         }
 
@@ -147,7 +159,6 @@ public class Ontology implements AutoCloseable {
             }
             var reasoner = getOwlReasoner(ontology);
             try {
-                reasonerCalls += 1;
                 return action.apply(reasoner);
             } finally {
                 disposeOwlReasoner(reasoner);
@@ -272,12 +283,12 @@ public class Ontology implements AutoCloseable {
 
     /**
      * @param filePath
-     *            ontaining the ontology.
+     *            File containing the ontology.
      * @param reasonerFactory
      *            The reasoner factory to be used for reasoning queries.
      * @return The new ontology, loaded form the file.
      */
-    public static Ontology loadOntology(String filePath, OWLReasonerFactory reasonerFactory) {
+    public static synchronized Ontology loadOntology(String filePath, OWLReasonerFactory reasonerFactory) {
         OWLOntology ontology = null;
         try {
             var ontologyFile = new File(filePath);
@@ -354,17 +365,17 @@ public class Ontology implements AutoCloseable {
      * @return true if some change was made to the ontology, false otherwise.
      */
     public boolean applyChangesTo(OWLOntology ontology) {
-        var oldAxioms = ontology.getAxioms();
-        var toAdd = Utils.toList(axioms().filter(axiom -> !oldAxioms.contains(axiom)));
+        var oldAxioms = Utils.toSet(ontology.axioms());
         var toRemove = Utils.toList(
                 oldAxioms.stream().filter(axiom -> !refutableAxioms.contains(axiom) && !staticAxioms.contains(axiom)));
-        if (!toAdd.isEmpty()) {
-            ontology.addAxioms(toAdd);
-        }
+        var toAdd = Utils.toList(axioms().filter(axiom -> !oldAxioms.contains(axiom)));
         if (!toRemove.isEmpty()) {
             ontology.removeAxioms(toRemove);
         }
-        return !toAdd.isEmpty() || !toRemove.isEmpty();
+        if (!toAdd.isEmpty()) {
+            ontology.addAxioms(toAdd);
+        }
+        return !toRemove.isEmpty() || !toAdd.isEmpty();
     }
 
     /**
@@ -493,9 +504,10 @@ public class Ontology implements AutoCloseable {
      *            The axioms to remove.
      */
     public void removeAxioms(Stream<? extends OWLAxiom> axioms) {
+        changed = true;
         axioms.forEach(axiom -> {
-            changed |= staticAxioms.remove(axiom);
-            changed |= refutableAxioms.remove(axiom);
+            staticAxioms.remove(axiom);
+            refutableAxioms.remove(axiom);
         });
     }
 
@@ -504,9 +516,10 @@ public class Ontology implements AutoCloseable {
      *            The axioms to add.
      */
     public void addStaticAxioms(Stream<? extends OWLAxiom> axioms) {
+        changed = true;
         axioms.forEach(axiom -> {
-            changed |= refutableAxioms.remove(axiom);
-            changed |= staticAxioms.add(axiom);
+            refutableAxioms.remove(axiom);
+            staticAxioms.add(axiom);
         });
     }
 
@@ -515,9 +528,10 @@ public class Ontology implements AutoCloseable {
      *            The axioms to add.
      */
     public void addAxioms(Stream<? extends OWLAxiom> axioms) {
+        changed = true;
         axioms.forEach(axiom -> {
-            changed |= staticAxioms.remove(axiom);
-            changed |= refutableAxioms.add(axiom);
+            staticAxioms.remove(axiom);
+            refutableAxioms.add(axiom);
         });
     }
 
@@ -1018,7 +1032,6 @@ public class Ontology implements AutoCloseable {
     public Stream<OWLSubClassOfAxiom> inferredTaxonomyAxioms() {
         var df = getDefaultDataFactory();
         var cache = new SubClassCache();
-        cache.precomputeFor(Utils.toList(conceptsInSignature()), this::isSubClass);
         return conceptsInSignature().flatMap(subClass -> conceptsInSignature()
                 .filter(superClass -> cache.computeIfAbsent(subClass, superClass, this::isSubClass))
                 .map(superClass -> df.getOWLSubClassOfAxiom(subClass, superClass)));
@@ -1047,11 +1060,12 @@ public class Ontology implements AutoCloseable {
      * generate all missing declarations and add them as static axioms.
      */
     public void generateDeclarationAxioms() {
+        changed = true;
         var df = getDefaultDataFactory();
         for (var entity : Utils.toList(signature())) {
             var newAxiom = df.getOWLDeclarationAxiom(entity);
             if (!staticAxioms.contains(newAxiom) && !refutableAxioms.contains(newAxiom)) {
-                changed |= staticAxioms.add(newAxiom);
+                staticAxioms.add(newAxiom);
             }
         }
     }

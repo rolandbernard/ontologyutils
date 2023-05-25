@@ -6,12 +6,14 @@ import java.util.*;
 import java.util.stream.*;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.parallel.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.semanticweb.owlapi.model.*;
 
 import www.ontologyutils.toolbox.*;
 
+@Execution(ExecutionMode.CONCURRENT)
 public class RoleCoverTest {
     private static final String ONTOLOGY_IRI = "http://www.semanticweb.org/roland/ontologies/2023/3/untitled/";
 

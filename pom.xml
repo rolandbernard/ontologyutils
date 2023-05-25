@@ -9,7 +9,7 @@
     <version>0.0.1</version>
 
     <name>ontologyutils</name>
-    
+
     <repositories>
         <repository>
             <id>github</id>
@@ -69,6 +69,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
+                <configuration>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.execution.parallel.enabled=true
+                            junit.jupiter.execution.parallel.config.strategy=fixed
+                            junit.jupiter.execution.parallel.config.fixed.parallelism=16
+                            junit.jupiter.execution.parallel.config.fixed.max-pool-size=64
+                        </configurationParameters>
+                    </properties>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -82,7 +92,7 @@
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-distribution</artifactId>
-            <version>5.5.0</version>
+            <version>5.1.9</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
@@ -102,7 +112,7 @@
         <dependency>
             <groupId>ontologyutils</groupId>
             <artifactId>factplusplus</artifactId>
-            <version>1.7.0</version>
+            <version>1.7.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

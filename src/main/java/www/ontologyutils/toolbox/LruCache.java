@@ -102,6 +102,13 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
         return input -> cached.apply(input).stream();
     }
 
+    /**
+     * Remove the oldest entry in the cache.
+     */
+    public void removeOldest() {
+        remove(keySet().iterator().next());
+    }
+
     @Override
     public V computeIfAbsent(K key, Function<? super K, ? extends V> func) {
         V result;
