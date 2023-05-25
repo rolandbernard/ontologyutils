@@ -161,14 +161,4 @@ public class OntologyRepairMctsWeakening extends OntologyRepairBestOfKWeakening 
         }
         ontology.setRefutableAxioms((Set<OWLAxiom>) bestAxioms[0]);
     }
-
-    public static void main(String[] args) {
-        var path = "src/test/resources/inconsistent/pizza.owl";
-        try (var ontology = Ontology.loadOntology(path)) {
-            Utils.randomSeed(0);
-            var repair = OntologyRepairBestOfKWeakening.forConsistency(1_000);
-            var repaired = repair.modified(ontology);
-            System.out.println(repaired.inferredTaxonomyAxioms().count());
-        }
-    }
 }
