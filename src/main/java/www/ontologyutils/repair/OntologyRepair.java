@@ -24,7 +24,11 @@ public abstract class OntologyRepair implements OntologyModification {
          *            The ontology that all subsequent tests are a subset of.
          */
         public void initialize(Ontology ontology) {
-            unsatisfiable = Utils.toSet(ontology.unsatisfiableConcepts());
+            if (ontology.isConsistent()) {
+                unsatisfiable = Utils.toSet(ontology.unsatisfiableConcepts());
+            } else {
+                unsatisfiable = Utils.toSet(ontology.conceptsInSignature());
+            }
             last = null;
         }
 
