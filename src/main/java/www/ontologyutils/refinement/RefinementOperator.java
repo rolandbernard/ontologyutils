@@ -1,5 +1,6 @@
 package www.ontologyutils.refinement;
 
+import java.util.*;
 import java.util.stream.*;
 
 import org.semanticweb.owlapi.model.*;
@@ -36,6 +37,11 @@ public class RefinementOperator {
      * Accept only axioms that have direct equivalents in SROIQ.
      */
     public static final int FLAG_SROIQ_STRICT = AxiomRefinement.FLAG_SROIQ_STRICT;
+    /**
+     * Treat intersection and union operands as sets and disallow singleton sets.
+     * (Only during generation, invalid axioms will be accepted.)
+     */
+    public static final int FLAG_OWL2_SET_OPERANDS = AxiomRefinement.FLAG_OWL2_SET_OPERANDS;
 
     private static class Visitor implements OWLClassExpressionVisitorEx<Stream<OWLClassExpression>> {
         protected OWLDataFactory df;
@@ -76,7 +82,19 @@ public class RefinementOperator {
             }
             return IntStream.range(0, conjuncts.size()).mapToObj(i -> i)
                     .flatMap(i -> refine(conjuncts.get(i))
-                            .map(refined -> df.getOWLObjectIntersectionOf(Utils.replaceInList(conjuncts, i, refined))));
+                            .map(refined -> {
+                                var newConjunctsList = Utils.replaceInList(conjuncts, i, refined);
+                                if ((flags & FLAG_OWL2_SET_OPERANDS) != 0) {
+                                    var newConjunctsSet = new LinkedHashSet<>(newConjunctsList);
+                                    if (newConjunctsSet.size() > 1) {
+                                        return df.getOWLObjectIntersectionOf(newConjunctsSet);
+                                    } else {
+                                        return newConjunctsSet.iterator().next();
+                                    }
+                                } else {
+                                    return df.getOWLObjectIntersectionOf(newConjunctsList);
+                                }
+                            }));
         }
 
         @Override
@@ -87,7 +105,19 @@ public class RefinementOperator {
             }
             return IntStream.range(0, disjuncts.size()).mapToObj(i -> i)
                     .flatMap(i -> refine(disjuncts.get(i))
-                            .map(refined -> df.getOWLObjectUnionOf(Utils.replaceInList(disjuncts, i, refined))));
+                            .map(refined -> {
+                                var newDisjunctsList = Utils.replaceInList(disjuncts, i, refined);
+                                if ((flags & FLAG_OWL2_SET_OPERANDS) != 0) {
+                                    var newDisjunctsSet = new LinkedHashSet<>(newDisjunctsList);
+                                    if (newDisjunctsSet.size() > 1) {
+                                        return df.getOWLObjectUnionOf(newDisjunctsSet);
+                                    } else {
+                                        return newDisjunctsSet.iterator().next();
+                                    }
+                                } else {
+                                    return df.getOWLObjectUnionOf(newDisjunctsList);
+                                }
+                            }));
         }
 
         @Override
