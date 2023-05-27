@@ -24,7 +24,7 @@ public abstract class AxiomRefinement {
     /**
      * Default, do not apply any strict constraints.
      */
-    public static final int FLAG_NON_STRICT = 0;
+    public static final int FLAG_DEFAULT = 0;
     /**
      * Accept and produce only axioms with concepts in negation normal form.
      */
@@ -44,6 +44,15 @@ public abstract class AxiomRefinement {
      * errors for these cases, so we leave this behind a flag.
      */
     public static final int FLAG_OWL2_SET_OPERANDS = 1 << 3;
+    /**
+     * Refine roles only with simple roles, even in a context that allows complex
+     * roles.
+     */
+    public static final int FLAG_SIMPLE_ROLES_STRICT = 1 << 4;
+    /**
+     * Do not use a cache for the covers.
+     */
+    public static final int FLAG_UNCACHED = 1 << 5;
 
     /**
      * Visitor implementing the actual weakening.
@@ -128,7 +137,7 @@ public abstract class AxiomRefinement {
             var role = axiom.getProperty();
             var object = axiom.getObject();
             return Stream.concat(
-                    up.refine(role)
+                    up.refine(role, false)
                             .map(newRole -> df.getOWLObjectPropertyAssertionAxiom(newRole, subject, object)),
                     Stream.of(axiom, noopAxiom()));
         }
@@ -139,7 +148,7 @@ public abstract class AxiomRefinement {
             var role = axiom.getProperty();
             var object = axiom.getObject();
             return Stream.concat(
-                    down.refine(role)
+                    down.refine(role, false)
                             .map(newRole -> df.getOWLNegativeObjectPropertyAssertionAxiom(newRole, subject, object)),
                     Stream.of(axiom, noopAxiom()));
         }
@@ -211,10 +220,10 @@ public abstract class AxiomRefinement {
             }
             return Stream.concat(Stream.of(noopAxiom()),
                     Stream.concat(
-                            down.refine(axiom.getSubProperty())
+                            down.refine(axiom.getSubProperty(), true)
                                     .map(role -> df.getOWLSubObjectPropertyOfAxiom(role, axiom.getSuperProperty())),
                             simpleRoles.contains(axiom.getSubProperty())
-                                    ? up.refine(axiom.getSuperProperty())
+                                    ? up.refine(axiom.getSuperProperty(), true)
                                             .map(role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(),
                                                     role))
                                     : Stream.of()));
@@ -228,7 +237,7 @@ public abstract class AxiomRefinement {
             var chain = axiom.getPropertyChain();
             return Stream.concat(Stream.of(noopAxiom()),
                     IntStream.range(0, chain.size()).mapToObj(i -> i)
-                            .flatMap(i -> down.refine(chain.get(i))
+                            .flatMap(i -> down.refine(chain.get(i), true)
                                     .map(role -> df.getOWLSubPropertyChainOfAxiom(
                                             Utils.replaceInList(chain, i, role),
                                             axiom.getSuperProperty()))));
@@ -244,7 +253,7 @@ public abstract class AxiomRefinement {
             var properties = Utils.toList(axiom.properties());
             return Stream.concat(Stream.of(noopAxiom()),
                     IntStream.range(0, properties.size()).mapToObj(i -> i)
-                            .flatMap(i -> down.refine(properties.get(i))
+                            .flatMap(i -> down.refine(properties.get(i), true)
                                     .map(refined -> {
                                         var newRolesList = Utils.replaceInList(properties, i, refined);
                                         var newRolesSet = new LinkedHashSet<OWLObjectPropertyExpression>();

@@ -26,7 +26,7 @@ public class CachedWeakenerTest {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var cached = new AxiomWeakener(ontology);
-            var uncached = new AxiomWeakener(ontology, ontology, true);
+            var uncached = new AxiomWeakener(ontology, ontology, AxiomWeakener.FLAG_UNCACHED);
             ontology.logicalAxioms().forEach(axiom -> {
                 assertEquals(Utils.toSet(uncached.weakerAxioms(axiom)),
                         Utils.toSet(cached.weakerAxioms(axiom)));
@@ -40,7 +40,7 @@ public class CachedWeakenerTest {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var cached = new AxiomWeakener(ontology);
-            var uncached = new AxiomWeakener(ontology, ontology, true);
+            var uncached = new AxiomWeakener(ontology, ontology, AxiomWeakener.FLAG_UNCACHED);
             var axioms = Stream.concat(
                     Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
                     ontology.tboxAxioms().limit(10));
@@ -63,7 +63,7 @@ public class CachedWeakenerTest {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var cached = new AxiomStrengthener(ontology);
-            var uncached = new AxiomStrengthener(ontology, ontology, true);
+            var uncached = new AxiomStrengthener(ontology, ontology, AxiomStrengthener.FLAG_UNCACHED);
             ontology.logicalAxioms().forEach(axiom -> {
                 assertEquals(Utils.toSet(uncached.strongerAxioms(axiom)),
                         Utils.toSet(cached.strongerAxioms(axiom)));
@@ -77,7 +77,7 @@ public class CachedWeakenerTest {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var cached = new AxiomStrengthener(ontology);
-            var uncached = new AxiomStrengthener(ontology, ontology, true);
+            var uncached = new AxiomStrengthener(ontology, ontology, AxiomStrengthener.FLAG_UNCACHED);
             var axioms = Stream.concat(
                     Stream.concat(ontology.rboxAxioms(), ontology.aboxAxioms()),
                     ontology.tboxAxioms().limit(10));

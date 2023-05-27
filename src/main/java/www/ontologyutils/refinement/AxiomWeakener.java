@@ -100,8 +100,8 @@ public class AxiomWeakener extends AxiomRefinement {
     }
 
     private AxiomWeakener(Cover upCover, Cover downCover, Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
-        super(new Visitor(new RefinementOperator(upCover, downCover, flags),
-                new RefinementOperator(downCover, upCover, flags), simpleRoles, flags));
+        super(new Visitor(new RefinementOperator(upCover, downCover, flags, simpleRoles),
+                new RefinementOperator(downCover, upCover, flags, simpleRoles), simpleRoles, flags));
     }
 
     private AxiomWeakener(Covers covers, Set<OWLObjectPropertyExpression> simpleRoles, int flags, boolean uncached) {
@@ -109,19 +109,10 @@ public class AxiomWeakener extends AxiomRefinement {
                 uncached ? covers.downCover() : covers.downCover().cached(), simpleRoles, flags);
     }
 
-    /**
-     * @param refOntology
-     *            The reference ontology to use for the up and down covers.
-     * @param subConcepts
-     *            Return only concepts that are in this set.
-     * @param simpleRoles
-     *            The roles that are guaranteed to be simple.
-     * @param uncached
-     *            Do not use any caching, always call the reasoner.
-     */
-    public AxiomWeakener(Ontology refOntology, Set<OWLClassExpression> subConcepts,
-            Set<OWLObjectPropertyExpression> simpleRoles, boolean uncached) {
-        this(new Covers(refOntology, subConcepts, simpleRoles, uncached), simpleRoles, FLAG_NON_STRICT, uncached);
+    private AxiomWeakener(Ontology refOntology, Set<OWLClassExpression> subConcepts,
+            Set<OWLObjectPropertyExpression> subRoles, Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
+        this(new Covers(refOntology, subConcepts, (flags & FLAG_SIMPLE_ROLES_STRICT) != 0 ? simpleRoles : subRoles,
+                (flags & FLAG_UNCACHED) != 0), simpleRoles, flags, (flags & FLAG_UNCACHED) != 0);
     }
 
     /**
@@ -130,25 +121,12 @@ public class AxiomWeakener extends AxiomRefinement {
      * @param fullOntology
      *            The maximal ontology in which the weaker axioms will be
      *            used in.
-     * @param uncached
-     *            Do not use any caching, always call the reasoner.
+     * @param flags
+     *            The flags to use.
      */
-    public AxiomWeakener(Ontology refOntology, Ontology fullOntology, boolean uncached) {
-        this(refOntology, Utils.toSet(fullOntology.subConcepts()), Utils.toSet(fullOntology.simpleRoles()), uncached);
-    }
-
-    /**
-     * Create a new axiom weakener with the given reference ontology. To maintain
-     * global restrictions on roles, all roles in {@code simpleRoles} must be simple
-     * in all ontologies the weakened axioms are used in.
-     *
-     * @param refOntology
-     *            The reference ontology to use for the up and down covers.
-     * @param simpleRoles
-     *            The roles that are guaranteed to be simple.
-     */
-    public AxiomWeakener(Ontology refOntology, Set<OWLObjectPropertyExpression> simpleRoles) {
-        this(refOntology, Utils.toSet(refOntology.subConcepts()), simpleRoles, false);
+    public AxiomWeakener(Ontology refOntology, Ontology fullOntology, int flags) {
+        this(refOntology, Utils.toSet(fullOntology.subConcepts()),
+                Utils.toSet(fullOntology.rolesInSignatureAndInverse()), Utils.toSet(fullOntology.simpleRoles()), flags);
     }
 
     /**
@@ -161,7 +139,17 @@ public class AxiomWeakener extends AxiomRefinement {
      *            used in.
      */
     public AxiomWeakener(Ontology refOntology, Ontology fullOntology) {
-        this(refOntology, fullOntology, false);
+        this(refOntology, fullOntology, FLAG_DEFAULT);
+    }
+
+    /**
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
+     * @param flags
+     *            The flags to use.
+     */
+    public AxiomWeakener(Ontology refOntology, int flags) {
+        this(refOntology, refOntology, flags);
     }
 
     /**

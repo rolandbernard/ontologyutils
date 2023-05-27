@@ -88,7 +88,7 @@ public class Covers {
     private OWLDataFactory df;
     private Ontology refOntology;
     private Set<OWLClassExpression> subConcepts;
-    private Set<OWLObjectPropertyExpression> simpleRoles;
+    private Set<OWLObjectPropertyExpression> subRoles;
     private PreorderCache<OWLClassExpression> isSubClass;
     private PreorderCache<OWLObjectPropertyExpression> isSubRole;
 
@@ -99,12 +99,12 @@ public class Covers {
      *            The ontology used for entailment check.
      * @param subConcepts
      *            Return only concepts that are in this set.
-     * @param simpleRoles
+     * @param subRoles
      *            Return only roles that are in this set.
      */
     public Covers(Ontology refOntology, Set<OWLClassExpression> subConcepts,
-            Set<OWLObjectPropertyExpression> simpleRoles) {
-        this(refOntology, subConcepts, simpleRoles, false);
+            Set<OWLObjectPropertyExpression> subRoles) {
+        this(refOntology, subConcepts, subRoles, false);
     }
 
     /**
@@ -114,23 +114,23 @@ public class Covers {
      *            The ontology used for entailment check.
      * @param subConcepts
      *            Return only concepts that are in this set.
-     * @param simpleRoles
+     * @param subRoles
      *            Return only roles that are in this set.
      * @param uncached
      *            If true, no subclass relation cache will be created.
      */
     public Covers(Ontology refOntology, Set<OWLClassExpression> subConcepts,
-            Set<OWLObjectPropertyExpression> simpleRoles,
+            Set<OWLObjectPropertyExpression> subRoles,
             boolean uncached) {
         df = Ontology.getDefaultDataFactory();
         this.refOntology = refOntology;
         this.subConcepts = subConcepts;
-        this.simpleRoles = simpleRoles;
+        this.subRoles = subRoles;
         if (!uncached) {
             this.isSubClass = new SubClassCache();
             this.isSubClass.setupDomain(subConcepts);
             this.isSubRole = new SubRoleCache();
-            this.isSubRole.setupDomain(simpleRoles);
+            this.isSubRole.setupDomain(subRoles);
         }
     }
 
@@ -298,18 +298,18 @@ public class Covers {
      * @return True iff {@code candidate} is in the upward cover of {@code role}.
      */
     private boolean isInUpCover(OWLObjectPropertyExpression role, OWLObjectPropertyExpression candidate) {
-        if (!simpleRoles.contains(candidate) || !isSubRole(role, candidate)) {
+        if (!subRoles.contains(candidate) || !isSubRole(role, candidate)) {
             return false;
         } else if (isSubClass != null) {
             return !Stream.concat(
                     isSubRole.knownStrictPredecessors(candidate).stream()
-                            .filter(other -> simpleRoles.contains(other)),
+                            .filter(other -> subRoles.contains(other)),
                     isSubRole.possibleStrictPredecessors(candidate).stream()
-                            .filter(other -> simpleRoles.contains(other)
+                            .filter(other -> subRoles.contains(other)
                                     && isStrictSubRole(other, candidate)))
                     .anyMatch(other -> isStrictSubRole(role, other));
         } else {
-            return !simpleRoles.stream()
+            return !subRoles.stream()
                     .anyMatch(other -> isStrictSubRole(other, candidate) && isStrictSubRole(role, other));
         }
     }
@@ -320,7 +320,7 @@ public class Covers {
      * @return All role that are in the upward cover of {@code role}.
      */
     public Stream<OWLObjectPropertyExpression> upCover(OWLObjectPropertyExpression role) {
-        return simpleRoles.stream().filter(candidate -> isInUpCover(role, candidate));
+        return subRoles.stream().filter(candidate -> isInUpCover(role, candidate));
     }
 
     /**
@@ -332,18 +332,18 @@ public class Covers {
      *         {@code role}.
      */
     private boolean isInDownCover(OWLObjectPropertyExpression role, OWLObjectPropertyExpression candidate) {
-        if (!simpleRoles.contains(candidate) || !isSubRole(candidate, role)) {
+        if (!subRoles.contains(candidate) || !isSubRole(candidate, role)) {
             return false;
         } else if (isSubClass != null) {
             return !Stream.concat(
                     isSubRole.knownStrictSuccessors(candidate).stream()
-                            .filter(other -> simpleRoles.contains(other)),
+                            .filter(other -> subRoles.contains(other)),
                     isSubRole.possibleStrictSuccessors(candidate).stream()
-                            .filter(other -> simpleRoles.contains(other)
+                            .filter(other -> subRoles.contains(other)
                                     && isStrictSubRole(candidate, other)))
                     .anyMatch(other -> isStrictSubRole(other, role));
         } else {
-            return !simpleRoles.stream()
+            return !subRoles.stream()
                     .anyMatch(other -> isStrictSubRole(candidate, other) && isStrictSubRole(other, role));
         }
     }
@@ -354,7 +354,7 @@ public class Covers {
      * @return All roles that are in the downward cover of {@code role}.
      */
     public Stream<OWLObjectPropertyExpression> downCover(OWLObjectPropertyExpression role) {
-        return simpleRoles.stream().filter(candidate -> isInDownCover(role, candidate));
+        return subRoles.stream().filter(candidate -> isInDownCover(role, candidate));
     }
 
     /**

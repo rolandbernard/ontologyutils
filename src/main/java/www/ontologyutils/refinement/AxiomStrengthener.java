@@ -37,8 +37,8 @@ public class AxiomStrengthener extends AxiomRefinement {
     }
 
     private AxiomStrengthener(Cover upCover, Cover downCover, Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
-        super(new Visitor(new RefinementOperator(downCover, upCover, flags),
-                new RefinementOperator(upCover, downCover, flags), simpleRoles, flags));
+        super(new Visitor(new RefinementOperator(downCover, upCover, flags, simpleRoles),
+                new RefinementOperator(upCover, downCover, flags, simpleRoles), simpleRoles, flags));
     }
 
     private AxiomStrengthener(Covers covers, Set<OWLObjectPropertyExpression> simpleRoles, int flags,
@@ -47,19 +47,10 @@ public class AxiomStrengthener extends AxiomRefinement {
                 uncached ? covers.downCover() : covers.downCover().cached(), simpleRoles, flags);
     }
 
-    /**
-     * @param refOntology
-     *            The reference ontology to use for the up and down covers.
-     * @param subConcepts
-     *            Return only concepts that are in this set.
-     * @param simpleRoles
-     *            The roles that are guaranteed to be simple.
-     * @param uncached
-     *            Do not use any caching, always call the reasoner.
-     */
-    public AxiomStrengthener(Ontology refOntology, Set<OWLClassExpression> subConcepts,
-            Set<OWLObjectPropertyExpression> simpleRoles, boolean uncached) {
-        this(new Covers(refOntology, subConcepts, simpleRoles, uncached), simpleRoles, FLAG_NON_STRICT, uncached);
+    private AxiomStrengthener(Ontology refOntology, Set<OWLClassExpression> subConcepts,
+            Set<OWLObjectPropertyExpression> subRoles, Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
+        this(new Covers(refOntology, subConcepts, (flags & FLAG_SIMPLE_ROLES_STRICT) != 0 ? simpleRoles : subRoles,
+                (flags & FLAG_UNCACHED) != 0), simpleRoles, flags, (flags & FLAG_UNCACHED) != 0);
     }
 
     /**
@@ -68,25 +59,12 @@ public class AxiomStrengthener extends AxiomRefinement {
      * @param fullOntology
      *            The maximal ontology in which the weaker axioms will be
      *            used in.
-     * @param uncached
-     *            Do not use any caching, always call the reasoner.
+     * @param flags
+     *            The flags to use.
      */
-    public AxiomStrengthener(Ontology refOntology, Ontology fullOntology, boolean uncached) {
-        this(refOntology, Utils.toSet(fullOntology.subConcepts()), Utils.toSet(fullOntology.simpleRoles()), uncached);
-    }
-
-    /**
-     * Create a new axiom weakener with the given reference ontology. To maintain
-     * global restrictions on roles, all roles in {@code simpleRoles} must be simple
-     * in all ontologies the weakened axioms are used in.
-     *
-     * @param refOntology
-     *            The reference ontology to use for the up and down covers.
-     * @param simpleRoles
-     *            The roles that are guaranteed to be simple.
-     */
-    public AxiomStrengthener(Ontology refOntology, Set<OWLObjectPropertyExpression> simpleRoles) {
-        this(refOntology, Utils.toSet(refOntology.subConcepts()), simpleRoles, false);
+    public AxiomStrengthener(Ontology refOntology, Ontology fullOntology, int flags) {
+        this(refOntology, Utils.toSet(fullOntology.subConcepts()),
+                Utils.toSet(fullOntology.rolesInSignatureAndInverse()), Utils.toSet(fullOntology.simpleRoles()), flags);
     }
 
     /**
@@ -99,7 +77,17 @@ public class AxiomStrengthener extends AxiomRefinement {
      *            used in.
      */
     public AxiomStrengthener(Ontology refOntology, Ontology fullOntology) {
-        this(refOntology, fullOntology, false);
+        this(refOntology, fullOntology, FLAG_DEFAULT);
+    }
+
+    /**
+     * @param refOntology
+     *            The reference ontology to use for the up and down covers.
+     * @param flags
+     *            The flags to use.
+     */
+    public AxiomStrengthener(Ontology refOntology, int flags) {
+        this(refOntology, refOntology, flags);
     }
 
     /**

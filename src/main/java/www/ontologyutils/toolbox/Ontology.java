@@ -993,12 +993,18 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @return A stream containing all roles in the signature and there inverse.
+     */
+    public Stream<OWLObjectPropertyExpression> rolesInSignatureAndInverse() {
+        return rolesInSignature().flatMap(r -> Stream.of(r, r.getInverseProperty()));
+    }
+
+    /**
      * @return A stream containing all simple roles.
      */
     public Stream<OWLObjectPropertyExpression> simpleRoles() {
         var nonSimple = Utils.toSet(nonSimpleRoles());
-        return rolesInSignature().flatMap(r -> Stream.of(r, r.getInverseProperty()))
-                .filter(role -> !nonSimple.contains(role));
+        return rolesInSignatureAndInverse().filter(role -> !nonSimple.contains(role));
     }
 
     /**

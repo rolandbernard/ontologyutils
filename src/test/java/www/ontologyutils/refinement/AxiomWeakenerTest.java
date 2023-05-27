@@ -25,7 +25,7 @@ public class AxiomWeakenerTest {
     public void setup() {
         var path = RoleCoverTest.class.getResource("/alch/catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        axiomWeakener = new AxiomWeakener(ontology);
+        axiomWeakener = new AxiomWeakener(ontology, AxiomWeakener.FLAG_SIMPLE_ROLES_STRICT);
     }
 
     @AfterEach
