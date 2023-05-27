@@ -8,4 +8,9 @@ public class OntologyRepairRandomMcsTest extends OntologyRepairTest {
     protected OntologyRepair getRepairForConsistency() {
         return OntologyRepairRandomMcs.forConsistency();
     }
+
+    @Override
+    protected OntologyRepair getRepairForCoherence() {
+        return OntologyRepairRandomMcs.forCoherence();
+    }
 }

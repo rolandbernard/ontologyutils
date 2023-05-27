@@ -12,6 +12,11 @@ public class OntologyRepairBestOfKWeakeningTest extends OntologyRepairTest {
     }
 
     @Override
+    protected OntologyRepair getRepairForCoherence() {
+        return OntologyRepairBestOfKWeakening.forCoherence(100);
+    }
+
+    @Override
     @ParameterizedTest
     @ValueSource(strings = { "/inconsistent/leftpolicies-small.owl", "/inconsistent/leftpolicies.owl" })
     public void repairInconsistentOntologyFromFile(String resourceName) {

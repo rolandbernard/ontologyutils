@@ -41,6 +41,8 @@ public abstract class OntologyRepairTest {
 
     protected abstract OntologyRepair getRepairForConsistency();
 
+    protected abstract OntologyRepair getRepairForCoherence();
+
     @Test
     public void completeOntologyIsInconsistent() {
         try (var ontology = Ontology.withAxioms(axioms)) {
@@ -57,6 +59,18 @@ public abstract class OntologyRepairTest {
             assertFalse(ontology.isConsistent());
             repair.apply(ontology);
             assertTrue(ontology.isConsistent());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 })
+    public void repairIncoherentOntology(int seed) {
+        Utils.randomSeed(seed);
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            var repair = getRepairForCoherence();
+            assertFalse(ontology.isCoherent());
+            repair.apply(ontology);
+            assertTrue(ontology.isCoherent());
         }
     }
 
@@ -87,6 +101,19 @@ public abstract class OntologyRepairTest {
             assertFalse(ontology.isConsistent());
             repair.apply(ontology);
             assertTrue(ontology.isConsistent());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "/inconsistent/leftpolicies-small.owl", "/inconsistent/leftpolicies.owl" })
+    public void repairIncoherentOntologyFromFile(String resourceName) {
+        var path = OntologyRepairTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
+            Utils.randomSeed(0);
+            var repair = getRepairForCoherence();
+            assertFalse(ontology.isCoherent());
+            repair.apply(ontology);
+            assertTrue(ontology.isCoherent());
         }
     }
 }

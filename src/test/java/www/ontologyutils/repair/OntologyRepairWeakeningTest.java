@@ -8,4 +8,9 @@ public class OntologyRepairWeakeningTest extends OntologyRepairTest {
     protected OntologyRepair getRepairForConsistency() {
         return OntologyRepairWeakening.forConsistency();
     }
+
+    @Override
+    protected OntologyRepair getRepairForCoherence() {
+        return OntologyRepairWeakening.forCoherence();
+    }
 }

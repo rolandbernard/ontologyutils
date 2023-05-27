@@ -1078,7 +1078,7 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * Clone this ontology, but give it a cache using the hermit reasoner.
+     * Clone this ontology, but give it a cache using the HermiT reasoner.
      *
      * @return The new ontology.
      */
@@ -1088,7 +1088,7 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * Clone this ontology, but give it a cache using the openllet reasoner.
+     * Clone this ontology, but give it a cache using the Openllet reasoner.
      *
      * @return The new ontology.
      */
@@ -1098,7 +1098,7 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * Clone this ontology, but give it a cache using the jfact reasoner.
+     * Clone this ontology, but give it a cache using the JFact reasoner.
      *
      * @return The new ontology.
      */
@@ -1168,6 +1168,50 @@ public class Ontology implements AutoCloseable {
     public Ontology withSeparateCache() {
         try (var current = this) {
             return this.cloneWithSeparateCache();
+        }
+    }
+
+    /**
+     * Close this ontology, and return a new one using the HermiT reasoner.
+     *
+     * @return The new ontology.
+     */
+    public Ontology withHermit() {
+        try (var current = this) {
+            return this.cloneWithHermit();
+        }
+    }
+
+    /**
+     * Close this ontology, and return a new one using the Openllet reasoner.
+     *
+     * @return The new ontology.
+     */
+    public Ontology withOpenllet() {
+        try (var current = this) {
+            return this.cloneWithOpenllet();
+        }
+    }
+
+    /**
+     * Close this ontology, and return a new one using the JFact reasoner.
+     *
+     * @return The new ontology.
+     */
+    public Ontology withJFact() {
+        try (var current = this) {
+            return this.cloneWithJFact();
+        }
+    }
+
+    /**
+     * Close this ontology, and return a new one using the FaCT++ reasoner.
+     *
+     * @return The new ontology.
+     */
+    public Ontology withFactPP() {
+        try (var current = this) {
+            return this.cloneWithFactPP();
         }
     }
 

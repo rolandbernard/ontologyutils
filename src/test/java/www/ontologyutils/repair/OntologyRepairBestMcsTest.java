@@ -8,4 +8,9 @@ public class OntologyRepairBestMcsTest extends OntologyRepairTest {
     protected OntologyRepair getRepairForConsistency() {
         return OntologyRepairBestMcs.forConsistency();
     }
+
+    @Override
+    protected OntologyRepair getRepairForCoherence() {
+        return OntologyRepairBestMcs.forCoherence();
+    }
 }
