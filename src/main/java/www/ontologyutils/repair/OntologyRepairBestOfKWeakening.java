@@ -71,14 +71,13 @@ public class OntologyRepairBestOfKWeakening extends OntologyRepairWeakening {
      *         make the ontology coherent.
      */
     public static OntologyRepair forCoherence(int numberOfRounds) {
-        return new OntologyRepairBestOfKWeakening(isCoherent(), numberOfRounds);
+        return new OntologyRepairBestOfKWeakening(Ontology::isCoherent, numberOfRounds);
     }
 
     @Override
     public void repair(Ontology ontology) {
         var refAxioms = Utils.randomChoice(getRefAxioms(ontology));
         infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
-        checkpoint(ontology);
         var repairs = new ArrayList<Map.Entry<Set<OWLAxiom>, Double>>();
         try (var refOntology = ontology.cloneWithRefutable(refAxioms).withSeparateCache()) {
             var axiomWeakener = new AxiomWeakener(refOntology, ontology);
