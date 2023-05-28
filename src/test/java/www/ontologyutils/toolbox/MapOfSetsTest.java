@@ -35,6 +35,45 @@ public class MapOfSetsTest {
     }
 
     @Test
+    @SuppressWarnings("unlikely-arg-type")
+    public void getForNonSetsNull() {
+        var map = new MapOfSets<Integer, Void>();
+        assertNull(map.get("test"));
+    }
+
+    @Test
+    @SuppressWarnings("unlikely-arg-type")
+    public void removeNonSets() {
+        var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(), 0);
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        map.remove("test");
+        assertEquals(
+                Set.of(new SimpleEntry<>(Set.of(), 0), new SimpleEntry<>(Set.of(2), 1),
+                        new SimpleEntry<>(Set.of(1, 3), 2), new SimpleEntry<>(Set.of(1, 4, 5, 6), 3)),
+                map.entrySet());
+    }
+
+    @Test
+    public void removeNonContained() {
+        var map = new MapOfSets<Integer, Integer>();
+        map.put(Set.of(), 0);
+        map.put(Set.of(2), 1);
+        map.put(Set.of(1, 3), 2);
+        map.put(Set.of(1, 4, 5, 6), 3);
+        map.remove(Set.of(4, 5, 6), 0);
+        map.remove(Set.of(1, 2), 1);
+        map.remove(Set.of(3), 2);
+        map.remove(Set.of(1, 4, 5), 3);
+        assertEquals(
+                Set.of(new SimpleEntry<>(Set.of(), 0), new SimpleEntry<>(Set.of(2), 1),
+                        new SimpleEntry<>(Set.of(1, 3), 2), new SimpleEntry<>(Set.of(1, 4, 5, 6), 3)),
+                map.entrySet());
+    }
+
+    @Test
     public void containsKeyAfterPut() {
         var map = new MapOfSets<Integer, Integer>();
         map.put(Set.of(), 0);

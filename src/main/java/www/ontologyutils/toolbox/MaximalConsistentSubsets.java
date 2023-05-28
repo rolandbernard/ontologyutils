@@ -142,7 +142,7 @@ public class MaximalConsistentSubsets {
     public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Collection<? extends OWLAxiom> axioms,
             int howMany, Collection<? extends OWLAxiom> contained) {
         try (var ontology = Ontology.withAxioms(contained, axioms)) {
-            return Utils.toSet(ontology.maximalConsistentSubsets().limit(howMany));
+            return Utils.toSet((new MaximalConsistentSubsets(ontology)).stream().limit(howMany));
         }
     }
 
@@ -156,8 +156,8 @@ public class MaximalConsistentSubsets {
      *         from {@code axioms}.
      */
     public static Set<Set<OWLAxiom>> maximalConsistentSubsets(Collection<? extends OWLAxiom> axioms, int howMany) {
-        try (var ontology = Ontology.withAxioms(Set.of(), axioms)) {
-            return Utils.toSet(ontology.maximalConsistentSubsets().limit(howMany));
+        try (var ontology = Ontology.withAxioms(axioms)) {
+            return Utils.toSet((new MaximalConsistentSubsets(ontology)).stream().limit(howMany));
         }
     }
 

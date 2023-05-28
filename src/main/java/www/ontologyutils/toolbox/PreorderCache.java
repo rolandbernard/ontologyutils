@@ -203,7 +203,7 @@ public class PreorderCache<T> {
      */
     public synchronized boolean isPossibleSuccessor(T pred, T succ) {
         var set = possibleSuccessors.get(pred);
-        if (set == null) {
+        if (set == null || !possibleSuccessors.containsKey(succ)) {
             return true;
         }
         return set.contains(succ);

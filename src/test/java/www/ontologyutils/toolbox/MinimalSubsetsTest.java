@@ -142,6 +142,23 @@ public class MinimalSubsetsTest {
         }
     }
 
+    @Test
+    public void getMaximalConsistentSubsets() {
+        var agenda = Set.copyOf(axioms);
+        try (var ontology = Ontology.withAxioms(agenda)) {
+            var results = ontology.getMaximalConsistentSubsets(Ontology::isConsistent);
+            for (var subset : results) {
+                assertTrue(subset.stream().allMatch(ax -> agenda.contains(ax)));
+                assertTrue(MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda));
+            }
+            for (var subset : (Iterable<Set<OWLAxiom>>) Utils.powerSet(agenda)::iterator) {
+                assertTrue(
+                        !MaximalConsistentSubsets.isMaximallyConsistentSubset(subset, agenda)
+                                || results.contains(subset));
+            }
+        }
+    }
+
     private static Stream<Arguments> axiomPowerSet() {
         var temp = new MinimalSubsetsTest();
         temp.setup();

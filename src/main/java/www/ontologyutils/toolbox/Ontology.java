@@ -619,7 +619,7 @@ public class Ontology implements AutoCloseable {
      * of {@code axiom} is {@code origin}.
      *
      * @param axiom
-     *            iom to annotate.
+     *            Axiom to annotate.
      * @param origin
      *            The origin axiom.
      * @return A new annotated axiom equivalent to {@code axiom}.
@@ -637,7 +637,7 @@ public class Ontology implements AutoCloseable {
      * annotated with the original axioms as the origin.
      *
      * @param remove
-     *            ove.
+     *            Axiom to remove.
      * @param replacement
      *            The axioms to add.
      */
@@ -669,7 +669,7 @@ public class Ontology implements AutoCloseable {
      * annotated with the original axioms as the origin.
      *
      * @param remove
-     *            ove.
+     *            Axiom to remove.
      * @param replacement
      *            The axioms to add.
      */
@@ -682,7 +682,7 @@ public class Ontology implements AutoCloseable {
      * annotated with the original axioms as the origin.
      *
      * @param remove
-     *            ove.
+     *            Axiom to remove.
      * @param replacement
      *            The axioms to add.
      */
@@ -801,7 +801,7 @@ public class Ontology implements AutoCloseable {
 
     /**
      * @param subClass
-     *            ub concept.
+     *            The possible sub concept.
      * @param superClass
      *            The possible super concept.
      * @return true if the extension of {@code subClass} is a subset of the
@@ -886,6 +886,43 @@ public class Ontology implements AutoCloseable {
      */
     public Stream<Set<OWLAxiom>> minimalUnsatisfiableSubsets(Predicate<Ontology> isRepaired) {
         return MinimalSubsets.allMinimalSubsets(refutableAxioms, axioms -> {
+            try (var ontology = new Ontology(staticAxioms, axioms, reasonerCache)) {
+                return !isRepaired.test(ontology);
+            }
+        });
+    }
+
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return The set containing all maximal subsets (including static axioms)
+     *         of the ontologies axioms that satisfy {@code isRepaired}.
+     */
+    public Set<Set<OWLAxiom>> getMaximalConsistentSubsets(Predicate<Ontology> isRepaired) {
+        return Utils.toSet(getMinimalCorrectionSubsets(isRepaired).stream().map(this::complement));
+    }
+
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return A set of all minimal subsets that when removed from the ontology
+     *         yield an optimal classical repair for consistency of the ontology.
+     */
+    public Set<Set<OWLAxiom>> getMinimalCorrectionSubsets(Predicate<Ontology> isRepaired) {
+        return MinimalSubsets.getAllMinimalSubsets(refutableAxioms, axioms -> {
+            try (var ontology = new Ontology(staticAxioms, complement(axioms), reasonerCache)) {
+                return isRepaired.test(ontology);
+            }
+        });
+    }
+
+    /**
+     * @param isRepaired
+     *            The monotone predicate testing that the ontology is repaired.
+     * @return A set of all minimal subsets that are not repaired.
+     */
+    public Set<Set<OWLAxiom>> getMinimalUnsatisfiableSubsets(Predicate<Ontology> isRepaired) {
+        return MinimalSubsets.getAllMinimalSubsets(refutableAxioms, axioms -> {
             try (var ontology = new Ontology(staticAxioms, axioms, reasonerCache)) {
                 return !isRepaired.test(ontology);
             }
