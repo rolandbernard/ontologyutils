@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * overwritten to specify a maximal cache size.
  */
 public class LruCache<K, V> extends LinkedHashMap<K, V> {
-	/**
+    /**
      * Maximum number of entries to keep in the cache.
      */
     private int cacheSize;

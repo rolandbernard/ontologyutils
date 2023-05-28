@@ -285,4 +285,43 @@ public class SroiqAxiomWeakenerTest {
             });
         }
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl", "/el/aeo.owl",
+            "/el/duo.owl", "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
+            "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
+            "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl", "/alcri/shapes.owl",
+            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Test_hybrid.owl", "/el/apo.owl",
+            "/alc/Vehicle.owl", "/alc/C50_R10_0.001_0.001_0.001_62888.owl", "/shi/SceneOntology.owl",
+            "/alcriq/adolena.owl", "/alcrq/BuildingStructure.owl", "/shoin/pizza.owl", "/shiq/stuff.owl",
+    })
+    public void weakeningMaintainsConstraints(String resourceName) throws OWLOntologyCreationException {
+        var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
+            ontology.generateDeclarationAxioms();
+            assertTrue(ontology.isOwl2Dl());
+            var originalSimpleRoles = Utils.toSet(ontology.simpleRoles());
+            var axiomWeakener = new AxiomWeakener(ontology, AxiomWeakener.FLAG_OWL2_SET_OPERANDS);
+            ontology.logicalAxioms().forEach(strongAxiom -> {
+                axiomWeakener.weakerAxioms(strongAxiom).forEach(weakAxiom -> {
+                    try (var copy = ontology.clone()) {
+                        copy.removeAxioms(strongAxiom);
+                        copy.addAxioms(weakAxiom);
+                        // Replacing an axiom with a weakening does not violate constraints.
+                        if (!copy.isOwl2Dl()) {
+                            copy.checkOwlProfiles().forEach(System.out::println);
+                            assertTrue(copy.isOwl2Dl());
+                        }
+                        // All roles that are simple in the original ontology are simple in the modified
+                        // ontology.
+                        var newSimpleRoles = Utils.toSet(copy.simpleRoles());
+                        if (!newSimpleRoles.containsAll(originalSimpleRoles)) {
+                            assertTrue(newSimpleRoles.containsAll(originalSimpleRoles));
+                        }
+                    }
+                });
+            });
+        }
+    }
 }

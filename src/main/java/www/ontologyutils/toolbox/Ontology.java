@@ -822,6 +822,13 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @return true if the ontology is in the OWL 2 DL profile.
+     */
+    public boolean isOwl2Dl() {
+        return withOwlOntologyDo(ontology -> Profiles.OWL2_DL.checkOntology(ontology).isInProfile());
+    }
+
+    /**
      * @return The list of languages the ontology can be expressed in.
      */
     public List<Languages> checkDlExpressivity() {
@@ -1113,9 +1120,11 @@ public class Ontology implements AutoCloseable {
         changed = true;
         var df = getDefaultDataFactory();
         for (var entity : Utils.toList(signature())) {
-            var newAxiom = df.getOWLDeclarationAxiom(entity);
-            if (!staticAxioms.contains(newAxiom) && !refutableAxioms.contains(newAxiom)) {
-                staticAxioms.add(newAxiom);
+            if (entity.isOWLClass() || entity.isOWLObjectProperty() || entity.isOWLNamedIndividual()) {
+                var newAxiom = df.getOWLDeclarationAxiom(entity);
+                if (!staticAxioms.contains(newAxiom) && !refutableAxioms.contains(newAxiom)) {
+                    staticAxioms.add(newAxiom);
+                }
             }
         }
     }
