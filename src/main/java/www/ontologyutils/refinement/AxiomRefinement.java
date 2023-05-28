@@ -46,13 +46,17 @@ public abstract class AxiomRefinement {
     public static final int FLAG_OWL2_SET_OPERANDS = 1 << 3;
     /**
      * Refine roles only with simple roles, even in a context that allows complex
-     * roles.
+     * roles. (Implies also the use of simple RIA refinement.)
      */
-    public static final int FLAG_SIMPLE_ROLES_STRICT = 1 << 4;
+    public static final int FLAG_SIMPLE_ROLES_STRICT = (1 << 4) | AxiomRefinement.FLAG_RIA_ONLY_SIMPLE;
     /**
      * Do not use a cache for the covers.
      */
     public static final int FLAG_UNCACHED = 1 << 5;
+    /**
+     * Use only simple roles for role inclusion axiom weakening.
+     */
+    public static final int FLAG_RIA_ONLY_SIMPLE = 1 << 6;
 
     /**
      * Visitor implementing the actual weakening.
@@ -72,9 +76,14 @@ public abstract class AxiomRefinement {
         protected RefinementOperator down;
         /**
          * The set of all roles that is guaranteed to be simple and whose simplicity
-         * must be
+         * must be.
          */
         protected Set<OWLObjectPropertyExpression> simpleRoles;
+        /**
+         * The order used for restricting the allowed refinements of the role inclusion
+         * axioms.
+         */
+        protected PreorderCache<OWLObjectProperty> regularPreorder;
         /**
          * The flags.
          */
@@ -91,8 +100,8 @@ public abstract class AxiomRefinement {
          * @param flags
          *            Flags that can be used to make the refinement ore strict.
          */
-        public Visitor(RefinementOperator up, RefinementOperator down,
-                Set<OWLObjectPropertyExpression> simpleRoles, int flags) {
+        public Visitor(RefinementOperator up, RefinementOperator down, Set<OWLObjectPropertyExpression> simpleRoles,
+                PreorderCache<OWLObjectProperty> regularPreorder, int flags) {
             df = Ontology.getDefaultDataFactory();
             this.up = up;
             this.down = down;
@@ -213,20 +222,60 @@ public abstract class AxiomRefinement {
                     .map(newConcept -> df.getOWLObjectPropertyRangeAxiom(property, newConcept));
         }
 
+        private boolean allowWeakeningTo(OWLSubObjectPropertyOfAxiom axiom) {
+            var sub = axiom.getSubProperty();
+            var sup = axiom.getSuperProperty();
+            return simpleRoles.contains(sub) || (!simpleRoles.contains(sup)
+                    && regularPreorder.isKnownSuccessor(sub.getNamedProperty(), sup.getNamedProperty()));
+        }
+
         @Override
         public Stream<OWLAxiom> visit(OWLSubObjectPropertyOfAxiom axiom) {
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 throw new IllegalArgumentException("The axiom " + axiom + " is not an ALC axiom.");
             }
-            return Stream.concat(Stream.of(noopAxiom()),
-                    Stream.concat(
-                            down.refine(axiom.getSubProperty(), true)
-                                    .map(role -> df.getOWLSubObjectPropertyOfAxiom(role, axiom.getSuperProperty())),
-                            simpleRoles.contains(axiom.getSubProperty())
-                                    ? up.refine(axiom.getSuperProperty(), true)
-                                            .map(role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(),
-                                                    role))
-                                    : Stream.of()));
+            if (regularPreorder == null) {
+                return Stream.concat(Stream.of(noopAxiom()),
+                        Stream.concat(
+                                down.refine(axiom.getSubProperty(), true)
+                                        .map(role -> df.getOWLSubObjectPropertyOfAxiom(role, axiom.getSuperProperty())),
+                                simpleRoles.contains(axiom.getSubProperty())
+                                        ? up.refine(axiom.getSuperProperty(), false).map(
+                                                role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(), role))
+                                        : Stream.of()));
+            } else {
+                return Stream.concat(
+                        down.refine(axiom.getSubProperty(), false)
+                                .map(role -> df.getOWLSubObjectPropertyOfAxiom(role, axiom.getSuperProperty())),
+                        up.refine(axiom.getSuperProperty(), false)
+                                .map(role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(), role)))
+                        .filter(ax -> allowWeakeningTo(ax))
+                        .map(ax -> (OWLAxiom) ax);
+            }
+        }
+
+        private boolean allowWeakeningTo(OWLSubPropertyChainOfAxiom axiom) {
+            var subs = axiom.getPropertyChain();
+            var sup = axiom.getSuperProperty();
+            List<OWLObjectPropertyExpression> preds;
+            if (subs.size() == 2 && subs.get(0).equals(sup) && subs.get(1).equals(sup)) {
+                return true;
+            } else if (subs.get(0).equals(sup)) {
+                preds = subs.subList(1, subs.size());
+            } else if (subs.get(subs.size() - 1).equals(sup)) {
+                preds = subs.subList(0, subs.size() - 1);
+            } else {
+                preds = subs;
+            }
+            for (var pred : preds) {
+                var subName = pred.getNamedProperty();
+                var supName = sup.getNamedProperty();
+                if (!regularPreorder.isKnownSuccessor(subName, supName)
+                        || regularPreorder.isKnownSuccessor(supName, subName)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         @Override
@@ -235,12 +284,22 @@ public abstract class AxiomRefinement {
                 throw new IllegalArgumentException("The axiom " + axiom + " is not an ALC axiom.");
             }
             var chain = axiom.getPropertyChain();
-            return Stream.concat(Stream.of(noopAxiom()),
-                    IntStream.range(0, chain.size()).mapToObj(i -> i)
-                            .flatMap(i -> down.refine(chain.get(i), true)
-                                    .map(role -> df.getOWLSubPropertyChainOfAxiom(
-                                            Utils.replaceInList(chain, i, role),
-                                            axiom.getSuperProperty()))));
+            if (regularPreorder == null) {
+                return Stream.concat(Stream.of(noopAxiom()),
+                        IntStream.range(0, chain.size()).mapToObj(i -> i)
+                                .flatMap(i -> down.refine(chain.get(i), true)
+                                        .map(role -> df.getOWLSubPropertyChainOfAxiom(
+                                                Utils.replaceInList(chain, i, role), axiom.getSuperProperty()))));
+            } else {
+                return Stream.concat(IntStream.range(0, chain.size()).mapToObj(i -> i)
+                        .flatMap(i -> down.refine(chain.get(i), false)
+                                .map(role -> df.getOWLSubPropertyChainOfAxiom(
+                                        Utils.replaceInList(chain, i, role), axiom.getSuperProperty()))),
+                        up.refine(axiom.getSuperProperty(), false)
+                                .map(role -> df.getOWLSubPropertyChainOfAxiom(chain, role)))
+                        .filter(ax -> allowWeakeningTo(ax))
+                        .map(ax -> (OWLAxiom) ax);
+            }
         }
 
         @Override

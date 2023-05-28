@@ -1032,15 +1032,21 @@ public class Ontology implements AutoCloseable {
      * @return A stream containing all non-simple roles.
      */
     public Stream<OWLObjectPropertyExpression> nonSimpleRoles() {
-        return withOwlOntologyDo(ontology -> (new OWLObjectPropertyManager(ontology)).getNonSimpleProperties())
-                .stream();
+        var df = getDefaultDataFactory();
+        return Stream
+                .concat(withOwlOntologyDo(ontology -> (new OWLObjectPropertyManager(ontology)).getNonSimpleProperties())
+                        .stream(),
+                        Stream.of(df.getOWLBottomObjectProperty(), df.getOWLTopObjectProperty()))
+                .distinct();
     }
 
     /**
      * @return A stream containing all roles in the signature and there inverse.
      */
-    public Stream<OWLObjectPropertyExpression> rolesInSignatureAndInverse() {
-        return rolesInSignature().flatMap(r -> Stream.of(r, r.getInverseProperty()));
+    public Stream<OWLObjectPropertyExpression> subRoles() {
+        var df = getDefaultDataFactory();
+        return Stream.concat(rolesInSignature().flatMap(r -> Stream.of(r, r.getInverseProperty())),
+                Stream.of(df.getOWLBottomObjectProperty(), df.getOWLTopObjectProperty())).distinct();
     }
 
     /**
@@ -1048,7 +1054,49 @@ public class Ontology implements AutoCloseable {
      */
     public Stream<OWLObjectPropertyExpression> simpleRoles() {
         var nonSimple = Utils.toSet(nonSimpleRoles());
-        return rolesInSignatureAndInverse().filter(role -> !nonSimple.contains(role));
+        return subRoles().filter(role -> !nonSimple.contains(role));
+    }
+
+    /**
+     * @return A pre-order for this ontology's role hierarchy or null if one does
+     *         not exist. Note that the generated preorder is maximal with respect
+     *         to the constraints.
+     */
+    public PreorderCache<OWLObjectProperty> regularPreorder() {
+        var preorder = new PreorderCache<OWLObjectProperty>();
+        preorder.setupDomain(Utils.toList(rolesInSignature()));
+        for (var axiom : (Iterable<OWLAxiom>) axioms()::iterator) {
+            if (axiom instanceof OWLSubObjectPropertyOfAxiom ax) {
+                var sub = ax.getSubProperty().getNamedProperty();
+                var sup = ax.getSuperProperty().getNamedProperty();
+                if (!sub.equals(sup) && !preorder.assertSuccessor(sub, sup)) {
+                    return null;
+                }
+            } else if (axiom instanceof OWLSubPropertyChainOfAxiom ax) {
+                var subs = ax.getPropertyChain();
+                var sup = ax.getSuperProperty();
+                List<OWLObjectPropertyExpression> preds;
+                if (subs.size() == 2 && subs.get(0).equals(sup) && subs.get(1).equals(sup)) {
+                    preds = List.of();
+                } else if (subs.get(0).equals(sup)) {
+                    preds = subs.subList(1, subs.size());
+                } else if (subs.get(subs.size() - 1).equals(sup)) {
+                    preds = subs.subList(0, subs.size() - 1);
+                } else {
+                    preds = subs;
+                }
+                for (var pred : preds) {
+                    var subName = pred.getNamedProperty();
+                    var supName = sup.getNamedProperty();
+                    if (!preorder.assertSuccessor(subName, supName)) {
+                        return null;
+                    } else if (!preorder.denySuccessor(supName, subName)) {
+                        return null;
+                    }
+                }
+            }
+        }
+        return preorder;
     }
 
     /**

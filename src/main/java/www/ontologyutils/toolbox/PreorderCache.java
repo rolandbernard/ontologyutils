@@ -253,6 +253,48 @@ public class PreorderCache<T> {
     }
 
     /**
+     * @param pred
+     *            The predecessor of {@code succ}.
+     * @param succ
+     *            The successor of {@code pred}.
+     * @return True iff the new information is consistent with what is already
+     *         known.
+     */
+    public boolean assertSuccessor(T pred, T succ) {
+        assureExistence(pred);
+        assureExistence(succ);
+        if (isKnownSuccessor(pred, succ)) {
+            return true;
+        } else if (!isPossibleSuccessor(pred, succ)) {
+            return false;
+        } else {
+            addKnownSuccessors(pred, succ);
+            return true;
+        }
+    }
+
+    /**
+     * @param pred
+     *            The non-predecessor of {@code succ}.
+     * @param succ
+     *            The non-successor of {@code pred}.
+     * @return True iff the new information is consistent with what is already
+     *         known.
+     */
+    public boolean denySuccessor(T pred, T succ) {
+        assureExistence(pred);
+        assureExistence(succ);
+        if (isKnownSuccessor(pred, succ)) {
+            return false;
+        } else if (!isPossibleSuccessor(pred, succ)) {
+            return true;
+        } else {
+            removePossibleSuccessors(pred, succ);
+            return true;
+        }
+    }
+
+    /**
      * Wrap the given preorder {@code preorder} using a {@code PreorderCache}.
      *
      * @param <T>

@@ -169,7 +169,7 @@ public class SroiqAxiomStrengthenerTest {
             ontology.logicalAxioms().forEach(weakAxiom -> {
                 try (var copy = ontology.cloneWithSeparateCache()) {
                     copy.removeAxioms(weakAxiom);
-                    var axiomStrengthener = new AxiomStrengthener(copy);
+                    var axiomStrengthener = new AxiomStrengthener(copy, AxiomStrengthener.FLAG_SIMPLE_ROLES_STRICT);
                     axiomStrengthener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
                         try (var copy2 = copy.clone()) {
                             copy2.addAxioms(strongAxiom);
@@ -178,6 +178,34 @@ public class SroiqAxiomStrengthenerTest {
                         }
                     });
                 }
+            });
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "/alch/catsandnumbers.owl", "/el/bodysystem.owl", "/alc/bfo.owl",
+            "/el/a-and-b.owl", "/el/Empty.owl", "/alc/Alignment.owl", "/alcroiq/owl-tests.owl",
+            "/alcri/sroiq-tests.owl", "/el/Disalignment.owl", "/alc/Fish.owl", "/alc/InitialOntology.owl",
+            "/alc/InitialOntologyAlignment.owl", "/alc/InitialOntologyInsta.owl",
+            "/alc/InitialOntologyInstantiationAlignment.owl", "/alc/Vehicle.owl",
+    })
+    public void strengtheningMaintainsConstraints(String resourceName) throws OWLOntologyCreationException {
+        var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
+        try (var ontology = Ontology.loadOntology(path)) {
+            ontology.generateDeclarationAxioms();
+            assertTrue(ontology.isOwl2Dl());
+            var originalSimpleRoles = Utils.toSet(ontology.simpleRoles());
+            var axiomWeakener = new AxiomStrengthener(ontology, AxiomWeakener.FLAG_OWL2_SET_OPERANDS);
+            ontology.logicalAxioms().forEach(weakAxiom -> {
+                axiomWeakener.strongerAxioms(weakAxiom).forEach(strongAxiom -> {
+                    try (var copy = ontology.clone()) {
+                        copy.addAxioms(strongAxiom);
+                        assertTrue(copy.isOwl2Dl());
+                        var newSimpleRoles = Utils.toSet(copy.simpleRoles());
+                        assertTrue(newSimpleRoles.containsAll(originalSimpleRoles));
+                    }
+                });
             });
         }
     }

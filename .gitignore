@@ -10,4 +10,5 @@ bin/
 /bin/
 *-made-inconsistent.owl
 *-made-consistent.owl
+*.log
 tmp.*

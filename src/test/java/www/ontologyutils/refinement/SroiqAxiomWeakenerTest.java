@@ -24,7 +24,7 @@ public class SroiqAxiomWeakenerTest {
     public void setup() {
         var path = RoleCoverTest.class.getResource("/alcri/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
-        axiomWeakener = new AxiomWeakener(ontology, ontology);
+        axiomWeakener = new AxiomWeakener(ontology, ontology, AxiomWeakener.FLAG_SIMPLE_ROLES_STRICT);
     }
 
     @AfterEach
@@ -309,16 +309,11 @@ public class SroiqAxiomWeakenerTest {
                         copy.removeAxioms(strongAxiom);
                         copy.addAxioms(weakAxiom);
                         // Replacing an axiom with a weakening does not violate constraints.
-                        if (!copy.isOwl2Dl()) {
-                            copy.checkOwlProfiles().forEach(System.out::println);
-                            assertTrue(copy.isOwl2Dl());
-                        }
+                        assertTrue(copy.isOwl2Dl());
                         // All roles that are simple in the original ontology are simple in the modified
                         // ontology.
                         var newSimpleRoles = Utils.toSet(copy.simpleRoles());
-                        if (!newSimpleRoles.containsAll(originalSimpleRoles)) {
-                            assertTrue(newSimpleRoles.containsAll(originalSimpleRoles));
-                        }
+                        assertTrue(newSimpleRoles.containsAll(originalSimpleRoles));
                     }
                 });
             });
