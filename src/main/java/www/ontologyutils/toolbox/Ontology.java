@@ -1069,7 +1069,7 @@ public class Ontology implements AutoCloseable {
             if (axiom instanceof OWLSubObjectPropertyOfAxiom ax) {
                 var sub = ax.getSubProperty().getNamedProperty();
                 var sup = ax.getSuperProperty().getNamedProperty();
-                if (!sub.equals(sup) && !preorder.assertSuccessor(sub, sup)) {
+                if (!preorder.assertSuccessor(sub, sup)) {
                     return null;
                 }
             } else if (axiom instanceof OWLSubPropertyChainOfAxiom ax) {

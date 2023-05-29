@@ -25,8 +25,9 @@ public class RoleCoverTest {
         var path = CoverTest.class.getResource("/alcri/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         var subConcepts = Utils.toSet(ontology.subConcepts());
+        var subRoles = Utils.toSet(ontology.subRoles());
         var simpleRoles = Utils.toSet(ontology.simpleRoles());
-        covers = new Covers(ontology, subConcepts, simpleRoles);
+        covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
     }
 
     @AfterEach
@@ -97,7 +98,7 @@ public class RoleCoverTest {
     @MethodSource("expectedUpCover")
     public void upCover(Set<OWLObjectPropertyExpression> expected,
             OWLObjectPropertyExpression concept) {
-        assertEquals(expected, Utils.toSet(covers.upCover(concept)));
+        assertEquals(expected, Utils.toSet(covers.upCover(concept, true)));
     }
 
     private static Stream<Arguments> expectedDownCover() {
@@ -153,20 +154,20 @@ public class RoleCoverTest {
     @MethodSource("expectedDownCover")
     public void downCover(Set<OWLObjectPropertyExpression> expected,
             OWLObjectPropertyExpression concept) {
-        assertEquals(expected, Utils.toSet(covers.downCover(concept)));
+        assertEquals(expected, Utils.toSet(covers.downCover(concept, true)));
     }
 
     @Test
     public void allUpCover() {
         ontology.rolesInSignature()
                 .flatMap(role -> Stream.of(role, role.getInverseProperty()))
-                .map(covers::upCover).forEach(Stream::count);
+                .map(r -> covers.upCover(r, false)).forEach(Stream::count);
     }
 
     @Test
     public void allDownCover() {
         ontology.rolesInSignature()
                 .flatMap(role -> Stream.of(role, role.getInverseProperty()))
-                .map(covers::downCover).forEach(Stream::count);
+                .map(r -> covers.downCover(r, false)).forEach(Stream::count);
     }
 }

@@ -226,7 +226,7 @@ public abstract class AxiomRefinement {
             var sub = axiom.getSubProperty();
             var sup = axiom.getSuperProperty();
             return simpleRoles.contains(sub) || (!simpleRoles.contains(sup)
-                    && regularPreorder.isKnownSuccessor(sub.getNamedProperty(), sup.getNamedProperty()));
+                    && regularPreorder.assertSuccessor(sub.getNamedProperty(), sup.getNamedProperty()));
         }
 
         @Override
@@ -257,6 +257,9 @@ public abstract class AxiomRefinement {
         private boolean allowWeakeningTo(OWLSubPropertyChainOfAxiom axiom) {
             var subs = axiom.getPropertyChain();
             var sup = axiom.getSuperProperty();
+            if (simpleRoles.contains(sup)) {
+                return false;
+            }
             List<OWLObjectPropertyExpression> preds;
             if (subs.size() == 2 && subs.get(0).equals(sup) && subs.get(1).equals(sup)) {
                 return true;
@@ -270,8 +273,8 @@ public abstract class AxiomRefinement {
             for (var pred : preds) {
                 var subName = pred.getNamedProperty();
                 var supName = sup.getNamedProperty();
-                if (!regularPreorder.isKnownSuccessor(subName, supName)
-                        || regularPreorder.isKnownSuccessor(supName, subName)) {
+                if (!simpleRoles.contains(pred) && (!regularPreorder.assertSuccessor(subName, supName)
+                        || !regularPreorder.denySuccessor(supName, subName))) {
                     return false;
                 }
             }

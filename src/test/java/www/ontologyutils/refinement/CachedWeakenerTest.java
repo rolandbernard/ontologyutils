@@ -3,6 +3,7 @@ package www.ontologyutils.refinement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.parallel.*;
@@ -101,16 +102,21 @@ public class CachedWeakenerTest {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var subConcepts = Utils.toSet(ontology.subConcepts());
+            var subRoles = Utils.toSet(ontology.subRoles());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
-            var cached = new Covers(ontology, subConcepts, simpleRoles);
-            var uncached = new Covers(ontology, subConcepts, simpleRoles, true);
+            var cached = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
+            var uncached = new Covers(ontology, subConcepts, subRoles, simpleRoles, true);
             ontology.subConcepts().forEach(concept -> {
                 assertEquals(Utils.toSet(uncached.upCover(concept)), Utils.toSet(cached.upCover(concept)));
                 assertEquals(Utils.toSet(uncached.downCover(concept)), Utils.toSet(cached.downCover(concept)));
             });
             ontology.rolesInSignature().forEach(role -> {
-                assertEquals(Utils.toSet(uncached.upCover(role)), Utils.toSet(cached.upCover(role)));
-                assertEquals(Utils.toSet(uncached.downCover(role)), Utils.toSet(cached.downCover(role)));
+                for (var simple : List.of(true, false)) {
+                    assertEquals(Utils.toSet(uncached.upCover(role, simple)),
+                            Utils.toSet(cached.upCover(role, simple)));
+                    assertEquals(Utils.toSet(uncached.downCover(role, simple)),
+                            Utils.toSet(cached.downCover(role, simple)));
+                }
             });
         }
     }

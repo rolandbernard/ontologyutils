@@ -116,7 +116,7 @@ public class AxiomWeakener extends AxiomRefinement {
             Set<OWLObjectPropertyExpression> subRoles, Set<OWLObjectPropertyExpression> simpleRoles,
             PreorderCache<OWLObjectProperty> regularPreorder, int flags) {
         this(new Covers(refOntology, subConcepts, (flags & FLAG_SIMPLE_ROLES_STRICT) != 0 ? simpleRoles : subRoles,
-                (flags & FLAG_UNCACHED) != 0), simpleRoles, regularPreorder, flags);
+                simpleRoles, (flags & FLAG_UNCACHED) != 0), simpleRoles, regularPreorder, flags);
     }
 
     /**

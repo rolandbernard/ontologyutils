@@ -45,18 +45,16 @@ public class RefinementOperator {
 
     private static class Visitor implements OWLClassExpressionVisitorEx<Stream<OWLClassExpression>> {
         protected OWLDataFactory df;
-        protected Set<OWLObjectPropertyExpression> simpleRoles;
         private Cover way;
         private Cover back;
         private int flags;
         private Visitor reverse;
 
-        public Visitor(Cover way, Cover back, int flags, Set<OWLObjectPropertyExpression> simpleRoles) {
+        public Visitor(Cover way, Cover back, int flags) {
             df = Ontology.getDefaultDataFactory();
             this.way = way;
             this.back = back;
             this.flags = flags;
-            this.simpleRoles = simpleRoles;
         }
 
         @Override
@@ -221,10 +219,8 @@ public class RefinementOperator {
         public Stream<OWLObjectPropertyExpression> refine(OWLObjectPropertyExpression role, boolean simple) {
             if ((flags & FLAG_ALC_STRICT) != 0) {
                 return Stream.of(role);
-            } else if (simple && simpleRoles != null) {
-                return way.apply(role).filter(r -> simpleRoles.contains(r));
             } else {
-                return way.apply(role);
+                return way.apply(role, simple);
             }
         }
     }
@@ -251,8 +247,8 @@ public class RefinementOperator {
      *            returned by the covers are assumed to be simple.
      */
     public RefinementOperator(Cover way, Cover back, int flags, Set<OWLObjectPropertyExpression> simpleRoles) {
-        visitor = new Visitor(way, back, flags, simpleRoles);
-        visitor.reverse = new Visitor(back, way, flags, simpleRoles);
+        visitor = new Visitor(way, back, flags);
+        visitor.reverse = new Visitor(back, way, flags);
         visitor.reverse.reverse = visitor;
     }
 

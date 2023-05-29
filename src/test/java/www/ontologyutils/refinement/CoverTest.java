@@ -25,8 +25,9 @@ public class CoverTest {
         var path = RoleCoverTest.class.getResource("/alch/catsandnumbers.owl").getFile();
         ontology = Ontology.loadOntology(path);
         var subConcepts = Utils.toSet(ontology.subConcepts());
+        var subRoles = Utils.toSet(ontology.subRoles());
         var simpleRoles = Utils.toSet(ontology.simpleRoles());
-        covers = new Covers(ontology, subConcepts, simpleRoles);
+        covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
     }
 
     @AfterEach

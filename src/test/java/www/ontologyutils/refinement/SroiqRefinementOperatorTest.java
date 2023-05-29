@@ -27,8 +27,9 @@ public class SroiqRefinementOperatorTest {
         var path = RoleCoverTest.class.getResource("/alcri/sroiq-tests.owl").getFile();
         ontology = Ontology.loadOntology(path);
         var subConcepts = Utils.toSet(ontology.subConcepts());
+        var subRoles = Utils.toSet(ontology.subRoles());
         var simpleRoles = Utils.toSet(ontology.simpleRoles());
-        covers = new Covers(ontology, subConcepts, simpleRoles);
+        covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
         var upCover = covers.upCover().cached();
         var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);
@@ -394,8 +395,9 @@ public class SroiqRefinementOperatorTest {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var subConcepts = Utils.toSet(ontology.subConcepts());
+            var subRoles = Utils.toSet(ontology.subRoles());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
-            var covers = new Covers(ontology, subConcepts, simpleRoles);
+            covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
             var upCover = covers.upCover().cached();
             var downCover = covers.downCover().cached();
             generalization = new RefinementOperator(upCover, downCover);
@@ -420,8 +422,9 @@ public class SroiqRefinementOperatorTest {
         var path = SroiqAxiomWeakenerTest.class.getResource(resourceName).getFile();
         try (var ontology = Ontology.loadOntology(path)) {
             var subConcepts = Utils.toSet(ontology.subConcepts());
+            var subRoles = Utils.toSet(ontology.subRoles());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
-            var covers = new Covers(ontology, subConcepts, simpleRoles);
+            covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
             var upCover = covers.upCover().cached();
             var downCover = covers.downCover().cached();
             specialization = new RefinementOperator(downCover, upCover);
