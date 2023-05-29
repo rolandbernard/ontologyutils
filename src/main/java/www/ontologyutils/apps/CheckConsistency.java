@@ -6,7 +6,7 @@ import www.ontologyutils.toolbox.Ontology;
  * Class for checking the consistency of an ontology. Checks will be performed
  * using all supported reasoners.
  */
-public class AppCheckConsistency {
+public class CheckConsistency {
     private static void printResult(boolean consistent) {
         if (consistent) {
             System.out.println("-> consistent");

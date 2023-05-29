@@ -9,7 +9,7 @@ import www.ontologyutils.toolbox.*;
  * Small benchmark for computing repeated refinements on the same ontology.
  * Mainly useful for profiling and comparing performance of reasoners.
  */
-public class AppBenchmark {
+public class Benchmark {
     private static void benchRun(Ontology ontology) {
         Utils.randomSeed(42);
         for (int i = 0; i < 10; i++) {
@@ -62,7 +62,7 @@ public class AppBenchmark {
      */
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Usage: java " + AppBenchmark.class.getCanonicalName() + " FILENAME");
+            System.err.println("Usage: java " + Benchmark.class.getCanonicalName() + " FILENAME");
             System.exit(1);
         }
         var ontology = Ontology.loadOntology(args[0]);

@@ -36,7 +36,9 @@ public class Covers {
          * @param conceptCover
          *            The concept function of this cover.
          * @param roleCover
-         *            The role function of this cover.
+         *            The (simple) role function of this cover.
+         * @param nonSimpleRoleCover
+         *            The (non-simple) role function of this cover.
          * @param intCover
          *            The integer function of the over.
          */
@@ -73,6 +75,10 @@ public class Covers {
         /**
          * @param role
          *            The role for which to compute the cover.
+         * @param simple
+         *            Whether to return only simple roles. See
+         *            {@link Covers#upCover(OWLObjectPropertyExpression, boolean)} and
+         *            {@link Covers#downCover(OWLObjectPropertyExpression, boolean)}}.
          * @return The stream containing all elements of the cover.
          */
         public Stream<OWLObjectPropertyExpression> apply(OWLObjectPropertyExpression role, boolean simple) {
@@ -106,6 +112,9 @@ public class Covers {
      *            Return only concepts that are in this set.
      * @param subRoles
      *            Return only roles that are in this set.
+     * @param simpleRoles
+     *            Return only roles that are in this set if asked for simple roles
+     *            covers.
      * @param uncached
      *            If true, no subclass relation cache will be created.
      */
@@ -308,6 +317,10 @@ public class Covers {
     /**
      * @param role
      *            The role for which to compute the upward cover.
+     * @param simple
+     *            Whether to return only simple roles. This is more than just a
+     *            filter applied to the output, but also affects the test of whether
+     *            there exist more specific generalizations.
      * @return All role that are in the upward cover of {@code role}.
      */
     public Stream<OWLObjectPropertyExpression> upCover(OWLObjectPropertyExpression role, boolean simple) {
@@ -344,6 +357,10 @@ public class Covers {
     /**
      * @param role
      *            The role to compute the downward cover for.
+     * @param simple
+     *            Whether to return only simple roles. This is more than just a
+     *            filter applied to the output, but also affects the test of whether
+     *            there exist more general specializations.
      * @return All roles that are in the downward cover of {@code role}.
      */
     public Stream<OWLObjectPropertyExpression> downCover(OWLObjectPropertyExpression role, boolean simple) {

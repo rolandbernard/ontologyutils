@@ -8,7 +8,7 @@ import www.ontologyutils.toolbox.Ontology;
  *
  * @author nico
  */
-public class AppCheckConsistencyBasic {
+public class CheckConsistencyBasic {
     private static void printOutput(boolean cons) {
         if (cons) {
             System.out.print("1");

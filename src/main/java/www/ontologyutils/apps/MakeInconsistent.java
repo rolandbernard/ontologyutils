@@ -12,7 +12,7 @@ import www.ontologyutils.toolbox.*;
  * Take the given ontology and make it inconsistent by adding some strengthened
  * axioms.
  */
-public class AppMakeInconsistent {
+public class MakeInconsistent {
     /**
      * A first argument must be given, corresponding to an OWL ontology file path.
      * E.g., run with the parameter resources/catsandnumbers.owl A second argument

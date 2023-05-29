@@ -97,6 +97,10 @@ public abstract class AxiomRefinement {
          * @param simpleRoles
          *            The set of simple roles. These are used for deciding whether it is
          *            safe to refine a role inclusion axiom.
+         * @param regularPreorder
+         *            A preorder that was produced for the regularity check of a
+         *            ontology. The refined axioms are guaranteed to be valid in any
+         *            ontology for which this preorder describes the RBox hierarchy.
          * @param flags
          *            Flags that can be used to make the refinement ore strict.
          */

@@ -1,14 +1,12 @@
 package www.ontologyutils.apps;
 
-import org.semanticweb.HermiT.ReasonerFactory;
-
 import www.ontologyutils.toolbox.*;
 
 /**
  * Check the different OWL2 profiles against the given ontology. Outputting the
  * report results.
  */
-public class AppClassifyOntology {
+public class ClassifyOntology {
     /**
      * One argument must be given, corresponding to an OWL ontology file path. E.g.,
      * run with the parameter resources/inconsistent-leftpolicies-small.owl
@@ -19,10 +17,10 @@ public class AppClassifyOntology {
      */
     public static void main(String[] args) {
         if (args.length != 1) {
-            System.err.println("Usage: java " + AppClassifyOntology.class.getCanonicalName() + " FILENAME");
+            System.err.println("Usage: java " + ClassifyOntology.class.getCanonicalName() + " FILENAME");
             System.exit(1);
         }
-        var ontology = Ontology.loadOntology(args[0], new ReasonerFactory());
+        var ontology = Ontology.loadOntology(args[0]).withHermit();
         System.out.print("OWL 2 profiles: ");
         ontology.checkOwlProfiles().forEach(profile -> {
             if (profile.isInProfile()) {

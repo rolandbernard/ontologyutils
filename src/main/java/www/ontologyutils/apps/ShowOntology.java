@@ -5,7 +5,7 @@ import www.ontologyutils.toolbox.Ontology;
 /**
  * Show the ontology.
  */
-public class AppShowOntology {
+public class ShowOntology {
     /**
      * @param args
      *            Must contain one argument representing the file path of an
