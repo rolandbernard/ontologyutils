@@ -27,17 +27,17 @@ public abstract class RepairApp extends App {
                 throw new IllegalArgumentException("multiple input files specified");
             }
             inputFile = file.toString();
-        }, "the file containing the original ontology", null));
+        }, "the file containing the original ontology"));
         options.add(OptionType.FILE.create('o', "output", file -> {
             if (outputFile != null) {
                 throw new IllegalArgumentException("multiple output files specified");
             }
             outputFile = file.toString();
-        }, "the file to write the result to", null));
+        }, "the file to write the result to"));
         options.add(OptionType.FLAG.create('n', "normalize", b -> normalize = true,
-                "normalize the ontology before repair", null));
-        options.add(OptionType.FLAG.create('R', "no-repair", b -> repair = false, "no not perform repair", null));
-        options.add(OptionType.FLAG.create('v', "verbose", b -> verbose = true, "print more information", null));
+                "normalize the ontology before repair"));
+        options.add(OptionType.FLAG.create('R', "no-repair", b -> repair = false, "no not perform repair"));
+        options.add(OptionType.FLAG.create('v', "verbose", b -> verbose = true, "print more information"));
         return options;
     }
 
@@ -59,7 +59,7 @@ public abstract class RepairApp extends App {
         if (repair) {
             var repair = getRepair();
             if (verbose) {
-                repair.setInfoCallback(msg -> System.out.println("[" + getTimeStamp() + "] " + msg));
+                repair.setInfoCallback(this::logMessage);
             }
             System.err.println("Repairing...");
             repair.apply(ontology);

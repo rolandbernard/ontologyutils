@@ -1,5 +1,8 @@
 package www.ontologyutils.apps;
 
+import java.util.*;
+import java.util.stream.Stream;
+
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
 import www.ontologyutils.refinement.*;
@@ -9,8 +12,23 @@ import www.ontologyutils.toolbox.*;
  * Small benchmark for computing repeated refinements on the same ontology.
  * Mainly useful for profiling and comparing performance of reasoners.
  */
-public class Benchmark {
-    private static void benchRun(Ontology ontology) {
+public class Benchmark extends App {
+    private String inputFile;
+
+    @Override
+    protected List<Option<?>> appOptions() {
+        var options = new ArrayList<Option<?>>();
+        options.addAll(super.appOptions());
+        options.add(OptionType.FILE.createDefault(file -> {
+            if (inputFile != null) {
+                throw new IllegalArgumentException("multiple input files specified");
+            }
+            inputFile = file.toString();
+        }, "the file containing the original ontology"));
+        return options;
+    }
+
+    private void benchRun(Ontology ontology) {
         Utils.randomSeed(42);
         for (int i = 0; i < 10; i++) {
             var subConcepts = Utils.toSet(ontology.subConcepts());
@@ -33,8 +51,9 @@ public class Benchmark {
                 for (int j = 0; j < 10; j++) {
                     var badAxioms = ontology.someMinimalUnsatisfiableSubsets(Ontology::isConsistent)
                             .flatMap(s -> s.stream());
-                    OWLClassExpression toRefine = Utils
-                            .randomChoice(Utils.randomChoice(badAxioms).nestedClassExpressions());
+                    var badAxiom = Utils.randomChoice(badAxioms);
+                    var toRefine = Utils.randomChoice(Stream.concat(badAxiom.nestedClassExpressions(),
+                            Stream.of(Utils.randomChoice(subConcepts))));
                     for (int k = 0; k < 10; k++) {
                         toRefine = Utils.randomChoice(refinement.refine(toRefine));
                     }
@@ -43,7 +62,7 @@ public class Benchmark {
         }
     }
 
-    private static void benchOntology(Ontology ontology) {
+    private void benchOntology(Ontology ontology) {
         var startTime = System.nanoTime();
         Ontology.reasonerCalls = 0;
         benchRun(ontology);
@@ -51,21 +70,9 @@ public class Benchmark {
         System.out.println((endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls");
     }
 
-    /**
-     * One argument must be given, corresponding to an OWL ontology file path. E.g.,
-     * run with the parameter
-     * src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
-     *
-     * @param args
-     *            Must contain one argument representing the file path of an
-     *            ontology.
-     */
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.err.println("Usage: java " + Benchmark.class.getCanonicalName() + " FILENAME");
-            System.exit(1);
-        }
-        var ontology = Ontology.loadOntology(args[0]);
+    @Override
+    protected void run() {
+        var ontology = Ontology.loadOntology(inputFile);
         System.err.println("Loaded...");
         System.err.println("** Benchmark: FaCT++");
         try (var withFactPP = ontology.cloneWithFactPP()) {
@@ -92,5 +99,18 @@ public class Benchmark {
             System.err.println("ERROR... " + e);
         }
         ontology.close();
+    }
+
+    /**
+     * One argument must be given, corresponding to an OWL ontology file path. E.g.,
+     * run with the parameter
+     * src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
+     *
+     * @param args
+     *            Must contain one argument representing the file path of an
+     *            ontology.
+     */
+    public static void main(String[] args) {
+        (new Benchmark()).launch(args);
     }
 }

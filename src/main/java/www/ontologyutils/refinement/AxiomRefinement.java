@@ -248,13 +248,13 @@ public abstract class AxiomRefinement {
                                                 role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(), role))
                                         : Stream.of()));
             } else {
-                return Stream.concat(
+                return Stream.concat(Stream.of(noopAxiom()), Stream.concat(
                         down.refine(axiom.getSubProperty(), false)
                                 .map(role -> df.getOWLSubObjectPropertyOfAxiom(role, axiom.getSuperProperty())),
                         up.refine(axiom.getSuperProperty(), false)
                                 .map(role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(), role)))
                         .filter(ax -> allowWeakeningTo(ax))
-                        .map(ax -> (OWLAxiom) ax);
+                        .map(ax -> (OWLAxiom) ax));
             }
         }
 
@@ -298,14 +298,15 @@ public abstract class AxiomRefinement {
                                         .map(role -> df.getOWLSubPropertyChainOfAxiom(
                                                 Utils.replaceInList(chain, i, role), axiom.getSuperProperty()))));
             } else {
-                return Stream.concat(IntStream.range(0, chain.size()).mapToObj(i -> i)
-                        .flatMap(i -> down.refine(chain.get(i), false)
-                                .map(role -> df.getOWLSubPropertyChainOfAxiom(
-                                        Utils.replaceInList(chain, i, role), axiom.getSuperProperty()))),
+                return Stream.concat(Stream.of(noopAxiom()), Stream.concat(
+                        IntStream.range(0, chain.size()).mapToObj(i -> i)
+                                .flatMap(i -> down.refine(chain.get(i), false)
+                                        .map(role -> df.getOWLSubPropertyChainOfAxiom(
+                                                Utils.replaceInList(chain, i, role), axiom.getSuperProperty()))),
                         up.refine(axiom.getSuperProperty(), false)
                                 .map(role -> df.getOWLSubPropertyChainOfAxiom(chain, role)))
                         .filter(ax -> allowWeakeningTo(ax))
-                        .map(ax -> (OWLAxiom) ax);
+                        .map(ax -> (OWLAxiom) ax));
             }
         }
 

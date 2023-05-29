@@ -14,8 +14,7 @@ public class RepairRandomMcs extends RepairApp {
     protected List<Option<?>> appOptions() {
         var options = new ArrayList<Option<?>>();
         options.addAll(super.appOptions());
-        options.add(
-                OptionType.FLAG.create(null, "coherence", b -> coherence = true, "make the ontology coherent", null));
+        options.add(OptionType.FLAG.create("coherence", b -> coherence = true, "make the ontology coherent"));
         return options;
     }
 
@@ -26,11 +25,6 @@ public class RepairRandomMcs extends RepairApp {
         } else {
             return OntologyRepairRandomMcs.forConsistency();
         }
-    }
-
-    @Override
-    protected String appName() {
-        return "RepairRandomMcs";
     }
 
     /**

@@ -19,11 +19,11 @@ public class RepairWeakening extends RepairApp {
         var options = new ArrayList<Option<?>>();
         options.addAll(super.appOptions());
         options.add(
-                OptionType.FLAG.create(null, "coherence", b -> coherence = true, "make the ontology coherent", null));
-        options.add(OptionType.FLAG.create(null, "fast", b -> {
+                OptionType.FLAG.create("coherence", b -> coherence = true, "make the ontology coherent"));
+        options.add(OptionType.FLAG.create("fast", b -> {
             refOntologyStrategy = RefOntologyStrategy.ONE_MCS;
             badAxiomStrategy = BadAxiomStrategy.IN_ONE_MUS;
-        }, "use fast methods for selection", null));
+        }, "use fast methods for selection"));
         options.add(OptionType.options(
                 Map.of("intersect", RefOntologyStrategy.INTERSECTION_OF_MCS,
                         "intersect-of-some", RefOntologyStrategy.INTERSECTION_OF_SOME_MCS,
@@ -31,9 +31,8 @@ public class RepairWeakening extends RepairApp {
                         "any", RefOntologyStrategy.ONE_MCS,
                         "random", RefOntologyStrategy.RANDOM_MCS,
                         "random-of-some", RefOntologyStrategy.SOME_MCS))
-                .create(null, "ref-ontology", method -> {
-                    refOntologyStrategy = method;
-                }, "method for reference ontology selection", null));
+                .create("ref-ontology", method -> refOntologyStrategy = method,
+                        "method for reference ontology selection"));
         options.add(OptionType.options(
                 Map.of("least-mcs", BadAxiomStrategy.IN_LEAST_MCS,
                         "one-mus", BadAxiomStrategy.IN_ONE_MUS,
@@ -42,9 +41,7 @@ public class RepairWeakening extends RepairApp {
                         "one-mcs", BadAxiomStrategy.NOT_IN_ONE_MCS,
                         "some-mcs", BadAxiomStrategy.NOT_IN_SOME_MCS,
                         "random", BadAxiomStrategy.RANDOM))
-                .create(null, "bad-axiom", method -> {
-                    badAxiomStrategy = method;
-                }, "method for bad axiom selection", null));
+                .create("bad-axiom", method -> badAxiomStrategy = method, "method for bad axiom selection"));
         return options;
     }
 
@@ -52,11 +49,6 @@ public class RepairWeakening extends RepairApp {
     protected OntologyRepair getRepair() {
         return new OntologyRepairWeakening(coherence ? Ontology::isCoherent : Ontology::isConsistent,
                 refOntologyStrategy, badAxiomStrategy);
-    }
-
-    @Override
-    protected String appName() {
-        return "RepairWeakening";
     }
 
     /**

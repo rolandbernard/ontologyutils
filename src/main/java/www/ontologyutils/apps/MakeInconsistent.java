@@ -1,6 +1,6 @@
 package www.ontologyutils.apps;
 
-import java.util.HashSet;
+import java.util.*;
 
 import org.semanticweb.owlapi.model.*;
 
@@ -12,27 +12,45 @@ import www.ontologyutils.toolbox.*;
  * Take the given ontology and make it inconsistent by adding some strengthened
  * axioms.
  */
-public class MakeInconsistent {
-    /**
-     * A first argument must be given, corresponding to an OWL ontology file path.
-     * E.g., run with the parameter resources/catsandnumbers.owl A second argument
-     * can be given, to indicate the minimal number of strengthening iterations must
-     * be done. A third argument can be given, to indicate the minimal number of
-     * iterations needed that must be done after reaching inconsistency.
-     *
-     * @param args
-     *            Up to three arguments containing in order: ontology file path,
-     *            minimum number of iterations, and minimum number of iterations
-     *            after making the ontology inconsistent.
-     */
-    public static void main(String[] args) {
+public class MakeInconsistent extends App {
+    private String inputFile;
+    private String outputFile = null;
+    private boolean normalize = false;
+    private boolean verbose = false;
+    private int minIter = 0;
+    private int minAfter = 0;
+
+    @Override
+    protected List<Option<?>> appOptions() {
+        var options = new ArrayList<Option<?>>();
+        options.addAll(super.appOptions());
+        options.add(OptionType.FILE.createDefault(file -> {
+            if (inputFile != null) {
+                throw new IllegalArgumentException("multiple input files specified");
+            }
+            inputFile = file.toString();
+        }, "the file containing the original ontology"));
+        options.add(OptionType.FILE.create('o', "output", file -> {
+            if (outputFile != null) {
+                throw new IllegalArgumentException("multiple output files specified");
+            }
+            outputFile = file.toString();
+        }, "the file to write the result to"));
+        options.add(OptionType.FLAG.create('n', "normalize", b -> normalize = true,
+                "normalize the ontology beforehand"));
+        options.add(OptionType.FLAG.create('v', "verbose", b -> verbose = true, "print more information"));
+        options.add(OptionType.UINT.create("min-iter", i -> minIter = i, "minimum number of iterations to perform"));
+        options.add(OptionType.UINT.create("min-after", i -> minAfter = i, "minimum iterations after inconsistency"));
+        return options;
+    }
+
+    @Override
+    public void run() {
         var startTime = System.nanoTime();
-        var fast = args[0].equals("fast");
-        var file = fast ? args[1] : args[0];
-        var ontology = Ontology.loadOntology(file);
-        var normalization = new SroiqNormalization();
+        var ontology = Ontology.loadOntology(inputFile);
         System.err.println("Loaded... (" + ontology.logicalAxioms().count() + " axioms)");
-        if (!fast) {
+        if (normalize) {
+            var normalization = new SroiqNormalization();
             normalization.apply(ontology);
             System.err.println("Normalized. (" + ontology.logicalAxioms().count() + " axioms)");
         }
@@ -40,28 +58,12 @@ public class MakeInconsistent {
             System.err.println("Ontology is already inconsistent.");
             return;
         }
-        int minNumIter = 0;
-        try {
-            minNumIter = Integer.parseInt(fast ? args[2] : args[1]);
-            System.err.println("Minimal number of strengthening iterations: " + minNumIter);
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            System.err.println("No minimal number of strengthening iterations specified.");
-        }
-        int minNumIterAfterInconsistency = 0;
-        try {
-            minNumIterAfterInconsistency = Integer.parseInt(fast ? args[3] : args[2]);
-            System.err.println(
-                    "Minimal number of iterations after reaching inconsistency: " + minNumIterAfterInconsistency);
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            System.err.println("No minimal number of iterations after reaching inconsistency specified.");
-        }
         var emptyOntology = ontology.cloneOnlyStatic();
         var axiomStrengthener = new AxiomStrengthener(ontology);
         int iter = 0;
         int iterSinceInconsistency = 0;
         boolean isConsistent = ontology.isConsistent();
-        System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
-        while (isConsistent || iter < minNumIter || iterSinceInconsistency < minNumIterAfterInconsistency) {
+        while (isConsistent || iter < minIter || iterSinceInconsistency < minAfter) {
             OWLAxiom axiom = Utils.randomChoice(ontology.logicalAxioms());
             var strongerAxioms = Utils.toSet(axiomStrengthener.strongerAxioms(axiom));
             // We do not consider the axioms already in the ontology.
@@ -87,6 +89,9 @@ public class MakeInconsistent {
             strongerAxioms.removeAll(tautologies);
             if (!strongerAxioms.isEmpty()) {
                 OWLAxiom strongerAxiom = Utils.randomChoice(strongerAxioms);
+                if (verbose) {
+                    logMessage("adding axiom " + Utils.prettyPrintAxiom(strongerAxiom));
+                }
                 ontology.addAxioms(strongerAxiom);
             }
             isConsistent = ontology.isConsistent();
@@ -96,19 +101,38 @@ public class MakeInconsistent {
             } else {
                 iterSinceInconsistency = 0;
             }
-            System.err.println(" ... " + (isConsistent ? "" : "-> INCONSISTENT"));
         }
-        System.err.println("=== BEGIN RESULT ===");
-        ontology.refutableAxioms().map(OWLAxiom::toString).map(Utils::pretty)
-                .sorted().forEach(System.out::println);
-        ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
-                .sorted().forEach(System.out::println);
-        System.err.println("==== END RESULT ====");
-        ontology.saveOntology(file.replaceAll(".owl$", "") + "-made-inconsistent.owl");
+        if (verbose) {
+            System.err.println("=== BEGIN RESULT ===");
+            ontology.refutableAxioms().map(OWLAxiom::toString).map(Utils::pretty)
+                    .sorted().forEach(System.out::println);
+            ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
+                    .sorted().forEach(System.out::println);
+            System.err.println("==== END RESULT ====");
+        }
+        if (outputFile != null) {
+            ontology.saveOntology(outputFile);
+        }
         emptyOntology.close();
         ontology.close();
         var endTime = System.nanoTime();
         System.err.println(
                 "Done. (" + (endTime - startTime) / 1_000_000 + " ms; " + Ontology.reasonerCalls + " reasoner calls)");
+    }
+
+    /**
+     * A first argument must be given, corresponding to an OWL ontology file path.
+     * E.g., run with the parameter resources/catsandnumbers.owl A second argument
+     * can be given, to indicate the minimal number of strengthening iterations must
+     * be done. A third argument can be given, to indicate the minimal number of
+     * iterations needed that must be done after reaching inconsistency.
+     *
+     * @param args
+     *            Up to three arguments containing in order: ontology file path,
+     *            minimum number of iterations, and minimum number of iterations
+     *            after making the ontology inconsistent.
+     */
+    public static void main(String[] args) {
+        (new MakeInconsistent()).launch(args);
     }
 }
