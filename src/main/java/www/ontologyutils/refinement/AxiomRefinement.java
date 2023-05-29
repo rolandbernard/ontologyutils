@@ -97,6 +97,10 @@ public abstract class AxiomRefinement {
          * @param simpleRoles
          *            The set of simple roles. These are used for deciding whether it is
          *            safe to refine a role inclusion axiom.
+         * @param regularPreorder
+         *            A preorder that was produced for the regularity check of a
+         *            ontology. The refined axioms are guaranteed to be valid in any
+         *            ontology for which this preorder describes the RBox hierarchy.
          * @param flags
          *            Flags that can be used to make the refinement ore strict.
          */
@@ -244,13 +248,13 @@ public abstract class AxiomRefinement {
                                                 role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(), role))
                                         : Stream.of()));
             } else {
-                return Stream.concat(
+                return Stream.concat(Stream.of(noopAxiom()), Stream.concat(
                         down.refine(axiom.getSubProperty(), false)
                                 .map(role -> df.getOWLSubObjectPropertyOfAxiom(role, axiom.getSuperProperty())),
                         up.refine(axiom.getSuperProperty(), false)
                                 .map(role -> df.getOWLSubObjectPropertyOfAxiom(axiom.getSubProperty(), role)))
                         .filter(ax -> allowWeakeningTo(ax))
-                        .map(ax -> (OWLAxiom) ax);
+                        .map(ax -> (OWLAxiom) ax));
             }
         }
 
@@ -294,14 +298,15 @@ public abstract class AxiomRefinement {
                                         .map(role -> df.getOWLSubPropertyChainOfAxiom(
                                                 Utils.replaceInList(chain, i, role), axiom.getSuperProperty()))));
             } else {
-                return Stream.concat(IntStream.range(0, chain.size()).mapToObj(i -> i)
-                        .flatMap(i -> down.refine(chain.get(i), false)
-                                .map(role -> df.getOWLSubPropertyChainOfAxiom(
-                                        Utils.replaceInList(chain, i, role), axiom.getSuperProperty()))),
+                return Stream.concat(Stream.of(noopAxiom()), Stream.concat(
+                        IntStream.range(0, chain.size()).mapToObj(i -> i)
+                                .flatMap(i -> down.refine(chain.get(i), false)
+                                        .map(role -> df.getOWLSubPropertyChainOfAxiom(
+                                                Utils.replaceInList(chain, i, role), axiom.getSuperProperty()))),
                         up.refine(axiom.getSuperProperty(), false)
                                 .map(role -> df.getOWLSubPropertyChainOfAxiom(chain, role)))
                         .filter(ax -> allowWeakeningTo(ax))
-                        .map(ax -> (OWLAxiom) ax);
+                        .map(ax -> (OWLAxiom) ax));
             }
         }
 
