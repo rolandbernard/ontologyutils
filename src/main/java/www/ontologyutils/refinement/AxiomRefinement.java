@@ -32,7 +32,7 @@ public abstract class AxiomRefinement {
     /**
      * Accept only axioms that have direct equivalents in ALC.
      */
-    public static final int FLAG_ALC_STRICT = 1 << 1;
+    public static final int FLAG_ALC_STRICT = (1 << 1) | AxiomRefinement.FLAG_SROIQ_STRICT;
     /**
      * Accept only axioms that have direct equivalents in SROIQ.
      */
@@ -110,6 +110,7 @@ public abstract class AxiomRefinement {
             this.up = up;
             this.down = down;
             this.simpleRoles = simpleRoles;
+            this.regularPreorder = regularPreorder;
             this.flags = flags;
         }
 

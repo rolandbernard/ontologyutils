@@ -288,13 +288,13 @@ public abstract class App {
                     if (option != null) {
                         if (option.type.value == null) {
                             if (len + 2 < args[i].length()) {
-                                argsError("'--" + name + "'': '" + args[i].substring(len + 3)
+                                argsError("'--" + name + "': '" + args[i].substring(len + 3)
                                         + "': option does not expect a value");
                             }
                             try {
                                 ((Consumer<Object>) option.action).accept(option.type.parse.apply(null));
                             } catch (IllegalArgumentException ex) {
-                                argsError("'--" + name + "'': " + ex.getMessage());
+                                argsError("'--" + name + "': " + ex.getMessage());
                             }
                         } else {
                             String value = null;
@@ -307,12 +307,12 @@ public abstract class App {
                             try {
                                 ((Consumer<Object>) option.action).accept(option.type.parse.apply(value));
                             } catch (IllegalArgumentException ex) {
-                                argsError("'--" + name + "'': '" + value + "': " + ex.getMessage());
+                                argsError("'--" + name + "': '" + value + "': " + ex.getMessage());
                             }
                         }
                         unused.remove(option);
                     } else {
-                        argsError("'--" + name + "'': unknown command line option");
+                        argsError("'--" + name + "': unknown command line option");
                     }
                 } else {
                     var arg = args[i];
@@ -324,7 +324,7 @@ public abstract class App {
                                 try {
                                     ((Consumer<Object>) option.action).accept(option.type.parse.apply(null));
                                 } catch (IllegalArgumentException ex) {
-                                    argsError("'-" + c + "'': " + ex.getMessage());
+                                    argsError("'-" + c + "': " + ex.getMessage());
                                 }
                             } else {
                                 String value = null;
@@ -338,12 +338,12 @@ public abstract class App {
                                 try {
                                     ((Consumer<Object>) option.action).accept(option.type.parse.apply(value));
                                 } catch (IllegalArgumentException ex) {
-                                    argsError("'-" + c + "'': '" + value + "': " + ex.getMessage());
+                                    argsError("'-" + c + "': '" + value + "': " + ex.getMessage());
                                 }
                             }
                             unused.remove(option);
                         } else {
-                            argsError("'-" + c + "'': unknown command line option");
+                            argsError("'-" + c + "': unknown command line option");
                         }
                     }
                 }
@@ -356,7 +356,7 @@ public abstract class App {
                     }
                     unused.remove(def);
                 } else {
-                    argsError("'" + args[i] + "'': unknown command line option");
+                    argsError("'" + args[i] + "': unknown command line option");
                 }
             }
         }

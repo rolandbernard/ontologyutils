@@ -2,8 +2,14 @@ package www.ontologyutils.apps;
 
 import java.util.*;
 
+import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
+import openllet.owlapi.OpenlletReasonerFactory;
+import uk.ac.manchester.cs.factplusplus.owlapi.FaCTPlusPlusReasonerFactory;
+import uk.ac.manchester.cs.jfact.JFactFactory;
+import www.ontologyutils.normalization.NnfNormalization;
 import www.ontologyutils.normalization.SroiqNormalization;
 import www.ontologyutils.repair.*;
 import www.ontologyutils.toolbox.*;
@@ -14,9 +20,11 @@ import www.ontologyutils.toolbox.*;
 public abstract class RepairApp extends App {
     private String inputFile;
     private String outputFile = null;
-    private boolean normalize = false;
+    private boolean normalizeSroiq = false;
+    private boolean normalizeNnf = false;
     private boolean repair = true;
-    private boolean verbose = false;
+    private OWLReasonerFactory reasonerFactory = new FaCTPlusPlusReasonerFactory();
+    private int verbose = 0;
 
     @Override
     protected List<Option<?>> appOptions() {
@@ -34,10 +42,20 @@ public abstract class RepairApp extends App {
             }
             outputFile = file.toString();
         }, "the file to write the result to"));
-        options.add(OptionType.FLAG.create('n', "normalize", b -> normalize = true,
+        options.add(OptionType.FLAG.create('n', "normalize", b -> normalizeSroiq = true,
                 "normalize the ontology before repair"));
+        options.add(OptionType.FLAG.create("normalize-nnf", b -> normalizeSroiq = true,
+                "normalize the ontology to NNF before repair"));
         options.add(OptionType.FLAG.create('R', "no-repair", b -> repair = false, "no not perform repair"));
-        options.add(OptionType.FLAG.create('v', "verbose", b -> verbose = true, "print more information"));
+        options.add(OptionType.FLAG.create('v', "verbose", b -> verbose = Integer.max(1, verbose),
+                "print more information"));
+        options.add(OptionType.FLAG.create('V', "extra-verbose", b -> verbose = 2, "print even more information"));
+        options.add(OptionType.options(
+                Map.of("hermit", new ReasonerFactory(),
+                        "jfact", new JFactFactory(),
+                        "openllet", OpenlletReasonerFactory.getInstance(),
+                        "fact++", new FaCTPlusPlusReasonerFactory()))
+                .create("reasoner", r -> reasonerFactory = r, "the reasoner to use"));
         return options;
     }
 
@@ -49,23 +67,28 @@ public abstract class RepairApp extends App {
     @Override
     protected void run() {
         var startTime = System.nanoTime();
-        var ontology = Ontology.loadOntology(inputFile);
+        var ontology = Ontology.loadOntology(inputFile, reasonerFactory);
         System.err.println("Loaded...");
-        if (normalize) {
-            var normalization = new SroiqNormalization();
-            System.err.println("Normalizing...");
+        if (normalizeNnf) {
+            var normalization = new NnfNormalization();
+            System.err.println("Normalizing to NNF...");
+            normalization.apply(ontology);
+        }
+        if (normalizeSroiq) {
+            var normalization = new SroiqNormalization(true, true);
+            System.err.println("Normalizing to SROIQ...");
             normalization.apply(ontology);
         }
         if (repair) {
             var repair = getRepair();
-            if (verbose) {
+            if (verbose >= 1) {
                 repair.setInfoCallback(this::logMessage);
             }
             System.err.println("Repairing...");
             repair.apply(ontology);
             System.err.println("Repaired.");
         }
-        if (verbose) {
+        if (verbose >= 2) {
             System.err.println("=== BEGIN RESULT ===");
             ontology.refutableAxioms().map(OWLAxiom::toString).map(Utils::pretty)
                     .sorted().forEach(System.out::println);

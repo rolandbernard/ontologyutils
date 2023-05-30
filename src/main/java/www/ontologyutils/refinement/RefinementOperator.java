@@ -77,7 +77,7 @@ public class RefinementOperator {
         @Override
         public Stream<OWLClassExpression> visit(OWLObjectIntersectionOf concept) {
             var conjuncts = concept.getOperandsAsList();
-            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0 && conjuncts.size() != 2) {
+            if ((flags & FLAG_SROIQ_STRICT) != 0 && conjuncts.size() != 2) {
                 throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             }
             return IntStream.range(0, conjuncts.size()).mapToObj(i -> i)
@@ -100,7 +100,7 @@ public class RefinementOperator {
         @Override
         public Stream<OWLClassExpression> visit(OWLObjectUnionOf concept) {
             var disjuncts = concept.getOperandsAsList();
-            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0 && disjuncts.size() != 2) {
+            if ((flags & FLAG_SROIQ_STRICT) != 0 && disjuncts.size() != 2) {
                 throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             }
             return IntStream.range(0, disjuncts.size()).mapToObj(i -> i)
@@ -179,7 +179,7 @@ public class RefinementOperator {
 
         @Override
         public Stream<OWLClassExpression> visit(OWLObjectExactCardinality concept) {
-            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
+            if ((flags & FLAG_SROIQ_STRICT) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             }
             var number = concept.getCardinality();
@@ -203,7 +203,7 @@ public class RefinementOperator {
         @Override
         public <T> Stream<OWLClassExpression> doDefault(T obj) throws IllegalArgumentException {
             var concept = (OWLClassExpression) obj;
-            if ((flags & (FLAG_ALC_STRICT | FLAG_SROIQ_STRICT)) != 0) {
+            if ((flags & FLAG_SROIQ_STRICT) != 0) {
                 throw new IllegalArgumentException("The concept " + concept + " is not a SROIQ concept.");
             } else {
                 return Stream.of();
