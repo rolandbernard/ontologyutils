@@ -322,7 +322,7 @@ public class RefinementOperator {
      *             If the axioms in this ontology are not
      *             supported by the current flags.
      */
-    public Stream<OWLClassExpression> refineReverse(OWLClassExpression concept) throws IllegalArgumentException {
+    public Stream<OWLClassExpression> corefine(OWLClassExpression concept) throws IllegalArgumentException {
         return visitor.reverse.refine(concept);
     }
 
@@ -336,19 +336,19 @@ public class RefinementOperator {
      *            true to force the returned role to be simple.
      * @return A stream of all refinements of {@code role} using the covers.
      */
-    public Stream<OWLObjectPropertyExpression> refineReverse(OWLObjectPropertyExpression role, boolean simple) {
+    public Stream<OWLObjectPropertyExpression> corefine(OWLObjectPropertyExpression role, boolean simple) {
         return visitor.reverse.refine(role, simple);
     }
 
     /**
      * Apply refinement to a role. This is equivalent of
-     * {@code this.refineReverse(role, true)}.
+     * {@code this.corefine(role, true)}.
      *
      * @param role
      *            The role that should be refined.
      * @return A stream of all refinements of {@code role} using the covers.
      */
-    public Stream<OWLObjectPropertyExpression> refineReverse(OWLObjectPropertyExpression role) {
-        return this.refineReverse(role, true);
+    public Stream<OWLObjectPropertyExpression> corefine(OWLObjectPropertyExpression role) {
+        return this.corefine(role, true);
     }
 }

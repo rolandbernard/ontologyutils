@@ -28,11 +28,17 @@ public class ClassifyOntology extends App {
     public void run() {
         var ontology = Ontology.loadOntology(inputFile).withHermit();
         System.out.print("OWL 2 profiles: ");
-        ontology.checkOwlProfiles().forEach(profile -> {
-            if (profile.isInProfile()) {
-                System.out.print(profile.getProfile().getName() + "; ");
+        var reports = ontology.checkOwlProfiles();
+        for (var report : reports) {
+            if (!report.isInProfile() && report.getProfile().getName().endsWith("DL")) {
+                System.out.print(report);
             }
-        });
+        }
+        for (var report : reports) {
+            if (report.isInProfile()) {
+                System.out.print(report.getProfile().getName() + "; ");
+            }
+        }
         System.out.println();
         System.out.print("DL languages: ");
         ontology.checkDlExpressivity().forEach(language -> {
