@@ -38,8 +38,8 @@ public class AxiomStrengthener extends AxiomRefinement {
 
     private AxiomStrengthener(Cover upCover, Cover downCover, Set<OWLObjectPropertyExpression> simpleRoles,
             PreorderCache<OWLObjectProperty> regularPreorder, int flags) {
-        super(new Visitor(new RefinementOperator(downCover, upCover, flags, simpleRoles),
-                new RefinementOperator(upCover, downCover, flags, simpleRoles), simpleRoles, regularPreorder, flags));
+        super(new Visitor(new RefinementOperator(downCover, upCover, flags),
+                new RefinementOperator(upCover, downCover, flags), simpleRoles, regularPreorder, flags));
     }
 
     private AxiomStrengthener(Covers covers, Set<OWLObjectPropertyExpression> simpleRoles,

@@ -101,8 +101,8 @@ public class AxiomWeakener extends AxiomRefinement {
 
     private AxiomWeakener(Cover upCover, Cover downCover, Set<OWLObjectPropertyExpression> simpleRoles,
             PreorderCache<OWLObjectProperty> regularPreorder, int flags) {
-        super(new Visitor(new RefinementOperator(upCover, downCover, flags, simpleRoles),
-                new RefinementOperator(downCover, upCover, flags, simpleRoles), simpleRoles, regularPreorder, flags));
+        super(new Visitor(new RefinementOperator(upCover, downCover, flags),
+                new RefinementOperator(downCover, upCover, flags), simpleRoles, regularPreorder, flags));
     }
 
     private AxiomWeakener(Covers covers, Set<OWLObjectPropertyExpression> simpleRoles,

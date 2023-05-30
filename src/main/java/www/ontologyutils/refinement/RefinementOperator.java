@@ -241,12 +241,8 @@ public class RefinementOperator {
      *            FLAG_ALC_STRICT is set, an exception will be raised if a concept
      *            is not valid in ALC. If FLAG_NNF_STRICT is set, the input must
      *            be in NNF and the output will also be in NNF.
-     * @param simpleRoles
-     *            The roles that are guaranteed to be simple in all ontologies the
-     *            resulting concepts will be used in. If null is used, all roles
-     *            returned by the covers are assumed to be simple.
      */
-    public RefinementOperator(Cover way, Cover back, int flags, Set<OWLObjectPropertyExpression> simpleRoles) {
+    public RefinementOperator(Cover way, Cover back, int flags) {
         visitor = new Visitor(way, back, flags);
         visitor.reverse = new Visitor(back, way, flags);
         visitor.reverse.reverse = visitor;
@@ -263,7 +259,7 @@ public class RefinementOperator {
      *            upward cover.
      */
     public RefinementOperator(Cover way, Cover back) {
-        this(way, back, FLAG_DEFAULT, null);
+        this(way, back, FLAG_DEFAULT);
     }
 
     /**
