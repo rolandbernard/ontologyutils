@@ -2,10 +2,10 @@ package www.ontologyutils.apps;
 
 import java.util.*;
 
-import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.*;
 
-import www.ontologyutils.toolbox.Ontology;
-import www.ontologyutils.toolbox.Utils;
+import www.ontologyutils.normalization.SroiqNormalization;
+import www.ontologyutils.toolbox.*;
 
 /**
  * Remove all annotations, annotation axioms, and imports of the ontology.
@@ -45,6 +45,17 @@ public class CleanupOntology extends App {
                 newOntology.addAxioms(newAxiom);
             }
         }
+        for (var report : newOntology.checkOwlProfiles()) {
+            if (!report.isInProfile() && report.getProfile().getName().endsWith("DL")) {
+                for (var violation : report.getViolations()) {
+                    newOntology.removeAxioms(violation.getAxiom());
+                }
+            }
+        }
+        System.err.println("Cleaned. (" + newOntology.logicalAxioms().count() + " axioms)");
+        var normalize = new SroiqNormalization();
+        normalize.apply(newOntology);
+        System.err.println("Normalized. (" + newOntology.logicalAxioms().count() + " axioms)");
         newOntology.generateDeclarationAxioms();
         if (outputFile != null) {
             newOntology.saveOntology(outputFile);

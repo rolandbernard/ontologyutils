@@ -67,6 +67,9 @@ public class RepairWeakening extends RepairApp {
         options.add(OptionType.FLAG.create("simple-ria-weakening", b -> {
             weakeningFlags |= AxiomWeakener.FLAG_RIA_ONLY_SIMPLE;
         }, "do not use the more advanced RIA weakening"));
+        options.add(OptionType.FLAG.create("no-role-refinement", b -> {
+            weakeningFlags |= AxiomWeakener.FLAG_NO_ROLE_REFINEMENT;
+        }, "do not refine roles in any context"));
         options.add(OptionType.options(
                 Map.of("troquard2018", 2018,
                         "confalonieri2020", 2020,
@@ -78,7 +81,7 @@ public class RepairWeakening extends RepairApp {
                         badAxiomStrategy = BadAxiomStrategy.IN_SOME_MUS;
                         weakeningFlags = AxiomWeakener.FLAG_SROIQ_STRICT | AxiomWeakener.FLAG_SIMPLE_ROLES_STRICT
                                 | AxiomWeakener.FLAG_RIA_ONLY_SIMPLE | AxiomWeakener.FLAG_NNF_STRICT
-                                | AxiomWeakener.FLAG_ALC_STRICT;
+                                | AxiomWeakener.FLAG_ALC_STRICT | AxiomWeakener.FLAG_NO_ROLE_REFINEMENT;
                     } else if (preset == 2020) {
                         refOntologyStrategy = RefOntologyStrategy.ONE_MCS;
                         badAxiomStrategy = BadAxiomStrategy.IN_SOME_MUS;

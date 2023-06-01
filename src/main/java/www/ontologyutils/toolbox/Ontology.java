@@ -7,7 +7,6 @@ import java.util.stream.*;
 
 import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.profiles.*;
 import org.semanticweb.owlapi.reasoner.*;
@@ -33,6 +32,7 @@ public class Ontology implements AutoCloseable {
      * This is only here for statistics
      */
     public static int reasonerCalls;
+    public static boolean originAnnotation = false;
 
     private static class ReasonerCache {
         private OWLReasonerFactory reasonerFactory;
@@ -348,7 +348,7 @@ public class Ontology implements AutoCloseable {
         this.<Void>withOwlOntologyDo(ontology -> {
             var ontologyFile = new File(filePath);
             try {
-                ontology.saveOntology(new FunctionalSyntaxDocumentFormat(), IRI.create(ontologyFile));
+                ontology.saveOntology(IRI.create(ontologyFile));
             } catch (OWLOntologyStorageException e) {
                 Utils.panic(e);
             }
@@ -625,7 +625,7 @@ public class Ontology implements AutoCloseable {
      * @return A new annotated axiom equivalent to {@code axiom}.
      */
     public static OWLAxiom getOriginAnnotatedAxiom(OWLAxiom axiom, OWLAxiom origin) {
-        if (axiom.equals(origin)) {
+        if (!originAnnotation || axiom.equals(origin)) {
             return axiom;
         } else {
             return axiom.getAnnotatedAxiom(axiomOriginAnnotations(origin));

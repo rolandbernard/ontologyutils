@@ -57,6 +57,11 @@ public abstract class AxiomRefinement {
      * Use only simple roles for role inclusion axiom weakening.
      */
     public static final int FLAG_RIA_ONLY_SIMPLE = 1 << 6;
+    /**
+     * Completely disallow refinement of roles, by not giving the cover any roles to
+     * select from.
+     */
+    public static final int FLAG_NO_ROLE_REFINEMENT = 1 << 7;
 
     /**
      * Visitor implementing the actual weakening.
