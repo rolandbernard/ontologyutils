@@ -116,4 +116,11 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
         ontology.removeAxioms(toRemove);
         infoMessage("Selected a repair with " + ontology.axioms().count() + " axioms.");
     }
+
+    @Override
+    public Stream<Ontology> multiple(Ontology ontology) throws IllegalArgumentException {
+        // Optimized version that returns every possible repair only once.
+        return mcsPeekInfo(false, computeMcs(ontology))
+                .map(axioms -> ontology.cloneWithRefutable(ontology.complement(axioms)));
+    }
 }

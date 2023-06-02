@@ -53,14 +53,15 @@ public class CleanupOntology extends App {
             }
         }
         System.err.println("Cleaned. (" + newOntology.logicalAxioms().count() + " axioms)");
-        var normalize = new SroiqNormalization();
+        var normalize = new SroiqNormalization(true, false);
         normalize.apply(newOntology);
         System.err.println("Normalized. (" + newOntology.logicalAxioms().count() + " axioms)");
         newOntology.generateDeclarationAxioms();
-        if (outputFile != null) {
-            newOntology.saveOntology(outputFile);
-            System.err.println("Saved. (" + newOntology.logicalAxioms().count() + " axioms)");
+        if (outputFile == null) {
+            outputFile = inputFile;
         }
+        newOntology.saveOntology(outputFile);
+        System.err.println("Saved. (" + newOntology.logicalAxioms().count() + " axioms)");
     }
 
     /**

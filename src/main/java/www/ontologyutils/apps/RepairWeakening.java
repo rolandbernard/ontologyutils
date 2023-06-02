@@ -89,7 +89,7 @@ public class RepairWeakening extends RepairApp {
                                 | AxiomWeakener.FLAG_RIA_ONLY_SIMPLE | AxiomWeakener.FLAG_NNF_STRICT
                                 | AxiomWeakener.FLAG_SROIQ_STRICT;
                     } else if (preset == 2023) {
-                        refOntologyStrategy = RefOntologyStrategy.INTERSECTION_OF_SOME_MCS;
+                        refOntologyStrategy = RefOntologyStrategy.ONE_MCS;
                         badAxiomStrategy = BadAxiomStrategy.IN_SOME_MUS;
                         weakeningFlags = AxiomWeakener.FLAG_SROIQ_STRICT | AxiomWeakener.FLAG_SIMPLE_ROLES_STRICT
                                 | AxiomWeakener.FLAG_RIA_ONLY_SIMPLE;

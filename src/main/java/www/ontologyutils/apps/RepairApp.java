@@ -24,7 +24,11 @@ public abstract class RepairApp extends App {
     private boolean normalizeNnf = false;
     private boolean repair = true;
     private OWLReasonerFactory reasonerFactory = new FaCTPlusPlusReasonerFactory();
+    private int limit = 1;
     private int verbose = 0;
+
+    private long lastStart;
+    private int lastCalls;
 
     @Override
     protected List<Option<?>> appOptions() {
@@ -50,6 +54,9 @@ public abstract class RepairApp extends App {
         options.add(OptionType.FLAG.create('v', "verbose", b -> verbose = Integer.max(1, verbose),
                 "print more information"));
         options.add(OptionType.FLAG.create('V', "extra-verbose", b -> verbose = 2, "print even more information"));
+        options.add(OptionType.INT.create("limit", i -> limit = i, "number of repairs to generate"));
+        options.add(OptionType.INT.create("no-limit", i -> limit = Integer.MAX_VALUE,
+                "only stop once all repairs have been generated"));
         options.add(OptionType.options(
                 Map.of("hermit", new ReasonerFactory(),
                         "jfact", new JFactFactory(),
@@ -64,9 +71,35 @@ public abstract class RepairApp extends App {
      */
     protected abstract OntologyRepair getRepair();
 
+    private void saveResult(Ontology ontology, int i) {
+        if (verbose >= 2) {
+            System.err.println("=== BEGIN RESULT ===");
+            ontology.refutableAxioms().map(OWLAxiom::toString).map(Utils::pretty)
+                    .sorted().forEach(System.out::println);
+            ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
+                    .sorted().forEach(System.out::println);
+            assert ontology.isConsistent();
+            System.err.println("==== END RESULT ====");
+        }
+        if (outputFile != null) {
+            if (limit > 1 || i != 0) {
+                ontology.saveOntology(outputFile.replaceAll(".owl$", "") + "-" + i + ".owl");
+            } else {
+                ontology.saveOntology(outputFile);
+            }
+            var currentTime = System.nanoTime();
+            System.err.println("Saved result. (" + (currentTime - lastStart) / 1_000_000 + " ms; "
+                    + (Ontology.reasonerCalls - lastCalls) + " reasoner calls)");
+            lastStart = currentTime;
+            lastCalls = Ontology.reasonerCalls;
+        }
+    }
+
     @Override
     protected void run() {
         var startTime = System.nanoTime();
+        lastStart = startTime;
+        lastCalls = Ontology.reasonerCalls;
         var ontology = Ontology.loadOntology(inputFile, reasonerFactory);
         System.err.println("Loaded...");
         if (normalizeNnf) {
@@ -85,21 +118,19 @@ public abstract class RepairApp extends App {
                 repair.setInfoCallback(this::logMessage);
             }
             System.err.println("Repairing...");
+            var i = new int[1];
+            try (var stream = repair.multiple(ontology)) {
+                stream.limit(limit).forEach(onto -> {
+                    saveResult(onto, i[0]);
+                    onto.close();
+                    i[0]++;
+                });
+            }
             repair.apply(ontology);
-            System.err.println("Repaired.");
-        }
-        if (verbose >= 2) {
-            System.err.println("=== BEGIN RESULT ===");
-            ontology.refutableAxioms().map(OWLAxiom::toString).map(Utils::pretty)
-                    .sorted().forEach(System.out::println);
-            ontology.staticAxioms().map(OWLAxiom::toString).map(Utils::pretty)
-                    .sorted().forEach(System.out::println);
-            assert ontology.isConsistent();
-            System.err.println("==== END RESULT ====");
-        }
-        if (outputFile != null) {
-            ontology.saveOntology(outputFile);
-            System.err.println("Saved result.");
+            System.err.println(
+                    "Repaired.");
+        } else {
+            saveResult(ontology, 0);
         }
         ontology.close();
         var endTime = System.nanoTime();

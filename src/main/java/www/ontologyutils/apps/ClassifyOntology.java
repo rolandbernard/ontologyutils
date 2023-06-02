@@ -27,8 +27,9 @@ public class ClassifyOntology extends App {
     @Override
     public void run() {
         var ontology = Ontology.loadOntology(inputFile).withHermit();
-        System.out.println("Axioms: " + ontology.logicalAxioms().count() + "; Concepts: "
-                + ontology.conceptsInSignature().count() + "; Roles: " + ontology.rolesInSignature().count());
+        System.out.println("Axioms: " + ontology.logicalAxioms().count() + "; Concept names: "
+                + ontology.conceptsInSignature().count() + "; Role names: " + ontology.rolesInSignature().count()
+                + "; Subconcepts: " + ontology.subConcepts().count());
         System.out.print("OWL 2 profiles: ");
         var reports = ontology.checkOwlProfiles();
         for (var report : reports) {

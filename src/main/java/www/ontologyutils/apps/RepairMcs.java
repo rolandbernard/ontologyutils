@@ -3,27 +3,36 @@ package www.ontologyutils.apps;
 import java.util.*;
 
 import www.ontologyutils.repair.*;
+import www.ontologyutils.repair.OntologyRepairRandomMcs.McsComputationStrategy;
+import www.ontologyutils.toolbox.Ontology;
 
 /**
  * Repair the given ontology using a random maximal consistent subset.
  */
-public class RepairRandomMcs extends RepairApp {
+public class RepairMcs extends RepairApp {
     private boolean coherence = false;
+    private McsComputationStrategy mcsComputation = McsComputationStrategy.SOME_MCS;
 
     @Override
     protected List<Option<?>> appOptions() {
         var options = new ArrayList<Option<?>>();
         options.addAll(super.appOptions());
         options.add(OptionType.FLAG.create("coherence", b -> coherence = true, "make the ontology coherent"));
+        options.add(OptionType.options(
+                Map.of("one", McsComputationStrategy.ONE_MCS,
+                        "some", McsComputationStrategy.SOME_MCS,
+                        "all", McsComputationStrategy.ALL_MCS))
+                .create("compute", method -> mcsComputation = method,
+                        "how many maximal consistent subsets to compute"));
         return options;
     }
 
     @Override
     protected OntologyRepair getRepair() {
         if (coherence) {
-            return OntologyRepairRandomMcs.forCoherence();
+            return new OntologyRepairRandomMcs(Ontology::isCoherent, mcsComputation);
         } else {
-            return OntologyRepairRandomMcs.forConsistency();
+            return new OntologyRepairRandomMcs(Ontology::isConsistent, mcsComputation);
         }
     }
 
@@ -37,6 +46,6 @@ public class RepairRandomMcs extends RepairApp {
      *            ontology.
      */
     public static void main(String[] args) {
-        (new RepairRandomMcs()).launch(args);
+        (new RepairMcs()).launch(args);
     }
 }

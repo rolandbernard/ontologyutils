@@ -1,6 +1,10 @@
 package www.ontologyutils.repair;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -278,5 +282,40 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 ontology.replaceAxiom(badAxiom, weakerAxiom);
             }
         }
+    }
+
+    @Override
+    public Stream<Ontology> multiple(Ontology ontology) {
+        // Optimized version that reuses the cached reasoners and axiom weakeners.
+        var executor = Executors.newSingleThreadExecutor();
+        var weakeners = new HashMap<Set<OWLAxiom>, AxiomWeakener>();
+        return Stream.generate(() -> {
+            var handler = executor.submit(() -> {
+                var refAxioms = Utils.randomChoice(getRefAxioms(ontology));
+                AxiomWeakener axiomWeakener;
+                synchronized (weakeners) {
+                    axiomWeakener = weakeners.computeIfAbsent(refAxioms,
+                            ax -> getWeakener(ontology.cloneWithRefutable(ax).withSeparateCache(), ontology));
+                }
+                var copy = ontology.clone();
+                while (!isRepaired(copy)) {
+                    var badAxioms = Utils.toList(findBadAxioms(copy));
+                    var badAxiom = Utils.randomChoice(badAxioms);
+                    var weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(badAxiom));
+                    var weakerAxiom = Utils.randomChoice(weakerAxioms);
+                    copy.replaceAxiom(badAxiom, weakerAxiom);
+                }
+                infoMessage("Found repair.");
+                return copy;
+            });
+            try {
+                return handler.get(10, TimeUnit.MINUTES);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e.getCause());
+            } catch (TimeoutException | InterruptedException e) {
+                handler.cancel(true);
+                return null;
+            }
+        }).filter(onto -> onto != null).onClose(() -> executor.shutdown());
     }
 }
