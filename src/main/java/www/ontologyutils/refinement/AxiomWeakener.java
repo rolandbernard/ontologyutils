@@ -133,7 +133,9 @@ public class AxiomWeakener extends AxiomRefinement {
     public AxiomWeakener(Ontology refOntology, Ontology fullOntology, int flags) {
         this(refOntology, Utils.toSet(fullOntology.subConcepts()),
                 Utils.toSet(fullOntology.subRoles()), Utils.toSet(fullOntology.simpleRoles()),
-                (flags & FLAG_RIA_ONLY_SIMPLE) != 0 ? null : fullOntology.regularPreorder(), flags);
+                (flags & (FLAG_RIA_ONLY_SIMPLE | FLAG_SIMPLE_ROLES_STRICT)) != 0 ? null
+                        : fullOntology.regularPreorder(),
+                flags);
     }
 
     /**

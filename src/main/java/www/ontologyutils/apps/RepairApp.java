@@ -24,7 +24,7 @@ public abstract class RepairApp extends App {
     private boolean normalizeNnf = false;
     private boolean repair = true;
     private OWLReasonerFactory reasonerFactory = new FaCTPlusPlusReasonerFactory();
-    private int limit = 1;
+    private int limit = 0;
     private int verbose = 0;
 
     private long lastStart;
@@ -119,16 +119,18 @@ public abstract class RepairApp extends App {
             }
             System.err.println("Repairing...");
             var i = new int[1];
-            try (var stream = repair.multiple(ontology)) {
-                stream.limit(limit).forEach(onto -> {
-                    saveResult(onto, i[0]);
-                    onto.close();
-                    i[0]++;
-                });
+            if (limit == 0) {
+                repair.apply(ontology);
+            } else {
+                try (var stream = repair.multiple(ontology)) {
+                    stream.limit(limit).forEach(onto -> {
+                        saveResult(onto, i[0]);
+                        onto.close();
+                        i[0]++;
+                    });
+                }
             }
-            repair.apply(ontology);
-            System.err.println(
-                    "Repaired.");
+            System.err.println("Repaired.");
         } else {
             saveResult(ontology, 0);
         }

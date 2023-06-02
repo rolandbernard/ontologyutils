@@ -32,7 +32,7 @@ public abstract class AxiomRefinement {
     /**
      * Accept only axioms that have direct equivalents in ALC.
      */
-    public static final int FLAG_ALC_STRICT = (1 << 1) | AxiomRefinement.FLAG_SROIQ_STRICT;
+    public static final int FLAG_ALC_STRICT = 1 << 1;
     /**
      * Accept only axioms that have direct equivalents in SROIQ.
      */
@@ -48,7 +48,7 @@ public abstract class AxiomRefinement {
      * Refine roles only with simple roles, even in a context that allows complex
      * roles. (Implies also the use of simple RIA refinement.)
      */
-    public static final int FLAG_SIMPLE_ROLES_STRICT = (1 << 4) | AxiomRefinement.FLAG_RIA_ONLY_SIMPLE;
+    public static final int FLAG_SIMPLE_ROLES_STRICT = 1 << 4;
     /**
      * Do not use a cache for the covers.
      */
