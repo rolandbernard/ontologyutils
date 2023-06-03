@@ -309,10 +309,13 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 return copy;
             });
             try {
-                return handler.get(10, TimeUnit.MINUTES);
+                return handler.get(5, TimeUnit.MINUTES);
             } catch (ExecutionException e) {
-                throw new RuntimeException(e.getCause());
+                e.printStackTrace();
+                handler.cancel(true);
+                return null;
             } catch (TimeoutException | InterruptedException e) {
+                infoMessage("Timed out.");
                 handler.cancel(true);
                 return null;
             }

@@ -30,6 +30,11 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
          * Compute one maximal consistent subset.
          */
         ONE_MCS,
+        /**
+         * Compute an infinite set by sampling subsets. Only usable with the multiple
+         * repairs methods, as it will never terminate.
+         */
+        SAMPLE_MCS,
     }
 
     private McsComputationStrategy mcsComputation;
@@ -105,6 +110,8 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
                 return ontology.someMinimalCorrectionSubsets(isRepaired);
             case ONE_MCS:
                 return Stream.of(ontology.minimalCorrectionSubset(isRepaired));
+            case SAMPLE_MCS:
+                return Stream.generate(() -> ontology.minimalCorrectionSubset(isRepaired));
             default:
                 throw new IllegalArgumentException("Unimplemented maximal consistent subset computation method.");
         }
@@ -120,7 +127,7 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
     @Override
     public Stream<Ontology> multiple(Ontology ontology) throws IllegalArgumentException {
         // Optimized version that returns every possible repair only once.
-        return mcsPeekInfo(false, computeMcs(ontology))
+        return mcsPeekInfo(true, computeMcs(ontology))
                 .map(axioms -> ontology.cloneWithRefutable(ontology.complement(axioms)));
     }
 }

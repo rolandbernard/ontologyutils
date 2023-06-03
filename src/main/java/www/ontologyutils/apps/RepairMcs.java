@@ -21,7 +21,8 @@ public class RepairMcs extends RepairApp {
         options.add(OptionType.options(
                 Map.of("one", McsComputationStrategy.ONE_MCS,
                         "some", McsComputationStrategy.SOME_MCS,
-                        "all", McsComputationStrategy.ALL_MCS))
+                        "all", McsComputationStrategy.ALL_MCS,
+                        "sample", McsComputationStrategy.SAMPLE_MCS))
                 .create("compute", method -> mcsComputation = method,
                         "how many maximal consistent subsets to compute"));
         return options;
