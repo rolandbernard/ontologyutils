@@ -2,7 +2,13 @@ package www.ontologyutils.apps;
 
 import java.util.*;
 
+import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+
+import openllet.owlapi.OpenlletReasonerFactory;
+import uk.ac.manchester.cs.factplusplus.owlapi.FaCTPlusPlusReasonerFactory;
+import uk.ac.manchester.cs.jfact.JFactFactory;
 
 import www.ontologyutils.normalization.SroiqNormalization;
 import www.ontologyutils.refinement.AxiomStrengthener;
@@ -13,6 +19,8 @@ import www.ontologyutils.toolbox.*;
  * axioms.
  */
 public class MakeInconsistent extends App {
+    private OWLReasonerFactory reasonerFactory = new FaCTPlusPlusReasonerFactory();
+    private int strengtheningFlags = AxiomStrengthener.FLAG_DEFAULT;
     private String inputFile;
     private String outputFile = null;
     private boolean normalize = false;
@@ -38,6 +46,18 @@ public class MakeInconsistent extends App {
         }, "the file to write the result to"));
         options.add(OptionType.FLAG.create('n', "normalize", b -> normalize = true,
                 "normalize the ontology beforehand"));
+        options.add(OptionType.FLAG.create("uncached", b -> {
+            strengtheningFlags |= AxiomStrengthener.FLAG_UNCACHED;
+        }, "do not use any caches for the covers"));
+        options.add(OptionType.FLAG.create("strict-sroiq", b -> {
+            strengtheningFlags |= AxiomStrengthener.FLAG_SROIQ_STRICT;
+        }, "accept and produce only SROIQ axioms"));
+        options.add(OptionType.options(
+                Map.of("hermit", new ReasonerFactory(),
+                        "jfact", new JFactFactory(),
+                        "openllet", OpenlletReasonerFactory.getInstance(),
+                        "fact++", new FaCTPlusPlusReasonerFactory()))
+                .create("reasoner", r -> reasonerFactory = r, "the reasoner to use"));
         options.add(OptionType.FLAG.create('v', "verbose", b -> verbose = true, "print more information"));
         options.add(OptionType.UINT.create("min-iter", i -> minIter = i, "minimum number of iterations to perform"));
         options.add(OptionType.UINT.create("min-after", i -> minAfter = i, "minimum iterations after inconsistency"));
@@ -47,7 +67,7 @@ public class MakeInconsistent extends App {
     @Override
     public void run() {
         var startTime = System.nanoTime();
-        var ontology = Ontology.loadOntology(inputFile);
+        var ontology = Ontology.loadOntology(inputFile, reasonerFactory);
         System.err.println("Loaded... (" + ontology.logicalAxioms().count() + " axioms)");
         if (normalize) {
             var normalization = new SroiqNormalization();
@@ -59,7 +79,7 @@ public class MakeInconsistent extends App {
             return;
         }
         var emptyOntology = ontology.cloneOnlyStatic();
-        var axiomStrengthener = new AxiomStrengthener(ontology);
+        var axiomStrengthener = new AxiomStrengthener(ontology, strengtheningFlags);
         int iter = 0;
         int iterSinceInconsistency = 0;
         boolean isConsistent = ontology.isConsistent();

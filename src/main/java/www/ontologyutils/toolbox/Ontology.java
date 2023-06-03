@@ -160,6 +160,12 @@ public class Ontology implements AutoCloseable {
             var reasoner = getOwlReasoner(ontology);
             try {
                 return action.apply(reasoner);
+            } catch (ReasonerInternalException ex) {
+                // Nothing we can really do here, try again with a new reasoner.
+                ex.printStackTrace();
+                reasoner.dispose();
+                reasoner = null;
+                return withReasonerDo(ontology, action);
             } catch (Exception ex) {
                 // Reusing the reasoner after an exception is not a good idea.
                 reasoner.dispose();

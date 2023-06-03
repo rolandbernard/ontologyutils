@@ -12,9 +12,9 @@ import www.ontologyutils.toolbox.Ontology;
  */
 public class RepairWeakening extends RepairApp {
     private boolean coherence = false;
-    RefOntologyStrategy refOntologyStrategy = RefOntologyStrategy.ONE_MCS;
-    BadAxiomStrategy badAxiomStrategy = BadAxiomStrategy.IN_SOME_MUS;
-    int weakeningFlags = AxiomWeakener.FLAG_DEFAULT;
+    private RefOntologyStrategy refOntologyStrategy = RefOntologyStrategy.ONE_MCS;
+    private BadAxiomStrategy badAxiomStrategy = BadAxiomStrategy.IN_SOME_MUS;
+    private int weakeningFlags = AxiomWeakener.FLAG_DEFAULT;
 
     @Override
     protected List<Option<?>> appOptions() {
