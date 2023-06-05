@@ -52,6 +52,18 @@ public class MakeInconsistent extends App {
         options.add(OptionType.FLAG.create("strict-sroiq", b -> {
             strengtheningFlags |= AxiomStrengthener.FLAG_SROIQ_STRICT;
         }, "accept and produce only SROIQ axioms"));
+        options.add(OptionType.FLAG.create("strict-sroiq", b -> {
+            strengtheningFlags |= AxiomStrengthener.FLAG_SROIQ_STRICT;
+        }, "accept and produce only SROIQ axioms"));
+        options.add(OptionType.FLAG.create("strict-simple-roles", b -> {
+            strengtheningFlags |= AxiomStrengthener.FLAG_SIMPLE_ROLES_STRICT;
+        }, "use only simple roles in upward and downward covers"));
+        options.add(OptionType.FLAG.create("simple-ria-weakening", b -> {
+            strengtheningFlags |= AxiomStrengthener.FLAG_RIA_ONLY_SIMPLE;
+        }, "do not use the more advanced RIA weakening"));
+        options.add(OptionType.FLAG.create("strict-owl2", b -> {
+            strengtheningFlags |= AxiomStrengthener.FLAG_OWL2_SET_OPERANDS;
+        }, "do not produce intersection and union with a single operand"));
         options.add(OptionType.options(
                 Map.of("hermit", new ReasonerFactory(),
                         "jfact", new JFactFactory(),
