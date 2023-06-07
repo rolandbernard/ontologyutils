@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 
 import org.semanticweb.owlapi.model.OWLClassExpression;
 
+import www.ontologyutils.normalization.SroiqNormalization;
 import www.ontologyutils.refinement.*;
 import www.ontologyutils.toolbox.*;
 
@@ -14,6 +15,7 @@ import www.ontologyutils.toolbox.*;
  */
 public class Benchmark extends App {
     private String inputFile;
+    private boolean normalizeSroiq = false;
 
     @Override
     protected List<Option<?>> appOptions() {
@@ -25,6 +27,8 @@ public class Benchmark extends App {
             }
             inputFile = file.toString();
         }, "the file containing the original ontology"));
+        options.add(OptionType.FLAG.create('n', "normalize", b -> normalizeSroiq = true,
+                "normalize the ontology before tests"));
         return options;
     }
 
@@ -74,29 +78,38 @@ public class Benchmark extends App {
     protected void run() {
         var ontology = Ontology.loadOntology(inputFile);
         System.err.println("Loaded...");
+        if (normalizeSroiq) {
+            var normalization = new SroiqNormalization(true, true);
+            System.err.println("Normalizing to SROIQ...");
+            normalization.apply(ontology);
+        }
         System.err.println("** Benchmark: FaCT++");
         try (var withFactPP = ontology.cloneWithFactPP()) {
             benchOntology(withFactPP);
         } catch (Exception e) {
             System.err.println("ERROR... " + e);
+            e.printStackTrace();
         }
         System.err.println("** Benchmark: OPENLLET");
         try (var withOpenllet = ontology.cloneWithOpenllet()) {
             benchOntology(withOpenllet);
         } catch (Exception e) {
             System.err.println("ERROR... " + e);
+            e.printStackTrace();
         }
         System.err.println("** Benchmark: FACT");
         try (var withFact = ontology.cloneWithJFact()) {
             benchOntology(withFact);
         } catch (Exception e) {
             System.out.println("ERROR... " + e);
+            e.printStackTrace();
         }
         System.err.println("** Benchmark: HERMIT");
         try (var withHermit = ontology.cloneWithHermit()) {
             benchOntology(withHermit);
         } catch (Exception e) {
             System.err.println("ERROR... " + e);
+            e.printStackTrace();
         }
         ontology.close();
     }

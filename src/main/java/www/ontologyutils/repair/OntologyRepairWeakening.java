@@ -1,10 +1,6 @@
 package www.ontologyutils.repair;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -287,10 +283,9 @@ public class OntologyRepairWeakening extends OntologyRepair {
     @Override
     public Stream<Ontology> multiple(Ontology ontology) {
         // Optimized version that reuses the cached reasoners and axiom weakeners.
-        var executor = Executors.newSingleThreadExecutor();
         var weakeners = new HashMap<Set<OWLAxiom>, AxiomWeakener>();
         return Stream.generate(() -> {
-            var handler = executor.submit(() -> {
+            try {
                 var refAxioms = Utils.randomChoice(getRefAxioms(ontology));
                 AxiomWeakener axiomWeakener;
                 synchronized (weakeners) {
@@ -300,25 +295,21 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 var copy = ontology.clone();
                 while (!isRepaired(copy)) {
                     var badAxioms = Utils.toList(findBadAxioms(copy));
+                    infoMessage("Found " + badAxioms.size() + " possible bad axioms.");
                     var badAxiom = Utils.randomChoice(badAxioms);
+                    infoMessage("Selected the bad axiom " + Utils.prettyPrintAxiom(badAxiom) + ".");
                     var weakerAxioms = Utils.toList(axiomWeakener.weakerAxioms(badAxiom));
+                    infoMessage("Found " + weakerAxioms.size() + " weaker axioms.");
                     var weakerAxiom = Utils.randomChoice(weakerAxioms);
+                    infoMessage("Selected the weaker axiom " + Utils.prettyPrintAxiom(weakerAxiom) + ".");
                     copy.replaceAxiom(badAxiom, weakerAxiom);
                 }
                 infoMessage("Found repair.");
                 return copy;
-            });
-            try {
-                return handler.get(5, TimeUnit.MINUTES);
-            } catch (ExecutionException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-                handler.cancel(true);
-                return null;
-            } catch (TimeoutException | InterruptedException e) {
-                infoMessage("Timed out.");
-                handler.cancel(true);
                 return null;
             }
-        }).filter(onto -> onto != null).onClose(() -> executor.shutdown());
+        }).filter(onto -> onto != null);
     }
 }

@@ -1011,11 +1011,12 @@ public class Ontology implements AutoCloseable {
      * @return A stream of some minimal correction subset.
      */
     public Stream<Set<OWLAxiom>> someMinimalCorrectionSubsets(Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.randomizedMinimalSubsets(refutableAxioms, 1, axioms -> {
-            try (var ontology = new Ontology(staticAxioms, complement(axioms), reasonerCache)) {
-                return isRepaired.test(ontology);
-            }
-        });
+        return IntStream.range(0, 16)
+                .mapToObj(i -> MinimalSubsets.getRandomizedMinimalSubset(refutableAxioms, axioms -> {
+                    try (var ontology = new Ontology(staticAxioms, complement(axioms), reasonerCache)) {
+                        return isRepaired.test(ontology);
+                    }
+                })).distinct();
     }
 
     /**
@@ -1025,11 +1026,12 @@ public class Ontology implements AutoCloseable {
      *         unsatisfiable subset.
      */
     public Stream<Set<OWLAxiom>> someMinimalUnsatisfiableSubsets(Predicate<Ontology> isRepaired) {
-        return MinimalSubsets.randomizedMinimalSubsets(refutableAxioms, 1, axioms -> {
-            try (var ontology = new Ontology(staticAxioms, axioms, reasonerCache)) {
-                return !isRepaired.test(ontology);
-            }
-        });
+        return IntStream.range(0, 16)
+                .mapToObj(i -> MinimalSubsets.getRandomizedMinimalSubset(refutableAxioms, axioms -> {
+                    try (var ontology = new Ontology(staticAxioms, axioms, reasonerCache)) {
+                        return !isRepaired.test(ontology);
+                    }
+                })).distinct();
     }
 
     /**
@@ -1144,15 +1146,45 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
-     * @return The stream of C1 subclass C2 axioms, C1 and C2 classes in the
-     *         signature of {@code ontology}, entailed by {@code ontology}.
+     * @param concepts
+     *            The concepts over which to build the
+     * @return The stream of C1 subclass C2 axioms, C1 and C2 subconcepts in of this
+     *         ontology, entailed by this ontology.
      */
-    public Stream<OWLSubClassOfAxiom> inferredTaxonomyAxioms() {
+    public Stream<OWLSubClassOfAxiom> inferredSubsumptionsOver(Set<OWLClassExpression> concepts) {
         var df = getDefaultDataFactory();
         var cache = new SubClassCache();
-        return conceptsInSignature().flatMap(subClass -> conceptsInSignature()
+        return concepts.stream().flatMap(subClass -> concepts.stream()
                 .filter(superClass -> cache.computeIfAbsent(subClass, superClass, this::isSubClass))
                 .map(superClass -> df.getOWLSubClassOfAxiom(subClass, superClass)));
+    }
+
+    /**
+     * @return The stream of C1 subclass C2 axioms, C1 and C2 classes in the
+     *         signature of this ontology, entailed by this ontology.
+     */
+    public Stream<OWLSubClassOfAxiom> inferredTaxonomyAxioms() {
+        return inferredSubsumptionsOver(Utils.toSet(conceptsInSignature()));
+    }
+
+    /**
+     * @param <T>
+     *            The set element type.
+     * @param a
+     *            The first set.
+     * @param b
+     *            The second set.
+     * @return double between 0 and 1. > 0.5 if {@code a} contains more information.
+     *         < 0.5 if {@code b} contains more information.
+     */
+    public static <T> double relativeInformationContent(Set<T> a, Set<T> b) {
+        var onlyA = a.stream().filter(ax -> !b.contains(ax)).count();
+        var onlyB = b.stream().filter(ax -> !a.contains(ax)).count();
+        if (onlyB == 0 && onlyA == 0) {
+            return 0.5;
+        } else {
+            return ((double) onlyA) / ((double) onlyA + (double) onlyB);
+        }
     }
 
     /**
@@ -1162,15 +1194,8 @@ public class Ontology implements AutoCloseable {
      *         the other ontology.
      */
     public double iicWithRespectTo(Ontology other) {
-        var inferredThis = Utils.toSet(inferredTaxonomyAxioms());
-        var inferredOther = Utils.toSet(other.inferredTaxonomyAxioms());
-        var onlyThis = inferredThis.stream().filter(ax -> !inferredOther.contains(ax)).count();
-        var onlyOther = inferredOther.stream().filter(ax -> !inferredThis.contains(ax)).count();
-        if (onlyOther == 0 && onlyThis == 0) {
-            return 0.5;
-        } else {
-            return ((double) onlyThis) / ((double) onlyThis + (double) onlyOther);
-        }
+        return relativeInformationContent(Utils.toSet(inferredTaxonomyAxioms()),
+                Utils.toSet(other.inferredTaxonomyAxioms()));
     }
 
     /**
@@ -1185,6 +1210,20 @@ public class Ontology implements AutoCloseable {
                 var newAxiom = df.getOWLDeclarationAxiom(entity);
                 if (!staticAxioms.contains(newAxiom) && !refutableAxioms.contains(newAxiom)) {
                     staticAxioms.add(newAxiom);
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove all declaration axioms that are otherwise not in the signature.
+     */
+    public void cleanUnnecessaryDeclarationAxioms() {
+        var needed = Utils.toSet(logicalAxioms().flatMap(ax -> ax.signature()));
+        for (var ax : Utils.toList(axioms(AxiomType.DECLARATION))) {
+            if (ax instanceof OWLDeclarationAxiom axiom) {
+                if (!needed.contains(axiom.getEntity())) {
+                    removeAxioms(ax);
                 }
             }
         }

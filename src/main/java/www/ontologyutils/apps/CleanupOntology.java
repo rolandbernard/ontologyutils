@@ -13,6 +13,7 @@ import www.ontologyutils.toolbox.*;
 public class CleanupOntology extends App {
     private String inputFile;
     private String outputFile = null;
+    private boolean normalize = false;
 
     @Override
     protected List<Option<?>> appOptions() {
@@ -30,6 +31,8 @@ public class CleanupOntology extends App {
             }
             outputFile = file.toString();
         }, "the file to write the result to"));
+        options.add(OptionType.FLAG.create('n', "normalize", b -> normalize = true,
+                "normalize the ontology beforehand"));
         return options;
     }
 
@@ -52,11 +55,14 @@ public class CleanupOntology extends App {
                 }
             }
         }
-        System.err.println("Cleaned. (" + newOntology.logicalAxioms().count() + " axioms)");
-        var normalize = new SroiqNormalization(true, false);
-        normalize.apply(newOntology);
-        System.err.println("Normalized. (" + newOntology.logicalAxioms().count() + " axioms)");
+        newOntology.cleanUnnecessaryDeclarationAxioms();
         newOntology.generateDeclarationAxioms();
+        System.err.println("Cleaned. (" + newOntology.logicalAxioms().count() + " axioms)");
+        if (normalize) {
+            var normalize = new SroiqNormalization(true, false);
+            normalize.apply(newOntology);
+            System.err.println("Normalized. (" + newOntology.logicalAxioms().count() + " axioms)");
+        }
         if (outputFile == null) {
             outputFile = inputFile;
         }
