@@ -108,7 +108,7 @@ public abstract class RepairApp extends App {
             normalization.apply(ontology);
         }
         if (normalizeSroiq) {
-            var normalization = new SroiqNormalization(true, true);
+            var normalization = new SroiqNormalization(true, false);
             System.err.println("Normalizing to SROIQ...");
             normalization.apply(ontology);
         }

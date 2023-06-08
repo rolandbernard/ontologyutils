@@ -60,6 +60,7 @@ public class EvaluateRepairs extends App {
         var inferred = new HashMap<String, Set<OWLAxiom>>();
         for (var file : inputFiles) {
             try (var ontology = Ontology.loadOntology(file, reasonerFactory)) {
+                assert ontology.isConsistent();
                 inferred.put(file, Utils.toSet(ontology.inferredSubsumptionsOver(subConcepts)));
             }
         }

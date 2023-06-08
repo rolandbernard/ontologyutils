@@ -95,6 +95,25 @@ public class Covers {
         }
     }
 
+    private static class CachedKeyComparator<K, V extends Comparable<V>> implements Comparator<K> {
+        private Function<K, V> keyFunction;
+        private Map<K, V> cached;
+        private boolean ascending;
+
+        public CachedKeyComparator(Function<K, V> keyFunction, boolean ascending) {
+            this.keyFunction = keyFunction;
+            this.ascending = ascending;
+            this.cached = new HashMap<>();
+        }
+
+        @Override
+        public int compare(K arg0, K arg1) {
+            var cmp = cached.computeIfAbsent(arg0, keyFunction)
+                    .compareTo(cached.computeIfAbsent(arg1, keyFunction));
+            return ascending ? cmp : -cmp;
+        }
+    }
+
     private OWLDataFactory df;
     private Ontology refOntology;
     private Set<OWLClassExpression> subConcepts;
@@ -221,7 +240,11 @@ public class Covers {
                     isSubClass.knownStrictPredecessors(candidate).stream()
                             .filter(other -> subConcepts.contains(other)),
                     isSubClass.possibleStrictPredecessors(candidate).stream()
+                            .sorted(new CachedKeyComparator<>(
+                                    other -> isSubClass.possibleInformationGain(other, candidate), false))
                             .filter(other -> subConcepts.contains(other) && isStrictSubClass(other, candidate)))
+                    .sorted(new CachedKeyComparator<>(
+                            other -> isSubClass.possibleInformationGain(concept, other), false))
                     .anyMatch(other -> isStrictSubClass(concept, other));
         } else {
             return !subConcepts.stream()
@@ -256,7 +279,11 @@ public class Covers {
                     isSubClass.knownStrictSuccessors(candidate).stream()
                             .filter(other -> subConcepts.contains(other)),
                     isSubClass.possibleStrictSuccessors(candidate).stream()
+                            .sorted(new CachedKeyComparator<>(
+                                    other -> isSubClass.possibleInformationGain(candidate, other), false))
                             .filter(other -> subConcepts.contains(other) && isStrictSubClass(candidate, other)))
+                    .sorted(new CachedKeyComparator<>(
+                            other -> isSubClass.possibleInformationGain(other, concept), false))
                     .anyMatch(other -> isStrictSubClass(other, concept));
         } else {
             return !subConcepts.stream()
@@ -305,8 +332,12 @@ public class Covers {
                     isSubRole.knownStrictPredecessors(candidate).stream()
                             .filter(other -> roles.contains(other)),
                     isSubRole.possibleStrictPredecessors(candidate).stream()
+                            .sorted(new CachedKeyComparator<>(
+                                    other -> isSubRole.possibleInformationGain(other, candidate), false))
                             .filter(other -> roles.contains(other)
                                     && isStrictSubRole(other, candidate)))
+                    .sorted(new CachedKeyComparator<>(
+                            other -> isSubRole.possibleInformationGain(role, other), false))
                     .anyMatch(other -> isStrictSubRole(role, other));
         } else {
             return !roles.stream()
@@ -345,8 +376,12 @@ public class Covers {
                     isSubRole.knownStrictSuccessors(candidate).stream()
                             .filter(other -> roles.contains(other)),
                     isSubRole.possibleStrictSuccessors(candidate).stream()
+                            .sorted(new CachedKeyComparator<>(
+                                    other -> isSubRole.possibleInformationGain(candidate, other), false))
                             .filter(other -> roles.contains(other)
                                     && isStrictSubRole(candidate, other)))
+                    .sorted(new CachedKeyComparator<>(
+                            other -> isSubRole.possibleInformationGain(other, role), false))
                     .anyMatch(other -> isStrictSubRole(other, role));
         } else {
             return !roles.stream()

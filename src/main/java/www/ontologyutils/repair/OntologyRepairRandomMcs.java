@@ -31,8 +31,8 @@ public class OntologyRepairRandomMcs extends OntologyRepair {
          */
         ONE_MCS,
         /**
-         * Compute an infinite set by sampling subsets. Only usable with the multiple
-         * repairs methods, as it will never terminate.
+         * Compute an infinite sequence by sampling subsets. Only usable with the
+         * multiple repairs methods, as it will never terminate.
          */
         SAMPLE_MCS,
     }

@@ -32,6 +32,10 @@ public class Ontology implements AutoCloseable {
      * This is only here for statistics
      */
     public static int reasonerCalls;
+    /**
+     * Set this to true if you want to add axioms reflecting the original axioms,
+     * before replacement.
+     */
     public static boolean originAnnotation = false;
 
     private static class ReasonerCache {
@@ -52,6 +56,13 @@ public class Ontology implements AutoCloseable {
             this.references = new HashSet<>();
             this.unusedReasoners = new ArrayDeque<>();
             this.lastOntologies = new IdentityHashMap<>();
+        }
+
+        /**
+         * @returns The set of ontologies referencing this cache.
+         */
+        public synchronized Set<Ontology> getReferences() {
+            return Set.copyOf(references);
         }
 
         /**
@@ -166,7 +177,7 @@ public class Ontology implements AutoCloseable {
                 reasoner.dispose();
                 reasoner = null;
                 return withReasonerDo(ontology, action);
-            } catch (Exception ex) {
+            } catch (Exception | OutOfMemoryError ex) {
                 // Reusing the reasoner after an exception is not a good idea.
                 reasoner.dispose();
                 reasoner = null;
@@ -1154,6 +1165,7 @@ public class Ontology implements AutoCloseable {
     public Stream<OWLSubClassOfAxiom> inferredSubsumptionsOver(Set<OWLClassExpression> concepts) {
         var df = getDefaultDataFactory();
         var cache = new SubClassCache();
+        cache.precomputeFor(concepts, this::isSubClass);
         return concepts.stream().flatMap(subClass -> concepts.stream()
                 .filter(superClass -> cache.computeIfAbsent(subClass, superClass, this::isSubClass))
                 .map(superClass -> df.getOWLSubClassOfAxiom(subClass, superClass)));
@@ -1376,6 +1388,21 @@ public class Ontology implements AutoCloseable {
     public void close() {
         if (reasonerCache != null) {
             reasonerCache.removeReference(this);
+            reasonerCache = null;
+        }
+    }
+
+    /**
+     * Close this ontology, and all ontologies that share a cache with this
+     * ontology.
+     */
+    public void closeAll() {
+        if (reasonerCache != null) {
+            synchronized (reasonerCache) {
+                for (var onto : reasonerCache.getReferences()) {
+                    onto.close();
+                }
+            }
             reasonerCache = null;
         }
     }

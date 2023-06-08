@@ -284,13 +284,14 @@ public class OntologyRepairWeakening extends OntologyRepair {
     public Stream<Ontology> multiple(Ontology ontology) {
         // Optimized version that reuses the cached reasoners and axiom weakeners.
         var weakeners = new HashMap<Set<OWLAxiom>, AxiomWeakener>();
+        var refOntologyBase = ontology.cloneWithSeparateCache();
         return Stream.generate(() -> {
             try {
                 var refAxioms = Utils.randomChoice(getRefAxioms(ontology));
                 AxiomWeakener axiomWeakener;
                 synchronized (weakeners) {
                     axiomWeakener = weakeners.computeIfAbsent(refAxioms,
-                            ax -> getWeakener(ontology.cloneWithRefutable(ax).withSeparateCache(), ontology));
+                            ax -> getWeakener(refOntologyBase.cloneWithRefutable(ax), ontology));
                 }
                 var copy = ontology.clone();
                 while (!isRepaired(copy)) {
@@ -306,10 +307,15 @@ public class OntologyRepairWeakening extends OntologyRepair {
                 }
                 infoMessage("Found repair.");
                 return copy;
+            } catch (OutOfMemoryError e) {
+                weakeners.clear();
+                return null;
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
-        }).filter(onto -> onto != null);
+        }).filter(onto -> onto != null).onClose(() -> {
+            refOntologyBase.closeAll();
+        });
     }
 }
