@@ -121,6 +121,7 @@ public abstract class RepairApp extends App {
             var i = new int[1];
             if (limit == 0) {
                 repair.apply(ontology);
+                saveResult(ontology, 0);
             } else {
                 try (var stream = repair.multiple(ontology)) {
                     stream.limit(limit).forEach(onto -> {
