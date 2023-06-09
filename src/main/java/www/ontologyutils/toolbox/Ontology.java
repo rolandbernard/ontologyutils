@@ -1165,7 +1165,6 @@ public class Ontology implements AutoCloseable {
     public Stream<OWLSubClassOfAxiom> inferredSubsumptionsOver(Set<OWLClassExpression> concepts) {
         var df = getDefaultDataFactory();
         var cache = new SubClassCache();
-        cache.precomputeFor(concepts, this::isSubClass);
         return concepts.stream().flatMap(subClass -> concepts.stream()
                 .filter(superClass -> cache.computeIfAbsent(subClass, superClass, this::isSubClass))
                 .map(superClass -> df.getOWLSubClassOfAxiom(subClass, superClass)));

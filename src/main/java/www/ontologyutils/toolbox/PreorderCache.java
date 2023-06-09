@@ -129,46 +129,6 @@ public class PreorderCache<T> {
     }
 
     /**
-     * Precompute the complete preorder for the given domain and relation.
-     *
-     * @param domain
-     *            The domain for which to compute the order.
-     * @param order
-     *            The relation to be computed.
-     */
-    public synchronized void precomputeFor(Collection<T> domain, BiPredicate<T, T> order) {
-        setupDomain(domain);
-        for (var pred : domain) {
-            List<T> possible = possibleSuccessors.get(pred).stream()
-                    .sorted(Comparator.<T>comparingInt(succ -> possibleInformationGain(pred, succ)))
-                    .toList();
-            for (var succ : possible) {
-                computeIfAbsent(pred, succ, order);
-            }
-        }
-    }
-
-    /**
-     * Very crude estimate of how much information can be gained from the given
-     * test, assuming it is not know already. The value return is not in any
-     * particular scale.
-     *
-     * @param pred
-     *            The possible predecessor.
-     * @param succ
-     *            The possible successor.
-     * @return A estimate on how valuable the information of this query would be.
-     */
-    public synchronized int possibleInformationGain(T pred, T succ) {
-        var ps = knownPredecessors.get(succ);
-        var ss = knownSuccessors.get(succ);
-        var pp = knownPredecessors.get(pred);
-        var sp = knownSuccessors.get(pred);
-        return (ps != null ? ps.size() : 0) + (ss != null ? ss.size() : 0)
-                + (pp != null ? pp.size() : 0) + (sp != null ? sp.size() : 0);
-    }
-
-    /**
      * @param pred
      *            The element for which to find successors.
      * @return A stream of all known successors of {@code pred}.
