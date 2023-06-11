@@ -28,7 +28,7 @@ public class RefinementOperatorTest {
         ontology = Ontology.loadOntology(path);
         var subConcepts = Utils.toSet(ontology.subConcepts());
         var simpleRoles = Utils.toSet(ontology.simpleRoles());
-        covers = new Covers(ontology, subConcepts, simpleRoles, simpleRoles, false);
+        covers = new Covers(ontology, subConcepts, simpleRoles, simpleRoles, 0);
         var upCover = covers.upCover().cached();
         var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);

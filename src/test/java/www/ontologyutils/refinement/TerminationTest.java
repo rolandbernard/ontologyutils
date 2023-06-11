@@ -28,7 +28,7 @@ public class TerminationTest {
         var subConcepts = Utils.toSet(ontology.subConcepts());
         var subRoles = Utils.toSet(ontology.subRoles());
         var simpleRoles = Utils.toSet(ontology.simpleRoles());
-        covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
+        covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, 0);
         var upCover = covers.upCover().cached();
         var downCover = covers.downCover().cached();
         generalization = new RefinementOperator(upCover, downCover);

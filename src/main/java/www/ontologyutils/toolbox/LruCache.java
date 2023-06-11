@@ -1,6 +1,7 @@
 package www.ontologyutils.toolbox;
 
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -11,6 +12,11 @@ import java.util.stream.Stream;
  * overwritten to specify a maximal cache size.
  */
 public class LruCache<K, V> extends LinkedHashMap<K, V> {
+    private static record Tuple<K1,K2>(
+    K1 first, K2 second)
+    {
+    }
+
     /**
      * Maximum number of entries to keep in the cache.
      */
@@ -63,7 +69,25 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
      * @return The wrapped function.
      */
     public static <K, V> Function<K, V> wrapFunction(Function<K, V> function) {
-        return wrapFunction(function, 4096);
+        return wrapFunction(function, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Wrap the given function {@code function} using a {@code LruCache} with some
+     * unspecified maximum size.
+     *
+     * @param <K>
+     *            The domain of the function.
+     * @param <V>
+     *            The range of the function.
+     * @param function
+     *            The function to wrap.
+     * @return The wrapped function.
+     */
+    public static <K1, K2> BiPredicate<K1, K2> wrapFunction(BiPredicate<K1, K2> function) {
+        var cached = LruCache.<Tuple<K1, K2>, Boolean>wrapFunction(t -> function.test(t.first, t.second),
+                Integer.MAX_VALUE);
+        return (a, b) -> cached.apply(new Tuple<>(a, b));
     }
 
     /**

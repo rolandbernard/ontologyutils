@@ -49,6 +49,9 @@ public class MakeInconsistent extends App {
         options.add(OptionType.FLAG.create("uncached", b -> {
             strengtheningFlags |= AxiomStrengthener.FLAG_UNCACHED;
         }, "do not use any caches for the covers"));
+        options.add(OptionType.FLAG.create("basic-cache", b -> {
+            strengtheningFlags |= AxiomStrengthener.FLAG_BASIC_CACHED;
+        }, "use only a basic cache"));
         options.add(OptionType.FLAG.create("strict-sroiq", b -> {
             strengtheningFlags |= AxiomStrengthener.FLAG_SROIQ_STRICT;
         }, "accept and produce only SROIQ axioms"));

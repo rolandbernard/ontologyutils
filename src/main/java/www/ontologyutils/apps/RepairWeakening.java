@@ -61,6 +61,9 @@ public class RepairWeakening extends RepairApp {
         options.add(OptionType.FLAG.create("uncached", b -> {
             weakeningFlags |= AxiomWeakener.FLAG_UNCACHED;
         }, "do not use any caches for the covers"));
+        options.add(OptionType.FLAG.create("basic-cache", b -> {
+            weakeningFlags |= AxiomWeakener.FLAG_BASIC_CACHED;
+        }, "use only a basic cache"));
         options.add(OptionType.FLAG.create("strict-owl2", b -> {
             weakeningFlags |= AxiomWeakener.FLAG_OWL2_SET_OPERANDS;
         }, "do not produce intersection and union with a single operand"));

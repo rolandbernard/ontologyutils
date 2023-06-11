@@ -104,18 +104,21 @@ public class CachedWeakenerTest {
             var subConcepts = Utils.toSet(ontology.subConcepts());
             var subRoles = Utils.toSet(ontology.subRoles());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
-            var cached = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
-            var uncached = new Covers(ontology, subConcepts, subRoles, simpleRoles, true);
+            var cached = new Covers(ontology, subConcepts, subRoles, simpleRoles, 0);
+            var basicCache = new Covers(ontology, subConcepts, subRoles, simpleRoles, AxiomWeakener.FLAG_BASIC_CACHED);
+            var uncached = new Covers(ontology, subConcepts, subRoles, simpleRoles, AxiomWeakener.FLAG_UNCACHED);
             ontology.subConcepts().forEach(concept -> {
                 assertEquals(Utils.toSet(uncached.upCover(concept)), Utils.toSet(cached.upCover(concept)));
                 assertEquals(Utils.toSet(uncached.downCover(concept)), Utils.toSet(cached.downCover(concept)));
             });
             ontology.rolesInSignature().forEach(role -> {
                 for (var simple : List.of(true, false)) {
-                    assertEquals(Utils.toSet(uncached.upCover(role, simple)),
-                            Utils.toSet(cached.upCover(role, simple)));
-                    assertEquals(Utils.toSet(uncached.downCover(role, simple)),
-                            Utils.toSet(cached.downCover(role, simple)));
+                    var up = Utils.toSet(uncached.upCover(role, simple));
+                    var down = Utils.toSet(uncached.downCover(role, simple));
+                    assertEquals(up, Utils.toSet(cached.upCover(role, simple)));
+                    assertEquals(down, Utils.toSet(cached.downCover(role, simple)));
+                    assertEquals(up, Utils.toSet(basicCache.upCover(role, simple)));
+                    assertEquals(down, Utils.toSet(basicCache.downCover(role, simple)));
                 }
             });
         }

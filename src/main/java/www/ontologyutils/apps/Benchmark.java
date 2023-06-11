@@ -39,7 +39,7 @@ public class Benchmark extends App {
             var subRoles = Utils.toSet(ontology.subRoles());
             var simpleRoles = Utils.toSet(ontology.simpleRoles());
             if (ontology.isConsistent()) {
-                var covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, false);
+                var covers = new Covers(ontology, subConcepts, subRoles, simpleRoles, 0);
                 var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
                 for (int j = 0; j < 10; j++) {
                     OWLClassExpression toRefine = Ontology.getDefaultDataFactory().getOWLNothing();
@@ -50,7 +50,7 @@ public class Benchmark extends App {
             } else {
                 var mcs = Utils.randomChoice(ontology.someMaximalConsistentSubsets(Ontology::isConsistent));
                 var refOnto = ontology.cloneWithRefutable(mcs);
-                var covers = new Covers(refOnto, subConcepts, subRoles, simpleRoles, false);
+                var covers = new Covers(refOnto, subConcepts, subRoles, simpleRoles, 0);
                 var refinement = new RefinementOperator(covers.upCover().cached(), covers.downCover().cached());
                 for (int j = 0; j < 10; j++) {
                     var badAxioms = ontology.someMinimalUnsatisfiableSubsets(Ontology::isConsistent)
