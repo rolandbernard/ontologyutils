@@ -93,6 +93,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
     private RefOntologyStrategy refOntologySource;
     private BadAxiomStrategy badAxiomSource;
     private int weakeningFlags;
+    private boolean enhanceRef;
 
     /**
      * @param isRepaired
@@ -103,13 +104,17 @@ public class OntologyRepairWeakening extends OntologyRepair {
      *            The strategy for computing bad axioms.
      * @param weakeningFlags
      *            The flags to use for weakening
+     * @param enhanceRef
+     *            Use the reference ontology as a base ontology that is always
+     *            included in the repair.
      */
     public OntologyRepairWeakening(Predicate<Ontology> isRepaired, RefOntologyStrategy refOntologySource,
-            BadAxiomStrategy badAxiomSource, int weakeningFlags) {
+            BadAxiomStrategy badAxiomSource, int weakeningFlags, boolean enhanceRef) {
         super(isRepaired);
         this.refOntologySource = refOntologySource;
         this.badAxiomSource = badAxiomSource;
         this.weakeningFlags = weakeningFlags;
+        this.enhanceRef = enhanceRef;
     }
 
     /**
@@ -117,7 +122,7 @@ public class OntologyRepairWeakening extends OntologyRepair {
      *            The monotone predicate testing whether an ontology is repaired.
      */
     public OntologyRepairWeakening(Predicate<Ontology> isRepaired) {
-        this(isRepaired, RefOntologyStrategy.ONE_MCS, BadAxiomStrategy.IN_SOME_MUS, AxiomWeakener.FLAG_DEFAULT);
+        this(isRepaired, RefOntologyStrategy.ONE_MCS, BadAxiomStrategy.IN_SOME_MUS, AxiomWeakener.FLAG_DEFAULT, true);
     }
 
     /**
@@ -264,6 +269,9 @@ public class OntologyRepairWeakening extends OntologyRepair {
     public void repair(Ontology ontology) {
         var refAxioms = Utils.randomChoice(getRefAxioms(ontology));
         infoMessage("Selected a reference ontology with " + refAxioms.size() + " axioms.");
+        if (enhanceRef) {
+            ontology.addStaticAxioms(refAxioms);
+        }
         try (var refOntology = ontology.cloneWithRefutable(refAxioms).withSeparateCache()) {
             var axiomWeakener = getWeakener(refOntology, ontology);
             while (!isRepaired(ontology)) {
@@ -294,6 +302,9 @@ public class OntologyRepairWeakening extends OntologyRepair {
                             ax -> getWeakener(refOntologyBase.cloneWithRefutable(ax), ontology));
                 }
                 var copy = ontology.clone();
+                if (enhanceRef) {
+                    copy.addStaticAxioms(refAxioms);
+                }
                 while (!isRepaired(copy)) {
                     var badAxioms = Utils.toList(findBadAxioms(copy));
                     infoMessage("Found " + badAxioms.size() + " possible bad axioms.");

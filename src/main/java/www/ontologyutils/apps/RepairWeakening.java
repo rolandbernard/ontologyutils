@@ -15,6 +15,7 @@ public class RepairWeakening extends RepairApp {
     private RefOntologyStrategy refOntologyStrategy = RefOntologyStrategy.ONE_MCS;
     private BadAxiomStrategy badAxiomStrategy = BadAxiomStrategy.IN_SOME_MUS;
     private int weakeningFlags = AxiomWeakener.FLAG_DEFAULT;
+    private boolean enhanceRef = false;
 
     @Override
     protected List<Option<?>> appOptions() {
@@ -73,6 +74,9 @@ public class RepairWeakening extends RepairApp {
         options.add(OptionType.FLAG.create("no-role-refinement", b -> {
             weakeningFlags |= AxiomWeakener.FLAG_NO_ROLE_REFINEMENT;
         }, "do not refine roles in any context"));
+        options.add(OptionType.FLAG.create("enhance-ref", b -> {
+            enhanceRef = true;
+        }, "keep the reference ontology as static axioms in the output"));
         options.add(OptionType.options(
                 Map.of("troquard2018", 2018,
                         "confalonieri2020", 2020,
@@ -105,7 +109,7 @@ public class RepairWeakening extends RepairApp {
     @Override
     protected OntologyRepair getRepair() {
         return new OntologyRepairWeakening(coherence ? Ontology::isCoherent : Ontology::isConsistent,
-                refOntologyStrategy, badAxiomStrategy, weakeningFlags);
+                refOntologyStrategy, badAxiomStrategy, weakeningFlags, enhanceRef);
     }
 
     /**

@@ -11,12 +11,12 @@ public class OntologyRepairWeakeningFastTest extends OntologyRepairTest {
     @Override
     protected OntologyRepair getRepairForConsistency() {
         return new OntologyRepairWeakening(Ontology::isConsistent, RefOntologyStrategy.ONE_MCS,
-                BadAxiomStrategy.IN_ONE_MUS, AxiomWeakener.FLAG_DEFAULT);
+                BadAxiomStrategy.IN_ONE_MUS, AxiomWeakener.FLAG_DEFAULT, true);
     }
 
     @Override
     protected OntologyRepair getRepairForCoherence() {
         return new OntologyRepairWeakening(Ontology::isCoherent, RefOntologyStrategy.ONE_MCS,
-                BadAxiomStrategy.IN_ONE_MUS, AxiomWeakener.FLAG_DEFAULT);
+                BadAxiomStrategy.IN_ONE_MUS, AxiomWeakener.FLAG_DEFAULT, true);
     }
 }
