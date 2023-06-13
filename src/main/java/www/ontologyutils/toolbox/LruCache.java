@@ -76,10 +76,10 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
      * Wrap the given function {@code function} using a {@code LruCache} with some
      * unspecified maximum size.
      *
-     * @param <K>
-     *            The domain of the function.
-     * @param <V>
-     *            The range of the function.
+     * @param <K1>
+     *            The first key.
+     * @param <K2>
+     *            The second key.
      * @param function
      *            The function to wrap.
      * @return The wrapped function.

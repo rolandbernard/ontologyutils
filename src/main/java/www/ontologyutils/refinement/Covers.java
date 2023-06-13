@@ -126,8 +126,8 @@ public class Covers {
      * @param simpleRoles
      *            Return only roles that are in this set if asked for simple roles
      *            covers.
-     * @param uncached
-     *            If true, no subclass relation cache will be created.
+     * @param flags
+     *            Flags configuring behavior.
      */
     public Covers(Ontology refOntology, Set<OWLClassExpression> subConcepts, Set<OWLObjectPropertyExpression> subRoles,
             Set<OWLObjectPropertyExpression> simpleRoles, int flags) {

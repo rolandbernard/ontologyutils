@@ -3,7 +3,8 @@ package www.ontologyutils.repair;
 import org.junit.jupiter.api.parallel.*;
 
 import www.ontologyutils.refinement.AxiomWeakener;
-import www.ontologyutils.repair.OntologyRepairWeakening.*;
+import www.ontologyutils.repair.OntologyRepairWeakening.RefOntologyStrategy;
+import www.ontologyutils.repair.OntologyRepairRemoval.BadAxiomStrategy;
 import www.ontologyutils.toolbox.Ontology;
 
 @Execution(ExecutionMode.CONCURRENT)

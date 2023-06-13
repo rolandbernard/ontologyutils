@@ -110,9 +110,8 @@ public abstract class OntologyRepair implements OntologyModification {
      * @param ontology
      *            The ontology to repair.
      * @return A stream of the repairs.
-     * @throws IllegalArgumentException
      */
-    public Stream<Ontology> multiple(Ontology ontology) throws IllegalArgumentException {
+    public Stream<Ontology> multiple(Ontology ontology) {
         return Stream.generate(() -> modified(ontology));
     }
 }
