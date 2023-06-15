@@ -1,8 +1,7 @@
 package www.ontologyutils.toolbox;
 
 import java.util.*;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 /**
