@@ -116,7 +116,7 @@ public class RepairWeakening extends RepairApp {
     /**
      * One argument must be given, corresponding to an OWL ontology file path. E.g.,
      * run with the parameter
-     * src/test/resources/www/ontologyutils/inconsistent-leftpolicies.owl
+     * src/test/resources/inconsistent/leftpolicies.owl
      *
      * @param args
      *            Must contain one or two argument representing the keyword "fast"
