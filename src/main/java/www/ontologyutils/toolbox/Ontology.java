@@ -849,6 +849,20 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @param subRole
+     *            The possible sub role.
+     * @param superRole
+     *            The possible super role.
+     * @return true if the extension of {@code subRole} is a subset of the
+     *         extension of {@code superRole} in every model of the ontology, false
+     *         otherwise.
+     */
+    public boolean isSubRole(OWLObjectPropertyExpression subRole, OWLObjectPropertyExpression superRole) {
+        var df = getDefaultDataFactory();
+        return withReasonerDo(reasoner -> reasoner.isEntailed(df.getOWLSubObjectPropertyOfAxiom(subRole, superRole)));
+    }
+
+    /**
      * @return The list of profile reports for all OWL 2 profiles.
      */
     public List<OWLProfileReport> checkOwlProfiles() {
@@ -1169,11 +1183,10 @@ public class Ontology implements AutoCloseable {
 
     /**
      * @param concepts
-     *            The concepts over which to build the
-     * @return The stream of C1 subclass C2 axioms, C1 and C2 subconcepts in of this
-     *         ontology, entailed by this ontology.
+     *            The concepts over which to build the axioms
+     * @return The stream of C1 subclass C2 axioms, entailed by this ontology.
      */
-    public Stream<OWLSubClassOfAxiom> inferredSubsumptionsOver(Set<OWLClassExpression> concepts) {
+    public Stream<OWLSubClassOfAxiom> inferredSubClassAxiomsOver(Set<OWLClassExpression> concepts) {
         var df = getDefaultDataFactory();
         var cache = new SubClassCache(concepts);
         return concepts.stream().flatMap(subClass -> concepts.stream()
@@ -1182,11 +1195,24 @@ public class Ontology implements AutoCloseable {
     }
 
     /**
+     * @param roles
+     *            The roles over which to build the axioms
+     * @return The stream of r1 subrole r2 axioms, entailed by this ontology.
+     */
+    public Stream<OWLSubObjectPropertyOfAxiom> inferredSubRoleAxiomsOver(Set<OWLObjectPropertyExpression> roles) {
+        var df = getDefaultDataFactory();
+        var cache = new SubRoleCache(roles);
+        return roles.stream().flatMap(subRole -> roles.stream()
+                .filter(superRole -> cache.computeIfAbsent(subRole, superRole, this::isSubRole))
+                .map(superRole -> df.getOWLSubObjectPropertyOfAxiom(subRole, superRole)));
+    }
+
+    /**
      * @return The stream of C1 subclass C2 axioms, C1 and C2 classes in the
      *         signature of this ontology, entailed by this ontology.
      */
     public Stream<OWLSubClassOfAxiom> inferredTaxonomyAxioms() {
-        return inferredSubsumptionsOver(Utils.toSet(conceptsInSignature()));
+        return inferredSubClassAxiomsOver(Utils.toSet(conceptsInSignature()));
     }
 
     /**

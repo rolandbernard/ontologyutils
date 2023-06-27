@@ -1,6 +1,7 @@
 package www.ontologyutils.apps;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import org.semanticweb.HermiT.ReasonerFactory;
 import org.semanticweb.owlapi.model.*;
@@ -46,12 +47,14 @@ public class EvaluateRepairs extends App {
         var startTime = System.nanoTime();
         var df = Ontology.getDefaultDataFactory();
         var subConcepts = new HashSet<OWLClassExpression>();
+        var subRoles = new HashSet<OWLObjectPropertyExpression>();
         subConcepts.add(df.getOWLThing());
         subConcepts.add(df.getOWLNothing());
         for (var file : inputFiles) {
             try (var ontology = Ontology.loadOntology(file, reasonerFactory)) {
                 if (extended) {
                     subConcepts.addAll(Utils.toList(ontology.subConcepts()));
+                    subRoles.addAll(Utils.toList(ontology.subRoles()));
                 } else {
                     subConcepts.addAll(Utils.toList(ontology.conceptsInSignature()));
                 }
@@ -61,7 +64,9 @@ public class EvaluateRepairs extends App {
         for (var file : inputFiles) {
             try (var ontology = Ontology.loadOntology(file, reasonerFactory)) {
                 assert ontology.isConsistent();
-                inferred.put(file, Utils.toSet(ontology.inferredSubsumptionsOver(subConcepts)));
+                inferred.put(file, Utils.toSet(Stream.concat(
+                        ontology.inferredSubClassAxiomsOver(subConcepts),
+                        ontology.inferredSubRoleAxiomsOver(subRoles))));
             }
         }
         if (iicPairs) {

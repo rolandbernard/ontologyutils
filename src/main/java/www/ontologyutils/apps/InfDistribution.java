@@ -30,11 +30,11 @@ public class InfDistribution extends App {
     public void run() {
         Ontology ontology = Ontology.loadOntology(inputFile);
         var concepts = Utils.toSet(ontology.conceptsInSignature().map(c -> (OWLClassExpression) c));
-        var initial = Utils.toSet(ontology.inferredSubsumptionsOver(concepts));
+        var initial = Utils.toSet(ontology.inferredSubClassAxiomsOver(concepts));
         ontology.logicalAxioms().forEach(axiom -> {
             try (var copy = ontology.clone()) {
                 copy.removeAxioms(axiom);
-                var without = Utils.toSet(copy.inferredSubsumptionsOver(concepts));
+                var without = Utils.toSet(copy.inferredSubClassAxiomsOver(concepts));
                 System.out
                         .println((initial.size() - without.size()) + ";" + (without.size() / (double) initial.size()));
             }

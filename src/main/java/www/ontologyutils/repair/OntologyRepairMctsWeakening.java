@@ -85,6 +85,8 @@ public class OntologyRepairMctsWeakening extends OntologyRepairBestOfKWeakening 
      *            The strategy for computing bad axioms.
      * @param weakeningFlags
      *            The flags to use for weakening.
+     * @param enhanceRef
+     *            Do not weaken any of the axioms in the reference ontology.
      * @param quality
      *            Function for evaluating the quality of a repair.
      * @param numberOfRounds

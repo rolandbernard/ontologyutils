@@ -53,6 +53,11 @@ public class OntologyRepairWeakening extends OntologyRepairRemoval {
 
     private RefOntologyStrategy refOntologySource;
     private int weakeningFlags;
+    /**
+     * If true, retain all axioms in the reference ontology unchanged in the
+     * generated repairs. That is, take a reference ontology and enhance it by
+     * adding more data using axiom weakening.
+     */
     protected boolean enhanceRef;
 
     /**

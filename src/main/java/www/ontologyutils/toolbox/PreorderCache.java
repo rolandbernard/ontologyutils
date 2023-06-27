@@ -88,26 +88,22 @@ public class PreorderCache<T> {
                 }
             }
             for (var succ2 : Utils.toArray(possibleSuccessors.get(succ))) {
-                if (possibleSuccessors.get(succ).contains(succ2)) {
-                    for (var succ3 : Utils.toArray(knownSuccessors.get(succ2))) {
-                        if (!possibleSuccessors.get(pred).contains(succ3)
-                                && !knownSuccessors.get(pred).contains(succ3)) {
-                            possibleSuccessors.get(succ).remove(succ2);
-                            possiblePredecessors.get(succ2).remove(succ);
-                            break;
-                        }
+                for (var succ3 : Utils.toArray(knownSuccessors.get(succ2))) {
+                    if (!possibleSuccessors.get(pred).contains(succ3)
+                            && !knownSuccessors.get(pred).contains(succ3)) {
+                        possibleSuccessors.get(succ).remove(succ2);
+                        possiblePredecessors.get(succ2).remove(succ);
+                        break;
                     }
                 }
             }
             for (var pred2 : Utils.toArray(possiblePredecessors.get(pred))) {
-                if (possibleSuccessors.get(pred2).contains(pred)) {
-                    for (var pred3 : Utils.toArray(knownPredecessors.get(pred2))) {
-                        if (!possibleSuccessors.get(pred3).contains(succ)
-                                && !knownSuccessors.get(pred3).contains(succ)) {
-                            possibleSuccessors.get(pred2).remove(pred);
-                            possiblePredecessors.get(pred).remove(pred2);
-                            break;
-                        }
+                for (var pred3 : Utils.toArray(knownPredecessors.get(pred2))) {
+                    if (!possibleSuccessors.get(pred3).contains(succ)
+                            && !knownSuccessors.get(pred3).contains(succ)) {
+                        possibleSuccessors.get(pred2).remove(pred);
+                        possiblePredecessors.get(pred).remove(pred2);
+                        break;
                     }
                 }
             }
